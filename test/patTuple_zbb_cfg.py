@@ -31,7 +31,7 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
                             triggerConditions = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1",
                                                             "HLT_Ele10_LW_L1R","HLT_Ele10_SW_L1R","HLT_Ele15_LW_L1R","HLT_Ele15_SW_L1R"
-                                                            ),    #HLT_Ele10_SW_L1R for TTJets sample           #changer HLT pour 2010B "HLT_Mu15_v1"
+                                                            ),    #HLT_Ele10_SW_L1R for TTJets sample    
                             hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                             l1tResults = cms.InputTag( "gtDigis" ),
                             l1tIgnoreMask = cms.bool( False ),
