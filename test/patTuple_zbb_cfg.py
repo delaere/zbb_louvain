@@ -126,7 +126,11 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     #jetIdLabel   = "ak5"
                     )
 
-#selected Jets
+# selected Jets
+process.selectedPatJets.cut      = 'pt > 25. & abs(eta) < 2.4 '
+process.selectedPatJetsAK7PF.cut = 'pt > 25. & abs(eta) < 2.4 '
+
+# NOT selected Jets (beware, these are clean jets)
 process.selectedJetsAK5PF = process.cleanPatJets.clone(preselection =                                # cleanPatJets are the ak5PFJets
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.4 '
@@ -318,7 +322,7 @@ process.source.fileNames = [
     #"file:/home/fynu/arnaudp/scratch/Early_top_Analysis/101206/CMSSW_3_8_6_patch1/src/TopAnalysis/TopAnalysis/test/test_tt.root"
     ]                                     
 
-process.maxEvents.input = 1
+process.maxEvents.input = 1000
 
 #for local submission                                       
 # process.out.fileName = 'pat_leptons_cuts.root'
