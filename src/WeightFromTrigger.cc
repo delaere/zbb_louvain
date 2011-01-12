@@ -13,7 +13,7 @@
 //
 // Original Author:  Christophe Delaere,354 2-003,+41227674739,
 //         Created:  Sat Nov 20 15:25:22 CET 2010
-// $Id$
+// $Id: WeightFromTrigger.cc,v 1.1 2011/01/11 15:57:42 delaer Exp $
 //
 //
 
@@ -21,6 +21,7 @@
 // system include files
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -125,6 +126,7 @@ WeightFromTrigger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    std::pair<int,int> prescalepair;
    std::vector<bool>  triggerSubset;
    for(unsigned int itrig = 0; itrig < triggerNames_.size(); ++itrig) {
+    if(triggerIndices_[itrig]!=2048) {
      // check trigger response
      bit = hltTriggerResultHandle->accept(triggerIndices_[itrig]);
      triggerSubset.push_back(bit);
@@ -143,6 +145,10 @@ WeightFromTrigger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
          edm::LogError("MyAnalyzer") << " Unable to get prescale set from event. Check that L1 data products are present.";
        }
      }
+    } else {
+     // that trigger is presently not in the menu
+     triggerSubset.push_back(false);
+    }
    }
 
    // put the result in the event
@@ -172,7 +178,10 @@ WeightFromTrigger::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
    //HLT indices
    triggerIndices_.clear();
    for(unsigned int itrig = 0; itrig < triggerNames_.size(); ++itrig) {
-     triggerIndices_.push_back(hltConfig_.triggerIndex(triggerNames_[itrig]));
+     if(find(hlNames.begin(),hlNames.end(),triggerNames_[itrig])!=hlNames.end())
+       triggerIndices_.push_back(hltConfig_.triggerIndex(triggerNames_[itrig]));
+     else
+       triggerIndices_.push_back(2048);
    }
 
    // text (debug) output
