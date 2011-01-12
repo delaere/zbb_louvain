@@ -152,6 +152,12 @@ from PhysicsTools.PatAlgos.cleaningLayer1.electronCleaner_cfi import *
 
 #*************************************** Muons
 #*******************************************************
+# clean pat muons should be isolated for cleaning purpose
+process.cleanPatMuons.preselection = ('isGlobalMuon & isTrackerMuon & trackIso < 3')
+
+# aditional collection of muons with no cuts
+process.allMuons = process.cleanPatMuons.clone( preselection = 'pt > 5' )
+
 # clean muons for direct analysis
 process.looseMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
@@ -182,6 +188,7 @@ process.tightMuons = process.cleanPatMuons.clone(preselection =
                                                  #number of muon station >1 in the PAS
                                                  )
 
+
 process.Ztightloose = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("tightMuons@+ looseMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
@@ -210,6 +217,11 @@ process.patElectrons.electronIDSources = cms.PSet(
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.patElectrons)
 
+# clean pat Electrons should be isolated for cleaning purpose
+process.cleanPatElectrons.preselection = 'electronID("simpleEleId95relIso") == 7'
+
+# aditional collection of electrons with no cuts 
+process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' ) 
 
 # clean electrons for direct analysis
 process.isolatedElectrons = cleanPatElectrons.clone(preselection =
@@ -262,9 +274,11 @@ process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber
 # add user objects to patDefault
 process.patDefaultSequence *= process.looseMuons
 process.patDefaultSequence *= process.tightMuons
+process.patDefaultSequence *= process.allMuons
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
 process.patDefaultSequence *= process.isolatedElectrons
+process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.Zelel
 process.patDefaultSequence *= process.selectedJetsAK5PF
 #process.patDefaultSequence *= process.jet1
@@ -299,9 +313,11 @@ tokeep_clean  = [ #'keep *']
 
 tokeep_clean += ['keep *_isolatedMuons*_*_*',
                  'keep *_isolatedElectrons*_*_*',
+                 'keep *_allElectrons*_*_*',
                  
                  'keep *_looseMuons*_*_*',
                  'keep *_tightMuons*_*_*',
+                 'keep *_allMuons*_*_*',
                  'keep *_Z*_*_*',
                  'keep *_isolatedElectrons010*_*_*',
                  'keep *_jet1*_*_*',
