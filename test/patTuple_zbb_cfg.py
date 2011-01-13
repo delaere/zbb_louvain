@@ -1,16 +1,9 @@
 ## import skeleton process
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-# for the latest reprocessed samples
-#dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
-# dbs search --query="find dataset.tag where dataset like /Mu/Run2010B-DiLeptonMu-Dec22Skim_v2/RECO"
+# for the latest reprocessed samples. You can find it with:
+# dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
 process.GlobalTag.globaltag = cms.string('FT_R_39X_V4A::All')
-
-#dbs search --query="find dataset.tag where dataset like /TTJets_TuneD6T_7TeV-madgraph-tauola/Fall10-START38_V12-v2/GEN-SIM-RECO"
-#process.GlobalTag.globaltag = cms.string('START38_V13::All')
-
-# for the local cp3 samples
-#process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
 
 # running on data, remove genparticle references in objects
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -28,10 +21,12 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 #---------------------------- Trigger
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
+muontriggers     = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1")
+electrontriggers = cms.vstring("HLT_Ele10_LW_L1R","HLT_Ele10_SW_L1R","HLT_Ele15_LW_L1R","HLT_Ele15_SW_L1R")
+alltriggers      = muontriggers + electrontriggers
+
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
-                            triggerConditions = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1",
-                                                            "HLT_Ele10_LW_L1R","HLT_Ele10_SW_L1R","HLT_Ele15_LW_L1R","HLT_Ele15_SW_L1R"
-                                                            ),    #HLT_Ele10_SW_L1R for TTJets sample    
+                             triggerConditions = alltriggers,
                             hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                             l1tResults = cms.InputTag( "gtDigis" ),
                             l1tIgnoreMask = cms.bool( False ),
@@ -44,51 +39,58 @@ process.hlt = cms.EDFilter( "TriggerResultsFilter",
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process)
 
-process.cleanMuonTriggerMatchHLTMuAll = cms.EDProducer(
+# trigger matchers for various collections
+
+# base matcher to define default values
+defaultTriggerMatch = cms.EDProducer(
     "PATTriggerMatcherDRDPtLessByR", 
-    src     = cms.InputTag( "cleanPatMuons" ), 
-    matched = cms.InputTag( "patTrigger" ), 
-    andOr                      = cms.bool( False ), 
+    src     = cms.InputTag( "cleanPatMuons" ),
+    matched = cms.InputTag( "patTrigger" ),          
+    andOr                      = cms.bool( False ),  
     filterIdsEnum              = cms.vstring( '*' ), 
-    filterIds                  = cms.vint32( 0 ), 
+    filterIds                  = cms.vint32( 0 ),    
     filterLabels               = cms.vstring( '*' ), 
-    pathNames                  = cms.vstring(
-        'HLT_Mu3','HLT_Mu5','HLT_Mu7','HLT_Mu9','HLT_Mu11','HLT_Mu15_v1'
-    ), 
-    pathLastFilterAcceptedOnly = cms.bool( True ), 
+    pathNames                  = cms.vstring( 'HLT_Mu9' ),
+    pathLastFilterAcceptedOnly = cms.bool( True ),    
     collectionTags             = cms.vstring( '*' ), 
-    maxDPtRel = cms.double( 0.5 ), 
-    maxDeltaR = cms.double( 0.5 ), 
-    resolveAmbiguities    = cms.bool( True ), 
-    resolveByMatchQuality = cms.bool( True )
+    maxDPtRel = cms.double( 0.5 ),
+    maxDeltaR = cms.double( 0.5 ),
+    resolveAmbiguities    = cms.bool( True ),     
+    resolveByMatchQuality = cms.bool( True ),      
 )
 
-process.cleanElectronTriggerMatchHLTEleAll = cms.EDProducer(
-    "PATTriggerMatcherDRDPtLessByR", 
-    src     = cms.InputTag( "cleanPatElectrons" ), 
-    matched = cms.InputTag( "patTrigger" ), 
-    andOr                      = cms.bool( False ), 
-    filterIdsEnum              = cms.vstring( '*' ), 
-    filterIds                  = cms.vint32( 0 ), 
-    filterLabels               = cms.vstring( '*' ), 
-    pathNames                  = cms.vstring(
-       'HLT_Ele10_LW_L1R','HLT_Ele10_SW_L1R','HLT_Ele15_LW_L1R','HLT_Ele15_SW_L1R' 
-    ), 
-    pathLastFilterAcceptedOnly = cms.bool( True ), 
-    collectionTags             = cms.vstring( '*' ), 
-    maxDPtRel = cms.double( 0.5 ), 
-    maxDeltaR = cms.double( 0.5 ), 
-    resolveAmbiguities    = cms.bool( True ), 
-    resolveByMatchQuality = cms.bool( True )
-)
 
-from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import *
-switchOnTriggerMatching( process ,
-                         triggerMatchers = ['cleanMuonTriggerMatchHLTMuAll',
-                                            'cleanElectronTriggerMatchHLTEleAll'
-                                           ]
-                       )
 
+process.tightMuonTriggerMatch = defaultTriggerMatch.clone(
+        src         = cms.InputTag( "tightMuonsNoTrigger" ),
+        pathNames   = muontriggers
+    )
+
+process.looseMuonTriggerMatch = defaultTriggerMatch.clone(
+        src         = cms.InputTag( "looseMuonsNoTrigger" ),
+        pathNames   = muontriggers
+    )
+
+process.isolatedElectronTriggerMatch = defaultTriggerMatch.clone(
+        src         = cms.InputTag( "isolatedElectronsNoTrigger" ),
+        pathNames   = electrontriggers
+    )
+
+# trigger object embedders for the same collections
+process.tightMuons = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
+        src     = cms.InputTag(  "tightMuonsNoTrigger" ),
+        matches = cms.VInputTag( cms.InputTag('tightMuonTriggerMatch') )
+    )
+
+process.looseMuons = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
+        src     = cms.InputTag(  "looseMuonsNoTrigger" ),
+        matches = cms.VInputTag( cms.InputTag('looseMuonTriggerMatch') )
+    )
+
+process.isolatedElectrons = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
+        src     = cms.InputTag(  "isolatedElectronsNoTrigger" ),
+        matches = cms.VInputTag( cms.InputTag('isolatedElectronTriggerMatch') )
+    )
 
 #---------------------------- MET
 #------------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,19 +132,6 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
 process.selectedPatJets.cut      = 'pt > 25. & abs(eta) < 2.4 '
 process.selectedPatJetsAK7PF.cut = 'pt > 25. & abs(eta) < 2.4 '
 
-# NOT selected Jets (beware, these are clean jets)
-process.selectedJetsAK5PF = process.cleanPatJets.clone(preselection =                                # cleanPatJets are the ak5PFJets
-                                                   'pt > 25. &'
-                                                   'abs(eta) < 2.4 '
-                                                   )
-
-
-from PhysicsTools.PatAlgos.selectionLayer1.jetCountFilter_cfi import *
-process.jet1 = countPatJets.clone(src = 'selectedJetsAK5PF', minNumber = 1)
-process.jets2 = countPatJets.clone(src = 'selectedJetsAK5PF', minNumber = 2)
-
-
-
 #---------------------------- Leptons
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -159,7 +148,7 @@ process.cleanPatMuons.preselection = ('isGlobalMuon & isTrackerMuon & trackIso <
 process.allMuons = process.cleanPatMuons.clone( preselection = 'pt > 5' )
 
 # clean muons for direct analysis
-process.looseMuons = process.cleanPatMuons.clone(preselection =
+process.looseMuonsNoTrigger = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'pt > 10 &'
                                                  'abs(eta) < 2.4 &'
@@ -171,7 +160,7 @@ process.looseMuons = process.cleanPatMuons.clone(preselection =
 
                                                  )
 
-process.tightMuons = process.cleanPatMuons.clone(preselection =
+process.tightMuonsNoTrigger = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'pt > 10 &'
                                                  'abs(eta) < 2.4 &'
@@ -224,7 +213,7 @@ process.cleanPatElectrons.preselection = 'electronID("simpleEleId95relIso") == 7
 process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' ) 
 
 # clean electrons for direct analysis
-process.isolatedElectrons = cleanPatElectrons.clone(preselection =
+process.isolatedElectronsNoTrigger = cleanPatElectrons.clone(preselection =
                                                     'electronID("simpleEleId95relIso") == 7 &' ## abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP95
                                                     'pt > 20. &'
                                                     'abs(eta) < 2.5 &'
@@ -263,8 +252,6 @@ process.goodPV.cut=cms.string('ndof > 4&'
                               )
 
 
-
-
 # triggers based on loose leptons for skimming #in the talk
 from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import *
 from PhysicsTools.PatAlgos.selectionLayer1.electronCountFilter_cfi import *
@@ -272,37 +259,36 @@ process.mutrigger = countPatMuons.clone(src = 'cleanPatMuons', minNumber = 2)
 process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 2)
 
 # add user objects to patDefault
-process.patDefaultSequence *= process.looseMuons
-process.patDefaultSequence *= process.tightMuons
+process.patDefaultSequence *= process.looseMuonsNoTrigger
+process.patDefaultSequence *= process.tightMuonsNoTrigger
 process.patDefaultSequence *= process.allMuons
-process.patDefaultSequence *= process.Ztightloose
-process.patDefaultSequence *= process.Zcleanclean
-process.patDefaultSequence *= process.isolatedElectrons
+process.patDefaultSequence *= process.isolatedElectronsNoTrigger
 process.patDefaultSequence *= process.allElectrons
-process.patDefaultSequence *= process.Zelel
-process.patDefaultSequence *= process.selectedJetsAK5PF
-#process.patDefaultSequence *= process.jet1
-#process.patDefaultSequence *= process.jets2
 process.patDefaultSequence *= process.goodPV
 
+# trigger matching and embedding should be done at the end of the sequence
+process.patDefaultSequence *= process.tightMuonTriggerMatch
+process.patDefaultSequence *= process.tightMuons
+process.patDefaultSequence *= process.looseMuonTriggerMatch
+process.patDefaultSequence *= process.looseMuons
+process.patDefaultSequence *= process.isolatedElectronTriggerMatch
+process.patDefaultSequence *= process.isolatedElectrons
+
+# combine leptons to get Z candidates
+process.patDefaultSequence *= process.Ztightloose
+process.patDefaultSequence *= process.Zcleanclean
+process.patDefaultSequence *= process.Zelel
+
+
 # Run it
-#process.p1 = cms.Path(process.scrapingVeto * process.patDefaultSequence* process.mutrigger)
 process.p1 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence * process.mutrigger)
-#process.p2 = cms.Path(process.scrapingVeto * process.patDefaultSequence* process.eltrigger )
 process.p2 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence *process.eltrigger)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2') )
 
-# decide what collections to keep. keep * is fun, try it :)
 #process.out.outputCommands = cms.untracked.vstring('keep *')
-#from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
-#patEventContentNoCleaning += ['keep *_isolatedMuons*_*_*', 'keep *_isolatedElectrons*_*_*']
-
-tokeep_clean  = [ #'keep *']
-                  'keep *_cleanPatElectrons*_*_*',
-                  'keep *_cleanPatMuons*_*_*',
-                  
-                  # keep all types of pat and Pat Jets
+tokeep_clean  = [ 
+                  # keep all types of pat and Pat Jets, to access embedded PF candidates
                   'keep *_*atJets*_*_*',
 
                   # keep all tracks (not tracksextra)
@@ -311,26 +297,24 @@ tokeep_clean  = [ #'keep *']
                   'keep *_patMETs*_*_*',
                   'keep *_patTrigger*_*_*' ]
 
-tokeep_clean += ['keep *_isolatedMuons*_*_*',
-                 'keep *_isolatedElectrons*_*_*',
+tokeep_clean += [
+                 'keep *_isolatedElectrons_*_*',
                  'keep *_allElectrons*_*_*',
                  
-                 'keep *_looseMuons*_*_*',
-                 'keep *_tightMuons*_*_*',
+                 'keep *_looseMuons_*_*',
+                 'keep *_tightMuons_*_*',
                  'keep *_allMuons*_*_*',
-                 'keep *_Z*_*_*',
-                 'keep *_isolatedElectrons010*_*_*',
-                 'keep *_jet1*_*_*',
-                 'keep *_jets2*_*_*',
-                 'keep *_goodPV*_*_*']
 
-#B-Tagging!!!!!
+                 'keep *_Z*_*_*',
+
+                 'keep *_goodPV*_*_*' ]
+
+# B-Tagging: is this needed ?
 tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCounting*BJetTags*_*_PAT']
 
 
-# process.out.outputCommands = cms.untracked.vstring('drop *', *patEventContentNoCleaning )
 process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
-#process.out.outputCommands = cms.untracked.vstring('drop *', 'keep *' )
+# process.out.outputCommands = cms.untracked.vstring( 'keep *' )
 
 
 process.source.fileNames = [
@@ -340,21 +324,6 @@ process.source.fileNames = [
 
 process.maxEvents.input = 1000
 
-#for local submission                                       
-# process.out.fileName = 'pat_leptons_cuts.root'
-#process.out.fileName = 'tttttttttt_test.root'
-#process.out.fileName = '2011_01_07_local_MURun2010A-DiLeptonMu-Dec22Skim.root'
-#process.out.fileName = '2011_01_08_MURun2010A-DiLeptonMu-Dec22Skim.root'
-
-#for CRAB submission
-#process.out.fileName = 'MuRun2010A-DiLeptonMu-Nov4Skim_v1.root'  
-#process.out.fileName = 'MuRun2010A-WZMu-Nov4Skim_v1.root'  
-#process.out.fileName = 'TTJets_TuneD6T_7TeV-madgraph.root'  
-#process.out.fileName = 'MuRun2010B-DiLeptonMu-Nov4Skim_v1.root'  
-#process.out.fileName = 'MuRun2010A-DiLeptonMu-Nov4Skim_20101220.root'
-#process.out.fileName = 'MURun2010A-DiLeptonMu-Dec22Skim.root'
 process.out.fileName = 'MURun2010B-DiLeptonMu-Dec22Skim.root'
-#process.out.fileName = 'ELERun2010A-DiLeptonEle-Dec22Skim.root'
-#process.out.fileName = 'ELERun2010B-DiLeptonEle-Dec22Skim.root'
 
 process.options.wantSummary = True
