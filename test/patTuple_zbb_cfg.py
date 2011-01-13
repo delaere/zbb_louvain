@@ -116,7 +116,9 @@ addJetCollection(process,cms.InputTag('ak7PFJets'),
                  'AK7', 'PF',
                  doJTA        = True,
                  doBTagging   = True,
-                 jetCorrLabel = ('AK7PF',['L2Relative', 'L3Absolute']),
+                 # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
+                 # jetCorrLabel = ('AK7PF',['L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                 jetCorrLabel = ('AK7PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                  doType1MET   = False,
                  doL1Cleaning = True,                 
                  doL1Counters = False,
@@ -129,7 +131,9 @@ addJetCollection(process,cms.InputTag('ak7PFJets'),
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
-                    jetCorrLabel = ('AK5PF',['L2Relative', 'L3Absolute']),  #  , 'L2L3Residual' working for 387 but not for 397
+                    # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
+                    #jetCorrLabel = ('AK5PF',['L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                    jetCorrLabel = ('AK5PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
@@ -245,11 +249,6 @@ process.patElectrons.embedTrack = True
 #------------------------------ Vertices 
 #------------------------------------------------------------------------------------------------------------------------------------------------		
 # vertex filter
-process.vertexselect = cms.EDFilter("VertexSelector",
-                                    src = cms.InputTag("offlinePrimaryVertices"),
-                                    cut = cms.string("!isFake && ndof > 4 && abs(z) < 24 && position.Rho < 2"),
-                                    filter = cms.bool(True),
-                                    )
 
 from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi import *
 process.goodPV= offlinePrimaryVertices.clone()
