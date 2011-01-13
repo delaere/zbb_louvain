@@ -35,6 +35,14 @@ process.hlt = cms.EDFilter( "TriggerResultsFilter",
                             throw = cms.bool( False )
                             )
 
+# compute weight from prescale
+process.WeightFromTrigger = cms.EDProducer('WeightFromTrigger',
+    HLTLabel = cms.InputTag("TriggerResults::HLT"),
+    UseCombinedPrescales = cms.bool(False),
+    TriggerNames = alltriggers 
+)
+
+
 # add trigger information (trigTools)
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process)
@@ -274,6 +282,9 @@ process.patDefaultSequence *= process.looseMuons
 process.patDefaultSequence *= process.isolatedElectronTriggerMatch
 process.patDefaultSequence *= process.isolatedElectrons
 
+# compute weight from trigger presscale
+process.patDefaultSequence *= process.WeightFromTrigger
+
 # combine leptons to get Z candidates
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
@@ -304,6 +315,9 @@ tokeep_clean += [
                  'keep *_looseMuons_*_*',
                  'keep *_tightMuons_*_*',
                  'keep *_allMuons*_*_*',
+
+                 # keep the weight from trigger info
+                 'keep *_WeightFromTrigger_*_*',
 
                  'keep *_Z*_*_*',
 
