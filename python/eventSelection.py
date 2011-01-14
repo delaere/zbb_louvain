@@ -1,36 +1,32 @@
-def isTriggerOK(triggerInfo, channel=1, runNumber=None):
+def isTriggerOK(triggerInfo, muchannel=True, runNumber=None):
   """Checks if the proper trigger is passed"""
-  # simple case: mu trigger for mu channel (1), ele trigger for ele channel (2)
+  # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
 
   # IMPORTANT: to be fast, it uses the vector from TriggerWeight and assumes the order within.
-  # muontriggers     = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1")
-  # electrontriggers = cms.vstring("HLT_Ele10_LW_L1R","HLT_Ele10_SW_L1R","HLT_Ele15_LW_L1R","HLT_Ele15_SW_L1R")
-  # alltriggers      = muontriggers + electrontriggers
 
   outcome = False
   if runNumber is None:
-    if channel==1:
+    if muChannel:
       for i in range(6): outcome |= triggerInfo[i]
-    elif channel==2:
-      for i in range(6,10): outcome |= triggerInfo[i]
+    else:
+      for i in range(6,13): outcome |= triggerInfo[i]
   else:
-    #TODO: implement... check run ranges and triggers
-    if channel==1:
-#      if runNumber> and runNumber< : outcome = triggerInfo[0]
-#      if runNumber> and runNumber< : outcome = triggerInfo[1]
-#      if runNumber> and runNumber< : outcome = triggerInfo[2]
-#      if runNumber> and runNumber< : outcome = triggerInfo[3]
-#      if runNumber> and runNumber< : outcome = triggerInfo[4]
-#      if runNumber> and runNumber< : outcome = triggerInfo[5]
-    elif channel==2:
-#      if runNumber>=136033 and runNumber<=139980 : outcome = triggerInfo[6]
-#      if runNumber>=140058 and runNumber<=141882 : outcome = triggerInfo[7]
-#      if runNumber>=141956 and runNumber<=144114 : outcome = triggerInfo[8]
-#      if runNumber>=146428 and runNumber<=147116 : outcome = triggerInfo[9]
-#      if runNumber>=147196 and runNumber<=148058 : outcome = triggerInfo[10]
-#      if runNumber>=148819 and runNumber<=149064 : outcome = triggerInfo[11]
-#      if runNumber>=149181 and runNumber<=149442 : outcome = triggerInfo[12]
+    if muChannel:
+      if runNumber>=132440 and runNumber<=139980 : outcome = triggerInfo[0]  #HLT_Mu3
+      if runNumber>=140058 and runNumber<=140401 : outcome = triggerInfo[1]  #HLT_Mu5
+      if runNumber>=141956 and runNumber<=144114 : outcome = triggerInfo[2]  #HLT_Mu7
+      if runNumber>=146428 and runNumber<=147116 : outcome = triggerInfo[3]  #HLT_Mu9
+      if runNumber>=147146 and runNumber<=148102 : outcome = triggerInfo[4]  #HLT_Mu11
+      if runNumber>=148783 and runNumber<=149442 : outcome = triggerInfo[5]  #HLT_Mu15_v1
+    else:
+      if runNumber>=132440 and runNumber<=137028 : outcome = triggerInfo[6]  #HLT_Photon10_L1R should impose a cut at 15 GeV by hand
+      if runNumber>=138564 and runNumber<=140401 : outcome = triggerInfo[7]  #HLT_Photon15_Cleaned_L1R
+      if runNumber>=141956 and runNumber<=144114 : outcome = triggerInfo[8]  #HLT_Ele15_SW_CaloEleId_L1R
+      if runNumber>=146428 and runNumber<=147116 : outcome = triggerInfo[9]  #HLT_Ele17_SW_CaloEleId_L1R
+      if runNumber>=147146 and runNumber<=148102 : outcome = triggerInfo[10] #HLT_Ele17_SW_TightEleId_L1R
+      if runNumber>=148783 and runNumber<=149063 : outcome = triggerInfo[11] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1
+      if runNumber>=149181 and runNumber<=149442 : outcome = triggerInfo[12] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2
   return outcome
 
 def isLooseMuon(muon):
@@ -38,6 +34,7 @@ def isLooseMuon(muon):
   #TODO: implement
   # anything on top of PAT cfg ?
   # cleaning ?
+  #muon.pt()>20.
   return True
 
 def isTightMuon(muon):
@@ -46,6 +43,7 @@ def isTightMuon(muon):
   # check trigger matching
   # anything else on top of PAT cfg ?
   # cleaning ?
+  #muon.pt()>20.
   return True
 
 def isGoodElectron(electron):
@@ -54,6 +52,7 @@ def isGoodElectron(electron):
   # check trigger matching
   # anything else on top of PAT cfg ?
   # cleaning ?
+  #electron.pt()>20.
   return True
 
 def isGoodJet(jet)
@@ -61,6 +60,8 @@ def isGoodJet(jet)
   #TODO: implement
   # perform cleaning
   # jet id ?
+  # abs(jet.eta())<2.1
+  # dR(leptons)>0.4
   return True
 
 def isBJet(jet,workingPoint)
@@ -107,8 +108,8 @@ def findBestCandidate(*zCandidates):
 def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets):
   """See up to which level the event passes the selection"""
   #TODO: add vertex constraints when ready
-  if not isTriggerOK(triggerInfo): return 0
   bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+  if not isTriggerOK(triggerInfo, bestZcandidate.daughter(0).isMuon()): return 0
   if bestZcandidate is None : return 1
   if abs(bestZcandidate.mass-91.1876)<15.): return 2
   nJets    = 0
