@@ -21,9 +21,14 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 #---------------------------- Trigger
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
-muontriggers     = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1")
-electrontriggers = cms.vstring("HLT_Ele10_LW_L1R","HLT_Ele10_SW_L1R","HLT_Ele15_LW_L1R","HLT_Ele15_SW_L1R")
-alltriggers      = muontriggers + electrontriggers
+# electron triggers are taken accroding to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
+
+muontriggers      = cms.vstring("HLT_Mu3","HLT_Mu5","HLT_Mu7","HLT_Mu9","HLT_Mu11","HLT_Mu15_v1")
+
+electrontriggers  = cms.vstring("HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R","HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R")
+electrontriggers += cms.vstring("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2") 
+
+alltriggers       = muontriggers + electrontriggers
 
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
                              triggerConditions = alltriggers,
