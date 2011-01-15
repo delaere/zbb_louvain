@@ -1,3 +1,4 @@
+
 def isTriggerOK(triggerInfo, muchannel=True, runNumber=None):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
@@ -31,37 +32,75 @@ def isTriggerOK(triggerInfo, muchannel=True, runNumber=None):
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
-  #TODO: implement
+  # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
+
   # anything on top of PAT cfg ?
   # cleaning ?
-  #muon.pt()>20.
+
   return True
 
 def isTightMuon(muon):
   """Perform additional checks that define a tight muon"""
-  #TODO: implement
-  # check trigger matching
+  # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
+
   # anything else on top of PAT cfg ?
   # cleaning ?
-  #muon.pt()>20.
+
+  return (isLooseMuon(muon) and True)
+
+def isMatchedMuon(muon):
+  """Perform additional checks that define a matched muon"""
+  # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
+
+  # anything else on top of PAT cfg ?
+  # cleaning ?
+
+  return (isTightMuon(muon) and True)
+
+def isGoodMuon(muon,role):
+  """Perform additional checks that define a good muon"""
+  if role=="loose" : return isLooseMuon(muon)
+  if role=="tight" : return isTightMuon(muon)
+  if role=="matched" : return isMatchedMuon(muon)
+
+def isLooseElectron(electron):
+  """Perform additional checks that define a loose electron"""
+
+  # anything else on top of PAT cfg ?
+  # cleaning ?
+
   return True
 
-def isGoodElectron(electron):
-  """Perform additional checks that define a good electron"""
-  #TODO: implement
-  # check trigger matching
+def isTightElectron(electron):
+  """Perform additional checks that define a tight electron"""
+
   # anything else on top of PAT cfg ?
   # cleaning ?
-  #electron.pt()>20.
-  return True
+
+  return (isLooseElectron(electron) and True)
+
+def isMatchedElectron(electron):
+  """Perform additional checks that define a matched electron"""
+
+  # anything else on top of PAT cfg ?
+  # cleaning ?
+
+  return (isTightElectron(electron) and True)
+
+def isGoodElectron(electron,role):
+  """Perform additional checks that define a good electron"""
+  if role=="loose" : return isLooseElectron(electron)
+  if role=="tight" : return isTightElectron(electron)
+  if role=="matched" : return isMatchedElectron(electron)
 
 def isGoodJet(jet)
   """Perform additional checks that define a good jet"""
-  #TODO: implement
+
   # perform cleaning
   # jet id ?
   # abs(jet.eta())<2.1
   # dR(leptons)>0.4
+
   return True
 
 def isBJet(jet,workingPoint)
@@ -76,21 +115,27 @@ def isBJet(jet,workingPoint)
 
 def isZcandidate(zCandidate):
   """Checks that this is a suitable candidate from lepton quality"""
-  lepton1 = zcandidate.daughter(0)
-  lepton2 = zcandidate.daughter(1)
+  result = True
+  flavor = 1
+  charge = 1
+  for r in zCandidate.roles():
+    daughter = Z.daughter(r)
+    charge *= daughter.charge()
+    if daughter.isMuon() :
+      flavor *= -1
+      result = result and isGoodMuon(Z.daughter(r),r)
+    elif Z.daughter(r).isElectron():
+      result = result and isGoodElectron(Z.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
-  if lepton1.charge()*lepton2.charge() != -1:
+  if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"
     return False
-  # check that the leptons pass all quality criterias
-  if lepton1.isMuon() and lepton2.isMuon():
-    #is there a way to know in which collection is each lepton ?
-    return (isLooseMuon(lepton1) and isLooseMuon(lepton2) and (isTightMuon(lepton1) or isTightMuon(lepton2)))
-  elif lepton1.isElectron() and lepton2.isElectron():
-    return (isGoodElectron(lepton1) and isGoodElectron(lepton2))
-  else:
-    print "Error: Z is not made of a proper lepton pair (Flavor issue)"
+  # check that leptons are same flavor (should always be the case)
+  if flavor != 1:
+    print "Error: Z is not made of a proper lepton pair (flavor issue)"
     return False
+  # if everything ok, return the result of the lepton check
+  return result
 
 def findBestCandidate(*zCandidates):
   """Finds the best Z candidate. Might be none.
