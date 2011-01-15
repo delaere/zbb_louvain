@@ -17,7 +17,6 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                     thresh = cms.untracked.double(0.2)
                                     )
 
-
 #---------------------------- Trigger
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,14 +30,14 @@ electrontriggers += cms.vstring("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1","HLT_Ele
 alltriggers       = muontriggers + electrontriggers
 
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
-                             triggerConditions = alltriggers,
+                            triggerConditions = alltriggers,
                             hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                             l1tResults = cms.InputTag( "gtDigis" ),
                             l1tIgnoreMask = cms.bool( False ),
                             l1techIgnorePrescales = cms.bool( False ),
                             daqPartitions = cms.uint32( 1 ),
                             throw = cms.bool( False )
-                            )
+                          )
 
 # compute weight from prescale
 process.WeightFromTrigger = cms.EDProducer('WeightFromTrigger',
@@ -46,7 +45,6 @@ process.WeightFromTrigger = cms.EDProducer('WeightFromTrigger',
     UseCombinedPrescales = cms.bool(False),
     TriggerNames = alltriggers 
 )
-
 
 # add trigger information (trigTools)
 from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -57,7 +55,7 @@ switchOnTrigger(process)
 # base matcher to define default values
 defaultTriggerMatch = cms.EDProducer(
     "PATTriggerMatcherDRDPtLessByR", 
-    src     = cms.InputTag( "cleanPatMuons" ),
+    src     = cms.InputTag( "selectedPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),          
     andOr                      = cms.bool( False ),  
     filterIdsEnum              = cms.vstring( '*' ), 
@@ -72,37 +70,25 @@ defaultTriggerMatch = cms.EDProducer(
     resolveByMatchQuality = cms.bool( True ),      
 )
 
-
-
-process.tightMuonTriggerMatch = defaultTriggerMatch.clone(
-        src         = cms.InputTag( "tightMuonsNoTrigger" ),
+process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
+        src         = cms.InputTag( "selectedPatMuons" ),
         pathNames   = muontriggers
-    )
+)
 
-process.looseMuonTriggerMatch = defaultTriggerMatch.clone(
-        src         = cms.InputTag( "looseMuonsNoTrigger" ),
-        pathNames   = muontriggers
-    )
-
-process.isolatedElectronTriggerMatch = defaultTriggerMatch.clone(
-        src         = cms.InputTag( "isolatedElectronsNoTrigger" ),
+process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
+        src         = cms.InputTag( "selectedPatElectrons" ),
         pathNames   = electrontriggers
-    )
+)
 
 # trigger object embedders for the same collections
-process.tightMuons = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-        src     = cms.InputTag(  "tightMuonsNoTrigger" ),
-        matches = cms.VInputTag( cms.InputTag('tightMuonTriggerMatch') )
+process.selectedMuonsMatched = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
+        src     = cms.InputTag(  "selectedPatMuons" ),
+        matches = cms.VInputTag( cms.InputTag('selectedMuonsTriggerMatch') )
     )
 
-process.looseMuons = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-        src     = cms.InputTag(  "looseMuonsNoTrigger" ),
-        matches = cms.VInputTag( cms.InputTag('looseMuonTriggerMatch') )
-    )
-
-process.isolatedElectrons = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
-        src     = cms.InputTag(  "isolatedElectronsNoTrigger" ),
-        matches = cms.VInputTag( cms.InputTag('isolatedElectronTriggerMatch') )
+process.selectedElectronsMatched = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
+        src     = cms.InputTag(  "selectedPatElectrons" ),
+        matches = cms.VInputTag( cms.InputTag('selectedElectronsTriggerMatch') )
     )
 
 #---------------------------- MET
@@ -159,44 +145,63 @@ from PhysicsTools.PatAlgos.cleaningLayer1.electronCleaner_cfi import *
 #*************************************** Muons
 #*******************************************************
 # clean pat muons should be isolated for cleaning purpose
-process.cleanPatMuons.preselection = ('isGlobalMuon & isTrackerMuon & trackIso < 3')
+#process.cleanPatMuons.src = "selectedMuonsMatched"
+process.cleanPatMuons.preselection = ('isGlobalMuon & isTrackerMuon & (trackIso+caloIso)/pt < 0.15')
 
 # aditional collection of muons with no cuts
 process.allMuons = process.cleanPatMuons.clone( preselection = 'pt > 5' )
 
 # clean muons for direct analysis
-process.looseMuonsNoTrigger = process.cleanPatMuons.clone(preselection =
+process.looseMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
+                                                 'innerTrack.numberOfValidHits > 10 &'
+                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice 
+                                                 #' trackIso < 3 &'                # VBTF choice
                                                  'pt > 10 &'
-                                                 'abs(eta) < 2.4 &'
-                                                 #'(trackIso+caloIso)/pt < 0.15 &'  # in the talk
-                                                 ' trackIso < 3 &'
-                                                 'abs(dB) < 0.02 &'
-                                                 'innerTrack.hitPattern.numberOfValidStripHits > 10'
-                                                 #'innerTrack.numberOfValidHits > 10 &'
-
+                                                 'abs(eta) < 2.4'
                                                  )
+process.looseMuons.src = "selectedMuonsMatched"
 
-process.tightMuonsNoTrigger = process.cleanPatMuons.clone(preselection =
+process.tightMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
-                                                 'pt > 10 &'
-                                                 'abs(eta) < 2.4 &'
-                                                 #'(trackIso+caloIso)/pt < 0.15 &'   # in the talk
-                                                 ' trackIso < 3 &'
-                                                 'abs(dB) < 0.02 &'
-                                                 'innerTrack.hitPattern.numberOfValidStripHits > 10 &'
-                                                 #'innerTrack.numberOfValidHits > 10 &'
-                                                 'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                                                 #'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'
+                                                 'innerTrack.numberOfValidHits > 10 &'
+                                                 'abs(dB) < 0.02 &' # why not 0.2 for 2mm ???
                                                  'normChi2 < 10 &'
+                                                 'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                                                 'numberOfMatches>1 &' # segments matched in at least two muon stations 
+                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &' # one muon hit matched to the global fit
+                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice
+                                                 #' trackIso < 3 &'                # VBTF choice
+                                                 'pt > 20 &'
                                                  'abs(eta) < 2.1'
-                                                 #Trigger Match DeltaR and DeltapT/pT to be really tight
-                                                 #number of muon station >1 in the PAS
                                                  )
+process.tightMuons.src = "selectedMuonsMatched"
 
+process.matchedMuons = process.cleanPatMuons.clone(preselection =
+                                                 'isGlobalMuon & isTrackerMuon &'
+                                                 'innerTrack.numberOfValidHits > 10 &'
+                                                 'abs(dB) < 0.02 &' # why not 0.2 for 2mm ???
+                                                 'normChi2 < 10 &'
+                                                 'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                                                 'numberOfMatches>1 &' # segments matched in at least two muon stations 
+                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &' # one muon hit matched to the global fit
+                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice
+                                                 #' trackIso < 3 &'                # VBTF choice
+                                                 'pt > 20 &'
+                                                 'abs(eta) < 2.1 &'
+                                                 'triggerObjectMatches.size > 0' #Trigger Match DeltaR and DeltapT/pT to be really tight
+                                                 )
+process.matchedMuons.src = "selectedMuonsMatched"
+
+process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
+                                     decay = cms.string("matchedMuons@+ tightMuons@-"),
+                                     cut = cms.string("60.0 < mass < 120.0"), 
+                                     name = cms.string('ztighttight'),
+                                     roles = cms.vstring('muon1', 'muon2')
+                                     )
 
 process.Ztightloose = cms.EDProducer("CandViewShallowCloneCombiner", 
-                                     decay = cms.string("tightMuons@+ looseMuons@-"), 
+                                     decay = cms.string("matchedMuons@+ looseMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
                                      name = cms.string('ztightloose'),
                                      roles = cms.vstring('muon1', 'muon2')
@@ -208,7 +213,6 @@ process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner",
                                      name = cms.string('zcleanclean'),
                                      roles = cms.vstring('muon1', 'muon2')
                                      )
-
 
 #*************************************** Electrons
 #*******************************************************
@@ -224,28 +228,38 @@ process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.patElectrons)
 
 # clean pat Electrons should be isolated for cleaning purpose
-process.cleanPatElectrons.preselection = 'electronID("simpleEleId95relIso") == 7'
+#process.cleanPatElectrons.src = "selectedElectronsMatched"
+process.cleanPatElectrons.preselection = 'electronID("simpleEleId85relIso") == 7'
 
 # aditional collection of electrons with no cuts 
 process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' ) 
 
 # clean electrons for direct analysis
-process.isolatedElectronsNoTrigger = cleanPatElectrons.clone(preselection =
-                                                    'electronID("simpleEleId95relIso") == 7 &' ## abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP95
-                                                    'pt > 20. &'
-                                                    'abs(eta) < 2.5 &'
-                                                    'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
-                                                    'abs(dB) < 0.02'
-                                                    #'sqrt(pow(gsfTrack.innerPosition.x,2) + pow(gsfTrack.innerPosition.y,2))< 0.02 '  #supposed to be same than above
-                                                    #'ecalDriven &'
-                                                    #'(((dr03TkSumPt+max(0,dr03EcalRecHitSumEt-1)+dr03HcalTowerSumEt)/max(20,et)< 0.15 && abs(eta)<=1.4442)  ||'                                                                       '((dr03TkSumPt+max(0,dr03EcalRecHitSumEt)+dr03HcalTowerSumEt)/max(20,et)< 0.15 && abs(eta)>1.566))' #user defined isolation independantly from WP90/95
-                                                    )
+process.tightElectrons = cleanPatElectrons.clone( preselection =
+                                                 'electronID("simpleEleId85relIso") == 7 &' 
+                                                 # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                 'pt > 10. &'
+                                                 'abs(eta) < 2.5 &'
+                                                 #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
+                                                 'abs(dB) < 0.02'
+                                                 )
+process.tightElectrons.src = "selectedElectronsMatched"
+
+process.matchedElectrons = cleanPatElectrons.clone(preselection =
+                                                   'electronID("simpleEleId85relIso") == 7 &' 
+                                                   # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                   'pt > 25. &'
+                                                   'abs(eta) < 2.5 &'
+                                                   #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
+                                                   'abs(dB) < 0.02 &'
+                                                   'triggerObjectMatches.size > 0' #Trigger Match DeltaR and DeltapT/pT to be really tight
+                                                   )
+process.matchedElectrons.src = "selectedElectronsMatched"
 
 process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("isolatedElectrons@+ isolatedElectrons@-"),
+                               decay = cms.string("tightElectrons@+ matchedElectrons@-"),
                                cut = cms.string("60.0 < mass < 120.0")
-                               )
-
+                              )
 
 #-----------------tracks
 process.patMuons.embedTrack = True
@@ -263,41 +277,43 @@ process.goodPV.cut=cms.string('ndof > 4&'
                               ' position.Rho <2 '
                               )
 
-
+#------------------------------ Sequence
+#------------------------------------------------------------------------------------------------------------------------------------------------		
+# vertex filter
 # triggers based on loose leptons for skimming #in the talk
 from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import *
 from PhysicsTools.PatAlgos.selectionLayer1.electronCountFilter_cfi import *
 process.mutrigger = countPatMuons.clone(src = 'cleanPatMuons', minNumber = 2)
 process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 2)
 
+# trigger matching and embedding should be done at the end of the sequence
+process.patDefaultSequence *= process.selectedMuonsTriggerMatch
+process.patDefaultSequence *= process.selectedMuonsMatched
+process.patDefaultSequence *= process.selectedElectronsTriggerMatch
+process.patDefaultSequence *= process.selectedElectronsMatched
+
 # add user objects to patDefault
-process.patDefaultSequence *= process.looseMuonsNoTrigger
-process.patDefaultSequence *= process.tightMuonsNoTrigger
+process.patDefaultSequence *= process.looseMuons
+process.patDefaultSequence *= process.tightMuons
+process.patDefaultSequence *= process.matchedMuons
 process.patDefaultSequence *= process.allMuons
-process.patDefaultSequence *= process.isolatedElectronsNoTrigger
+process.patDefaultSequence *= process.tightElectrons
+process.patDefaultSequence *= process.matchedElectrons
 process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.goodPV
-
-# trigger matching and embedding should be done at the end of the sequence
-process.patDefaultSequence *= process.tightMuonTriggerMatch
-process.patDefaultSequence *= process.tightMuons
-process.patDefaultSequence *= process.looseMuonTriggerMatch
-process.patDefaultSequence *= process.looseMuons
-process.patDefaultSequence *= process.isolatedElectronTriggerMatch
-process.patDefaultSequence *= process.isolatedElectrons
 
 # compute weight from trigger presscale
 process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
+process.patDefaultSequence *= process.Ztighttight
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
 process.patDefaultSequence *= process.Zelel
 
-
 # Run it
 process.p1 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence * process.mutrigger)
-process.p2 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence *process.eltrigger)
+process.p2 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence * process.eltrigger)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2') )
 
@@ -313,11 +329,13 @@ tokeep_clean  = [
                   'keep *_patTrigger*_*_*' ]
 
 tokeep_clean += [
-                 'keep *_isolatedElectrons_*_*',
+                 'keep *_tightElectrons_*_*',
+                 'keep *_matchedElectrons_*_*',
                  'keep *_allElectrons*_*_*',
                  
                  'keep *_looseMuons_*_*',
                  'keep *_tightMuons_*_*',
+                 'keep *_matchedMuons_*_*',
                  'keep *_allMuons*_*_*',
 
                  # keep the weight from trigger info
