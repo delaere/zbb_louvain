@@ -1,6 +1,12 @@
 ## import skeleton process
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
+process.configurationMetadata = cms.untracked.PSet(
+    version = cms.untracked.string('$Revision$'),
+    annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
+    name = cms.untracked.string('$Source$')
+)
+
 # for the latest reprocessed samples. You can find it with:
 # dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
 process.GlobalTag.globaltag = cms.string('FT_R_39X_V4A::All')
@@ -197,21 +203,21 @@ process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
                                      decay = cms.string("matchedMuons@+ tightMuons@-"),
                                      cut = cms.string("60.0 < mass < 120.0"), 
                                      name = cms.string('ztighttight'),
-                                     roles = cms.vstring('muon1', 'muon2')
+                                     roles = cms.vstring('matched', 'tight')
                                      )
 
 process.Ztightloose = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("matchedMuons@+ looseMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
                                      name = cms.string('ztightloose'),
-                                     roles = cms.vstring('muon1', 'muon2')
+                                     roles = cms.vstring('matched', 'loose')
                                      )
 
 process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("cleanPatMuons@+ cleanPatMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
                                      name = cms.string('zcleanclean'),
-                                     roles = cms.vstring('muon1', 'muon2')
+                                     roles = cms.vstring('clean1', 'clean2')
                                      )
 
 #*************************************** Electrons
@@ -259,6 +265,8 @@ process.matchedElectrons.src = "selectedElectronsMatched"
 process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("tightElectrons@+ matchedElectrons@-"),
                                cut = cms.string("60.0 < mass < 120.0")
+                               name = cms.string('zelel'), 
+                               roles = cms.vstring('tight', 'matched')
                               )
 
 #-----------------tracks
