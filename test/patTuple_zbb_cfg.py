@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision$'),
+    version = cms.untracked.string('$Revision: 1.10 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source$')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
@@ -264,7 +264,7 @@ process.matchedElectrons.src = "selectedElectronsMatched"
 
 process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("tightElectrons@+ matchedElectrons@-"),
-                               cut = cms.string("60.0 < mass < 120.0")
+                               cut = cms.string("60.0 < mass < 120.0"),
                                name = cms.string('zelel'), 
                                roles = cms.vstring('tight', 'matched')
                               )
