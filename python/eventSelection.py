@@ -62,12 +62,15 @@ def isGoodMuon(muon,role):
   if role=="loose" : return isLooseMuon(muon)
   if role=="tight" : return isTightMuon(muon)
   if role=="matched" : return isMatchedMuon(muon)
+  print "Warning: Unknown muon role:",role
+  return True
 
 def isLooseElectron(electron):
   """Perform additional checks that define a loose electron"""
 
   # anything else on top of PAT cfg ?
   # cleaning ?
+  if electron.hasOverlaps("muons"): return False
 
   return True
 
@@ -76,6 +79,7 @@ def isTightElectron(electron):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
+  if electron.hasOverlaps("muons"): return False
 
   return (isLooseElectron(electron) and True)
 
@@ -84,6 +88,7 @@ def isMatchedElectron(electron):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
+  if electron.hasOverlaps("muons"): return False
 
   return (isTightElectron(electron) and True)
 
@@ -92,18 +97,24 @@ def isGoodElectron(electron,role):
   if role=="loose" : return isLooseElectron(electron)
   if role=="tight" : return isTightElectron(electron)
   if role=="matched" : return isMatchedElectron(electron)
+  print "Warning: Unknown muon role:",role
+  return True
 
-def isGoodJet(jet)
+def isGoodJet(jet):
   """Perform additional checks that define a good jet"""
 
   # perform cleaning
+  # check first the performances of the cleaning.
+  # Q: what is the mu/ele collection used as input? Full collection -> wrong.
+  #if jet.hasOverlaps("muons"): return False
+  #if jet.hasOverlaps("electrons"): return False
   # jet id ?
   # abs(jet.eta())<2.1
   # dR(leptons)>0.4
 
   return True
 
-def isBJet(jet,workingPoint)
+def isBJet(jet,workingPoint):
   """Perform b-tagging"""
   if workingPoint=="HE":
     return jet.bDiscriminant("simpleSecondaryVertexHighEffBJetTags")>1.7
@@ -156,7 +167,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets):
   bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
   if not isTriggerOK(triggerInfo, bestZcandidate.daughter(0).isMuon()): return 0
   if bestZcandidate is None : return 1
-  if abs(bestZcandidate.mass-91.1876)<15.): return 2
+  if abs(bestZcandidate.mass-91.1876)<15. : return 2
   nJets    = 0
   nBjetsHE = 0
   nBjetsHP = 0
