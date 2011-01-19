@@ -2,18 +2,18 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.11 $'),
-    annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
+    version = cms.untracked.string('$Revision: 1.1 $'),
+    annotation = cms.untracked.string('PAT tuple for Z+b analysis: MC'),
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_MC.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
 # dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
-process.GlobalTag.globaltag = cms.string('START39_V8::All')
+process.GlobalTag.globaltag = cms.string('START38_V12::All')
 
 # running on data, remove genparticle references in objects
-from PhysicsTools.PatAlgos.tools.coreTools import *
-removeMCMatching(process, ['All'])
+# from PhysicsTools.PatAlgos.tools.coreTools import *
+# removeMCMatching(process, ['All'])
 
 # scrapingveto:
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
@@ -231,7 +231,9 @@ process.patElectrons.electronIDSources = cms.PSet(
     simpleEleId85relIso= cms.InputTag("simpleEleId85relIso")
     )
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
-process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.patElectrons)
+
+# attention: process.electronMatch is needed for MC matching, so thi is NOT an elegant solution
+process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.electronMatch*process.patElectrons)
 
 # clean pat Electrons should be isolated for cleaning purpose
 #process.cleanPatElectrons.src = "selectedElectronsMatched"
