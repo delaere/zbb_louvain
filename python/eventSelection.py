@@ -1,11 +1,13 @@
 
-def isTriggerOK(triggerInfo, muchannel=True, runNumber=None):
+def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
 
   # IMPORTANT: to be fast, it uses the vector from TriggerWeight and assumes the order within.
 
+  #TODO: ROOT BUG here. cannot use vector<bool>
+  return True
   outcome = False
   if runNumber is None:
     if muChannel:
@@ -70,7 +72,8 @@ def isLooseElectron(electron):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
-  if electron.hasOverlaps("muons"): return False
+  # note: how to make a pat lepton from the shallowclone ?
+  #if electron.hasOverlaps("muons"): return False
 
   return True
 
@@ -79,7 +82,8 @@ def isTightElectron(electron):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
-  if electron.hasOverlaps("muons"): return False
+  # note: how to make a pat lepton from the shallowclone ?
+  #if electron.hasOverlaps("muons"): return False
 
   return (isLooseElectron(electron) and True)
 
@@ -88,7 +92,8 @@ def isMatchedElectron(electron):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
-  if electron.hasOverlaps("muons"): return False
+  # note: how to make a pat lepton from the shallowclone ?
+  #if electron.hasOverlaps("muons"): return False
 
   return (isTightElectron(electron) and True)
 
@@ -117,9 +122,9 @@ def isGoodJet(jet):
 def isBJet(jet,workingPoint):
   """Perform b-tagging"""
   if workingPoint=="HE":
-    return jet.bDiscriminant("simpleSecondaryVertexHighEffBJetTags")>1.7
+    return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.7
   elif workingPoint=="HP":
-    return jet.bDiscriminant("simpleSecondaryVertexHighPurBJetTags")>2.0
+    return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0
   else:
     print "Error: unforeseen working point for b-tagging. Use HE or HP"
     return False
@@ -130,13 +135,13 @@ def isZcandidate(zCandidate):
   flavor = 1
   charge = 1
   for r in zCandidate.roles():
-    daughter = Z.daughter(r)
+    daughter = zCandidate.daughter(r)
     charge *= daughter.charge()
     if daughter.isMuon() :
       flavor *= -1
-      result = result and isGoodMuon(Z.daughter(r),r)
-    elif Z.daughter(r).isElectron():
-      result = result and isGoodElectron(Z.daughter(r),r)
+      result = result and isGoodMuon(zCandidate.daughter(r),r)
+    elif zCandidate.daughter(r).isElectron():
+      result = result and isGoodElectron(zCandidate.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
   if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"
@@ -161,13 +166,13 @@ def findBestCandidate(*zCandidates):
         bestZ = z
   return bestZ
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, muChannel=True):
   """See up to which level the event passes the selection"""
   #TODO: add vertex constraints when ready
+  if not isTriggerOK(triggerInfo, muChannel): return 0
   bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
-  if not isTriggerOK(triggerInfo, bestZcandidate.daughter(0).isMuon()): return 0
   if bestZcandidate is None : return 1
-  if abs(bestZcandidate.mass-91.1876)<15. : return 2
+  if abs(bestZcandidate.mass()-91.1876)>30. : return 2
   nJets    = 0
   nBjetsHE = 0
   nBjetsHP = 0
@@ -176,7 +181,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets):
       nJets += 1
       if isBJet(jet,"HE"): nBjetsHE += 1
       if isBJet(jet,"HP"): nBjetsHP += 1
-  if njets==0: return 3
+  if nJets==0: return 3
   if nBjetsHE==0: return 4 # we can do this way because HP is a subset of HE
   if nBjetsHP==0: return 5 #
   return 6
