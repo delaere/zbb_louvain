@@ -2,18 +2,13 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis: MC'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_MC.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
-# dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
-process.GlobalTag.globaltag = cms.string('START38_V12::All')
-
-# running on data, remove genparticle references in objects
-# from PhysicsTools.PatAlgos.tools.coreTools import *
-# removeMCMatching(process, ['All'])
+process.GlobalTag.globaltag = cms.string('START39_V8::All')
 
 # scrapingveto:
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
@@ -296,6 +291,32 @@ from PhysicsTools.PatAlgos.selectionLayer1.electronCountFilter_cfi import *
 process.mutrigger = countPatMuons.clone(src = 'cleanPatMuons', minNumber = 2)
 process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 2)
 
+# additional collections and candidates
+process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
+
+process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("bjets bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('bbar'),
+                               roles = cms.vstring('b1', 'b2')
+                              )
+
+process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Zelel bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+process.Zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Ztightloose bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+
+
 # trigger matching and embedding should be done at the end of the sequence
 #process.patDefaultSequence *= process.selectedMuonsTriggerMatch
 #process.patDefaultSequence *= process.selectedMuonsMatched
@@ -320,6 +341,12 @@ process.patDefaultSequence *= process.Ztighttight
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
 process.patDefaultSequence *= process.Zelel
+
+# run additional colllections and candidates
+process.patDefaultSequence *= process.bjets
+process.patDefaultSequence *= process.bbbar
+process.patDefaultSequence *= process.Zmmbb
+process.patDefaultSequence *= process.Zeebb
 
 # Run it
 process.p1 = cms.Path(process.scrapingVeto * process.patDefaultSequence * process.mutrigger)
@@ -351,6 +378,14 @@ tokeep_clean += [
                  # keep the weight from trigger info
                  'keep *_WeightFromTrigger_*_*',
 
+                 # keep gen particles
+                 'keep *_genParticles*_*_*',
+
+                 # keep candidates based on b jets
+                 'keep *_bjets*_*_*',
+                 'keep *_bbbar*_*_*',
+
+                 # keep Z candidates 
                  'keep *_Z*_*_*',
 
                  'keep *_goodPV*_*_*' ]
