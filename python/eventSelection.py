@@ -64,6 +64,7 @@ def isGoodMuon(muon,role):
   if role=="loose" : return isLooseMuon(muon)
   if role=="tight" : return isTightMuon(muon)
   if role=="matched" : return isMatchedMuon(muon)
+  if role=="none" : return True
   print "Warning: Unknown muon role:",role
   return True
 
@@ -102,6 +103,7 @@ def isGoodElectron(electron,role):
   if role=="loose" : return isLooseElectron(electron)
   if role=="tight" : return isTightElectron(electron)
   if role=="matched" : return isMatchedElectron(electron)
+  if role=="none" : return True
   print "Warning: Unknown muon role:",role
   return True
 

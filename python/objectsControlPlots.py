@@ -48,15 +48,26 @@ class MuonsControlPlots:
       for muon in muons:
         # for muons:
         self.h_muonType.Fill(muon.isGlobalMuon()+2*muon.isTrackerMuon())
-        self.h_muonhits.Fill(muon.innerTrack().numberOfValidHits())
+        if muon.isTrackerMuon():
+          self.h_muonhits.Fill(muon.innerTrack().numberOfValidHits())
+          self.h_muonPHits.Fill(muon.innerTrack().hitPattern().numberOfValidPixelHits())
+          self.h_muonSHits.Fill(muon.innerTrack().hitPattern().numberOfValidStripHits())
+        else:
+          self.h_muonhits.Fill(0)
+          self.h_muonPHits.Fill(0)
+          self.h_muonSHits.Fill(0)
+        if muon.isGlobalMuon():
+          self.h_muonMHits.Fill(muon.globalTrack().hitPattern().numberOfValidMuonHits())
+        else:
+          self.h_muonMHits.Fill(0)
+        if muon.isTrackerMuon() and muon.isGlobalMuon():
+          self.h_muonChi2.Fill(muon.normChi2())
+        else:
+          self.h_muonChi2.Fill(0)
         self.h_muonIso.Fill((muon.trackIso()+muon.caloIso())/muon.pt())
         self.h_muonPt.Fill(muon.pt())
         self.h_muonEta.Fill(muon.eta())
-        self.h_muonChi2.Fill(muon.normChi2())
-        self.h_muonPHits.Fill(muon.innerTrack().hitPattern().numberOfValidPixelHits())
-        self.h_muonSHits.Fill(muon.innerTrack().hitPattern().numberOfValidStripHits())
         self.h_muonMatches.Fill(muon.numberOfMatches())
-        self.h_muonMHits.Fill(muon.globalTrack().hitPattern().numberOfValidMuonHits())
         if isGoodMuon(muon,self.muonType) : nmu += 1
       self.h_nmu.Fill(nmu)
     
