@@ -89,6 +89,7 @@ def isTightElectron(electron):
   return (isLooseElectron(electron) and True)
 
 def isMatchedElectron(electron):
+
   """Perform additional checks that define a matched electron"""
 
   # anything else on top of PAT cfg ?
@@ -107,19 +108,48 @@ def isGoodElectron(electron,role):
   print "Warning: Unknown muon role:",role
   return True
 
-def isGoodJet(jet):
-  """Perform additional checks that define a good jet"""
+def hasNoOverlap(jet, Z):
+  """check overlap between jets and leptons from the Z"""
+  l1 = Z.daughter(0)
+  l2 = Z.daughter(1)
+  l1v = ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
+  l2v = ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy())
+  jv =  ROOT.TLorentzVector(j.px(),j.py(),j.pz(),j.energy())
+  dr1 = jv.DeltaR(l1v)
+  dr2 = jv.DeltaR(l2v)
+  return (dr1>0.4 and dr2>0.4)
 
-  # perform cleaning
-  # check first the performances of the cleaning.
-  # Q: what is the mu/ele collection used as input? Full collection -> wrong.
+def jetId(jet,level="loose"):
+  """jet id - This corresponds to the jet id selection for PF jets"""
+  rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+  nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
+  nef = rawjet.neutralEmEnergyFraction()
+  nconstituents = rawjet.numberOfDaughters()
+  chf = rawjet.chargedHadronEnergyFraction()
+  nch = rawjet.chargedMultiplicity()
+  cef = rawjet.chargedEmEnergyFraction()
+  if level=="loose":
+    return nhf<0.99 and nef<0.99 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99
+  elif level=="medium":
+    return nhf<0.95 and nef<0.95 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99
+  elif level=="tight":
+    return nhf<0.90 and nef<0.90 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99
+  else: 
+    print "Error: unknown jetid level:",level
+    return False
+
+def isGoodJet(jet, Z = None):
+  """Perform additional checks that define a good jet"""
+  # restrict in eta
+  outcome = abs(jet.eta())<2.1
+  # overlap checking
+  # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
   #if jet.hasOverlaps("muons"): return False
   #if jet.hasOverlaps("electrons"): return False
-  # jet id ?
-  # abs(jet.eta())<2.1
-  # dR(leptons)>0.4
-
-  return True
+  if not Z is None: outcome = outcome and hasNoOverlap(jet,Z)
+  # check jetid (loose)
+  outcome = outcome and jetId(jet,"loose")
+  return outcome
 
 def isBJet(jet,workingPoint):
   """Perform b-tagging"""

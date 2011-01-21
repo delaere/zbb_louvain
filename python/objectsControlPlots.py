@@ -161,8 +161,6 @@ class JetmetControlPlots:
       self.h_SSVHEdisc = ROOT.TH1F("SSVHEdisc","SSVHEdisc",200,-10,10)
       self.h_SSVHPdisc = ROOT.TH1F("SSVHPdisc","SSVHPdisc",200,-10,10)
       self.h_met = ROOT.TH1F("MET","MET",100,0,200)
-      self.h_dijetM = ROOT.TH1F("dijetM","b bbar invariant mass",1000,0,1000)
-      self.h_dijetPt = ROOT.TH1F("dijetPt","b bbar Pt",500,0,500)
       self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
       self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",50,-2.5, 2.5)
       self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
@@ -180,6 +178,13 @@ class JetmetControlPlots:
       self.h_nb = ROOT.TH1I("nb","b-jet count",5,0,5)
       self.h_nbP = ROOT.TH1I("nbP","pure b-jet count",5,0,5)
       self.h_njb = ROOT.TH2I("njb","number of bjets vs number of jets",15,0,15,5,0,5)
+      self.h_nhf = ROOT.TH1F("nhf","neutral hadron energy fraction",101,0,1.01)
+      self.h_nef = ROOT.TH1F("nef","neutral EmEnergy fraction",101,0,1.01)
+      self.h_nconstituents = ROOT.TH1I("npf","total multiplicity",50,0,50)
+      self.h_chf = ROOT.TH1F("chf","charged hadron energy fraction",101,0,1.01)
+      self.h_nch = ROOT.TH1I("nch","charged multiplicity",50,0,50)
+      self.h_cef = ROOT.TH1F("cef","charged EmEnergy fraction",101,0,1.01)
+      self.h_jetid = ROOT.TH1I("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
@@ -204,7 +209,17 @@ class JetmetControlPlots:
         self.h_jetphi.Fill(jet.phi())
         self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
         self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
-        # add plots as soon as the jet selection is in place
+        rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+        self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
+        self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
+        self.h_nconstituents.Fill(rawjet.numberOfDaughters())
+        self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
+        self.h_nch.Fill(rawjet.chargedMultiplicity())
+        self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
+        if jetId(jet,"tight"): self.h_jetid.Fill(3)
+        elif jetId(jet,"medium"): self.h_jetid.Fill(2)
+        elif jetId(jet,"loose"): self.h_jetid.Fill(1)
+        else: self.h_jetid.Fill(0)
         # B-tagging
         if isGoodJet(jet):
           self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
