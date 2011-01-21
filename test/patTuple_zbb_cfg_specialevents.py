@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.11 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_specialevents.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
@@ -297,6 +297,28 @@ process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simp
 process.boostedZelel = process.Zelel.clone( cut = cms.string("60.0 < mass < 120.0 & pt > 150.0")  )
 process.boostedZmumu = process.Ztightloose.clone( cut = cms.string("60.0 < mass < 120.0 & pt > 150.0")  )
 
+process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("bjets bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('bbar'),
+                               roles = cms.vstring('b1', 'b2')
+                              )
+
+process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Zelel bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+process.Zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Ztightloose bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+
 # counters
 process.defaultcounter = cms.EDFilter("PATCandViewCountFilter",
     minNumber = cms.uint32(0),
@@ -328,6 +350,12 @@ process.patDefaultSequence *= process.matchedElectrons
 process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.goodPV
 
+# combine leptons to get Z candidates
+process.patDefaultSequence *= process.Ztighttight
+process.patDefaultSequence *= process.Ztightloose
+process.patDefaultSequence *= process.Zcleanclean
+process.patDefaultSequence *= process.Zelel
+
 # special events section
 process.patDefaultSequence *= process.bjets
 process.patDefaultSequence *= process.boostedZelel
@@ -336,11 +364,10 @@ process.patDefaultSequence *= process.boostedZmumu
 # compute weight from trigger presscale
 process.patDefaultSequence *= process.WeightFromTrigger
 
-# combine leptons to get Z candidates
-process.patDefaultSequence *= process.Ztighttight
-process.patDefaultSequence *= process.Ztightloose
-process.patDefaultSequence *= process.Zcleanclean
-process.patDefaultSequence *= process.Zelel
+# run additional collections and candidates
+process.patDefaultSequence *= process.bbbar
+process.patDefaultSequence *= process.Zmmbb
+process.patDefaultSequence *= process.Zeebb
 
 # Run it
 # Zmumu, 2 bjets
@@ -354,41 +381,9 @@ process.p4 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSeq
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3', 'p4') )
 
-#process.out.outputCommands = cms.untracked.vstring('keep *')
-tokeep_clean  = [ 
-                  # keep all types of pat and Pat Jets, to access embedded PF candidates
-                  'keep *_*atJets*_*_*',
 
-                  # keep all tracks (not tracksextra)
-                  'keep recoTracks_generalTracks_*_*',
-
-                  'keep *_patMETs*_*_*',
-                  'keep *_patTrigger*_*_*' ]
-
-tokeep_clean += [
-                 'keep *_tightElectrons_*_*',
-                 'keep *_matchedElectrons_*_*',
-                 'keep *_allElectrons*_*_*',
-                 
-                 'keep *_looseMuons_*_*',
-                 'keep *_tightMuons_*_*',
-                 'keep *_matchedMuons_*_*',
-                 'keep *_allMuons*_*_*',
-
-                 # keep the weight from trigger info
-                 'keep *_WeightFromTrigger_*_*',
-                 'keep *_bjets_*_*',
-
-                 'keep *_Z*_*_*',
-
-                 'keep *_goodPV*_*_*' ]
-
-# B-Tagging: is this needed ?
-tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCounting*BJetTags*_*_PAT']
-
-
-process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
-# process.out.outputCommands = cms.untracked.vstring( 'keep *' )
+# only few events, so we keep all reco info
+process.out.outputCommands = cms.untracked.vstring( 'keep *' )
 
 from glob import glob
 
