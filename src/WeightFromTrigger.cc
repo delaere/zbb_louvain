@@ -13,7 +13,7 @@
 //
 // Original Author:  Christophe Delaere,354 2-003,+41227674739,
 //         Created:  Sat Nov 20 15:25:22 CET 2010
-// $Id: WeightFromTrigger.cc,v 1.1 2011/01/11 15:57:42 delaer Exp $
+// $Id: WeightFromTrigger.cc,v 1.2 2011/01/12 19:45:17 delaer Exp $
 //
 //
 
@@ -85,7 +85,7 @@ WeightFromTrigger::WeightFromTrigger(const edm::ParameterSet& iConfig):hltConfig
   
   // registration of the product: weight and subset of trigger bits
   produces<float>("WeightFromTrigger");
-  produces<std::vector<bool> >("SelectedTriggers");
+  produces<std::vector<int> >("SelectedTriggers");
 
 }
 
@@ -124,7 +124,7 @@ WeightFromTrigger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    unsigned int prescale(0);
    bool bit(true);
    std::pair<int,int> prescalepair;
-   std::vector<bool>  triggerSubset;
+   std::vector<int>  triggerSubset;
    for(unsigned int itrig = 0; itrig < triggerNames_.size(); ++itrig) {
     if(triggerIndices_[itrig]!=2048) {
      // check trigger response
@@ -154,7 +154,7 @@ WeightFromTrigger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    // put the result in the event
    std::auto_ptr<float> pOut(new float(minimalPrescale));
    iEvent.put(pOut, "WeightFromTrigger");
-   std::auto_ptr<std::vector<bool> > pOut2(new std::vector<bool> (triggerSubset));
+   std::auto_ptr<std::vector<int> > pOut2(new std::vector<int> (triggerSubset));
    iEvent.put(pOut2, "SelectedTriggers");
 
 }
