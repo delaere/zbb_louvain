@@ -10,9 +10,13 @@ from vertexAssociationControlPlots import *
 
 def runTest():
   output = ROOT.TFile("controlPlots.root", "RECREATE")
-  muonsPlots = MuonsControlPlots(output.mkdir("muons"))
-  electronsPlots = ElectronsControlPlots(output.mkdir("electrons"))
-  jetmetPlots = JetmetControlPlots(output.mkdir("jetmet"))
+  allmuonsPlots = MuonsControlPlots(output.mkdir("allmuons"))
+  loosemuonsPlots = MuonsControlPlots(output.mkdir("loosemuons"))
+  tightmuonsPlots = MuonsControlPlots(output.mkdir("tightmuons"))
+  allelectronsPlots = ElectronsControlPlots(output.mkdir("allelectrons"))
+  tightelectronsPlots = ElectronsControlPlots(output.mkdir("tightelectrons"))
+  jetmetAK5PFPlots = JetmetControlPlots(output.mkdir("jetmetAK5PF"))
+  jetmetAK7PFPlots = JetmetControlPlots(output.mkdir("jetmetAK7PF"))
   vertexPlots = VertexAssociationControlPlots(output.mkdir("vertexAssociation"))
   selectionPlots = EventSelectionControlPlots(output.mkdir("selection"))
 
@@ -23,25 +27,37 @@ def runTest():
     files.append(path+fname)
   events = Events (files)
 
-  muonsPlots.beginJob()
-  electronsPlots.beginJob()
-  jetmetPlots.beginJob()
+  allmuonsPlots.beginJob(muonlabel="allMuons", muonType="none")
+  loosemuonsPlots.beginJob(muonlabel="looseMuons", muonType="loose")
+  tightmuonsPlots.beginJob(muonlabel="matchedMuons", muonType="tight")
+  allelectronsPlots.beginJob(electronlabel="allElectrons", electronType="none")
+  tightelectronsPlots.beginJob(electronlabel="matchedElectrons", electronType="tight")
+  jetmetAK5PFPlots.beginJob(jetlabel="cleanPatJets")
+  jetmetAK7PFPlots.beginJob(jetlabel="cleanPatJetsAK7PF")
   vertexPlots.beginJob()
   selectionPlots.beginJob()
 
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
-    jetmetPlots.processEvent(event)
-    muonsPlots.processEvent(event)
-    electronsPlots.processEvent(event)
+    jetmetAK5PFPlots.processEvent(event)
+    jetmetAK7PFPlots.processEvent(event)
+    allmuonsPlots.processEvent(event)
+    loosemuonsPlots.processEvent(event)
+    tightmuonsPlots.processEvent(event)
+    allelectronsPlots.processEvent(event)
+    tightelectronsPlots.processEvent(event)
     vertexPlots.processEvent(event)
     selectionPlots.processEvent(event)
     i += 1
 
-  jetmetPlots.endJob()
-  muonsPlots.endJob()
-  electronsPlots.endJob()
+  jetmetAK5PFPlots.endJob()
+  jetmetAK7PFPlots.endJob()
+  allmuonsPlots.endJob()
+  loosemuonsPlots.endJob()
+  tightmuonsPlots.endJob()
+  allelectronsPlots.endJob()
+  tightelectronsPlots.endJob()
   vertexPlots.endJob()
   selectionPlots.endJob()
   output.Close()
