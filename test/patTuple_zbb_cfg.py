@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.10 $'),
+    version = cms.untracked.string('$Revision: 1.11 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
@@ -285,6 +285,32 @@ process.goodPV.cut=cms.string('ndof > 4&'
                               ' position.Rho <2 '
                               )
 
+
+# additional collections and candidates
+process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
+
+process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("bjets bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('bbar'),
+                               roles = cms.vstring('b1', 'b2')
+                              )
+
+process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Zelel bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+process.Zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("Ztightloose bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b')
+                              )
+
+
 #------------------------------ Sequence
 #------------------------------------------------------------------------------------------------------------------------------------------------		
 # vertex filter
@@ -319,6 +345,12 @@ process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
 process.patDefaultSequence *= process.Zelel
 
+# run additional collections and candidates
+process.patDefaultSequence *= process.bjets
+process.patDefaultSequence *= process.bbbar
+process.patDefaultSequence *= process.Zmmbb
+process.patDefaultSequence *= process.Zeebb
+
 # Run it
 process.p1 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence * process.mutrigger)
 process.p2 = cms.Path(process.hlt * process.scrapingVeto * process.patDefaultSequence * process.eltrigger)
@@ -349,6 +381,11 @@ tokeep_clean += [
                  # keep the weight from trigger info
                  'keep *_WeightFromTrigger_*_*',
 
+                 # keep candidates based on b jets
+                 'keep *_bjets*_*_*',
+                 'keep *_bbbar*_*_*',
+                 
+                 # keep Z candidates
                  'keep *_Z*_*_*',
 
                  'keep *_goodPV*_*_*' ]
@@ -368,6 +405,6 @@ process.source.fileNames = [
 
 process.maxEvents.input = 1000
 
-process.out.fileName = 'MURun2010B-DiLeptonMu-Dec22Skim.root'
+process.out.fileName = 'Z_data.root'
 
 process.options.wantSummary = True
