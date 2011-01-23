@@ -21,7 +21,7 @@ class plotCombiner {
      plotCombiner() {}
      ~plotCombiner() {}
      void run(TDirectory* output) {
-       CombineDir(_filesMC, _filesMC, output);
+       CombineDir(_filesData, _filesMC, output);
      }
      void setDatacfg(std::vector<edm::ParameterSet>& inputs) {
       _dataInputs = inputs;
