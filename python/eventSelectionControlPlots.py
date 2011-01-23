@@ -67,11 +67,12 @@ class EventSelectionControlPlots:
       event.getByLabel (self.jetlabel,self.jetHandle)
       event.getByLabel (self.zmulabel,self.zmuHandle)
       event.getByLabel (self.zelelabel,self.zeleHandle)
-      event.getByLabel (self.trigInfolabel,"SelectedTriggers",self.trigInfoHandle)
+      #event.getByLabel (self.trigInfolabel,"SelectedTriggers",self.trigInfoHandle)
       jets = self.jetHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
-      triggerInfo = self.trigInfoHandle.product()
+      #triggerInfo = self.trigInfoHandle.product()
+      triggerInfo = None
 
       ## trigger
       # TODO: ROOT BUG HERE : vector<bool> dictionnary is incomplete
