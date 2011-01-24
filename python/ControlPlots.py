@@ -9,7 +9,7 @@ from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 
 def runTest():
-  output = ROOT.TFile("controlPlots_DYJetsToLL_TuneD6T.root", "RECREATE")
+  output = ROOT.TFile("controlPlots_Zcc-TuneZ2_2.root", "RECREATE")
   allmuonsPlots = MuonsControlPlots(output.mkdir("allmuons"))
   loosemuonsPlots = MuonsControlPlots(output.mkdir("loosemuons"))
   tightmuonsPlots = MuonsControlPlots(output.mkdir("tightmuons"))
@@ -24,8 +24,9 @@ def runTest():
 #  path="/storage/data/cms/store/user/favereau/MURun2010A-DiLeptonMu-Dec22/"
 #  path="/storage/data/cms/store/user/favereau/ELERun2010A-DiLeptonEle-Dec22/"
 #  path="/storage/data/cms/store/user/favereau/ELERun2010B-DiLeptonEle-Dec22/"
-  path="/storage/data/cms/store/user/favereau/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola_2/"
+#  path="/storage/data/cms/store/user/favereau/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola_2/"
 #  path="/storage/data/cms/store/user/favereau/Zbb-TuneZ2/"
+  path="/storage/data/cms/store/user/favereau/Zcc-TuneZ2_2/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -44,7 +45,6 @@ def runTest():
 
   i = 0
   for event in events:
-    if i>500000 : break
     if i%1000==0 : print "Processing... event ", i
     jetmetAK5PFPlots.processEvent(event)
     jetmetAK7PFPlots.processEvent(event)

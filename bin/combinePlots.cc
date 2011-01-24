@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 #include <iostream>
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
@@ -37,6 +38,11 @@ class plotCombiner {
          _filesMC.push_back(TFile::Open(filename.c_str()));
        }
      }
+     void setStyleTweaks(std::vector<edm::ParameterSet>& tweaks) {
+       for(std::vector<edm::ParameterSet>::const_iterator tweak = tweaks.begin(); tweak<tweaks.end(); ++tweak) {
+         _styleTweaks[tweak->getParameter<std::string>("name")] = *tweak;
+       }
+     }
    private:
      void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      void CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
@@ -44,6 +50,7 @@ class plotCombiner {
      std::vector<edm::ParameterSet> _mcInputs;
      std::vector<TDirectory*> _filesData;
      std::vector<TDirectory*> _filesMC;
+     std::map<std::string, edm::ParameterSet> _styleTweaks;
 };
 
 void setTDRStyle() {
@@ -215,6 +222,7 @@ int main(int argc, char *argv[]){
   std::string outputFile = parameters.getParameter<std::string>("outputFile");
   std::vector<edm::ParameterSet> dataInputs = parameters.getParameter<std::vector<edm::ParameterSet> >("data");
   std::vector<edm::ParameterSet> mcInputs = parameters.getParameter<std::vector<edm::ParameterSet> >("mc");
+  std::vector<edm::ParameterSet> styleTweaks = parameters.getParameter<std::vector<edm::ParameterSet> >("formating");
   // output file
   TFile *_output = TFile::Open(outputFile.c_str(),"RECREATE");
   // set the tdr Style
@@ -224,6 +232,7 @@ int main(int argc, char *argv[]){
   plotCombiner combiner;
   combiner.setDatacfg(dataInputs);
   combiner.setMCcfg(mcInputs);
+  combiner.setStyleTweaks(styleTweaks);
   combiner.run(_output);
   // save and quit
   _output->Write();
@@ -239,20 +248,27 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    TCanvas* c = new TCanvas(data->GetName(),data->GetTitle());
    THStack* stack = new THStack(data->GetName(),"MC stack");
    TLegend* leg = new TLegend(0.6,0.7,0.9,0.9);
+   std::map<std::string, edm::ParameterSet>::iterator style = _styleTweaks.find(data->GetName());
    for(std::vector<TDirectory*>::const_iterator it = datadirs.begin()+1;it<datadirs.end();++it) {
      TH1* h;
      (*it)->GetObject(data->GetName(),h);
      data->Add(h);
    }
+   if(style!=_styleTweaks.end()) data->Rebin(style->second.getUntrackedParameter<unsigned>("rebin",1));
+   data->SetTitle("data");
    leg->AddEntry(data,"Data","LE");
    std::vector<edm::ParameterSet>::const_iterator mcConf = _mcInputs.begin();
    for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it, ++mcConf) {
      TH1* h;
      (*it)->GetObject(data->GetName(),h);
+     // title
+     h->SetTitle(mcConf->getParameter<std::string>("role").c_str());
      // color
      h->SetFillColor(mcConf->getParameter<unsigned int>("color"));
      // scale
      h->Scale(mcConf->getParameter<double>("scale"));
+     // rebin
+     if(style!=_styleTweaks.end()) h->Rebin(style->second.getUntrackedParameter<unsigned>("rebin",1));
      // add
      stack->Add(h);
      // legend
@@ -261,6 +277,14 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    stack->Draw();
    data->Draw("e, same");
    leg->Draw();
+   if(style!=_styleTweaks.end()) {
+     // we might add in the config file a set of entries to set labels, axis, etc.
+     // everything is done using untracked parameters, so it is easy and quick to add things.
+     data->SetXTitle(style->second.getUntrackedParameter("labelx",std::string("")).c_str());
+     data->SetYTitle(style->second.getUntrackedParameter("labely",std::string("")).c_str());
+     if(style->second.getUntrackedParameter("logx",false)) c->SetLogx();
+     if(style->second.getUntrackedParameter("logy",false)) c->SetLogy();
+   }
    output->WriteObject(c,c->GetName());
    delete c;
 }
