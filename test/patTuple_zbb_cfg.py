@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.13 $'),
+    version = cms.untracked.string('$Revision: 1.14 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
@@ -115,7 +115,7 @@ addJetCollection(process,cms.InputTag('ak7PFJets'),
                  doBTagging   = True,
                  # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
                  # jetCorrLabel = ('AK7PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
-                 jetCorrLabel = ('AK7PF',['RAW', 'L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
+                 jetCorrLabel = ('AK7PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                  doType1MET   = False,
                  doL1Cleaning = True,                 
                  doL1Counters = False,
@@ -130,7 +130,7 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doBTagging   = True,
                     # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
                     #jetCorrLabel = ('AK5PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
-                    jetCorrLabel = ('AK5PF',['RAW', 'L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
+                    jetCorrLabel = ('AK5PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
