@@ -18,7 +18,7 @@ class EventSelectionControlPlots:
         self.dir = dir
       self.muChannel = muChannel
     
-    def beginJob(self, jetlabel="cleanPatJets", zmulabel="Ztightloose", zelelabel="Zelel", triggerlabel="WeightFromTrigger"):
+    def beginJob(self, jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="WeightFromTrigger"):
       # declare histograms
       self.dir.cd()
       self.h_triggerSelection = ROOT.TH1I("triggerSelection","triggerSelection ",2,0,2)

@@ -17,7 +17,7 @@ class VertexAssociationControlPlots:
         self.f = None
         self.dir = dir
     
-    def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztightloose", vertexlabel="goodPV" ):
+    def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" ):
       # declare histograms
       self.dir.cd()
       self.h_vx = ROOT.TH1F("vx","vx",400,-0.2,0.2)
