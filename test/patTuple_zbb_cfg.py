@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.14 $'),
+    version = cms.untracked.string('$Revision: 1.15 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
@@ -71,7 +71,7 @@ defaultTriggerMatch = cms.EDProducer(
     pathLastFilterAcceptedOnly = cms.bool( True ),    
     collectionTags             = cms.vstring( '*' ), 
     maxDPtRel = cms.double( 0.5 ),
-    maxDeltaR = cms.double( 0.2 ),
+    maxDeltaR = cms.double( 0.3 ),
     resolveAmbiguities    = cms.bool( True ),     
     resolveByMatchQuality = cms.bool( True ),      
 )
