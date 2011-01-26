@@ -200,6 +200,8 @@ def findBestCandidate(*zCandidates):
         bestZ = z
   return bestZ
 
+def eventCategories(): return 7
+
 def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, muChannel=True):
   """See up to which level the event passes the selection"""
   #TODO: add vertex constraints when ready
