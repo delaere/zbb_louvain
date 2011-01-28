@@ -6,35 +6,42 @@ process.CombinePlots = cms.PSet(
   outputFile = cms.string('mergedPlots.root'),
   data = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('controlPlots_ELERun2010A.root')
+     fileName = cms.string('controlPlots_El_2010A_Dec22.root')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_ELERun2010B.root')
+     fileName = cms.string('controlPlots_El_2010B_Dec22.root')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_MURun2010A.root')
+     fileName = cms.string('controlPlots_Mu_2010A_Dec22.root')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_MURun2010B.root')
+     fileName = cms.string('controlPlots_Mu_2010B_Dec22.root')
    ) 
   ),
   mc   = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('controlPlots_Zbb-TuneZ2.root'),
+     fileName = cms.string('controlPlots_Zbb-TuneZ2_2.root'),
      color = cms.uint32(2),
-     scale = cms.double(0.017978), #NLO
+     scale = cms.double(0.017978), #NLO k=1.25
      role = cms.string('Zbb')
    ), 
    cms.PSet(
      fileName = cms.string('controlPlots_Zcc-TuneZ2_2.root'),
      color = cms.uint32(4),
-     scale = cms.double(0.0189175), #NLO
+     scale = cms.double(0.0189175), #NLO k=1.25
      role = cms.string('Zcc')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_DYJetsToLL_TuneD6T.root'),
+     fileName = cms.string('controlPlots_TTJets_TuneZ2_387.root'),
+     color = cms.uint32(5),
+     scale = cms.double(0.003),
+     role = cms.string('ttbar')
+   ),
+   cms.PSet(
+     #fileName = cms.string('controlPlots_DYJetsToLL_TuneD6T.root'),
+     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_397.root'),
      color = cms.uint32(3),
-     scale = cms.double(0.0523572), #NNLO
+     scale = cms.double(0.03595), #NNLO
      role = cms.string('Z+jets')
    )
   ),
