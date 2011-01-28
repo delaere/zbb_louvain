@@ -36,19 +36,22 @@ from eventSelection import eventCategories, eventCategory
 def category(event,muChannel):
   """Compute the event category for histogramming"""
   jetHandle = Handle ("vector<pat::Jet>")
+  metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("vector<bool>")
   event.getByLabel ("cleanPatJets",jetHandle)
+  event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
   event.getByLabel ("Zelel",zeleHandle)
   #event.getByLabel ("WeightFromTrigger","SelectedTriggers",trigInfoHandle)
   jets = jetHandle.product()
+  met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   #triggerInfo = trigInfoHandle.product()
   triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, muChannel)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
 
 def runTest(path, levels, outputname="controlPlots.root"):
   """produce all the plots in one go"""

@@ -19,7 +19,7 @@ class EventSelectionControlPlots:
         self.dir = dir
       self.muChannel = muChannel
     
-    def beginJob(self, jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="WeightFromTrigger"):
+    def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="WeightFromTrigger"):
       # declare histograms
       self.dir.cd()
       self.h_triggerSelection = ROOT.TH1I("triggerSelection","triggerSelection ",2,0,2)
@@ -55,10 +55,12 @@ class EventSelectionControlPlots:
       
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
+      self.metHandle = Handle ("vector<pat::MET>")
       self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
       self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
       self.trigInfoHandle = Handle ("vector<bool>")
       self.jetlabel = (jetlabel)
+      self.metlabel = (metlabel)
       self.zmulabel = (zmulabel)
       self.zelelabel = (zelelabel)
       self.trigInfolabel = (triggerlabel)
@@ -66,10 +68,12 @@ class EventSelectionControlPlots:
     def processEvent(self,event):
       # load event
       event.getByLabel (self.jetlabel,self.jetHandle)
+      event.getByLabel (self.metlabel,self.metHandle)
       event.getByLabel (self.zmulabel,self.zmuHandle)
       event.getByLabel (self.zelelabel,self.zeleHandle)
       #event.getByLabel (self.trigInfolabel,"SelectedTriggers",self.trigInfoHandle)
       jets = self.jetHandle.product()
+      met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
       #triggerInfo = self.trigInfoHandle.product()
@@ -101,7 +105,7 @@ class EventSelectionControlPlots:
           self.h_ptBestEle.Fill(bestZcandidate.pt())
 
       # event category
-      category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, self.muChannel)
+      category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
       self.h_category.Fill(category)
 
       # some topological quantities

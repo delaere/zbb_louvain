@@ -153,6 +153,10 @@ def isGoodJet(jet, Z = None):
   outcome = outcome and jetId(jet,"loose")
   return outcome
 
+def isGoodMet(met,cut=50):
+  """Apply the MET cut"""
+  return met.pt()<cut
+
 def isBJet(jet,workingPoint):
   """Perform b-tagging"""
   if workingPoint=="HE":
@@ -200,9 +204,9 @@ def findBestCandidate(*zCandidates):
         bestZ = z
   return bestZ
 
-def eventCategories(): return 7
+def eventCategories(): return 8
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, muChannel=True):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True):
   """See up to which level the event passes the selection"""
   #TODO: add vertex constraints when ready
   if not isTriggerOK(triggerInfo, muChannel): return 0
@@ -218,7 +222,8 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, muChannel=Tr
       if isBJet(jet,"HE"): nBjetsHE += 1
       if isBJet(jet,"HP"): nBjetsHP += 1
   if nJets==0: return 3
-  if nBjetsHE==0: return 4 # we can do this way because HP is a subset of HE
-  if nBjetsHP==0: return 5 #
-  return 6
+  if nBjetsHE==0: return 4
+  if not isGoodMet(met[0]): return 5
+  if nBjetsHP==0: return 6
+  return 7
 

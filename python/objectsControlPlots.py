@@ -161,6 +161,7 @@ class JetmetControlPlots:
       self.h_SSVHEdisc = ROOT.TH1F("SSVHEdisc","SSVHEdisc",200,-10,10)
       self.h_SSVHPdisc = ROOT.TH1F("SSVHPdisc","SSVHPdisc",200,-10,10)
       self.h_met = ROOT.TH1F("MET","MET",100,0,200)
+      self.h_phimet = ROOT.TH1F("METphi","MET #phi",70,-3.5,3.5)
       self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
       self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",50,-2.5, 2.5)
       self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
@@ -246,6 +247,7 @@ class JetmetControlPlots:
       self.h_nbP.Fill(nbP)
       self.h_njb.Fill(nj,nb)
       self.h_met.Fill(met[0].pt())
+      self.h_phimet.Fill(met[0].phi())
     
     def endJob(self):
       self.dir.cd()
