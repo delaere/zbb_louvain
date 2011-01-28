@@ -2,6 +2,7 @@
 
 import ROOT
 import sys
+import os
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 

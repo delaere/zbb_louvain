@@ -69,7 +69,7 @@ def runTest(path, levels, outputname="controlPlots.root"):
       channelDir = output.mkdir("MuMuChannel")
     else:
       channelDir = output.mkdir("EEChannel")
-    for level in levels:
+    for level in range(eventCategories()):
       levelDir = channelDir.mkdir("stage_"+str(level))
       allmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("allmuons")))
       loosemuonsPlots.append(MuonsControlPlots(levelDir.mkdir("loosemuons")))
@@ -89,7 +89,11 @@ def runTest(path, levels, outputname="controlPlots.root"):
 
   # book histograms
   for muChannel in [True, False]:
-    for level in levels:
+    if muChannel: 
+      plots = levels
+    else:
+      plots = map(lambda x: x+eventCategories(),levels)
+    for level in plots:
       allmuonsPlots[level].beginJob(muonlabel="allMuons", muonType="none")
       loosemuonsPlots[level].beginJob(muonlabel="looseMuons", muonType="loose")
       tightmuonsPlots[level].beginJob(muonlabel="matchedMuons", muonType="tight")
@@ -106,7 +110,11 @@ def runTest(path, levels, outputname="controlPlots.root"):
     if i%1000==0 : print "Processing... event ", i
     for muChannel in [True, False]:
       evtcategory = category(event,muChannel)
-      for level in filter(lambda x: x<=evtcategory ,levels):
+      if muChannel: 
+        plots = filter(lambda x: x<=evtcategory ,levels)
+      else:
+        plots = map(lambda x: x+eventCategories(),filter(lambda x: x<=evtcategory ,levels))
+      for level in plots:
         jetmetAK5PFPlots[level].processEvent(event)
         jetmetAK7PFPlots[level].processEvent(event)
         allmuonsPlots[level].processEvent(event)
@@ -120,16 +128,20 @@ def runTest(path, levels, outputname="controlPlots.root"):
 
   # save all
   for muChannel in [True, False]:
-    for level in levels:
-     jetmetAK5PFPlots.pop().endJob()
-     jetmetAK7PFPlots.pop().endJob()
-     allmuonsPlots.pop().endJob()
-     loosemuonsPlots.pop().endJob()
-     tightmuonsPlots.pop().endJob()
-     allelectronsPlots.pop().endJob()
-     tightelectronsPlots.pop().endJob()
-     vertexPlots.pop().endJob()
-     selectionPlots.pop().endJob()
+    if muChannel: 
+      plots = levels
+    else:
+      plots = map(lambda x: x+eventCategories(),levels)
+    for level in plots:
+     jetmetAK5PFPlots[level].endJob()
+     jetmetAK7PFPlots[level].endJob()
+     allmuonsPlots[level].endJob()
+     loosemuonsPlots[level].endJob()
+     tightmuonsPlots[level].endJob()
+     allelectronsPlots[level].endJob()
+     tightelectronsPlots[level].endJob()
+     vertexPlots[level].endJob()
+     selectionPlots[level].endJob()
   output.Close()
 
 def main(options):
