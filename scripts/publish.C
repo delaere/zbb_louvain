@@ -73,6 +73,8 @@ void wwwPublisher::dumpHisto(TCanvas* h,const char* outpath)
    std::cout << "saving " << h->GetName() << std::endl;
    char buffer[1024];
    sprintf(buffer,"%s/%s.png",outpath,h->GetName());
+   ((TLegend*)h->FindObject("TPave"))->SetFillColor(kWhite);
+   ((TLegend*)h->FindObject("TPave"))->SetBorderSize(1);
    h->Print(buffer);
 //   sprintf(buffer,"%s/%s.eps",outpath,h->GetName());
 //   h->Print(buffer);
@@ -143,8 +145,10 @@ void wwwPublisher::createFrames(const char* path)
 void publish(const char* inputFile, const char* outputPath) {
   // input File
   TFile* input = TFile::Open(inputFile);
-  // set batch mode
+  // set batch mode and proper style
   gROOT->SetBatch();  
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(0);
   // do the job
   wwwPublisher publisher;
   publisher.traverseDir(input,outputPath);
