@@ -1,4 +1,6 @@
 def selectedTriggers(triggerInfo):
+  if triggerInfo is None:
+    return []
   triggers = ("HLT_Mu3","HLT_Mu5", "HLT_Mu7","HLT_Mu9", "HLT_Mu11", "HLT_Mu15_v1",
               "HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R",
               "HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R",
@@ -18,6 +20,8 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
+  if triggerInfo is None:
+    return True
   paths = triggerInfo.acceptedPaths()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:

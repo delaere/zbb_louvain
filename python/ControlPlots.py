@@ -16,14 +16,11 @@ parser.add_option("--all",action="store_true",dest="all",
                   help="Process all levels.")
 parser.add_option("-l", "--level", dest="levels",
                   help="Specify a coma-separated list of levels to be processed. No space is allowed.")
+parser.add_option("--Zjet",action="store_true",dest="ZjetFilter",
+                  help="Remove b and c contributions from Z+jets.")
+parser.add_option("--trigger",action="store_true",dest="checkTrigger",
+                  help="Check the trigger at the early stage of the .")
 (options, args) = parser.parse_args()
-#  path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
-#  path="/storage/data/cms/store/user/favereau/MURun2010A-DiLeptonMu-Dec22/"
-#  path="/storage/data/cms/store/user/favereau/ELERun2010A-DiLeptonEle-Dec22/"
-#  path="/storage/data/cms/store/user/favereau/ELERun2010B-DiLeptonEle-Dec22/"
-#  path="/storage/data/cms/store/user/favereau/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola_2/"
-#  path="/storage/data/cms/store/user/favereau/Zbb-TuneZ2/"
-#  path="/storage/data/cms/store/user/favereau/Zcc-TuneZ2_2/"
 
 import ROOT
 import os
@@ -32,9 +29,14 @@ from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
+from monteCarloSelection import isZlEvent
 
-def category(event,muChannel):
+def category(event,muChannel,ZjetFilter,checkTrigger):
   """Compute the event category for histogramming"""
+  if ZjetFilter:
+    genHandle = Handle ("vector<reco::GenParticle>")
+    event.getByLabel ("genParticles",genHandle)
+    if not isZlEvent(genHandle.product()): return -1
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
@@ -44,15 +46,18 @@ def category(event,muChannel):
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
   event.getByLabel ("Zelel",zeleHandle)
-  event.getByLabel ("patTriggerEvent",trigInfoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
-  triggerInfo = trigInfoHandle.product()
+  if checkTrigger:
+    event.getByLabel ("patTriggerEvent",trigInfoHandle)
+    triggerInfo = trigInfoHandle.product()
+  else:
+    triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
 
-def runTest(path, levels, outputname="controlPlots.root"):
+def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
@@ -81,7 +86,7 @@ def runTest(path, levels, outputname="controlPlots.root"):
       jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF")))
       jetmetAK7PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK7PF")))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
-      selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel))
+      selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
 
   dirList=os.listdir(path)
   files=[]
@@ -111,7 +116,7 @@ def runTest(path, levels, outputname="controlPlots.root"):
   for event in events:
     if i%1000==0 : print "Processing... event ", i
     for muChannel in [True, False]:
-      evtcategory = category(event,muChannel)
+      evtcategory = category(event,muChannel,ZjetFilter,checkTrigger)
       if muChannel: 
         plots = filter(lambda x: x<=evtcategory ,levels)
       else:
@@ -171,7 +176,7 @@ def main(options):
     parser.print_help()
     return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels)
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger)
 
 if __name__ == "__main__":
   main(options)

@@ -9,7 +9,7 @@ from eventSelection import *
 class EventSelectionControlPlots:
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, muChannel=True):
+    def __init__(self, dir=None, muChannel=True, checkTrigger=False):
       # create output file if needed. If no file is given, it means it is delegated
       if dir is None:
         self.f = ROOT.TFile("controlPlots.root", "RECREATE")
@@ -18,6 +18,7 @@ class EventSelectionControlPlots:
         self.f = None
         self.dir = dir
       self.muChannel = muChannel
+      self.checkTrigger = checkTrigger
     
     def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent"):
       # declare histograms
@@ -71,12 +72,15 @@ class EventSelectionControlPlots:
       event.getByLabel (self.metlabel,self.metHandle)
       event.getByLabel (self.zmulabel,self.zmuHandle)
       event.getByLabel (self.zelelabel,self.zeleHandle)
-      event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
       jets = self.jetHandle.product()
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
-      triggerInfo = self.trigInfoHandle.product()
+      if self.checkTrigger:
+        event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
+        triggerInfo = self.trigInfoHandle.product()
+      else:
+        triggerInfo = None
 
       ## trigger
       self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel))
