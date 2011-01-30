@@ -274,8 +274,9 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      // legend
      leg->AddEntry(h,mcConf->getParameter<std::string>("role").c_str(),"f");
    }
-   stack->Draw();
-   data->Draw("e, same");
+   data->Draw("e");         // first draw data... that fixes the scale
+   stack->Draw("same");     // then the stack on top
+   data->Draw("e, same");   // and again data to see all points
    leg->Draw();
    if(style!=_styleTweaks.end()) {
      // we might add in the config file a set of entries to set labels, axis, etc.
