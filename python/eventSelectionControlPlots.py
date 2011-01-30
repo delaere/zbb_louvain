@@ -19,7 +19,7 @@ class EventSelectionControlPlots:
         self.dir = dir
       self.muChannel = muChannel
     
-    def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="WeightFromTrigger"):
+    def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent"):
       # declare histograms
       self.dir.cd()
       self.h_triggerSelection = ROOT.TH1I("triggerSelection","triggerSelection ",2,0,2)
@@ -58,7 +58,7 @@ class EventSelectionControlPlots:
       self.metHandle = Handle ("vector<pat::MET>")
       self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
       self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.trigInfoHandle = Handle ("vector<bool>")
+      self.trigInfoHandle = Handle ("pat::TriggerEvent")
       self.jetlabel = (jetlabel)
       self.metlabel = (metlabel)
       self.zmulabel = (zmulabel)
@@ -71,22 +71,18 @@ class EventSelectionControlPlots:
       event.getByLabel (self.metlabel,self.metHandle)
       event.getByLabel (self.zmulabel,self.zmuHandle)
       event.getByLabel (self.zelelabel,self.zeleHandle)
-      #event.getByLabel (self.trigInfolabel,"SelectedTriggers",self.trigInfoHandle)
+      event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
       jets = self.jetHandle.product()
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
-      #triggerInfo = self.trigInfoHandle.product()
-      triggerInfo = None
+      triggerInfo = self.trigInfoHandle.product()
 
       ## trigger
-      # TODO: ROOT BUG HERE : vector<bool> dictionnary is incomplete
-      #for i in range(13):
-      #  if triggerInfo[i] : self.h_triggers.Fill(i)
-      #self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel))
-      #trigger = 0
-      #for trigger in range(triggerInfo.size()):
-      #  if triggerInfo[trigger] : self.h_triggerBit.Fill(trigger)
+      self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel))
+      selTriggers = selectedTriggers(triggerInfo)
+      for trigger,triggered in enumerate(selTriggers):
+        if triggered : self.h_triggerBit.Fill(trigger)
 
       # Z boson
       for z in zCandidatesMu:

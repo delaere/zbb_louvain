@@ -1,13 +1,52 @@
+def selectedTriggers(triggerInfo):
+  triggers = ("HLT_Mu3","HLT_Mu5", "HLT_Mu7","HLT_Mu9", "HLT_Mu11", "HLT_Mu15_v1",
+              "HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R",
+              "HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R",
+              "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2")
+  paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
+  def isFired(path):
+    if not path is None: 
+      path.wasAccept() 
+    else: 
+      False
+  pathout = map(lambda path:isFired(path),paths)
+  #not sure if the all-in-one solution below is faster...
+  #pathout = map(lambda trigger: if not triggerInfo.path(trigger) is None: triggerInfo.path(trigger).wasAccept() else: False, triggers)
+  return pathout
 
 def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
-
-  # IMPORTANT: to be fast, it uses the vector from TriggerWeight and assumes the order within.
-
-  #TODO: ROOT BUG here. cannot use vector<bool>
-  return True
+  paths = triggerInfo.acceptedPaths()
+  pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+  if runNumber is None:
+    if muChannel:
+      triggers = ("HLT_Mu3","HLT_Mu5", "HLT_Mu7","HLT_Mu9", "HLT_Mu11", "HLT_Mu15_v1")
+    else:
+      triggers = ("HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R",
+                  "HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1",
+                  "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2")
+    intersect = list(set(pathnames) & set(triggers))
+    outcome = len(intersect)>0
+  else:
+    if muChannel:
+      if runNumber>=132440 and runNumber<=139980 : outcome = "HLT_Mu3" in pathnames
+      if runNumber>=140058 and runNumber<=140401 : outcome = "HLT_Mu5" in pathnames
+      if runNumber>=141956 and runNumber<=144114 : outcome = "HLT_Mu7" in pathnames
+      if runNumber>=146428 and runNumber<=147116 : outcome = "HLT_Mu9" in pathnames
+      if runNumber>=147146 and runNumber<=148102 : outcome = "HLT_Mu11" in pathnames
+      if runNumber>=148783 and runNumber<=149442 : outcome = "HLT_Mu15_v1" in pathnames
+    else:
+      if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
+      if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
+      if runNumber>=141956 and runNumber<=144114 : outcome = "HLT_Ele15_SW_CaloEleId_L1R" in pathnames
+      if runNumber>=146428 and runNumber<=147116 : outcome = "HLT_Ele17_SW_CaloEleId_L1R" in pathnames
+      if runNumber>=147146 and runNumber<=148102 : outcome = "HLT_Ele17_SW_TightEleId_L1R" in pathnames
+      if runNumber>=148783 and runNumber<=149063 : outcome = "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1" in pathnames
+      if runNumber>=149181 and runNumber<=149442 : outcome = "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2" in pathnames
+  return outcome
+  # this is what we could do with the TriggerWeight product:
   #outcome = False
   #if runNumber is None:
   #  if muChannel:
@@ -30,7 +69,7 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   #    if runNumber>=147146 and runNumber<=148102 : outcome = triggerInfo[10] #HLT_Ele17_SW_TightEleId_L1R
   #    if runNumber>=148783 and runNumber<=149063 : outcome = triggerInfo[11] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1
   #    if runNumber>=149181 and runNumber<=149442 : outcome = triggerInfo[12] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2
-  return outcome
+  #return outcome
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""

@@ -39,18 +39,17 @@ def category(event,muChannel):
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  trigInfoHandle = Handle ("vector<bool>")
+  trigInfoHandle = Handle ("pat::TriggerEvent")
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
   event.getByLabel ("Zelel",zeleHandle)
-  #event.getByLabel ("WeightFromTrigger","SelectedTriggers",trigInfoHandle)
+  event.getByLabel ("patTriggerEvent",trigInfoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
-  #triggerInfo = trigInfoHandle.product()
-  triggerInfo = None
+  triggerInfo = trigInfoHandle.product()
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
 
 def runTest(path, levels, outputname="controlPlots.root"):
