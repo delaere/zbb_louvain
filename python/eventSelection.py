@@ -128,6 +128,7 @@ def isTightElectron(electron):
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
+  if electron.pt()<25. : return False
 
   return (isLooseElectron(electron) and True)
 
