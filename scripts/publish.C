@@ -157,7 +157,7 @@ void diowGenerator::addItem(const char* filename) {
 class wwwPublisher
 {
   public:
-    wwwPublisher():menuCreated(false),menu(NULL) {}
+    wwwPublisher():menu(NULL) {}
     ~wwwPublisher() {}
     void traverseDir(TDirectory* datadir, const char* outpath);
     void finishPage(const char* path) { createFrames(path); addMenuFooter(); }
@@ -168,7 +168,6 @@ class wwwPublisher
     void closeMenuItem();
     void createFrames(const char* path);
     void addMenuFooter();
-    bool menuCreated;
     ofstream* menu;
     string basepath;
 };
@@ -302,7 +301,8 @@ void publish(const char* inputFile, const char* outputPath) {
   // do the job
   wwwPublisher publisher;
   publisher.traverseDir(input,outputPath);
-  publisher.createFrames(outputPath);
-  publisher.addMenuFooter();
+  publisher.finishPage(outputPath); // here we finish everything.
+  // note that we could call traverseDir more than once, with different outputPath.
+  // the index is placed in the first outputPath and refers to all pages added.
 }
 
