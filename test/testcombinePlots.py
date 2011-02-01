@@ -52,7 +52,8 @@ process.CombinePlots = cms.PSet(
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("Z -> #mu#mu invariant mass (GeV/c^{2})"),
-      labely = cms.untracked.string("Events/GeV/c^{2}")
+      labely = cms.untracked.string("Events/GeV/c^{2}"),
+      rangex = cms.untracked.vdouble(60.,120.)
     ),
     cms.PSet(
       name = cms.string('bestzmassEle'),
@@ -60,7 +61,8 @@ process.CombinePlots = cms.PSet(
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("Z -> ee invariant mass (GeV/c^{2})"),
-      labely = cms.untracked.string("Events/GeV/c^{2}")
+      labely = cms.untracked.string("Events/GeV/c^{2}"),
+      rangex = cms.untracked.vdouble(60.,120.)
     ),
     cms.PSet(
       name = cms.string('bjet1pt'),
