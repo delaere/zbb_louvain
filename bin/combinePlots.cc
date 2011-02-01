@@ -285,7 +285,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      data->SetYTitle(style->second.getUntrackedParameter("labely",std::string("")).c_str());
      if(style->second.getUntrackedParameter("logx",false)) c->SetLogx();
      if(style->second.getUntrackedParameter("logy",false)) c->SetLogy();
-     std::vector<double> xrange = style->second.getUntrackedParameter("xrange",std::vector<double>());
+     std::vector<double> xrange = style->second.getUntrackedParameter("rangex",std::vector<double>());
      if(xrange.size()==2) data->GetXaxis()->SetRangeUser(xrange[0],xrange[1]);
    }
    output->WriteObject(c,c->GetName());
