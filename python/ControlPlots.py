@@ -29,7 +29,7 @@ from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
-from monteCarloSelection import isZlEvent
+from monteCarloSelection import isZbEvent, isZcEvent
 
 def category(event,muChannel,ZjetFilter,checkTrigger):
   """Compute the event category for histogramming"""
