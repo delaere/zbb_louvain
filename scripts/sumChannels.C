@@ -1,0 +1,62 @@
+/*
+ * That script allows to add to a file a directory with the sum of two directories.
+ * It assumes that each of the source directories has the same structure.
+ * If one of the source folder is missing, no corresponding folder is created in the sum directory.
+ * If one of the sources is missing, no histogram is created in the sum directory.
+ */
+
+void sumHistos(const char* name, TDirectory* dir1, TDirectory* dir2, TDirectory* output)
+{
+   TH1 *h1=NULL;
+   TH1 *h2=NULL;
+   dir1->GetObject(name,h1);
+   dir2->GetObject(name,h2);
+   if(!h1 || !h2) return;
+   h1 = (TH1*) h1->Clone();
+   h1->SetDirectory(output);
+   h1->Add(h2);
+   output->WriteObject(h1,h1->GetName());
+}
+
+void sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* output)
+{
+   TList* keys = dir1->GetListOfKeys();
+   TIter next(keys);
+   TKey *key;
+   while ((key = (TKey*) next())) {
+     if(key->IsFolder()) {
+        TDirectory* dirA;
+        dir1->GetObject(key->GetName(),dirA);
+        TDirectory* dirB;
+        dir2->GetObject(key->GetName(),dirB);
+	if(!dirA || !dirB) continue;
+        sumDir(dirA,dirB, output->mkdir(key->GetName()));
+     } else if (key->ReadObj()->InheritsFrom("TH1")) {
+        sumHistos(key->GetName(),dir1,dir2,output);
+     }
+   }
+}
+
+void sumChannels(const char* file, const char* chan1, const char* chan2, const char* sum)
+{
+   TFile* file = TFile::Open(file);
+   TDirectory* sumdir = file->mkdir(sum);
+   if(sumdir==NULL) {
+     std::cout << sum << " already exists. Exiting" << std::endl;
+     return;
+   }
+   TDirectory* chan1dir = file->Get(chan1);
+   if(chan1dir==NULL || !chan1dir->IsFolder()) {
+     std::cout << chan1 << " : not a directory. Exiting" << std::endl;
+     return;
+   }
+   TDirectory* chan2dir = file->Get(chan2);
+   if(chan1dir==NULL || !chan1dir->IsFolder()) {
+     std::cout << chan1 << " : not a directory. Exiting" << std::endl;
+     return;
+   }
+   sumDir(chan1dir,chan2dir,outdir);
+   file->Write();
+   file->Close();
+}
+
