@@ -169,7 +169,7 @@ class wwwPublisher
     void createFrames(const char* path);
     void addMenuFooter();
     ofstream* menu;
-    string basepath;
+    std::string basepath;
 };
 
 void wwwPublisher::traverseDir(TDirectory* datadir, const char* outpath)

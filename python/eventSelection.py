@@ -252,9 +252,14 @@ def eventCategories(): return 8
 
 def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True):
   """See up to which level the event passes the selection"""
-  #TODO: add vertex constraints when ready
   if not isTriggerOK(triggerInfo, muChannel): return 0
-  bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+  if muChannel:
+    bestZcandidate = findBestCandidate(zCandidatesMu)
+  else:
+    bestZcandidate = findBestCandidate(zCandidatesEle)
+  #looking for both would potentially introduce double counting and suffers from 
+  #the absence of trigger in MC.
+  #bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
   if bestZcandidate is None : return 1
   if abs(bestZcandidate.mass()-91.1876)>30. : return 2
   nJets    = 0

@@ -242,9 +242,11 @@ int main(int argc, char *argv[]){
 
 void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output)
 {
+std::cout << "plotCombiner::CombineHistos" << std::endl;
    TH1* data;
    (*datadirs.begin())->GetObject(name,data);
    data = (TH1*) data->Clone();
+std::cout << "working on histo " << data->GetName() << std::endl;
    TCanvas* c = new TCanvas(data->GetName(),data->GetTitle());
    THStack* stack = new THStack(data->GetName(),"MC stack");
    TLegend* leg = new TLegend(0.6,0.7,0.9,0.9);

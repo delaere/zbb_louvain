@@ -36,7 +36,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger):
   if ZjetFilter:
     genHandle = Handle ("vector<reco::GenParticle>")
     event.getByLabel ("genParticles",genHandle)
-    if not isZlEvent(genHandle.product()): return -1
+    if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return -1
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")

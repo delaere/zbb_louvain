@@ -205,24 +205,24 @@ class JetmetControlPlots:
       nb  = 0
       nbP = 0
       for jet in jets:
-        self.h_jetpt.Fill(jet.pt())
-        self.h_jeteta.Fill(jet.eta())
-        self.h_jetphi.Fill(jet.phi())
-        self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
-        self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
-        rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
-        self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-        self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
-        self.h_nconstituents.Fill(rawjet.numberOfDaughters())
-        self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
-        self.h_nch.Fill(rawjet.chargedMultiplicity())
-        self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
-        if jetId(jet,"tight"): self.h_jetid.Fill(3)
-        elif jetId(jet,"medium"): self.h_jetid.Fill(2)
-        elif jetId(jet,"loose"): self.h_jetid.Fill(1)
-        else: self.h_jetid.Fill(0)
-        # B-tagging
         if isGoodJet(jet):
+          self.h_jetpt.Fill(jet.pt())
+          self.h_jeteta.Fill(jet.eta())
+          self.h_jetphi.Fill(jet.phi())
+          self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
+          self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
+          rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+          self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
+          self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
+          self.h_nconstituents.Fill(rawjet.numberOfDaughters())
+          self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
+          self.h_nch.Fill(rawjet.chargedMultiplicity())
+          self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
+          if jetId(jet,"tight"): self.h_jetid.Fill(3)
+          elif jetId(jet,"medium"): self.h_jetid.Fill(2)
+          elif jetId(jet,"loose"): self.h_jetid.Fill(1)
+          else: self.h_jetid.Fill(0)
+          # B-tagging
           self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
           #eventually complement with variables from the btagging (check paper)

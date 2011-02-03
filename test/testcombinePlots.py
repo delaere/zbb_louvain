@@ -39,7 +39,7 @@ process.CombinePlots = cms.PSet(
    ),
    cms.PSet(
      #fileName = cms.string('controlPlots_DYJetsToLL_TuneD6T.root'),
-     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_397.root'),
+     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_387.root'),
      color = cms.uint32(3),
      scale = cms.double(0.03595), #NNLO
      role = cms.string('Z+jets')
