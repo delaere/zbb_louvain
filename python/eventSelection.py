@@ -266,7 +266,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
   nBjetsHE = 0
   nBjetsHP = 0
   for jet in jets:
-    if isGoodJet(jet):
+    if isGoodJet(jet,bestZcandidate):
       nJets += 1
       if isBJet(jet,"HE"): nBjetsHE += 1
       if isBJet(jet,"HP"): nBjetsHP += 1
