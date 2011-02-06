@@ -53,6 +53,37 @@ class EventSelectionControlPlots:
       self.h_el2pt = ROOT.TH1F("el2pt","subleading electron Pt",500,0,500)
       self.h_el1eta = ROOT.TH1F("el1eta","leading electron Eta",50,-2.5,2.5)
       self.h_el2eta = ROOT.TH1F("el2eta","subleading electron Eta",50,-2.5,2.5)
+
+### jet stuff
+
+      self.h_SSVHEdisc = ROOT.TH1F("SSVHEdisc","SSVHEdisc",200,-10,10)
+      self.h_SSVHPdisc = ROOT.TH1F("SSVHPdisc","SSVHPdisc",200,-10,10)
+      self.h_met = ROOT.TH1F("MET","MET",100,0,200)
+      self.h_phimet = ROOT.TH1F("METphi","MET #phi",70,-3.5,3.5)
+      self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
+      self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",50,-2.5, 2.5)
+      self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
+      self.h_jetoverlapmu = ROOT.TH1I("jetoverlapmu","jets overlaps with muons",2,0,2)
+      self.h_jetoverlapele = ROOT.TH1I("jetoverlapele","jets overlaps with electrons",2,0,2)
+      self.h_jet1pt = ROOT.TH1F("jet1pt","leading jet Pt",500,0,500)
+      self.h_jet1eta = ROOT.TH1F("jet1eta","leading jet Eta",50,-2.5,2.5)
+      self.h_jet2pt = ROOT.TH1F("jet2pt","subleading jet Pt",500,0,500)
+      self.h_jet2eta = ROOT.TH1F("jet2eta","subleading jet Eta",50,-2.5,2.5)
+      self.h_bjet1pt = ROOT.TH1F("bjet1pt","leading bjet Pt",500,0,500)
+      self.h_bjet1eta = ROOT.TH1F("bjet1eta","leading bjet Eta",50,-2.5,2.5)
+      self.h_bjet2pt = ROOT.TH1F("bjet2pt","subleading bjet Pt",500,0,500)
+      self.h_bjet2eta = ROOT.TH1F("bjet2eta","subleading bjet Eta",50,-2.5,2.5)
+      self.h_nj = ROOT.TH1I("nj","jet count",15,0,15)
+      self.h_nb = ROOT.TH1I("nb","b-jet count",5,0,5)
+      self.h_nbP = ROOT.TH1I("nbP","pure b-jet count",5,0,5)
+      self.h_njb = ROOT.TH2I("njb","number of bjets vs number of jets",15,0,15,5,0,5)
+      self.h_nhf = ROOT.TH1F("nhf","neutral hadron energy fraction",101,0,1.01)
+      self.h_nef = ROOT.TH1F("nef","neutral EmEnergy fraction",101,0,1.01)
+      self.h_nconstituents = ROOT.TH1I("npf","total multiplicity",50,0,50)
+      self.h_chf = ROOT.TH1F("chf","charged hadron energy fraction",101,0,1.01)
+      self.h_nch = ROOT.TH1I("nch","charged multiplicity",50,0,50)
+      self.h_cef = ROOT.TH1F("cef","charged EmEnergy fraction",101,0,1.01)
+      self.h_jetid = ROOT.TH1I("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
@@ -162,7 +193,59 @@ class EventSelectionControlPlots:
         self.h_ZbbM.Fill(Zbb.M())
         self.h_ZbbPt.Fill(Zbb.Pt())
         self.h_ZbbM2D.Fill(Zbb.M(),bb.M())
-    
+
+
+      # process event and fill histograms
+      # jets 
+      nj  = 0
+      nb  = 0
+      nbP = 0
+      for jet in jets:
+        if category>=4 and isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
+          self.h_jetpt.Fill(jet.pt())
+          self.h_jeteta.Fill(jet.eta())
+          self.h_jetphi.Fill(jet.phi())
+          self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
+          self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
+          rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+          self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
+          self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
+          self.h_nconstituents.Fill(rawjet.numberOfDaughters())
+          self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
+          self.h_nch.Fill(rawjet.chargedMultiplicity())
+          self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
+          if jetId(jet,"tight"): self.h_jetid.Fill(3)
+          elif jetId(jet,"medium"): self.h_jetid.Fill(2)
+          elif jetId(jet,"loose"): self.h_jetid.Fill(1)
+          else: self.h_jetid.Fill(0)
+          # B-tagging
+          self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+          self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+          #eventually complement with variables from the btagging (check paper)
+          nj += 1
+          if nj==1: 
+            self.h_jet1pt.Fill(jet.pt())
+            self.h_jet1eta.Fill(jet.eta())
+          elif nj==2:
+            self.h_jet2pt.Fill(jet.pt())
+            self.h_jet2eta.Fill(jet.eta())
+          if isBJet(jet,"HE"): 
+            nb += 1
+            if nb==1:
+              self.h_bjet1pt.Fill(jet.pt())
+              self.h_bjet1eta.Fill(jet.eta())
+            elif nb==2:
+              self.h_bjet2pt.Fill(jet.pt())
+              self.h_bjet2eta.Fill(jet.eta())
+          if isBJet(jet,"HP"): nbP += 1
+      self.h_nj.Fill(nj)
+      self.h_nb.Fill(nb)
+      self.h_nbP.Fill(nbP)
+      self.h_njb.Fill(nj,nb)
+      self.h_met.Fill(met[0].pt())
+      self.h_phimet.Fill(met[0].phi())
+
+
     def endJob(self):
       self.dir.cd()
       self.dir.Write()

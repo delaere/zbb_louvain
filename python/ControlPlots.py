@@ -26,7 +26,7 @@ import ROOT
 import os
 from DataFormats.FWLite import Events, Handle
 from objectsControlPlots import *
-from eventSelectionControlPlots_jetCleaning import *
+from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
 from monteCarloSelection import isZbEvent, isZcEvent
