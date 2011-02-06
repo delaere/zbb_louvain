@@ -26,7 +26,7 @@ import ROOT
 import os
 from DataFormats.FWLite import Events, Handle
 from objectsControlPlots import *
-from eventSelectionControlPlots import *
+from eventSelectionControlPlots_jetCleaning import *
 from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
 from monteCarloSelection import isZbEvent, isZcEvent
@@ -55,6 +55,8 @@ def category(event,muChannel,ZjetFilter,checkTrigger):
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
+#  print "***************************************************************************"  
+#  print "evtCat = ", eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
 
 def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False):

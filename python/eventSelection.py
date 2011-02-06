@@ -1,3 +1,5 @@
+import ROOT
+
 def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
@@ -160,11 +162,12 @@ def hasNoOverlap(jet, Z):
   l2 = Z.daughter(1)
   l1v = ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
   l2v = ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy())
-  jv =  ROOT.TLorentzVector(j.px(),j.py(),j.pz(),j.energy())
+  jv =  ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
   dr1 = jv.DeltaR(l1v)
   dr2 = jv.DeltaR(l2v)
-  return (dr1>0.4 and dr2>0.4)
-
+  if (dr1>0.5 and dr2>0.5): return True
+  else : return False
+    
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
   rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
@@ -190,9 +193,12 @@ def isGoodJet(jet, Z = None):
   outcome = abs(jet.eta())<2.1
   # overlap checking
   # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
-  #if jet.hasOverlaps("muons"): return False
-  #if jet.hasOverlaps("electrons"): return False
-  if not Z is None: outcome = outcome and hasNoOverlap(jet,Z)
+#  if jet.hasOverlaps("muons"): return False
+#  if jet.hasOverlaps("electrons"): return False
+  if not Z is None :
+    outcome = outcome
+    if not hasNoOverlap(jet,Z) :
+      return False 
   # check jetid (loose)
   outcome = outcome and jetId(jet,"loose")
   return outcome

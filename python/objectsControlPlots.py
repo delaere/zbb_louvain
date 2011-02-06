@@ -205,7 +205,7 @@ class JetmetControlPlots:
       nb  = 0
       nbP = 0
       for jet in jets:
-        if isGoodJet(jet):
+        if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           self.h_jetpt.Fill(jet.pt())
           self.h_jeteta.Fill(jet.eta())
           self.h_jetphi.Fill(jet.phi())
