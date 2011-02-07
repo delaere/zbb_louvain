@@ -36,7 +36,7 @@ class EventSelectionControlPlots:
       self.h_scaldptZbj1 = ROOT.TH1F("scaldptZbj1","scaldptZbj1",500,0,500)
       self.h_drZbj1 = ROOT.TH1F("drZbj1","distance between Z and leading jet",100,0,5)
       self.h_vecdptZbj1 = ROOT.TH1F("vecdptZbj1","vecdptZbj1",500,0,500)
-      self.h_dphiZbj1 = ROOT.TH1F("dphiZbj1","dphiZbj1",80,-4,4)
+      self.h_dphiZbj1 = ROOT.TH1F("dphiZbj1","dphiZbj1",40,0,4)
       self.h_dijetM = ROOT.TH1F("dijetM","b bbar invariant mass",1000,0,1000)
       self.h_dijetPt = ROOT.TH1F("dijetPt","b bbar Pt",500,0,500)
       self.h_ZbM = ROOT.TH1F("ZbM","Zb invariant mass",1000,0,1000)
@@ -47,12 +47,12 @@ class EventSelectionControlPlots:
       self.h_category = ROOT.TH1I("category","event category",10,0,10)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
-      self.h_mu1eta = ROOT.TH1F("mu1eta","leading muon Eta",50,-2.5,2.5)
-      self.h_mu2eta = ROOT.TH1F("mu2eta","subleading muon Eta",50,-2.5,2.5)
+      self.h_mu1eta = ROOT.TH1F("mu1eta","leading muon Eta",25,0,2.5)
+      self.h_mu2eta = ROOT.TH1F("mu2eta","subleading muon Eta",25,0,2.5)
       self.h_el1pt = ROOT.TH1F("el1pt","leading electron Pt",500,0,500)
       self.h_el2pt = ROOT.TH1F("el2pt","subleading electron Pt",500,0,500)
-      self.h_el1eta = ROOT.TH1F("el1eta","leading electron Eta",50,-2.5,2.5)
-      self.h_el2eta = ROOT.TH1F("el2eta","subleading electron Eta",50,-2.5,2.5)
+      self.h_el1eta = ROOT.TH1F("el1eta","leading electron Eta",25,0,2.5)
+      self.h_el2eta = ROOT.TH1F("el2eta","subleading electron Eta",25,0,2.5)
 
 ### jet stuff
 
@@ -61,18 +61,18 @@ class EventSelectionControlPlots:
       self.h_met = ROOT.TH1F("MET","MET",100,0,200)
       self.h_phimet = ROOT.TH1F("METphi","MET #phi",70,-3.5,3.5)
       self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
-      self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",50,-2.5, 2.5)
+      self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",25,0, 2.5)
       self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
       self.h_jetoverlapmu = ROOT.TH1I("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.h_jetoverlapele = ROOT.TH1I("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.h_jet1pt = ROOT.TH1F("jet1pt","leading jet Pt",500,0,500)
-      self.h_jet1eta = ROOT.TH1F("jet1eta","leading jet Eta",50,-2.5,2.5)
+      self.h_jet1eta = ROOT.TH1F("jet1eta","leading jet Eta",25,0,2.5)
       self.h_jet2pt = ROOT.TH1F("jet2pt","subleading jet Pt",500,0,500)
-      self.h_jet2eta = ROOT.TH1F("jet2eta","subleading jet Eta",50,-2.5,2.5)
+      self.h_jet2eta = ROOT.TH1F("jet2eta","subleading jet Eta",25,0,2.5)
       self.h_bjet1pt = ROOT.TH1F("bjet1pt","leading bjet Pt",500,0,500)
-      self.h_bjet1eta = ROOT.TH1F("bjet1eta","leading bjet Eta",50,-2.5,2.5)
+      self.h_bjet1eta = ROOT.TH1F("bjet1eta","leading bjet Eta",25,0,2.5)
       self.h_bjet2pt = ROOT.TH1F("bjet2pt","subleading bjet Pt",500,0,500)
-      self.h_bjet2eta = ROOT.TH1F("bjet2eta","subleading bjet Eta",50,-2.5,2.5)
+      self.h_bjet2eta = ROOT.TH1F("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.h_nj = ROOT.TH1I("nj","jet count",15,0,15)
       self.h_nb = ROOT.TH1I("nb","b-jet count",5,0,5)
       self.h_nbP = ROOT.TH1I("nbP","pure b-jet count",5,0,5)
@@ -150,8 +150,8 @@ class EventSelectionControlPlots:
             mu2 = bestZcandidate.daughter(0)
           self.h_mu1pt.Fill(mu1.pt())
           self.h_mu2pt.Fill(mu2.pt())
-          self.h_mu1eta.Fill(mu1.eta())
-          self.h_mu2eta.Fill(mu2.eta())
+          self.h_mu1eta.Fill(abs(mu1.eta()))
+          self.h_mu2eta.Fill(abs(mu2.eta()))
         elif bestZcandidate.daughter(0).isElectron():
           ele1 = bestZcandidate.daughter(0)
           ele2 = bestZcandidate.daughter(1)
@@ -160,8 +160,8 @@ class EventSelectionControlPlots:
             ele2 = bestZcandidate.daughter(0)
           self.h_el1pt.Fill(ele1.pt())
           self.h_el2pt.Fill(ele2.pt())
-          self.h_el1eta.Fill(ele1.eta())
-          self.h_el2eta.Fill(ele2.eta())
+          self.h_el1eta.Fill(abs(ele1.eta()))
+          self.h_el2eta.Fill(abs(ele2.eta()))
       if category>= 5:
         #bjets plots
         nJets = 0
@@ -181,7 +181,7 @@ class EventSelectionControlPlots:
         self.h_scaldptZbj1.Fill(bestZcandidate.pt()-bjet1.pt())
         self.h_vecdptZbj1.Fill(Zb.Pt())
         self.h_drZbj1.Fill(z.DeltaR(b1))
-        self.h_dphiZbj1.Fill(z.DeltaPhi(b1))
+        self.h_dphiZbj1.Fill(abs(z.DeltaPhi(b1)))
         self.h_ZbM.Fill(Zb.M())
         self.h_ZbPt.Fill(Zb.Pt())
         if bjet2 is None: return # the rest is about bb pairs
@@ -203,7 +203,7 @@ class EventSelectionControlPlots:
       for jet in jets:
         if category>=4 and isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
           self.h_jetpt.Fill(jet.pt())
-          self.h_jeteta.Fill(jet.eta())
+          self.h_jeteta.Fill(abs(jet.eta()))
           self.h_jetphi.Fill(jet.phi())
           self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
           self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
@@ -225,18 +225,18 @@ class EventSelectionControlPlots:
           nj += 1
           if nj==1: 
             self.h_jet1pt.Fill(jet.pt())
-            self.h_jet1eta.Fill(jet.eta())
+            self.h_jet1eta.Fill(abs(jet.eta()))
           elif nj==2:
             self.h_jet2pt.Fill(jet.pt())
-            self.h_jet2eta.Fill(jet.eta())
+            self.h_jet2eta.Fill(abs(jet.eta()))
           if isBJet(jet,"HE"): 
             nb += 1
             if nb==1:
               self.h_bjet1pt.Fill(jet.pt())
-              self.h_bjet1eta.Fill(jet.eta())
+              self.h_bjet1eta.Fill(abs(jet.eta()))
             elif nb==2:
               self.h_bjet2pt.Fill(jet.pt())
-              self.h_bjet2eta.Fill(jet.eta())
+              self.h_bjet2eta.Fill(abs(jet.eta()))
           if isBJet(jet,"HP"): nbP += 1
       self.h_nj.Fill(nj)
       self.h_nb.Fill(nb)
