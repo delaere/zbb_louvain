@@ -210,7 +210,7 @@ def isGoodMet(met,cut=40):
 def isBJet(jet,workingPoint):
   """Perform b-tagging"""
   if workingPoint=="HE":
-    return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.7
+    return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.74
   elif workingPoint=="HP":
     return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0
   else:
