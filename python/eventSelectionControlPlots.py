@@ -162,6 +162,55 @@ class EventSelectionControlPlots:
           self.h_el2pt.Fill(ele2.pt())
           self.h_el1eta.Fill(abs(ele1.eta()))
           self.h_el2eta.Fill(abs(ele2.eta()))
+      if category>= 2:
+        #jet plots
+        nj  = 0
+        nb  = 0
+        nbP = 0
+        for jet in jets:
+          if isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
+            self.h_jetpt.Fill(jet.pt())
+            self.h_jeteta.Fill(abs(jet.eta()))
+            self.h_jetphi.Fill(jet.phi())
+            self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
+            self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
+            rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+            self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
+            self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
+            self.h_nconstituents.Fill(rawjet.numberOfDaughters())
+            self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
+            self.h_nch.Fill(rawjet.chargedMultiplicity())
+            self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
+            if jetId(jet,"tight"): self.h_jetid.Fill(3)
+            elif jetId(jet,"medium"): self.h_jetid.Fill(2)
+            elif jetId(jet,"loose"): self.h_jetid.Fill(1)
+            else: self.h_jetid.Fill(0)
+            # B-tagging
+            self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+            self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+            #eventually complement with variables from the btagging (check paper)
+            nj += 1
+            if nj==1: 
+              self.h_jet1pt.Fill(jet.pt())
+              self.h_jet1eta.Fill(abs(jet.eta()))
+            elif nj==2:
+              self.h_jet2pt.Fill(jet.pt())
+              self.h_jet2eta.Fill(abs(jet.eta()))
+            if isBJet(jet,"HE"): 
+              nb += 1
+              if nb==1:
+                self.h_bjet1pt.Fill(jet.pt())
+                self.h_bjet1eta.Fill(abs(jet.eta()))
+              elif nb==2:
+                self.h_bjet2pt.Fill(jet.pt())
+                self.h_bjet2eta.Fill(abs(jet.eta()))
+            if isBJet(jet,"HP"): nbP += 1
+        self.h_nj.Fill(nj)
+        self.h_nb.Fill(nb)
+        self.h_nbP.Fill(nbP)
+        self.h_njb.Fill(nj,nb)
+        self.h_met.Fill(met[0].pt())
+        self.h_phimet.Fill(met[0].phi())
       if category>= 5:
         #bjets plots
         nJets = 0
@@ -193,58 +242,6 @@ class EventSelectionControlPlots:
         self.h_ZbbM.Fill(Zbb.M())
         self.h_ZbbPt.Fill(Zbb.Pt())
         self.h_ZbbM2D.Fill(Zbb.M(),bb.M())
-
-
-      # process event and fill histograms
-      # jets 
-      nj  = 0
-      nb  = 0
-      nbP = 0
-      for jet in jets:
-        if category>=4 and isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
-          self.h_jetpt.Fill(jet.pt())
-          self.h_jeteta.Fill(abs(jet.eta()))
-          self.h_jetphi.Fill(jet.phi())
-          self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
-          self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
-          rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
-          self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-          self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
-          self.h_nconstituents.Fill(rawjet.numberOfDaughters())
-          self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
-          self.h_nch.Fill(rawjet.chargedMultiplicity())
-          self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
-          if jetId(jet,"tight"): self.h_jetid.Fill(3)
-          elif jetId(jet,"medium"): self.h_jetid.Fill(2)
-          elif jetId(jet,"loose"): self.h_jetid.Fill(1)
-          else: self.h_jetid.Fill(0)
-          # B-tagging
-          self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-          self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-          #eventually complement with variables from the btagging (check paper)
-          nj += 1
-          if nj==1: 
-            self.h_jet1pt.Fill(jet.pt())
-            self.h_jet1eta.Fill(abs(jet.eta()))
-          elif nj==2:
-            self.h_jet2pt.Fill(jet.pt())
-            self.h_jet2eta.Fill(abs(jet.eta()))
-          if isBJet(jet,"HE"): 
-            nb += 1
-            if nb==1:
-              self.h_bjet1pt.Fill(jet.pt())
-              self.h_bjet1eta.Fill(abs(jet.eta()))
-            elif nb==2:
-              self.h_bjet2pt.Fill(jet.pt())
-              self.h_bjet2eta.Fill(abs(jet.eta()))
-          if isBJet(jet,"HP"): nbP += 1
-      self.h_nj.Fill(nj)
-      self.h_nb.Fill(nb)
-      self.h_nbP.Fill(nbP)
-      self.h_njb.Fill(nj,nb)
-      self.h_met.Fill(met[0].pt())
-      self.h_phimet.Fill(met[0].phi())
-
 
     def endJob(self):
       self.dir.cd()
