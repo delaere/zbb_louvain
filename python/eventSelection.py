@@ -203,7 +203,7 @@ def isGoodJet(jet, Z = None):
   outcome = outcome and jetId(jet,"loose")
   return outcome
 
-def isGoodMet(met,cut=50):
+def isGoodMet(met,cut=40):
   """Apply the MET cut"""
   return met.pt()<cut
 
