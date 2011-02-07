@@ -22,26 +22,26 @@ process.CombinePlots = cms.PSet(
    cms.PSet(
      fileName = cms.string('controlPlots_Zbb-TuneZ2_2.root'),
      color = cms.uint32(2),
-     scale = cms.double(0.017978), #NLO k=1.25
-     role = cms.string('Zbb')
+     scale = cms.double(0.0209334), #NLO k=1.3
+     role = cms.string('Zb')
    ), 
    cms.PSet(
      fileName = cms.string('controlPlots_Zcc-TuneZ2_2.root'),
      color = cms.uint32(4),
-     scale = cms.double(0.0189175), #NLO k=1.25
-     role = cms.string('Zcc')
+     scale = cms.double(0.0236728), #NLO k=1.4
+     role = cms.string('Zc')
    ), 
    cms.PSet(
      fileName = cms.string('controlPlots_TTJets_TuneZ2_387.root'),
      color = cms.uint32(5),
-     scale = cms.double(0.003),
+     scale = cms.double(0.0044184), #NLO k=1.67
      role = cms.string('ttbar')
    ),
    cms.PSet(
      #fileName = cms.string('controlPlots_DYJetsToLL_TuneD6T.root'),
      fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_387.root'),
      color = cms.uint32(3),
-     scale = cms.double(0.03595), #NNLO
+     scale = cms.double(0.0432474), #NNLO
      role = cms.string('Z+jets')
    )
   ),
@@ -116,6 +116,24 @@ process.CombinePlots = cms.PSet(
       name = cms.string('ZbbPt'),
       rebin = cms.untracked.uint32(10),
       labelx = cms.untracked.string("Zbb Pt (GeV/c)"),
+      labely = cms.untracked.string("Events/10GeV/c")
+    ),
+    cms.PSet(
+      name = cms.string('bestzpt'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("Z Pt (GeV/c)"),
+      labely = cms.untracked.string("Events/10GeV/c")
+    ),
+    cms.PSet(
+      name = cms.string('bestzptMu'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("Z Pt (GeV/c)"),
+      labely = cms.untracked.string("Events/10GeV/c")
+    ),
+    cms.PSet(
+      name = cms.string('bestzptEle'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("Z Pt (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
   )
