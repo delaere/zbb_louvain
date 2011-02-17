@@ -34,7 +34,7 @@ class VertexAssociationControlPlots:
       self.h_ratio1 = ROOT.TH1F("ratio1","jet/vertex association ratio v1",100,0,1)
       self.h_ratio2 = ROOT.TH1F("ratio2","jet/vertex association ratio v2",100,0,1)
       self.h_ratio3 = ROOT.TH1F("ratio3","jet/vertex association ratio v3",100,0,1)
-      self.h_goodevent = ROOT.TH1I("goodevent","pass or not Z+jet to vertex association",2,0,2)
+      self.h_goodevent = ROOT.TH1F("goodevent","pass or not Z+jet to vertex association",2,0,2)
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.zHandle = Handle ("vector<reco::CompositeCandidate>")

@@ -21,7 +21,7 @@ class MonteCarloSelectionControlPlots:
     def beginJob(self, genlabel="genParticles"):
       # declare histograms
       self.dir.cd()
-      self.h_eventType = ROOT.TH1I("eventType","Event Type (0,l,c,b)+Z",4,0,4)
+      self.h_eventType = ROOT.TH1F("eventType","Event Type (0,l,c,b)+Z",4,0,4)
       self.genlabel=genlabel
       self.genHandle = Handle ("vector<reco::GenParticle>")
       self.cjet = 0

@@ -23,8 +23,8 @@ class EventSelectionControlPlots:
     def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent"):
       # declare histograms
       self.dir.cd()
-      self.h_triggerSelection = ROOT.TH1I("triggerSelection","triggerSelection ",2,0,2)
-      self.h_triggerBit = ROOT.TH1I("triggerBits","trigger bits",20,0,20)
+      self.h_triggerSelection = ROOT.TH1F("triggerSelection","triggerSelection ",2,0,2)
+      self.h_triggerBit = ROOT.TH1F("triggerBits","trigger bits",20,0,20)
       self.h_zmassMu = ROOT.TH1F("zmassMu","zmassMu",2000,0,200)
       self.h_massBestMu = ROOT.TH1F("bestzmassMu","bestzmassMu",2000,0,200)
       self.h_zmassEle = ROOT.TH1F("zmassEle","zmassEle",2000,0,200)
@@ -44,7 +44,7 @@ class EventSelectionControlPlots:
       self.h_ZbbM = ROOT.TH1F("ZbbM","Zbb invariant mass",1000,0,1000)
       self.h_ZbbPt = ROOT.TH1F("ZbbPt","Zbb Pt",500,0,500)
       self.h_ZbbM2D = ROOT.TH2F("ZbbM2D","Zbb mass vs bb mass",100,0,1000,100,0,1000)
-      self.h_category = ROOT.TH1I("category","event category",10,0,10)  
+      self.h_category = ROOT.TH1F("category","event category",10,0,10)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
       self.h_mu1eta = ROOT.TH1F("mu1eta","leading muon Eta",25,0,2.5)
@@ -63,8 +63,8 @@ class EventSelectionControlPlots:
       self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
       self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",25,0, 2.5)
       self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
-      self.h_jetoverlapmu = ROOT.TH1I("jetoverlapmu","jets overlaps with muons",2,0,2)
-      self.h_jetoverlapele = ROOT.TH1I("jetoverlapele","jets overlaps with electrons",2,0,2)
+      self.h_jetoverlapmu = ROOT.TH1F("jetoverlapmu","jets overlaps with muons",2,0,2)
+      self.h_jetoverlapele = ROOT.TH1F("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.h_jet1pt = ROOT.TH1F("jet1pt","leading jet Pt",500,0,500)
       self.h_jet1eta = ROOT.TH1F("jet1eta","leading jet Eta",25,0,2.5)
       self.h_jet2pt = ROOT.TH1F("jet2pt","subleading jet Pt",500,0,500)
@@ -73,17 +73,17 @@ class EventSelectionControlPlots:
       self.h_bjet1eta = ROOT.TH1F("bjet1eta","leading bjet Eta",25,0,2.5)
       self.h_bjet2pt = ROOT.TH1F("bjet2pt","subleading bjet Pt",500,0,500)
       self.h_bjet2eta = ROOT.TH1F("bjet2eta","subleading bjet Eta",25,0,2.5)
-      self.h_nj = ROOT.TH1I("nj","jet count",15,0,15)
-      self.h_nb = ROOT.TH1I("nb","b-jet count",5,0,5)
-      self.h_nbP = ROOT.TH1I("nbP","pure b-jet count",5,0,5)
+      self.h_nj = ROOT.TH1F("nj","jet count",15,0,15)
+      self.h_nb = ROOT.TH1F("nb","b-jet count",5,0,5)
+      self.h_nbP = ROOT.TH1F("nbP","pure b-jet count",5,0,5)
       self.h_njb = ROOT.TH2I("njb","number of bjets vs number of jets",15,0,15,5,0,5)
       self.h_nhf = ROOT.TH1F("nhf","neutral hadron energy fraction",101,0,1.01)
       self.h_nef = ROOT.TH1F("nef","neutral EmEnergy fraction",101,0,1.01)
-      self.h_nconstituents = ROOT.TH1I("npf","total multiplicity",50,0,50)
+      self.h_nconstituents = ROOT.TH1F("npf","total multiplicity",50,0,50)
       self.h_chf = ROOT.TH1F("chf","charged hadron energy fraction",101,0,1.01)
-      self.h_nch = ROOT.TH1I("nch","charged multiplicity",50,0,50)
+      self.h_nch = ROOT.TH1F("nch","charged multiplicity",50,0,50)
       self.h_cef = ROOT.TH1F("cef","charged EmEnergy fraction",101,0,1.01)
-      self.h_jetid = ROOT.TH1I("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
+      self.h_jetid = ROOT.TH1F("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
@@ -265,3 +265,34 @@ def runTest():
     i += 1
   controlPlots.endJob()
 
+def dumpEventList(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"):
+  dirList=os.listdir(path)
+  files=[]
+  for fname in dirList:
+    files.append(path+fname)
+  events = Events (files)
+  metlabel="patMETsPF"
+  jetlabel="cleanPatJets"
+  zmulabel="Ztighttight"
+  zelelabel="Zelel"
+  triggerlabel="patTriggerEvent"
+  jetHandle = Handle ("vector<pat::Jet>")
+  metHandle = Handle ("vector<pat::MET>")
+  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
+  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+  trigInfoHandle = Handle ("pat::TriggerEvent")
+  for event in events:
+    event.getByLabel (jetlabel,jetHandle)
+    event.getByLabel (metlabel,metHandle)
+    event.getByLabel (zmulabel,zmuHandle)
+    event.getByLabel (zelelabel,zeleHandle)
+    event.getByLabel (triggerlabel,trigInfoHandle)
+    jets = jetHandle.product()
+    met = metHandle.product()
+    zCandidatesMu = zmuHandle.product()
+    zCandidatesEle = zeleHandle.product()
+    triggerInfo = trigInfoHandle.product()
+    bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+    category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
+    if category>=stage:
+      print "Run", event.eventAuxiliary().run(), ", Event", event.eventAuxiliary().id().event()
