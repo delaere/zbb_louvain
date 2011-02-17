@@ -60,7 +60,7 @@ void CategoryAdder::sumHistos(const char* name, TDirectory* dir1, TDirectory* di
        name1.replace(name1.find(pattern1),pattern1.length(),"");
    }
    h1->SetName(name1.c_str());
-   output->WriteObject(h1,h1->GetName());
+//   output->WriteObject(h1,h1->GetName());
 }
 
 void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* output)
@@ -87,16 +87,18 @@ void sumChannels(const char* filename, const char* outputfile=NULL)
    char chan1[16] = "MuMuChannel";
    char chan2[16] = "EEChannel";
    char sum[16] = "Combined";
-   TFile* file = TFile::Open(filename,"update");
+   TFile* file = NULL;
    TDirectory* sumdir = NULL;
    TFile* output = NULL;
    if(!outputfile) {
+     file = TFile::Open(filename,"update");
      sumdir = file->mkdir(sum);
      if(sumdir==NULL) {
        std::cout << sum << " already exists. Exiting" << std::endl;
        return;
      }
    } else {
+     file = TFile::Open(filename);
      output = TFile::Open(outputfile,"recreate");
      sumdir = output->mkdir(sum);
      if(sumdir==NULL) {
