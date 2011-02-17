@@ -268,6 +268,7 @@ std::cout << "working on histo " << data->GetName() << std::endl;
      // color
      h->SetFillColor(mcConf->getParameter<unsigned int>("color"));
      // scale
+     h->SumW2();
      h->Scale(mcConf->getParameter<double>("scale"));
      // rebin
      if(style!=_styleTweaks.end()) h->Rebin(style->second.getUntrackedParameter<unsigned>("rebin",1));
