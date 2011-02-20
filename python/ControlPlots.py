@@ -16,10 +16,16 @@ parser.add_option("--all",action="store_true",dest="all",
                   help="Process all levels.")
 parser.add_option("-l", "--level", dest="levels",
                   help="Specify a coma-separated list of levels to be processed. No space is allowed.")
+parser.add_option("--onlyMu",action="store_true",dest="onlyMu",
+                  help="Fill only the muon channel plots.")
+parser.add_option("--onlyEle",action="store_true",dest="onlyEle",
+                  help="Fill only the electron channel plots.")
 parser.add_option("--Zjet",action="store_true",dest="ZjetFilter",
                   help="Remove b and c contributions from Z+jets.")
 parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
+parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
+                  help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
 (options, args) = parser.parse_args()
 
 import ROOT
@@ -31,7 +37,7 @@ from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
-def category(event,muChannel,ZjetFilter,checkTrigger):
+def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
     genHandle = Handle ("vector<reco::GenParticle>")
@@ -56,10 +62,10 @@ def category(event,muChannel,ZjetFilter,checkTrigger):
   else:
     triggerInfo = None
 #  print "***************************************************************************"  
-#  print "evtCat = ", eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
+#  print "evtCat = ", eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
 
-def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False):
+def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
@@ -108,20 +114,22 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       tightmuonsPlots[level].beginJob(muonlabel="matchedMuons", muonType="tight")
       allelectronsPlots[level].beginJob(electronlabel="allElectrons", electronType="none")
       tightelectronsPlots[level].beginJob(electronlabel="matchedElectrons", electronType="tight")
-      jetmetAK5PFPlots[level].beginJob(jetlabel="cleanPatJets")
-      jetmetAK7PFPlots[level].beginJob(jetlabel="cleanPatJetsAK7PF")
+      jetmetAK5PFPlots[level].beginJob(jetlabel="cleanPatJets",btagging=btagAlgo)
+      jetmetAK7PFPlots[level].beginJob(jetlabel="cleanPatJetsAK7PF",btagging=btagAlgo)
       vertexPlots[level].beginJob()
-      selectionPlots[level].beginJob()
+      selectionPlots[level].beginJob(btagging=btagAlgo)
 
   # process events
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
     for muChannel in [True, False]:
-      evtcategory = category(event,muChannel,ZjetFilter,checkTrigger)
+      evtcategory = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo)
       if muChannel: 
+        if onlyEle: evtcategory=-1
         plots = filter(lambda x: x<=evtcategory ,levels)
       else:
+        if onlyMu: evtcategory=-1
         plots = map(lambda x: x+eventCategories(),filter(lambda x: x<=evtcategory ,levels))
       for level in plots:
         jetmetAK5PFPlots[level].processEvent(event)
@@ -177,8 +185,12 @@ def main(options):
     print "Error: last level is",eventCategories()-1
     parser.print_help()
     return
+  if options.onlyMu and options.onlyEle:
+    print "Error: --onlyMu and --onlyEle are exclusive."
+    parser.print_help()
+    return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger)
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle)
 
 if __name__ == "__main__":
   main(options)

@@ -170,7 +170,7 @@ def hasNoOverlap(jet, Z):
     
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
-  rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+  rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") 
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
   nconstituents = rawjet.numberOfDaughters()
@@ -207,15 +207,28 @@ def isGoodMet(met,cut=40):
   """Apply the MET cut"""
   return met.pt()<cut
 
-def isBJet(jet,workingPoint):
+def isBJet(jet,workingPoint,algo="SSV"):
   """Perform b-tagging"""
-  if workingPoint=="HE":
-    return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.74
-  elif workingPoint=="HP":
-    return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0
+  if algo=="SSV":
+    if workingPoint=="HE":
+      return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.74
+    elif workingPoint=="HP":
+      return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0
+    else:
+      print "Error: unforeseen working point for b-tagging. Use HE or HP"
+      return False
+  elif algo=="TC":
+    if workingPoint=="HE":
+      return jet.bDiscriminator("trackCountingHighEffBJetTags")>3.3
+    elif workingPoint=="HP":
+      return jet.bDiscriminator("trackCountingHighPurBJetTags")>3.41
+    else:
+      print "Error: unforeseen working point for b-tagging. Use HE or HP"
+      return False
   else:
-    print "Error: unforeseen working point for b-tagging. Use HE or HP"
+    print "Error: unforeseen algo for b-tagging. Use SSV or TC"
     return False
+
 
 def isZcandidate(zCandidate):
   """Checks that this is a suitable candidate from lepton quality"""
@@ -254,9 +267,9 @@ def findBestCandidate(*zCandidates):
         bestZ = z
   return bestZ
 
-def eventCategories(): return 8
+def eventCategories(): return 10
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV"):
   """See up to which level the event passes the selection"""
   if not isTriggerOK(triggerInfo, muChannel): return 0
   if muChannel:
@@ -274,11 +287,13 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
   for jet in jets:
     if isGoodJet(jet,bestZcandidate):
       nJets += 1
-      if isBJet(jet,"HE"): nBjetsHE += 1
-      if isBJet(jet,"HP"): nBjetsHP += 1
+      if isBJet(jet,"HE",btagging): nBjetsHE += 1
+      if isBJet(jet,"HP",btagging): nBjetsHP += 1
   if nJets==0: return 3
   if nBjetsHE==0: return 4
   if not isGoodMet(met[0]): return 5
   if nBjetsHP==0: return 6
-  return 7
+  if nBjetsHE==1: return 7
+  if nBjetsHP==1: return 8
+  return 9
 

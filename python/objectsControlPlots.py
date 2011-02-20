@@ -26,7 +26,8 @@ class MuonsControlPlots:
       self.h_muonhits = ROOT.TH1F("muonhits","Muon hits",50,0,50)
       self.h_muonIso = ROOT.TH1F("muonIso","Muon isolatio",20,0,0.2)
       self.h_muonPt = ROOT.TH1F("muonPt","Muon Pt",500,0,500)
-      self.h_muonEta = ROOT.TH1F("muonEta","Muon Eta",50,0,2.5)
+      self.h_muonEta = ROOT.TH1F("muonEta","Muon Eta",25,0,2.5)
+      self.h_muonEtapm = ROOT.TH1F("muonEtapm","Muon Eta",50,-2.5,2.5)
       self.h_muonChi2 = ROOT.TH1F("muonChi2","Muon normalized chi2",100,0,20)
       self.h_muonPHits = ROOT.TH1F("muonPHits","Muon Pixel hits",10,0,10)
       self.h_muonSHits = ROOT.TH1F("muonSHits","Muon Strip hits",30,0,30)
@@ -67,6 +68,7 @@ class MuonsControlPlots:
         self.h_muonIso.Fill((muon.trackIso()+muon.caloIso())/muon.pt())
         self.h_muonPt.Fill(muon.pt())
         self.h_muonEta.Fill(abs(muon.eta()))
+        self.h_muonEtapm.Fill(muon.eta())
         self.h_muonMatches.Fill(muon.numberOfMatches())
         if isGoodMuon(muon,self.muonType) : nmu += 1
       self.h_nmu.Fill(nmu)
@@ -96,6 +98,7 @@ class ElectronsControlPlots:
       self.h_elemisshits = ROOT.TH1F("elemisshits","Electron missing hits",5,0,5)
       self.h_elept = ROOT.TH1F("elept","electron pt",500,0,500)
       self.h_eleeta = ROOT.TH1F("eleeta","electron eta",30,0,3)
+      self.h_eleetapm = ROOT.TH1F("eleetapm","electron eta",60,-3,3)
       self.h_eledb = ROOT.TH1F("eledb","electron dB",100,0,0.05)
       self.h_eleoverlapmu = ROOT.TH1F("eleoverlapmu","electrons overlaps with muon",2,0,2)
       self.h_eleHcalIso = ROOT.TH1F("eleHcalIso","Electron HCAL relative isolation dr03",100,0,0.2)
@@ -132,6 +135,7 @@ class ElectronsControlPlots:
         self.h_eleinin.Fill(electron.scSigmaIEtaIEta())
         self.h_elept.Fill(electron.pt())
         self.h_eleeta.Fill(abs(electron.eta()))
+        self.h_eleetapm.Fill(electron.eta())
         self.h_eledb.Fill(abs(electron.dB()))
         self.h_eleoverlapmu.Fill(electron.hasOverlaps("muons"))
         if isGoodElectron(electron,self.electronType) : nel += 1
@@ -155,26 +159,47 @@ class JetmetControlPlots:
         self.f = None
         self.dir = dir
     
-    def beginJob(self, jetlabel="cleanPatJets", metlabel="patMETsPF" ):
+    def beginJob(self, jetlabel="cleanPatJets", metlabel="patMETsPF" , btagging="SSV"):
+      self.btagging=btagging
       # declare histograms
       self.dir.cd()
       self.h_SSVHEdisc = ROOT.TH1F("SSVHEdisc","SSVHEdisc",200,-10,10)
       self.h_SSVHPdisc = ROOT.TH1F("SSVHPdisc","SSVHPdisc",200,-10,10)
+      self.h_TCHEdisc = ROOT.TH1F("TCHEdisc","TCHEdisc",200,-10,10)
+      self.h_TCHPdisc = ROOT.TH1F("TCHPdisc","TCHPdisc",200,-10,10)
+      self.h_SSVHEdiscJet1 = ROOT.TH1F("SSVHEdiscJet1","SSVHEdiscJet1",200,-10,10)
+      self.h_SSVHPdiscJet1 = ROOT.TH1F("SSVHPdiscJet1","SSVHPdiscJet1",200,-10,10)
+      self.h_TCHEdiscJet1 = ROOT.TH1F("TCHEdiscJet1","TCHEdiscJet1",200,-10,10)
+      self.h_TCHPdiscJet1 = ROOT.TH1F("TCHPdiscJet1","TCHPdiscJet1",200,-10,10)
+      self.h_SSVHEdiscbJet1 = ROOT.TH1F("SSVHEdiscbJet1","SSVHEdiscbJet1",200,-10,10)
+      self.h_SSVHPdiscbJet1 = ROOT.TH1F("SSVHPdiscbJet1","SSVHPdiscbJet1",200,-10,10)
+      self.h_TCHEdiscbJet1 = ROOT.TH1F("TCHEdiscbJet1","TCHEdiscbJet1",200,-10,10)
+      self.h_TCHPdiscbJet1 = ROOT.TH1F("TCHPdiscbJet1","TCHPdiscbJet1",200,-10,10)
+      self.h_SSVHEdiscDisc1 = ROOT.TH1F("SSVHEdiscDisc1","SSVHEdiscDisc1",200,-10,10)
+      self.h_SSVHPdiscDisc1 = ROOT.TH1F("SSVHPdiscDisc1","SSVHPdiscDisc1",200,-10,10)
+      self.h_TCHEdiscDisc1 = ROOT.TH1F("TCHEdiscDisc1","TCHEdiscDisc1",200,-10,10)
+      self.h_TCHPdiscDisc1 = ROOT.TH1F("TCHPdiscDisc1","TCHPdiscDisc1",200,-10,10)
       self.h_met = ROOT.TH1F("MET","MET",100,0,200)
       self.h_phimet = ROOT.TH1F("METphi","MET #phi",70,-3.5,3.5)
       self.h_jetpt = ROOT.TH1F("jetpt","Jet Pt",100,15,215)
       self.h_jeteta = ROOT.TH1F("jeteta","Jet eta",25,0, 2.5)
+      self.h_jetetapm = ROOT.TH1F("jetetapm","Jet eta",50,-2.5, 2.5)
       self.h_jetphi = ROOT.TH1F("jetphi","Jet phi",80,-4,4)
       self.h_jetoverlapmu = ROOT.TH1F("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.h_jetoverlapele = ROOT.TH1F("jetoverlapele","jets overlaps with electrons",2,0,2)
-      self.h_jet1pt = ROOT.TH1F("jet1pt","leading jet Pt",500,0,500)
+      self.h_jet1pt = ROOT.TH1F("jet1pt","leading jet Pt",500,15,515)
       self.h_jet1eta = ROOT.TH1F("jet1eta","leading jet Eta",25,0,2.5)
-      self.h_jet2pt = ROOT.TH1F("jet2pt","subleading jet Pt",500,0,500)
+      self.h_jet1etapm = ROOT.TH1F("jet1etapm","leading jet Eta",50,-2.5,2.5)
+      self.h_jet2pt = ROOT.TH1F("jet2pt","subleading jet Pt",500,15,515)
       self.h_jet2eta = ROOT.TH1F("jet2eta","subleading jet Eta",25,0,2.5)
-      self.h_bjet1pt = ROOT.TH1F("bjet1pt","leading bjet Pt",500,0,500)
+      self.h_jet2etapm = ROOT.TH1F("jet2etapm","subleading jet Eta",50,-2.5,2.5)
+      self.h_bjet1pt = ROOT.TH1F("bjet1pt","leading bjet Pt",500,15,515)
       self.h_bjet1eta = ROOT.TH1F("bjet1eta","leading bjet Eta",25,0,2.5)
-      self.h_bjet2pt = ROOT.TH1F("bjet2pt","subleading bjet Pt",500,0,500)
+      self.h_bjet1etapm = ROOT.TH1F("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
+      self.h_bjet2pt = ROOT.TH1F("bjet2pt","subleading bjet Pt",500,15,515)
       self.h_bjet2eta = ROOT.TH1F("bjet2eta","subleading bjet Eta",25,0,2.5)
+      self.h_bjet2etapm = ROOT.TH1F("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
+      self.h_dptj1b1 = ROOT.TH1F("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.h_nj = ROOT.TH1F("nj","jet count",15,0,15)
       self.h_nb = ROOT.TH1F("nb","b-jet count",5,0,5)
       self.h_nbP = ROOT.TH1F("nbP","pure b-jet count",5,0,5)
@@ -204,10 +229,15 @@ class JetmetControlPlots:
       nj  = 0
       nb  = 0
       nbP = 0
+      maxbdiscSSVHE = -1
+      maxbdiscSSVHP = -1
+      maxbdiscTCHE  = -1
+      maxbdiscTCHP  = -1
       for jet in jets:
         if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           self.h_jetpt.Fill(jet.pt())
           self.h_jeteta.Fill(abs(jet.eta()))
+          self.h_jetetapm.Fill(jet.eta())
           self.h_jetphi.Fill(jet.phi())
           self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
           self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
@@ -225,23 +255,47 @@ class JetmetControlPlots:
           # B-tagging
           self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+          self.h_TCHEdisc.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
+          self.h_TCHPdisc.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
+	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+	  maxbdiscSSVHP = max(maxbdiscSSVHP,jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+	  maxbdiscTCHE = max(maxbdiscSSVHE,jet.bDiscriminator("trackCountingHighEffBJetTags"))
+	  maxbdiscTCHP = max(maxbdiscSSVHP,jet.bDiscriminator("trackCountingHighPurBJetTags"))
           #eventually complement with variables from the btagging (check paper)
           nj += 1
           if nj==1: 
+	    j1pt=jet.pt()
             self.h_jet1pt.Fill(jet.pt())
             self.h_jet1eta.Fill(abs(jet.eta()))
+            self.h_jet1etapm.Fill(jet.eta())
+            self.h_SSVHEdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+            self.h_SSVHPdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+            self.h_TCHEdiscJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
+            self.h_TCHPdiscJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
           elif nj==2:
             self.h_jet2pt.Fill(jet.pt())
             self.h_jet2eta.Fill(abs(jet.eta()))
-          if isBJet(jet,"HE"): 
+            self.h_jet2etapm.Fill(jet.eta())
+          if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
               self.h_bjet1pt.Fill(jet.pt())
               self.h_bjet1eta.Fill(abs(jet.eta()))
+              self.h_bjet1etapm.Fill(jet.eta())
+              self.h_SSVHEdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+              self.h_SSVHPdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+              self.h_TCHEdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
+              self.h_TCHPdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
+	      self.h_dptj1b1.Fill(jet.pt()-j1pt)
             elif nb==2:
               self.h_bjet2pt.Fill(jet.pt())
               self.h_bjet2eta.Fill(abs(jet.eta()))
-          if isBJet(jet,"HP"): nbP += 1
+              self.h_bjet2etapm.Fill(jet.eta())
+          if isBJet(jet,"HP",self.btagging): nbP += 1
+      self.h_SSVHEdiscDisc1.Fill(maxbdiscSSVHE)
+      self.h_SSVHPdiscDisc1.Fill(maxbdiscSSVHP)
+      self.h_TCHEdiscDisc1.Fill(maxbdiscTCHE)
+      self.h_TCHPdiscDisc1.Fill(maxbdiscTCHP)
       self.h_nj.Fill(nj)
       self.h_nb.Fill(nb)
       self.h_nbP.Fill(nbP)
