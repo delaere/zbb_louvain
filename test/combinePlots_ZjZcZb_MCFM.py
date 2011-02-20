@@ -3,19 +3,19 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('mergedPlots_ZjZcZb_MCFM.root'),
+  outputFile = cms.string('mergedPlots_ZjZcZb_MCFM_test.root'),
   data = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('controlPlots_El_2010A_Dec22.root')
+     fileName = cms.string('controlPlots_El_2010A_Dec22.root'),
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_El_2010B_Dec22.root')
+     fileName = cms.string('controlPlots_El_2010B_Dec22.root'),
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_Mu_2010A_Dec22.root')
+     fileName = cms.string('controlPlots_Mu_2010A_Dec22.root'),
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_Mu_2010B_Dec22.root')
+     fileName = cms.string('controlPlots_Mu_2010B_Dec22.root'),
    ) 
   ),
   mc   = cms.VPSet (
@@ -32,7 +32,7 @@ process.CombinePlots = cms.PSet(
      role = cms.string('Zc')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_TTJets_TuneZ2.root'),
+     fileName = cms.string('controlPlots_TTJets_TuneZ2_387.root'),
      color = cms.uint32(5),
      scale = cms.double(0.0044184), #NLO k=1.67
      role = cms.string('ttbar')
@@ -44,23 +44,26 @@ process.CombinePlots = cms.PSet(
      role = cms.string('Z+jets')
    )
   ),
+  options = cms.PSet (
+      nostack = cms.untracked.bool(False)
+  ),
   formating = cms.VPSet (
     cms.PSet(
       name = cms.string('bestzmassMu'),
-      rebin = cms.untracked.uint32(10),
+      rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("Z -> #mu#mu invariant mass (GeV/c^{2})"),
-      labely = cms.untracked.string("Events/GeV/c^{2}"),
+      labely = cms.untracked.string("Events/2GeV/c^{2}"),
       rangex = cms.untracked.vdouble(60.,120.)
     ),
     cms.PSet(
       name = cms.string('bestzmassEle'),
-      rebin = cms.untracked.uint32(10),
+      rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("Z -> ee invariant mass (GeV/c^{2})"),
-      labely = cms.untracked.string("Events/GeV/c^{2}"),
+      labely = cms.untracked.string("Events/2GeV/c^{2}"),
       rangex = cms.untracked.vdouble(60.,120.)
     ),
     cms.PSet(
