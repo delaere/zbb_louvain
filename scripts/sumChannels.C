@@ -65,6 +65,9 @@ void CategoryAdder::sumHistos(const char* name, TDirectory* dir1, TDirectory* di
 
 void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* output)
 {
+   dir1->SetWritable(false);
+   dir2->SetWritable(false);
+   output->SetWritable(true);
    TList* keys = dir1->GetListOfKeys();
    TIter next(keys);
    TKey *key;
