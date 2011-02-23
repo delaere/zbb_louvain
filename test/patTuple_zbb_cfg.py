@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.16 $'),
+    version = cms.untracked.string('$Revision: 1.17 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
@@ -139,6 +139,8 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
 # selected Jets
 process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
 process.selectedPatJetsAK7PF.cut = 'pt > 15. & abs(eta) < 2.4 '
+
+process.patJets.addTagInfos = cms.bool( True )
 
 #---------------------------- Leptons
 #------------------------------------------------------------------------------------------------------------------------------------------------
