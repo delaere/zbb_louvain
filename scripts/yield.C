@@ -43,7 +43,7 @@ void yield(TCanvas* categoryPlot, unsigned initialStage)
   std::cout << setw(10) << "Total MC" << setw(10) << "" << std::endl;
   mc->Reset();
   // now loop over stages and print data
-  for(unsigned stage=initialStage; stage<data->GetNbinsX()-1; ++stage) {
+  for(unsigned stage=initialStage; stage<=data->GetNbinsX()-1; ++stage) {
     //all info is in bin stage+1
     std::cout << setw(10) << "stage " << stage;
     Double_t integral, error;
@@ -87,6 +87,36 @@ void yield(TFile* file)
       }
     }
   }
+}
+
+void ratioData(double DataZb, double DataZj, double MCttbar, double purity, double efficiency, 
+               double purityErr = 0.15, double efficiencyErr = 0.2, double MCttbarError = 0.0, double JESError = 0.03)
+{
+  // first compute the ratio
+  double ratio = ((DataZb*purity)-MCttbar)/DataZj/efficiency;
+  // now, compute the statistical error
+  double stat = sqrt((purity*purity*DataZb+MCttbarError*MCttbarError)/((DataZb*purity-MCttbar)*(DataZb*purity-MCttbar))+1/DataZj);
+  // and finally the systematic error
+  double syst = sqrt(purityErr*purityErr+efficiencyErr*efficiencyErr+JESError*JESError);
+
+  // print
+  std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst)" << std::endl;
+}
+
+void ratioMC(double MCZb, double MCZj, double efficiency, double MCZbError, double MCZjError, double MCZbErrorTh, double MCZjErrorTh,
+             double efficiencyErr = 0.2,double JESError = 0.03)
+{
+  // first compute the ratio
+  double ratio = MCZb/MCZj/efficiency;
+  // now, compute the statistical error
+  double stat = sqrt(MCZbError*MCZbError+MCZjError*MCZjError);
+  // now, compute thesystematic error
+  double syst = sqrt(efficiencyErr*efficiencyErr+JESError*JESError);
+  // and finally the theoretical error
+  double theo = sqrt(MCZbErrorTh*MCZbErrorTh+MCZjErrorTh*MCZjErrorTh);
+
+  // print
+  std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst) +/- " << theo << " (theo)" << std::endl;
 }
 
 void yield(const char* filename)
