@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.17 $'),
+    version = cms.untracked.string('$Revision: 1.18 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
@@ -406,6 +406,9 @@ process.source.fileNames = [
 
 process.maxEvents.input = 1000
 
-process.out.fileName = 'Z_data.root'
+#process.out.fileName = 'Mu2010A.root'
+process.out.fileName = 'Mu2010B_v6.root'
+#process.out.fileName = 'Ele2010A_VERSION5.root'
+#process.out.fileName = 'Ele2010B_v4_bis.root'
 
 process.options.wantSummary = True

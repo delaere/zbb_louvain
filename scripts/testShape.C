@@ -62,7 +62,7 @@ void test2(TH1F* h1, TH1F* h2)
     int1->SetBinError(i,sqrt(int1->GetBinError(i)*int1->GetBinError(i)+int1->GetBinError(i-1)*int1->GetBinError(i-1)));
   }
   TH1F* int2 = h2->Clone("int2");
-  int2->SetLineColor(2);
+  int2->SetLineColor(3);
   int2->Sumw2();
   for(int i=1;i<=int2->GetNbinsX()+1;++i) {
     int2->SetBinContent(i,int2->GetBinContent(i)+int2->GetBinContent(i-1));
@@ -102,7 +102,7 @@ void test3(TH1F* h1, TH1F* h2)
     int1->SetBinError(i,sqrt(int1->GetBinError(i)*int1->GetBinError(i)+int1->GetBinError(i+1)*int1->GetBinError(i+1)));
   }
   TH1F* int2 = h2->Clone("int2");
-  int2->SetLineColor(2);
+  int2->SetLineColor(3);
   int2->Sumw2();
   for(int i=int1->GetNbinsX();i>=0;--i) {
     int2->SetBinContent(i,int2->GetBinContent(i)+int2->GetBinContent(i+1));
