@@ -2,15 +2,14 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.18 $'),
+    version = cms.untracked.string('$Revision: 1.15 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
 # dbs search --query="find dataset.tag where dataset like /Mu/Run2010A-DiLeptonMu-Dec22Skim_v2/RECO"
-#process.GlobalTag.globaltag = cms.string('FT_R_39X_V4A::All')
-process.GlobalTag.globaltag = cms.string('GR_R_39X_V6::All')
+process.GlobalTag.globaltag = cms.string('FT_R_39X_V4A::All')
 
 # running on data, remove genparticle references in objects
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -115,7 +114,8 @@ addJetCollection(process,cms.InputTag('ak7PFJets'),
                  doJTA        = True,
                  doBTagging   = True,
                  # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                 jetCorrLabel = ('AK7PF',['L1Offset','L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #   'L2L3Residual' as default
+                 # jetCorrLabel = ('AK7PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                 jetCorrLabel = ('AK7PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                  doType1MET   = False,
                  doL1Cleaning = True,                 
                  doL1Counters = False,
@@ -129,7 +129,8 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
                     # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                    jetCorrLabel = ('AK5PF',['L1Offset', 'L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #  'L2L3Residual' as default 
+                    #jetCorrLabel = ('AK5PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                    jetCorrLabel = ('AK5PF',['L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
@@ -137,10 +138,8 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     )
 
 # selected Jets
-process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
-process.selectedPatJetsAK7PF.cut = 'pt > 15. & abs(eta) < 2.4 '
-
-process.patJets.addTagInfos = cms.bool( True )
+process.selectedPatJets.cut      = 'pt > 25. & abs(eta) < 2.4 '
+process.selectedPatJetsAK7PF.cut = 'pt > 25. & abs(eta) < 2.4 '
 
 #---------------------------- Leptons
 #------------------------------------------------------------------------------------------------------------------------------------------------
@@ -400,15 +399,12 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 
 process.source.fileNames = [
-    "file:/scratch/lceard/store/dataset/data/DiLeptonMu-Dec22Skim_v2_0029_142EFD78-F010-E011-933A-003048D15D04.root"
+    "file:/storage/data/cms/store/data/Run2010A/Mu/RECO/DiLeptonMu-Dec22Skim_v2/0029/142EFD78-F010-E011-933A-003048D15D04.root"
     #"file:/home/fynu/arnaudp/scratch/Early_top_Analysis/101206/CMSSW_3_8_6_patch1/src/TopAnalysis/TopAnalysis/test/test_tt.root"
     ]                                     
 
 process.maxEvents.input = 1000
 
-#process.out.fileName = 'Mu2010A.root'
-process.out.fileName = 'Mu2010B_v6.root'
-#process.out.fileName = 'Ele2010A_VERSION5.root'
-#process.out.fileName = 'Ele2010B_v4_bis.root'
+process.out.fileName = 'Z_data.root'
 
 process.options.wantSummary = True

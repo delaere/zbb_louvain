@@ -2,14 +2,13 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.6 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis: MC'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_MC.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
-#process.GlobalTag.globaltag = cms.string('START39_V8::All')
-process.GlobalTag.globaltag = cms.string('MC_39Y_V8::All')
+process.GlobalTag.globaltag = cms.string('START39_V8::All')
 
 # scrapingveto:
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
@@ -110,7 +109,8 @@ addJetCollection(process,cms.InputTag('ak7PFJets'),
                  doJTA        = True,
                  doBTagging   = True,
                  # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                 jetCorrLabel = ('AK7PF',['L1Offset', 'L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton']),  # L3Absolute by default
+                 # jetCorrLabel = ('AK7PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                 jetCorrLabel = ('AK7PF',['RAW', 'L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                  doType1MET   = False,
                  doL1Cleaning = True,                 
                  doL1Counters = False,
@@ -124,7 +124,8 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
                     # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                    jetCorrLabel = ('AK5PF',['L1Offset', 'L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton']),  # L3Absolute by default 
+                    #jetCorrLabel = ('AK5PF',['RAW', 'L2Relative', 'L3Absolute','L2L3Residual', 'L5Flavor', 'L7Parton']),
+                    jetCorrLabel = ('AK5PF',['RAW', 'L2Relative', 'L3Absolute']),  #  'L2L3Residual' working for 387 but not for 397
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True
@@ -132,10 +133,8 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     )
 
 # selected Jets
-process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
-process.selectedPatJetsAK7PF.cut = 'pt > 15. & abs(eta) < 2.4 '
-
-process.patJets.addTagInfos = cms.bool( True )
+process.selectedPatJets.cut      = 'pt > 25. & abs(eta) < 2.4 '
+process.selectedPatJetsAK7PF.cut = 'pt > 25. & abs(eta) < 2.4 '
 
 #---------------------------- Leptons
 #------------------------------------------------------------------------------------------------------------------------------------------------
@@ -401,15 +400,12 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 process.source.fileNames = [
     #"file:/storage/data/cms/store/data/Run2010A/Mu/RECO/DiLeptonMu-Dec22Skim_v2/0029/142EFD78-F010-E011-933A-003048D15D04.root"
-    "file:/scratch/lceard/store/dataset/MC/TTjetsMC.root"
+    "file:/storage/data/cms/store/mc/Fall10/TTJets_TuneD6T_7TeV-madgraph-tauola/GEN-SIM-RECO/START38_V12-v2/0014/DC7F30A3-8AE1-DF11-A220-001D0967E04D.root"
     #"file:/home/fynu/arnaudp/scratch/Early_top_Analysis/101206/CMSSW_3_8_6_patch1/src/TopAnalysis/TopAnalysis/test/test_tt.root"
     ]                                     
 
 process.maxEvents.input = 1000
 
-#process.out.fileName = 'Zbb_Z2.root'
-#process.out.fileName = 'Zcc_Z2.root'
-#process.out.fileName = 'DYJets_Z2.root'
-process.out.fileName = 'TTJets_Z2.root'
+process.out.fileName = 'Z_MC.root'
 
 process.options.wantSummary = True
