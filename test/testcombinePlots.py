@@ -32,14 +32,13 @@ process.CombinePlots = cms.PSet(
      role = cms.string('Zc')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_TTJets_TuneZ2_387.root'),
+     fileName = cms.string('controlPlots_TTJets_TuneZ2.root'),
      color = cms.uint32(5),
      scale = cms.double(0.0044184), #NLO k=1.67
      role = cms.string('ttbar')
    ),
    cms.PSet(
-     #fileName = cms.string('controlPlots_DYJetsToLL_TuneD6T.root'),
-     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_387.root'),
+     fileName = cms.string('controlPlots_DYJets_TuneZ2_noZbbZcc.root'),
      color = cms.uint32(3),
      scale = cms.double(0.0432474), #NNLO
      role = cms.string('Z+jets')

@@ -160,9 +160,9 @@ class EventSelectionControlPlots:
             mu2 = bestZcandidate.daughter(0)
           self.h_mu1pt.Fill(mu1.pt())
           self.h_mu2pt.Fill(mu2.pt())
+          self.h_mu1etapm.Fill(mu1.eta())
           self.h_mu1eta.Fill(abs(mu1.eta()))
-          self.h_mu1eta.Fill(abs(mu1.eta()))
-          self.h_mu2etapm.Fill(mu2.eta())
+          self.h_mu2eta.Fill(abs(mu2.eta()))
           self.h_mu2etapm.Fill(mu2.eta())
         elif bestZcandidate.daughter(0).isElectron():
           ele1 = bestZcandidate.daughter(0)

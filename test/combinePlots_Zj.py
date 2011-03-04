@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('mergedPlots_ZjZcZb_MCFM_all.root'),
+  outputFile = cms.string('mergedPlots_Zj_all.root'),
   data = cms.VPSet (
    cms.PSet(
      fileName = cms.string('controlPlots_Ele_2010A_Dec22_all.root')
@@ -26,22 +26,10 @@ process.CombinePlots = cms.PSet(
      role = cms.string('t#bar{t}')
    ),
    cms.PSet(
-     fileName = cms.string('controlPlots_Zbb-TuneZ2_v3_all.root'),
-     color = cms.uint32(2),
-     scale = cms.double(0.0358024), #NLO MCFM
-     role = cms.string('Z+b')
-   ), 
-   cms.PSet(
-     fileName = cms.string('controlPlots_Zcc-TuneZ2_v3_all.root'),
-     color = cms.uint32(3),
-     scale = cms.double(0.0368016), #NLO MCFM
-     role = cms.string('Z+c')
-   ), 
-   cms.PSet(
-     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_Zl_all.root'),
+     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_Zj_all.root'),
      color = cms.uint32(4),
      scale = cms.double(0.0209305), #NNLO
-     role = cms.string('Z+l')
+     role = cms.string('Z+jets')
    ),
   ),
   options = cms.PSet (

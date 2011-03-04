@@ -96,24 +96,30 @@ void ratioData(double DataZb, double DataZj, double MCttbar, double purity, doub
   double ratio = ((DataZb*purity)-MCttbar)/DataZj/efficiency;
   // now, compute the statistical error
   double stat = sqrt((purity*purity*DataZb+MCttbarError*MCttbarError)/((DataZb*purity-MCttbar)*(DataZb*purity-MCttbar))+1/DataZj);
+  stat *= ratio;
   // and finally the systematic error
   double syst = sqrt(purityErr*purityErr+efficiencyErr*efficiencyErr+JESError*JESError);
+  syst *= ratio;
 
   // print
   std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst)" << std::endl;
 }
 
-void ratioMC(double MCZb, double MCZj, double efficiency, double MCZbError, double MCZjError, double MCZbErrorTh, double MCZjErrorTh,
-             double efficiencyErr = 0.2,double JESError = 0.03)
+void ratioMC(double MCZb, double MCZj, double MCZbError, double MCZjError, double MCZbErrorTh, double MCZjErrorTh,
+             double JESError = 0.03)
 {
   // first compute the ratio
-  double ratio = MCZb/MCZj/efficiency;
+  double ratio = MCZb/MCZj;
   // now, compute the statistical error
+  MCZbError/=MCZb;
+  MCZjError/=MCZj;
   double stat = sqrt(MCZbError*MCZbError+MCZjError*MCZjError);
+  stat*=ratio;
   // now, compute thesystematic error
-  double syst = sqrt(efficiencyErr*efficiencyErr+JESError*JESError);
+  double syst = ratio*JESError;
   // and finally the theoretical error
   double theo = sqrt(MCZbErrorTh*MCZbErrorTh+MCZjErrorTh*MCZjErrorTh);
+  theo*=ratio;
 
   // print
   std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst) +/- " << theo << " (theo)" << std::endl;
