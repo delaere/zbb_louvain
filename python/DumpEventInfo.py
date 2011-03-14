@@ -1,10 +1,11 @@
+from itertools import combinations
 from datetime import datetime
 from math import sin
 import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, jetId
+from eventSelection import eventCategories, eventCategory, jetId, findBestCandidate, isGoodJet, isBJet
 
 def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   """Dump informations about a given event"""
@@ -31,6 +32,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   # in case a fwevent is provided, use it
   PrintEvent(fwevent)
   # load objects
+  vertexHandle = Handle ("vector<reco::Vertex>")
   electronHandle = Handle ("vector<pat::Electron>")
   muonHandle = Handle ("vector<pat::Muon>")
   jetHandle = Handle ("vector<pat::Jet>")
@@ -43,6 +45,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   fwevent.getByLabel ("patMETsPF",metHandle)
   fwevent.getByLabel ("Ztighttight",zmuHandle)
   fwevent.getByLabel ("Zelel",zeleHandle)
+  fwevent.getByLabel ("goodPV",vertexHandle)
+  vertices = vertexHandle.product()
   electrons = electronHandle.product()
   muons = muonHandle.product()
   jets = jetHandle.product()
@@ -50,6 +54,9 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   # loop on objects
+  print len(vertices), "vertices in the event."
+  for vertex in vertices:
+    PrintVertex(vertex)
   for muon in muons:
     PrintMuon(muon)
   for electron in electrons:
@@ -62,7 +69,6 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   for z in zCandidatesEle:
     PrintCandidate("Z->elel",z)
   # additional composite candidates from the event
-  # TODO: Zb candidate is missing... we should compute it by hand
   dijetHandle = Handle ("vector<reco::CompositeCandidate>")
   zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
   zeebbHandle = Handle ("vector<reco::CompositeCandidate>")
@@ -78,6 +84,34 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
     PrintCandidate("Zbb",zb)
   for zmmbb in zmmbbs: 
     PrintCandidate("Zbb",zbb)
+  # handcrafted candidates: bb Zb Zbb
+  bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+  for jet in jets:
+    if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP") :
+      b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
+      z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+      Zb = z+b
+      PrintLorentzVector("Zb (HP)",Zb)
+  for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP"),jets),2) :
+    b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
+    b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
+    bb = b1 + b2
+    Zbb = bb+z
+    PrintLorentzVector("bb (HP)",bb)
+    PrintLorentzVector("zbb (HP)",Zbb)
+  for jet in jets:
+    if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE") :
+      b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
+      z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+      Zb = z+b
+      PrintLorentzVector("Zb (HE)",Zb)
+  for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE"),jets),2) :
+    b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
+    b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
+    bb = b1 + b2
+    Zbb = bb+z
+    PrintLorentzVector("bb (HE)",bb)
+    PrintLorentzVector("zbb (HE)",Zbb)
 
 def PrintEvent(event) :
   print "================================================================="
@@ -136,6 +170,22 @@ def PrintJet(jet) :
   print "  B-tagging information:"
   print "     SSVHE:",jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
   print "     SSVHP:",jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+  taginfo = jet.tagInfoSecondaryVertex("secondaryVertex")
+  if not taginfo is None:
+    sv = taginfo.secondaryVertex(0)
+    if not sv is None:
+      print "     details about the secondary vertex:"
+      print "     * number of tracks:", sv.tracksSize()
+      print "     * chi2:",sv.chi2()
+      distance = taginfo.flightDistance(0,True)
+      print "     * distance:", distance.value(), "+/-",distance.error()
+      print "     * distance significance:", distance.significance()
+      dir = taginfo.flightDirection(0)
+      print "     * flight direction:",dir.x(),",",dir.y(),",",dir.z()
+      dirv = ROOT.TVector3(dir.x(),dir.y(),dir.z())
+      dirj = ROOT.TVector3(jet.px(),jet.py(),jet.pz())
+      print "     * dR(jet):",dirv.DeltaR(dirj)
+      print "     * mass:",sv.p4().M()
   print "-----------------------------------------------------------------"
 
 def PrintMET(met) :
@@ -155,4 +205,21 @@ def PrintCandidate(label, candidate, line=True) :
   #  print "  vertex: (",candidate.vertex().x(),",",candidate.vertex().y(),",",candidate.vertex().z(),")"
   if line:
     print "-----------------------------------------------------------------"
+
+def PrintLorentzVector(label, lorentzVector, line=True) :
+  if line:
+    print "-----------------------------------------------------------------"
+  print label, "candidate"
+  print "  (pt, eta, phi) = (", lorentzVector.Pt(), ",", lorentzVector.Eta(), ",", lorentzVector.Phi(), ")" 
+  print "  mass =", lorentzVector.M()
+  print "  p =", lorentzVector.P(), "mt = ", lorentzVector.Mt()
+  if line:
+    print "-----------------------------------------------------------------"
+
+def PrintVertex(vertex) :
+  print "-----------------------------------------------------------------"
+  print "Vertex position: (", vertex.x(), ",", vertex.y(), ",",vertex.z(), ") +/- (",vertex.xError(),",",vertex.yError(),",",vertex.zError(),")"
+  print "  Number of tracks:", vertex.tracksSize()
+  print "  chi2/ndof:",vertex.chi2(),"/",vertex.ndof()
+  print "-----------------------------------------------------------------"
 
