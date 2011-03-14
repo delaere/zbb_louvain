@@ -217,7 +217,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    }
    if(style!=_styleTweaks.end()) data->Rebin(style->second.getUntrackedParameter<unsigned>("rebin",1));
    data->SetTitle("data");
-   leg->AddEntry(data,"Data","LE");
+   leg->AddEntry(data,"Data","LEP");
    // now to the MC
    std::vector<edm::ParameterSet>::const_iterator mcConf = _mcInputs.begin();
    for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it, ++mcConf) {

@@ -34,7 +34,7 @@ class EventSelectionControlPlots:
       self.h_ptBestMu = ROOT.TH1F("bestzptMu","bestzptMu",500,0,500)
       self.h_zptEle = ROOT.TH1F("zptEle","zptEle",500,0,500)
       self.h_ptBestEle = ROOT.TH1F("bestzptEle","bestzptEle",500,0,500)
-      self.h_scaldptZbj1 = ROOT.TH1F("scaldptZbj1","scaldptZbj1",500,0,500)
+      self.h_scaldptZbj1 = ROOT.TH1F("scaldptZbj1","scaldptZbj1",1000,-500,500)
       self.h_drZbj1 = ROOT.TH1F("drZbj1","distance between Z and leading jet",100,0,5)
       self.h_vecdptZbj1 = ROOT.TH1F("vecdptZbj1","vecdptZbj1",500,0,500)
       self.h_dphiZbj1 = ROOT.TH1F("dphiZbj1","dphiZbj1",40,0,4)

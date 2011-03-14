@@ -66,7 +66,7 @@ void setTDRStyle() {
   gStyle->SetTitleColor(1, "XYZ");
   gStyle->SetTitleFont(42, "XYZ");
   gStyle->SetTitleSize(0.05, "XYZ");
-  gStyle->SetTitleXOffset(0.9);
+  gStyle->SetTitleXOffset(1.1);
   gStyle->SetTitleYOffset(1.25);
   // For the axis labels:
   gStyle->SetLabelColor(1, "XYZ");
@@ -90,7 +90,7 @@ void setTDRStyle() {
   gROOT->UseCurrentStyle();
 }
 
-void DrawCanvas(TCanvas* canvas)
+void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char* addLabel=NULL)
 {
   setTDRStyle();
   // retrieve the frame
@@ -115,7 +115,21 @@ void DrawCanvas(TCanvas* canvas)
   canvas->UseCurrentStyle();
   canvas->SetLogx(logx);
   canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 36.1 pb^{-1}}");
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 36 pb^{-1}}");
+  if(SSVHE) {
+    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
+    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
+    lat.DrawLatex(x,y,"High Efficiency b-tagging");
+  } else if(SSVHP) {
+    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
+    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
+    lat.DrawLatex(x,y,"High Purity b-tagging");
+  }
+  if(addLabel) {
+    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
+    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
+    lat.DrawLatex(x,y,addLabel);
+  }
   // polish the legend
   TLegend* legend = ((TLegend*)canvas->FindObject("TPave"));
   if(legend) {

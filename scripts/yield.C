@@ -51,16 +51,16 @@ void yield(TCanvas* categoryPlot, unsigned initialStage)
     Double_t errmc = 0;
     IntegralAndError(data,stage+1,data->GetNbinsX(),integral,error);
     std::cout << setw(10) << setiosflags(ios::right) << integral << "+/-" << resetiosflags(ios::right);
-    std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(2) << error << resetiosflags(ios::left);
+    std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << error << resetiosflags(ios::left);
     while ((obj = mc->Next())) {
       TH1I* h = (TH1I*)obj;
       IntegralAndError(h,stage+1,h->GetNbinsX(),integral,error);
-      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(2) << integral << "+/-" << resetiosflags(ios::right);
-      std::cout << setiosflags(ios::left) << setprecision(2) << setw(7) << error << resetiosflags(ios::left);
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << integral << "+/-" << resetiosflags(ios::right);
+      std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << error << resetiosflags(ios::left);
       totmc += integral;
       errmc += error*error;
     }
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(2) << totmc << "+/-" << resetiosflags(ios::right);
+    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << totmc << "+/-" << resetiosflags(ios::right);
     std::cout << setiosflags(ios::left) << setw(7) << sqrt(errmc) << resetiosflags(ios::left) << std::endl;
     mc->Reset();
   }
