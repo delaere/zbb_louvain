@@ -48,6 +48,7 @@ class plotCombiner {
    private:
      void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      void CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
+     TH1* Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterator& style);
      std::vector<edm::ParameterSet> _dataInputs;
      std::vector<edm::ParameterSet> _mcInputs;
      std::vector<TDirectory*> _filesData;
@@ -215,7 +216,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      (*it)->GetObject(data->GetName(),h);
      data->Add(h);
    }
-   if(style!=_styleTweaks.end()) data->Rebin(style->second.getUntrackedParameter<unsigned>("rebin",1));
+   if(style!=_styleTweaks.end()) data = Rebin(data,style);
    data->SetTitle("data");
    leg->AddEntry(data,"Data","LEP");
    // now to the MC
@@ -232,34 +233,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      h->Sumw2();
      h->Scale(mcConf->getParameter<double>("scale"));
      // rebin
-     if(style!=_styleTweaks.end()) {
-       // simple rebin
-       unsigned ngroup = style->second.getUntrackedParameter<unsigned>("rebin",1);
-       // rebin using an explicit binning
-       std::vector<double> bins = style->second.getUntrackedParameter<std::vector<double> >("bins",std::vector<double>() );
-       // rebin using begin, end, width
-       double begin = style->second.getUntrackedParameter<double>("begin",0);
-       double end   = style->second.getUntrackedParameter<double>("end",-1);
-       double width = style->second.getUntrackedParameter<double>("width",1);
-       // now, prepare the array of bins
-       if(end>begin && bins.size()==0) {
-         width = width>h->GetBinWidth(h->GetNbinsX()/2) ? width : h->GetBinWidth(h->GetNbinsX()/2) ;
-         for(double x=begin;x<end;x+=width)
-	   bins.push_back(x);
-         bins.push_back(end);
-       }
-       // actually do the rebinning
-       if(bins.size()) {
-         double* xbins = new double[bins.size()];
-	 for(unsigned i=0;i<bins.size();++i)
-	   xbins[i] = bins[i];
-	 ngroup = bins.size()-1;
-         h->Rebin(ngroup,"",xbins);
-	 delete[] xbins;
-       } else {
-         h->Rebin(ngroup);
-       }
-     }
+     if(style!=_styleTweaks.end()) h = Rebin(h,style);
      // add
      stack->Add(h);
      // legend
@@ -291,6 +265,42 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    }
    output->WriteObject(c,c->GetName());
    delete c;
+}
+
+TH1* plotCombiner::Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterator& style)
+{
+       // simple rebin
+       unsigned ngroup = style->second.getUntrackedParameter<unsigned>("rebin",1);
+       // rebin using an explicit binning
+       std::vector<double> bins = style->second.getUntrackedParameter<std::vector<double> >("bins",std::vector<double>() );
+       // rebin using begin, end, width
+       double begin = style->second.getUntrackedParameter<double>("begin",0);
+       double end   = style->second.getUntrackedParameter<double>("end",-1);
+       double width = style->second.getUntrackedParameter<double>("width",1);
+       // now, prepare the array of bins
+       if(end>begin && bins.size()==0) {
+         width = width>h->GetBinWidth(h->GetNbinsX()/2) ? width : h->GetBinWidth(h->GetNbinsX()/2) ;
+         for(double x=begin;x<end;x+=width)
+	   bins.push_back(x);
+         bins.push_back(end);
+       }
+       // actually do the rebinning
+       if(bins.size()) {
+         double* xbins = new double[bins.size()];
+	 for(unsigned i=0;i<bins.size();++i) {
+	   xbins[i] = bins[i];
+	 }
+	 ngroup = bins.size()-1;
+         TH1* hnew = h->Rebin(ngroup,h->GetName(),xbins); 
+	 //delete h;
+	 h=hnew;
+	 delete[] xbins;
+	 return hnew;
+       } else {
+         h->Rebin(ngroup);
+         return h;
+       }
+       return h;
 }
 
 void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output)
