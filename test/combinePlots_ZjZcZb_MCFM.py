@@ -22,25 +22,25 @@ process.CombinePlots = cms.PSet(
    cms.PSet(
      fileName = cms.string('controlPlots_TTJets_TuneZ2_v3_all.root'),
      color = cms.uint32(5),
-     scale = cms.double(0.00463), #NLO MCFM
+     scale = cms.double(0.0045916), #NLO MCFM
      role = cms.string('t#bar{t}')
    ),
    cms.PSet(
      fileName = cms.string('controlPlots_Zbb-TuneZ2_v3_all.root'),
      color = cms.uint32(2),
-     scale = cms.double(0.0358024), #NLO MCFM
+     scale = cms.double(0.0355249), #NLO MCFM
      role = cms.string('Z+b')
    ), 
    cms.PSet(
      fileName = cms.string('controlPlots_Zcc-TuneZ2_v3_all.root'),
      color = cms.uint32(3),
-     scale = cms.double(0.0368016), #NLO MCFM
+     scale = cms.double(0.0365163), #NLO MCFM
      role = cms.string('Z+c')
    ), 
    cms.PSet(
      fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_Zl_all.root'),
      color = cms.uint32(4),
-     scale = cms.double(0.0209305), #NNLO
+     scale = cms.double(0.0207567), #NNLO
      role = cms.string('Z+l')
    ),
   ),
@@ -71,24 +71,26 @@ process.CombinePlots = cms.PSet(
       rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("M_{e^{+}e^{-}} invariant mass (GeV/c^{2})"),
+      labelx = cms.untracked.string("M_{e^{+}e^{-}} (GeV/c^{2})"),
       labely = cms.untracked.string("Events/2GeV/c^{2}"),
       rangex = cms.untracked.vdouble(60.,120.)
     ),
     cms.PSet(
       name = cms.string('bjet1pt'),
-      rebin = cms.untracked.uint32(10),
+      begin = cms.untracked.double(25),
+      end = cms.untracked.double(265),
+      width = cms.untracked.double(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("Leading bjet Pt (GeV/c)"),
-      labely = cms.untracked.string("Events/10GeV/c")
+      labelx = cms.untracked.string("p_{T}^{b-lead} (GeV/c)"),
+      labely = cms.untracked.string("Events/20GeV/c")
     ),
     cms.PSet(
       name = cms.string('bjet2pt'),
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("Second bjet Pt (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{b-sublead} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
@@ -96,12 +98,12 @@ process.CombinePlots = cms.PSet(
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("Pt_{Leading jet} (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{lead} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
       name = cms.string('jet1etapm'),
-      labelx = cms.untracked.string("#eta_{Leading jet} (GeV/c)"),
+      labelx = cms.untracked.string("#eta^{lead}"),
       labely = cms.untracked.string("Events/0.1")
     ),
     cms.PSet(
@@ -109,35 +111,35 @@ process.CombinePlots = cms.PSet(
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("Pt_{Second jet} (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{sublead} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
           name = cms.string('el1pt'),
 	  rebin = cms.untracked.uint32(5),
 	  logy = cms.untracked.bool(True),
-	  labelx = cms.untracked.string("Pt_{e_{1}} (GeV/c)"),
+	  labelx = cms.untracked.string("p_{T}^{e_{1}} (GeV/c)"),
 	  labely = cms.untracked.string("Events/5GeV/c")
     ),
     cms.PSet(
           name = cms.string('el2pt'),
 	  rebin = cms.untracked.uint32(5),
 	  logy = cms.untracked.bool(True),
-	  labelx = cms.untracked.string("Pt_{e_{2}} (GeV/c)"),
+	  labelx = cms.untracked.string("p_{T}^{e_{2}} (GeV/c)"),
 	  labely = cms.untracked.string("Events/5GeV/c")
     ),
     cms.PSet(
           name = cms.string('mu1pt'),
 	  rebin = cms.untracked.uint32(5),
 	  logy = cms.untracked.bool(True),
-	  labelx = cms.untracked.string("Pt_{#mu_{1}} (GeV/c)"),
+	  labelx = cms.untracked.string("p_{T}^{#mu_{1}} (GeV/c)"),
 	  labely = cms.untracked.string("Events/5GeV/c")
     ),
     cms.PSet(
           name = cms.string('mu2pt'),
 	  rebin = cms.untracked.uint32(5),
 	  logy = cms.untracked.bool(True),
-	  labelx = cms.untracked.string("Pt_{#mu_{2}} (GeV/c)"),
+	  labelx = cms.untracked.string("p_{T}^{#mu_{2}} (GeV/c)"),
 	  labely = cms.untracked.string("Events/5GeV/c")
     ),
     cms.PSet(
@@ -164,8 +166,20 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('ZbPt'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Pt_{Zb} (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{Zb} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
+    ),
+    cms.PSet(
+      name = cms.string('dijetM'),
+      rebin = cms.untracked.uint32(50),
+      labelx = cms.untracked.string("M_{bb} (GeV/c^{2})"),
+      labely = cms.untracked.string("Events/50GeV/c^{2}")
+    ),
+    cms.PSet(
+      name = cms.string('dijetPt'),
+      rebin = cms.untracked.uint32(20),
+      labelx = cms.untracked.string("p_{T}^{bb} (GeV/c)"),
+      labely = cms.untracked.string("Events/20GeV/c")
     ),
     cms.PSet(
       name = cms.string('ZbbM'),
@@ -176,25 +190,25 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('ZbbPt'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Pt_{Zbb} (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{Zbb} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
       name = cms.string('bestzpt'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Z Pt (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{Z} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
       name = cms.string('bestzptMu'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Z Pt (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{Z} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
       name = cms.string('bestzptEle'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Z Pt (GeV/c)"),
+      labelx = cms.untracked.string("p_{T}^{Z} (GeV/c)"),
       labely = cms.untracked.string("Events/10GeV/c")
     ),
     cms.PSet(
@@ -223,8 +237,9 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('dphiZbj1'),
-      labelx = cms.untracked.string("#Delta#phi(Z,bjet_{1})"),
-      labely = cms.untracked.string("Events/0.1")
+      rebin = cms.untracked.uint32(2),
+      labelx = cms.untracked.string("#Delta#phi(Z,b-lead)"),
+      labely = cms.untracked.string("Events/0.2")
     ),
     cms.PSet(
       name = cms.string('drZbj1'),
