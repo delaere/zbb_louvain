@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.19 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs_server/repositories/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_413.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
@@ -469,7 +469,6 @@ process.maxEvents.input = -1
 
 process.out.fileName = 'Ele_2011A_Jamboree_Json_noESpbl.root'
 ##process.out.fileName = 'Ele_2011A_NoTriggerNoMatching.root'
-#process.out.fileName = '.root'
 #process.out.fileName = '.root'
 
 process.options.wantSummary = True
