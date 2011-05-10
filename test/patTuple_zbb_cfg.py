@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.19 $'),
+    version = cms.untracked.string('$Revision: 1.20 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs_server/repositories/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
@@ -413,5 +413,3 @@ process.out.fileName = 'Mu2010B_v6.root'
 
 process.options.wantSummary = True
 
-
-#for cvs test
