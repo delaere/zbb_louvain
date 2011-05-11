@@ -4,7 +4,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_zbb_cfg_413.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_413_data_cfg.py,v $')
 )
 
 # for the latest reprocessed samples. You can find it with:
@@ -32,16 +32,15 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 
 # electron triggers are taken accroding to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
-muontriggers      = cms.vstring("HLT_Mu3_v3", "HLT_Mu5_v3", "HLT_Mu8_v1", "HLT_Mu12_v1", "HLT_Mu15_v2", "HLT_Mu20_v1", "HLT_Mu24_v1", "HLT_Mu30_v1", "HLT_DoubleMu3_v3", "HLT_DoubleMu6_v1", "HLT_DoubleMu7_v1")
+muontriggers      = cms.vstring("HLT_DoubleMu6_v*")
 
-electrontriggers  = cms.vstring("HLT_Ele8_v2", "HLT_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele8_CaloIdL_TrkIdVL_v2", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_v2", "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1", "HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3", "HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3", "HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v2")
-#electrontriggers += cms.vstring("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2") 
+electrontriggers  = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
 
 alltriggers       = muontriggers + electrontriggers
 
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
-                            #triggerConditions = alltriggers ,
-                            triggerConditions = cms.vstring("HLT_*"),         #test
+                            triggerConditions = alltriggers ,
+                            #triggerConditions = cms.vstring("HLT_*"),         #test
                             hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                             l1tResults = cms.InputTag( "gtDigis" ),
                             l1tIgnoreMask = cms.bool( False ),
@@ -68,7 +67,7 @@ defaultTriggerMatch = cms.EDProducer(
   "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
 , src     = cms.InputTag( "selectedPatMuons" )
 , matched = cms.InputTag( "patTrigger" )          # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
-, matchedCuts = cms.string( 'path( "HLT_Mu3_v3" )' )
+, matchedCuts = cms.string( 'path( "HLT_DoubleMu6_v*" )' )
 #, matchedCuts = cms.string( 'path( "HLT_Mu9" )' )
 #, andOr                      = cms.bool( False )  # AND
 #, filterIdsEnum              = cms.vstring( '*' ) # wildcard, overlaps with 'filterIds'
@@ -87,13 +86,13 @@ defaultTriggerMatch = cms.EDProducer(
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("*")')
+        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*")')
         #, matchedCuts = cms.string( 'path("HLT_Mu3_v3") || path("HLT_Mu5_v3") || path("HLT_Mu8_v1") || path("HLT_Mu12_v1") || path("HLT_Mu15_v2") || path("HLT_Mu20_v1") || path("HLT_Mu24_v1") || path("HLT_Mu30_v1") || path("HLT_DoubleMu3_v3") || path("HLT_DoubleMu6_v1") || path("HLT_DoubleMu7_v1")')          
 )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatElectrons" )
-        , matchedCuts = cms.string('path("*")')
+        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")')
         #, matchedCuts = cms.string('path("HLT_Ele8_v2") || path("HLT_Ele8_CaloIdL_CaloIsoVL_v2") || path("HLT_Ele8_CaloIdL_TrkIdVL_v2") || path("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2") || path("HLT_Ele17_CaloIdL_CaloIsoVL_v2") || path("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2") || path("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1") || path("HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3") || path("HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3") || path("HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v2")')
 )
 
@@ -486,7 +485,10 @@ tokeep_clean += [
                  
                  # keep Z candidates
                  'keep *_Z*_*_*',
-
+                 
+                 'keep *_emu_*_*',
+                 'keep *_embb_*_*',
+                 
                  'keep *_goodPV*_*_*' ]
 
 # B-Tagging: is this needed ?
@@ -505,19 +507,11 @@ process.source.fileNames = [
 
 process.maxEvents.input = 100
 
-#process.out.fileName = 'Mu_2011A_NoTriggerNoMatching.root'
-#process.out.fileName = 'Mu_2011A_Jamboree_Json5pb.root'
-#process.out.fileName = 'Ele_2011A_Jamboree_Json5pb.root'
-#process.out.fileName = 'Mu_2011A_Jamboree_Json5pb_2.root'
-
-#process.out.fileName = 'Ele_2011A_Jamboree_Json20pb_MuPhy_2.root'
-#process.out.fileName = 'Mu_2011A_Jamboree_Json20pb_MuPhy.root'
-
-#process.out.fileName = 'Ele_2011A_Jamboree_Json_noESpbl.root'
-##process.out.fileName = 'Ele_2011A_NoTriggerNoMatching.root'
 #process.out.fileName = 'LocalTestMu2011.root'
 
-#process.out.fileName = 'Mu_2011A_153pb.root'
-process.out.fileName = 'Ele_2011A_153pb.root'
+#process.out.dropMetaData = cms.untracked.string("ALL")
+
+process.out.fileName = 'Mu_2011A_153pb.root'
+#process.out.fileName = 'Ele_2011A_153pb.root'
 
 process.options.wantSummary = True
