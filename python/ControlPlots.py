@@ -37,17 +37,17 @@ from vertexAssociationControlPlots import *
 from eventSelection import eventCategories, eventCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
+jetHandle = Handle ("vector<pat::Jet>")
+metHandle = Handle ("vector<pat::MET>")
+zmuHandle = Handle ("vector<reco::CompositeCandidate>")
+zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+trigInfoHandle = Handle ("pat::TriggerEvent")
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
     genHandle = Handle ("vector<reco::GenParticle>")
     event.getByLabel ("genParticles",genHandle)
     if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return -1
-  jetHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  trigInfoHandle = Handle ("pat::TriggerEvent")
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
