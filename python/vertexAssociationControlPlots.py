@@ -20,6 +20,7 @@ class VertexAssociationControlPlots:
     def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" ):
       # declare histograms
       self.dir.cd()
+      self.h_nvertices = ROOT.TH1F("nvertices","nvertices",30,0,30)
       self.h_vx = ROOT.TH1F("vx","vx",400,-0.2,0.2)
       self.h_vy = ROOT.TH1F("vy","vy",400,-0.2,0.2)
       self.h_vz = ROOT.TH1F("vz","vz",100,-25,25)
@@ -51,6 +52,7 @@ class VertexAssociationControlPlots:
       jets = self.jetHandle.product()
       zs = self.zHandle.product()
       vs = self.vertexHandle.product()
+      self.h_nvertices.Fill(vs.size()) # control plot
       sigcut = 5.
       # only events with one Z candidate
       if zs.size()==0 : return
