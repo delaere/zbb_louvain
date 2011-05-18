@@ -314,4 +314,4 @@ def dumpEventList(stage=7, muChannel=True, path="/storage/data/cms/store/user/fa
     bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
     category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
     if category>=stage:
-      print "Run", event.eventAuxiliary().run(), ", Event", event.eventAuxiliary().id().event()
+      print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
