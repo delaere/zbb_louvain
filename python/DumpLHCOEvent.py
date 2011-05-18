@@ -64,13 +64,12 @@ def PrintEvent(event, file) :
   file.write('0' + srt(event.eventAuxiliary().run()) + ' ' +srt(event.eventAuxiliary().id().event())+' \n')
 
 def PrintLepton(lepton, file, index) :
-  file.write(str(index) + ' 2' + str(lepton.eta()) + ' ' + str(lepton.phi()) + ' ' + str(lepton.pt()) + ' ' + str(lepton.mass()) + ' ' + str(lepton.charge()) + ' 0 0 0 0 \n')
-
-#def PrintMuon(muon, file, index) :
-#  file.write(str(index) + ' 2' + str(muon.eta()) + ' ' + str(muon.phi()) + ' ' + str(muon.pt()) + ' ' + str(muon.mass()) + ' ' + str(muon.charge()) + ' 0 0 0 0 \n')
-#
-#def PrintElectron(electron, file, index) :
-#  file.write(str(index) + ' 2' + str(electron.eta()) + ' ' + str(electron.phi()) + ' ' + str(electron.pt()) + ' ' + str(electron.mass()) + ' ' + str(electron.charge()) + ' 0 0 0 0 \n')
+  if lepton.isMuon():
+    file.write(str(index) + ' 2' + str(lepton.eta()) + ' ' + str(lepton.phi()) + ' ' + str(lepton.pt()) + ' ' + str(lepton.mass()) + ' ' + str(lepton.charge()) + ' 0 0 0 0 \n')
+  elif lepton.isElectron():
+    file.write(str(index) + ' 1' + str(lepton.eta()) + ' ' + str(lepton.phi()) + ' ' + str(lepton.pt()) + ' ' + str(lepton.mass()) + ' ' + str(lepton.charge()) + ' 0 0 0 0 \n')
+  else:
+    print "ERROR: can only handle electrons or muons"
 
 def PrintJet(jet, file, index) :
   file.write(str(index) + ' 4' + str(jet.eta()) + ' ' + str(jet.phi()) + ' ' + str(jet.pt()) + ' ' + str(jet.mass()) + ' ' + str(jet.charge()) + ' 2 0 0 0 \n')
@@ -114,7 +113,7 @@ def dumpAll(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau
     for jet in jets:
       if isGoodJet(jet): 
         jetCount = jetCount+1
-    if category>=stage && jetCount>1 :
+    if category>=stage and jetCount>1 :
       DumpLHCOEvent(event, out_file_INCL)
       if jetCount>2:
         DumpLHCOEvent(event, out_file_3j)
