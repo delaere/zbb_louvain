@@ -3,14 +3,15 @@ import ROOT
 def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
-  triggers = ("HLT_Mu3","HLT_Mu5", "HLT_Mu7","HLT_Mu9", "HLT_Mu11", "HLT_Mu15_v1",
-              "HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R",
-              "HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R",
-              "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2")
+  triggers = ("HLT_Mu3_v3", "HLT_Mu5_v3", "HLT_Mu8_v1", "HLT_Mu12_v1", "HLT_Mu15_v2", "HLT_Mu20_v1", "HLT_Mu24_v1", "HLT_Mu30_v1", "HLT_DoubleMu3_v3", "HLT_DoubleMu6_v1", "HLT_DoubleMu7_v1",
+              "HLT_Ele8_v2", "HLT_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele8_CaloIdL_TrkIdVL_v2", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_v2",
+              "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1", "HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3", "HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3",
+              "HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v2"
+              )
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
     if not path is None: 
-      path.wasAccept() 
+      path.wasAccept() # error ReferenceError: attempt to access a null-pointer..... should change name
     else: 
       False
   pathout = map(lambda path:isFired(path),paths)
@@ -28,11 +29,12 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_Mu3","HLT_Mu5", "HLT_Mu7","HLT_Mu9", "HLT_Mu11", "HLT_Mu15_v1")
+      triggers = ("HLT_Mu3_v3", "HLT_Mu5_v3", "HLT_Mu8_v1", "HLT_Mu12_v1", "HLT_Mu15_v2", "HLT_Mu20_v1", "HLT_Mu24_v1", "HLT_Mu30_v1", "HLT_DoubleMu3_v3", "HLT_DoubleMu6_v1", "HLT_DoubleMu7_v1")
     else:
-      triggers = ("HLT_Photon10_L1R","HLT_Photon15_Cleaned_L1R","HLT_Ele15_SW_CaloEleId_L1R",
-                  "HLT_Ele17_SW_CaloEleId_L1R","HLT_Ele17_SW_TightEleId_L1R","HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1",
-                  "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2")
+      triggers = ("HLT_Ele8_v2", "HLT_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele8_CaloIdL_TrkIdVL_v2", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_v2",
+              "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1", "HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3", "HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3",
+              "HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v2"
+                  )
     intersect = list(set(pathnames) & set(triggers))
     outcome = len(intersect)>0
   else:
