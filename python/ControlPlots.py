@@ -132,15 +132,16 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         if onlyMu: evtcategory=-1
         plots = map(lambda x: x+eventCategories(),filter(lambda x: x<=evtcategory ,levels))
       for level in plots:
-        jetmetAK5PFPlots[level].processEvent(event)
-        jetmetAK7PFPlots[level].processEvent(event)
-        allmuonsPlots[level].processEvent(event)
-        loosemuonsPlots[level].processEvent(event)
-        tightmuonsPlots[level].processEvent(event)
-        allelectronsPlots[level].processEvent(event)
-        tightelectronsPlots[level].processEvent(event)
-        vertexPlots[level].processEvent(event)
-        selectionPlots[level].processEvent(event)
+        eventWeight = 1. # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
+        jetmetAK5PFPlots[level].processEvent(event, eventWeight)
+        jetmetAK7PFPlots[level].processEvent(event, eventWeight)
+        allmuonsPlots[level].processEvent(event, eventWeight)
+        loosemuonsPlots[level].processEvent(event, eventWeight)
+        tightmuonsPlots[level].processEvent(event, eventWeight)
+        allelectronsPlots[level].processEvent(event, eventWeight)
+        tightelectronsPlots[level].processEvent(event, eventWeight)
+        vertexPlots[level].processEvent(event, eventWeight)
+        selectionPlots[level].processEvent(event, eventWeight)
     i += 1
 
   # save all

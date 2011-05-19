@@ -29,23 +29,23 @@ class MonteCarloSelectionControlPlots:
       self.ljet = 0
       self.i = 0
       
-    def processEvent(self,event):
+    def processEvent(self,event, weight = 1.):
       event.getByLabel (self.genlabel,self.genHandle)
       particles = self.genHandle.product()
       self.i += 1
       if isZbEvent(particles):
         self.bjet += 1
-        self.h_eventType.Fill(3)
+        self.h_eventType.Fill(3,weight)
         return
       if isZcEvent(particles):
         self.cjet += 1
-        self.h_eventType.Fill(2)
+        self.h_eventType.Fill(2,weight)
         return
       if isZlEvent(particles):
         self.ljet += 1
-        self.h_eventType.Fill(1)
+        self.h_eventType.Fill(1,weight)
         return
-      self.h_eventType.Fill(0)
+      self.h_eventType.Fill(0,weight)
 
     def endJob(self):
       self.dir.cd()

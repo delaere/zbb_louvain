@@ -40,7 +40,7 @@ class MuonsControlPlots:
       self.muonlabel = (muonlabel)
       self.muonType = (muonType)
     
-    def processEvent(self,event):
+    def processEvent(self,event, weight = 1.):
       # load event
       event.getByLabel (self.muonlabel,self.muonHandle)
       muons = self.muonHandle.product()
@@ -48,30 +48,30 @@ class MuonsControlPlots:
       nmu = 0
       for muon in muons:
         # for muons:
-        self.h_muonType.Fill(muon.isGlobalMuon()+2*muon.isTrackerMuon())
+        self.h_muonType.Fill(muon.isGlobalMuon()+2*muon.isTrackerMuon(),weight)
         if muon.isTrackerMuon():
-          self.h_muonhits.Fill(muon.innerTrack().numberOfValidHits())
-          self.h_muonPHits.Fill(muon.innerTrack().hitPattern().numberOfValidPixelHits())
-          self.h_muonSHits.Fill(muon.innerTrack().hitPattern().numberOfValidStripHits())
+          self.h_muonhits.Fill(muon.innerTrack().numberOfValidHits(),weight)
+          self.h_muonPHits.Fill(muon.innerTrack().hitPattern().numberOfValidPixelHits(),weight)
+          self.h_muonSHits.Fill(muon.innerTrack().hitPattern().numberOfValidStripHits(),weight)
         else:
-          self.h_muonhits.Fill(0)
-          self.h_muonPHits.Fill(0)
-          self.h_muonSHits.Fill(0)
+          self.h_muonhits.Fill(0,weight)
+          self.h_muonPHits.Fill(0,weight)
+          self.h_muonSHits.Fill(0,weight)
         if muon.isGlobalMuon():
-          self.h_muonMHits.Fill(muon.globalTrack().hitPattern().numberOfValidMuonHits())
+          self.h_muonMHits.Fill(muon.globalTrack().hitPattern().numberOfValidMuonHits(),weight)
         else:
-          self.h_muonMHits.Fill(0)
+          self.h_muonMHits.Fill(0,weight)
         if muon.isTrackerMuon() and muon.isGlobalMuon():
-          self.h_muonChi2.Fill(muon.normChi2())
+          self.h_muonChi2.Fill(muon.normChi2(),weight)
         else:
-          self.h_muonChi2.Fill(0)
-        self.h_muonIso.Fill((muon.trackIso()+muon.caloIso())/muon.pt())
-        self.h_muonPt.Fill(muon.pt())
-        self.h_muonEta.Fill(abs(muon.eta()))
-        self.h_muonEtapm.Fill(muon.eta())
-        self.h_muonMatches.Fill(muon.numberOfMatches())
+          self.h_muonChi2.Fill(0,weight)
+        self.h_muonIso.Fill((muon.trackIso()+muon.caloIso())/muon.pt(),weight)
+        self.h_muonPt.Fill(muon.pt(),weight)
+        self.h_muonEta.Fill(abs(muon.eta()),weight)
+        self.h_muonEtapm.Fill(muon.eta(),weight)
+        self.h_muonMatches.Fill(muon.numberOfMatches(),weight)
         if isGoodMuon(muon,self.muonType) : nmu += 1
-      self.h_nmu.Fill(nmu)
+      self.h_nmu.Fill(nmu,weight)
     
     def endJob(self):
       self.dir.cd()
@@ -115,7 +115,7 @@ class ElectronsControlPlots:
       self.electronlabel = (electronlabel)
       self.electronType = (electronType)
     
-    def processEvent(self,event):
+    def processEvent(self,event, weight = 1.):
       # load event
       event.getByLabel (self.electronlabel,self.electronHandle)
       electrons = self.electronHandle.product()
@@ -123,23 +123,23 @@ class ElectronsControlPlots:
       nel = 0
       for electron in electrons:
         # for electrons
-        self.h_eleid.Fill(electron.electronID("simpleEleId85relIso"))
-        self.h_elemisshits.Fill(electron.gsfTrack().numberOfLostHits())
-        scEt = (electron.ecalEnergy()*sin(electron.theta()))
-        self.h_eleHcalIso.Fill(electron.dr03HcalTowerSumEt()/scEt)
-        self.h_eleEcalIso.Fill(electron.dr03EcalRecHitSumEt()/scEt)
-        self.h_eleTkIso.Fill(electron.dr03TkSumPt()/scEt)
-        self.h_eleHoE.Fill(electron.hadronicOverEm())
-        self.h_eledphi.Fill(electron.deltaPhiEleClusterTrackAtCalo())
-        self.h_eledeta.Fill(electron.deltaEtaEleClusterTrackAtCalo())
-        self.h_eleinin.Fill(electron.scSigmaIEtaIEta())
-        self.h_elept.Fill(electron.pt())
-        self.h_eleeta.Fill(abs(electron.eta()))
-        self.h_eleetapm.Fill(electron.eta())
-        self.h_eledb.Fill(abs(electron.dB()))
-        self.h_eleoverlapmu.Fill(electron.hasOverlaps("muons"))
+        self.h_eleid.Fill(electron.electronID("simpleEleId85relIso"), weight)
+        self.h_elemisshits.Fill(electron.gsfTrack().numberOfLostHits(), weight)
+        scEt = (electron.ecalEnergy()*sin(electron.theta()), weight)
+        self.h_eleHcalIso.Fill(electron.dr03HcalTowerSumEt()/scEt, weight)
+        self.h_eleEcalIso.Fill(electron.dr03EcalRecHitSumEt()/scEt, weight)
+        self.h_eleTkIso.Fill(electron.dr03TkSumPt()/scEt, weight)
+        self.h_eleHoE.Fill(electron.hadronicOverEm(), weight)
+        self.h_eledphi.Fill(electron.deltaPhiEleClusterTrackAtCalo(), weight)
+        self.h_eledeta.Fill(electron.deltaEtaEleClusterTrackAtCalo(), weight)
+        self.h_eleinin.Fill(electron.scSigmaIEtaIEta(), weight)
+        self.h_elept.Fill(electron.pt(), weight)
+        self.h_eleeta.Fill(abs(electron.eta()), weight)
+        self.h_eleetapm.Fill(electron.eta(), weight)
+        self.h_eledb.Fill(abs(electron.dB()), weight)
+        self.h_eleoverlapmu.Fill(electron.hasOverlaps("muons"), weight)
         if isGoodElectron(electron,self.electronType) : nel += 1
-      self.h_nel.Fill(nel)
+      self.h_nel.Fill(nel, weight)
     
     def endJob(self):
       self.dir.cd()
@@ -218,7 +218,7 @@ class JetmetControlPlots:
       self.jetlabel = (jetlabel)
       self.metlabel = (metlabel)
     
-    def processEvent(self,event):
+    def processEvent(self,event, weight = 1.):
       # load event
       event.getByLabel (self.jetlabel,self.jetHandle)
       event.getByLabel (self.metlabel,self.metHandle)
@@ -235,73 +235,73 @@ class JetmetControlPlots:
       maxbdiscTCHP  = -1
       for jet in jets:
         if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
-          self.h_jetpt.Fill(jet.pt())
-          self.h_jeteta.Fill(abs(jet.eta()))
-          self.h_jetetapm.Fill(jet.eta())
-          self.h_jetphi.Fill(jet.phi())
-          self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
-          self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
+          self.h_jetpt.Fill(jet.pt(), weight)
+          self.h_jeteta.Fill(abs(jet.eta()), weight)
+          self.h_jetetapm.Fill(jet.eta(), weight)
+          self.h_jetphi.Fill(jet.phi(), weight)
+          self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"), weight)
+          self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"), weight)
           rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
-          self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-          self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
-          self.h_nconstituents.Fill(rawjet.numberOfDaughters())
-          self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
-          self.h_nch.Fill(rawjet.chargedMultiplicity())
-          self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
-          if jetId(jet,"tight"): self.h_jetid.Fill(3)
-          elif jetId(jet,"medium"): self.h_jetid.Fill(2)
-          elif jetId(jet,"loose"): self.h_jetid.Fill(1)
-          else: self.h_jetid.Fill(0)
+          self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy(), weight)
+          self.h_nef.Fill(rawjet.neutralEmEnergyFraction(), weight)
+          self.h_nconstituents.Fill(rawjet.numberOfDaughters(), weight)
+          self.h_chf.Fill(rawjet.chargedHadronEnergyFraction(), weight)
+          self.h_nch.Fill(rawjet.chargedMultiplicity(), weight)
+          self.h_cef.Fill(rawjet.chargedEmEnergyFraction(), weight)
+          if jetId(jet,"tight"): self.h_jetid.Fill(3, weight)
+          elif jetId(jet,"medium"): self.h_jetid.Fill(2, weight)
+          elif jetId(jet,"loose"): self.h_jetid.Fill(1, weight)
+          else: self.h_jetid.Fill(0, weight)
           # B-tagging
-          self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-          self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-          self.h_TCHEdisc.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
-          self.h_TCHPdisc.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
-	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-	  maxbdiscSSVHP = max(maxbdiscSSVHP,jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-	  maxbdiscTCHE = max(maxbdiscSSVHE,jet.bDiscriminator("trackCountingHighEffBJetTags"))
-	  maxbdiscTCHP = max(maxbdiscSSVHP,jet.bDiscriminator("trackCountingHighPurBJetTags"))
+          self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"), weight)
+          self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"), weight)
+          self.h_TCHEdisc.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"), weight)
+          self.h_TCHPdisc.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"), weight)
+	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"), weight)
+	  maxbdiscSSVHP = max(maxbdiscSSVHP,jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"), weight)
+	  maxbdiscTCHE = max(maxbdiscSSVHE,jet.bDiscriminator("trackCountingHighEffBJetTags"), weight)
+	  maxbdiscTCHP = max(maxbdiscSSVHP,jet.bDiscriminator("trackCountingHighPurBJetTags"), weight)
           #eventually complement with variables from the btagging (check paper)
           nj += 1
           if nj==1: 
 	    j1pt=jet.pt()
-            self.h_jet1pt.Fill(jet.pt())
-            self.h_jet1eta.Fill(abs(jet.eta()))
-            self.h_jet1etapm.Fill(jet.eta())
-            self.h_SSVHEdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-            self.h_SSVHPdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-            self.h_TCHEdiscJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
-            self.h_TCHPdiscJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
+            self.h_jet1pt.Fill(jet.pt(), weight)
+            self.h_jet1eta.Fill(abs(jet.eta()), weight)
+            self.h_jet1etapm.Fill(jet.eta(), weight)
+            self.h_SSVHEdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"), weight)
+            self.h_SSVHPdiscJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"), weight)
+            self.h_TCHEdiscJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"), weight)
+            self.h_TCHPdiscJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"), weight)
           elif nj==2:
-            self.h_jet2pt.Fill(jet.pt())
-            self.h_jet2eta.Fill(abs(jet.eta()))
-            self.h_jet2etapm.Fill(jet.eta())
+            self.h_jet2pt.Fill(jet.pt(), weight)
+            self.h_jet2eta.Fill(abs(jet.eta()), weight)
+            self.h_jet2etapm.Fill(jet.eta(), weight)
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
-              self.h_bjet1pt.Fill(jet.pt())
-              self.h_bjet1eta.Fill(abs(jet.eta()))
-              self.h_bjet1etapm.Fill(jet.eta())
-              self.h_SSVHEdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-              self.h_SSVHPdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-              self.h_TCHEdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"))
-              self.h_TCHPdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"))
-	      self.h_dptj1b1.Fill(jet.pt()-j1pt)
+              self.h_bjet1pt.Fill(jet.pt(), weight)
+              self.h_bjet1eta.Fill(abs(jet.eta()), weight)
+              self.h_bjet1etapm.Fill(jet.eta(), weight)
+              self.h_SSVHEdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"), weight)
+              self.h_SSVHPdiscbJet1.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"), weight)
+              self.h_TCHEdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighEffBJetTags"), weight)
+              self.h_TCHPdiscbJet1.Fill(jet.bDiscriminator("trackCountingHighPurBJetTags"), weight)
+	      self.h_dptj1b1.Fill(jet.pt()-j1pt, weight)
             elif nb==2:
-              self.h_bjet2pt.Fill(jet.pt())
-              self.h_bjet2eta.Fill(abs(jet.eta()))
-              self.h_bjet2etapm.Fill(jet.eta())
+              self.h_bjet2pt.Fill(jet.pt(), weight)
+              self.h_bjet2eta.Fill(abs(jet.eta()), weight)
+              self.h_bjet2etapm.Fill(jet.eta(), weight)
           if isBJet(jet,"HP",self.btagging): nbP += 1
-      self.h_SSVHEdiscDisc1.Fill(maxbdiscSSVHE)
-      self.h_SSVHPdiscDisc1.Fill(maxbdiscSSVHP)
-      self.h_TCHEdiscDisc1.Fill(maxbdiscTCHE)
-      self.h_TCHPdiscDisc1.Fill(maxbdiscTCHP)
-      self.h_nj.Fill(nj)
-      self.h_nb.Fill(nb)
-      self.h_nbP.Fill(nbP)
-      self.h_njb.Fill(nj,nb)
-      self.h_met.Fill(met[0].pt())
-      self.h_phimet.Fill(met[0].phi())
+      self.h_SSVHEdiscDisc1.Fill(maxbdiscSSVHE, weight)
+      self.h_SSVHPdiscDisc1.Fill(maxbdiscSSVHP, weight)
+      self.h_TCHEdiscDisc1.Fill(maxbdiscTCHE, weight)
+      self.h_TCHPdiscDisc1.Fill(maxbdiscTCHP, weight)
+      self.h_nj.Fill(nj, weight)
+      self.h_nb.Fill(nb, weight)
+      self.h_nbP.Fill(nbP, weight)
+      self.h_njb.Fill(nj,nb, weight)
+      self.h_met.Fill(met[0].pt(), weight)
+      self.h_phimet.Fill(met[0].phi(), weight)
     
     def endJob(self):
       self.dir.cd()

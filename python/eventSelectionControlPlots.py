@@ -107,7 +107,7 @@ class EventSelectionControlPlots:
       self.zelelabel = (zelelabel)
       self.trigInfolabel = (triggerlabel)
     
-    def processEvent(self,event):
+    def processEvent(self,event, weight = 1.):
       # load event
       event.getByLabel (self.jetlabel,self.jetHandle)
       event.getByLabel (self.metlabel,self.metHandle)
@@ -124,30 +124,30 @@ class EventSelectionControlPlots:
         triggerInfo = None
 
       ## trigger
-      self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel))
+      self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel),weight)
       selTriggers = selectedTriggers(triggerInfo)
       for trigger,triggered in enumerate(selTriggers):
-        if triggered : self.h_triggerBit.Fill(trigger)
+        if triggered : self.h_triggerBit.Fill(trigger,weight)
 
       # Z boson
       for z in zCandidatesMu:
-        self.h_zmassMu.Fill(z.mass())
-        self.h_zptMu.Fill(z.pt())
+        self.h_zmassMu.Fill(z.mass(),weight)
+        self.h_zptMu.Fill(z.pt(),weight)
       for z in zCandidatesEle:
-        self.h_zmassEle.Fill(z.mass())
-        self.h_zptEle.Fill(z.pt())
+        self.h_zmassEle.Fill(z.mass(),weight)
+        self.h_zptEle.Fill(z.pt(),weight)
       bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle) 
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
-          self.h_massBestMu.Fill(bestZcandidate.mass())
-          self.h_ptBestMu.Fill(bestZcandidate.pt())
+          self.h_massBestMu.Fill(bestZcandidate.mass(),weight)
+          self.h_ptBestMu.Fill(bestZcandidate.pt(),weight)
         if bestZcandidate.daughter(0).isElectron() :
-          self.h_massBestEle.Fill(bestZcandidate.mass())
-          self.h_ptBestEle.Fill(bestZcandidate.pt())
+          self.h_massBestEle.Fill(bestZcandidate.mass(),weight)
+          self.h_ptBestEle.Fill(bestZcandidate.pt(),weight)
 
       # event category
       category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
-      self.h_category.Fill(category)
+      self.h_category.Fill(category,weight)
 
       # some topological quantities
       if category>= 2:
@@ -158,24 +158,24 @@ class EventSelectionControlPlots:
           if mu1.pt() < mu2.pt():
             mu1 = bestZcandidate.daughter(1)
             mu2 = bestZcandidate.daughter(0)
-          self.h_mu1pt.Fill(mu1.pt())
-          self.h_mu2pt.Fill(mu2.pt())
-          self.h_mu1etapm.Fill(mu1.eta())
-          self.h_mu1eta.Fill(abs(mu1.eta()))
-          self.h_mu2eta.Fill(abs(mu2.eta()))
-          self.h_mu2etapm.Fill(mu2.eta())
+          self.h_mu1pt.Fill(mu1.pt(),weight)
+          self.h_mu2pt.Fill(mu2.pt(),weight)
+          self.h_mu1etapm.Fill(mu1.eta(),weight)
+          self.h_mu1eta.Fill(abs(mu1.eta()),weight)
+          self.h_mu2eta.Fill(abs(mu2.eta()),weight)
+          self.h_mu2etapm.Fill(mu2.eta(),weight)
         elif bestZcandidate.daughter(0).isElectron():
           ele1 = bestZcandidate.daughter(0)
           ele2 = bestZcandidate.daughter(1)
           if ele1.pt() < ele2.pt():
             ele1 = bestZcandidate.daughter(1)
             ele2 = bestZcandidate.daughter(0)
-          self.h_el1pt.Fill(ele1.pt())
-          self.h_el2pt.Fill(ele2.pt())
-          self.h_el1eta.Fill(abs(ele1.eta()))
-          self.h_el2eta.Fill(abs(ele2.eta()))
-          self.h_el1etapm.Fill(ele1.eta())
-          self.h_el2etapm.Fill(ele2.eta())
+          self.h_el1pt.Fill(ele1.pt(),weight)
+          self.h_el2pt.Fill(ele2.pt(),weight)
+          self.h_el1eta.Fill(abs(ele1.eta()),weight)
+          self.h_el2eta.Fill(abs(ele2.eta()),weight)
+          self.h_el1etapm.Fill(ele1.eta(),weight)
+          self.h_el2etapm.Fill(ele2.eta(),weight)
       if category>= 2:
         #jet plots
         nj  = 0
@@ -183,53 +183,53 @@ class EventSelectionControlPlots:
         nbP = 0
         for jet in jets:
           if isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
-            self.h_jetpt.Fill(jet.pt())
-            self.h_jeteta.Fill(abs(jet.eta()))
-            self.h_jetetapm.Fill(jet.eta())
-            self.h_jetphi.Fill(jet.phi())
-            self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"))
-            self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"))
+            self.h_jetpt.Fill(jet.pt(),weight)
+            self.h_jeteta.Fill(abs(jet.eta()),weight)
+            self.h_jetetapm.Fill(jet.eta(),weight)
+            self.h_jetphi.Fill(jet.phi(),weight)
+            self.h_jetoverlapmu.Fill(jet.hasOverlaps("muons"),weight)
+            self.h_jetoverlapele.Fill(jet.hasOverlaps("electrons"),weight)
             rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW")
-            self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-            self.h_nef.Fill(rawjet.neutralEmEnergyFraction())
-            self.h_nconstituents.Fill(rawjet.numberOfDaughters())
-            self.h_chf.Fill(rawjet.chargedHadronEnergyFraction())
-            self.h_nch.Fill(rawjet.chargedMultiplicity())
-            self.h_cef.Fill(rawjet.chargedEmEnergyFraction())
-            if jetId(jet,"tight"): self.h_jetid.Fill(3)
-            elif jetId(jet,"medium"): self.h_jetid.Fill(2)
-            elif jetId(jet,"loose"): self.h_jetid.Fill(1)
-            else: self.h_jetid.Fill(0)
+            self.h_nhf.Fill(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy(),weight)
+            self.h_nef.Fill(rawjet.neutralEmEnergyFraction(),weight)
+            self.h_nconstituents.Fill(rawjet.numberOfDaughters(),weight)
+            self.h_chf.Fill(rawjet.chargedHadronEnergyFraction(),weight)
+            self.h_nch.Fill(rawjet.chargedMultiplicity(),weight)
+            self.h_cef.Fill(rawjet.chargedEmEnergyFraction(),weight)
+            if jetId(jet,"tight"): self.h_jetid.Fill(3,weight)
+            elif jetId(jet,"medium"): self.h_jetid.Fill(2,weight)
+            elif jetId(jet,"loose"): self.h_jetid.Fill(1,weight)
+            else: self.h_jetid.Fill(0,weight)
             # B-tagging
-            self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-            self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+            self.h_SSVHEdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"),weight)
+            self.h_SSVHPdisc.Fill(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"),weight)
             #eventually complement with variables from the btagging (check paper)
             nj += 1
             if nj==1: 
-              self.h_jet1pt.Fill(jet.pt())
-              self.h_jet1eta.Fill(abs(jet.eta()))
-              self.h_jet1etapm.Fill(jet.eta())
+              self.h_jet1pt.Fill(jet.pt(),weight)
+              self.h_jet1eta.Fill(abs(jet.eta()),weight)
+              self.h_jet1etapm.Fill(jet.eta(),weight)
             elif nj==2:
-              self.h_jet2pt.Fill(jet.pt())
-              self.h_jet2eta.Fill(abs(jet.eta()))
-              self.h_jet2etapm.Fill(jet.eta())
+              self.h_jet2pt.Fill(jet.pt(),weight)
+              self.h_jet2eta.Fill(abs(jet.eta()),weight)
+              self.h_jet2etapm.Fill(jet.eta(),weight)
             if isBJet(jet,"HE",self.btagging): 
               nb += 1
               if nb==1:
-                self.h_bjet1pt.Fill(jet.pt())
-                self.h_bjet1eta.Fill(abs(jet.eta()))
-                self.h_bjet1etapm.Fill(jet.eta())
+                self.h_bjet1pt.Fill(jet.pt(),weight)
+                self.h_bjet1eta.Fill(abs(jet.eta()),weight)
+                self.h_bjet1etapm.Fill(jet.eta(),weight)
               elif nb==2:
-                self.h_bjet2pt.Fill(jet.pt())
-                self.h_bjet2eta.Fill(abs(jet.eta()))
-                self.h_bjet2etapm.Fill(jet.eta())
+                self.h_bjet2pt.Fill(jet.pt(),weight)
+                self.h_bjet2eta.Fill(abs(jet.eta()),weight)
+                self.h_bjet2etapm.Fill(jet.eta(),weight)
             if isBJet(jet,"HP",self.btagging): nbP += 1
-        self.h_nj.Fill(nj)
-        self.h_nb.Fill(nb)
-        self.h_nbP.Fill(nbP)
-        self.h_njb.Fill(nj,nb)
-        self.h_met.Fill(met[0].pt())
-        self.h_phimet.Fill(met[0].phi())
+        self.h_nj.Fill(nj,weight)
+        self.h_nb.Fill(nb,weight)
+        self.h_nbP.Fill(nbP,weight)
+        self.h_njb.Fill(nj,nb,weight)
+        self.h_met.Fill(met[0].pt(),weight)
+        self.h_phimet.Fill(met[0].phi(),weight)
       if category>= 5:
         #bjets plots
         nJets = 0
@@ -246,21 +246,21 @@ class EventSelectionControlPlots:
         b1 = ROOT.TLorentzVector(bjet1.px(),bjet1.py(),bjet1.pz(),bjet1.energy())
         z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
         Zb = z+b1
-        self.h_scaldptZbj1.Fill(bestZcandidate.pt()-bjet1.pt())
-        self.h_vecdptZbj1.Fill(Zb.Pt())
-        self.h_drZbj1.Fill(z.DeltaR(b1))
-        self.h_dphiZbj1.Fill(abs(z.DeltaPhi(b1)))
-        self.h_ZbM.Fill(Zb.M())
-        self.h_ZbPt.Fill(Zb.Pt())
+        self.h_scaldptZbj1.Fill(bestZcandidate.pt()-bjet1.pt(),weight)
+        self.h_vecdptZbj1.Fill(Zb.Pt(),weight)
+        self.h_drZbj1.Fill(z.DeltaR(b1),weight)
+        self.h_dphiZbj1.Fill(abs(z.DeltaPhi(b1)),weight)
+        self.h_ZbM.Fill(Zb.M(),weight)
+        self.h_ZbPt.Fill(Zb.Pt(),weight)
         if bjet2 is None: return # the rest is about bb pairs
         b2 = ROOT.TLorentzVector(bjet2.px(),bjet2.py(),bjet2.pz(),bjet2.energy())
         bb = b1 + b2
-        self.h_dijetM.Fill(bb.M())
-        self.h_dijetPt.Fill(bb.Pt())
+        self.h_dijetM.Fill(bb.M(),weight)
+        self.h_dijetPt.Fill(bb.Pt(),weight)
         Zbb = Zb + b2
-        self.h_ZbbM.Fill(Zbb.M())
-        self.h_ZbbPt.Fill(Zbb.Pt())
-        self.h_ZbbM2D.Fill(Zbb.M(),bb.M())
+        self.h_ZbbM.Fill(Zbb.M(),weight)
+        self.h_ZbbPt.Fill(Zbb.Pt(),weight)
+        self.h_ZbbM2D.Fill(Zbb.M(),bb.M(),weight)
 
     def endJob(self):
       self.dir.cd()
