@@ -125,7 +125,7 @@ class ElectronsControlPlots:
         # for electrons
         self.h_eleid.Fill(electron.electronID("simpleEleId85relIso"), weight)
         self.h_elemisshits.Fill(electron.gsfTrack().numberOfLostHits(), weight)
-        scEt = (electron.ecalEnergy()*sin(electron.theta()), weight)
+        scEt = (electron.ecalEnergy()*sin(electron.theta()))
         self.h_eleHcalIso.Fill(electron.dr03HcalTowerSumEt()/scEt, weight)
         self.h_eleEcalIso.Fill(electron.dr03EcalRecHitSumEt()/scEt, weight)
         self.h_eleTkIso.Fill(electron.dr03TkSumPt()/scEt, weight)
