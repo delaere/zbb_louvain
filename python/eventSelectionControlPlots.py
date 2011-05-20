@@ -146,11 +146,12 @@ class EventSelectionControlPlots:
           self.h_ptBestEle.Fill(bestZcandidate.pt(),weight)
 
       # event category
-      category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
-      self.h_category.Fill(category,weight)
+      for category in range(eventCategories()):
+        if isInCategory(category, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
+	  self.h_category.Fill(category,weight)
 
       # some topological quantities
-      if category>= 2:
+      if isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
         #dilepton plots
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
@@ -176,7 +177,7 @@ class EventSelectionControlPlots:
           self.h_el2eta.Fill(abs(ele2.eta()),weight)
           self.h_el1etapm.Fill(ele1.eta(),weight)
           self.h_el2etapm.Fill(ele2.eta(),weight)
-      if category>= 2:
+      if isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
         #jet plots
         nj  = 0
         nb  = 0
@@ -230,7 +231,7 @@ class EventSelectionControlPlots:
         self.h_njb.Fill(nj,nb,weight)
         self.h_met.Fill(met[0].pt(),weight)
         self.h_phimet.Fill(met[0].phi(),weight)
-      if category>= 5:
+      if isInCategory(5, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
         #bjets plots
         nJets = 0
         bjet1 = None
@@ -284,7 +285,7 @@ def runTest():
     i += 1
   controlPlots.endJob()
 
-def dumpEventList(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"):
+def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"):
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -312,6 +313,5 @@ def dumpEventList(stage=7, muChannel=True, path="/storage/data/cms/store/user/fa
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
     bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
-    category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
-    if category>=stage:
+    if isInCategory(stage, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel):
       print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

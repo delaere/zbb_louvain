@@ -5,7 +5,7 @@ import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, jetId, findBestCandidate, isGoodJet, isBJet
+from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet
 
 def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   """Dump informations about a given event"""
@@ -116,9 +116,6 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
 def PrintEvent(event) :
   print "================================================================="
   print "Run", event.eventAuxiliary().run(), "Event", event.eventAuxiliary().id().event(), "Lumi", event.eventAuxiliary().luminosityBlock()
-  #to print the category, one needs the input collections
-  #category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
-  #print "Passes selection level", category
   time = event.eventAuxiliary().time().unixTime()
   dtime = datetime.fromtimestamp(time)
   print "Recorded on", dtime.strftime("%Y-%m-%d %H:%M:%S")

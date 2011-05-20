@@ -262,46 +262,120 @@ def isZcandidate(zCandidate):
   # if everything ok, return the result of the lepton check
   return result
 
-def findBestCandidate(*zCandidates):
+def findBestCandidate(*zCandidates, muChannel=None):
   """Finds the best Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates."""
   bestZ = None
   bestM = -1000.
-  for col in zCandidates:
-    for z in col:
-      if not isZcandidate(z): continue
-      if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
-        bestM = z.mass()
-        bestZ = z
+  if muChannel is None:
+    for col in zCandidates:
+      for z in col:
+        if not isZcandidate(z): continue
+        if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
+          bestM = z.mass()
+          bestZ = z
+  else:
+    for col in zCandidates:
+      for z in col:
+        if not isZcandidate(z): continue
+	if (muChannel==True and z.daughter(0).isElectron() ) or (muChannel==False and z.daughter(0).isMuon()) : continue
+        if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
+          bestM = z.mass()
+          bestZ = z
   return bestZ
 
-def eventCategories(): return 10
-
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV"):
-  """See up to which level the event passes the selection"""
-  if not isTriggerOK(triggerInfo, muChannel): return 0
-  if muChannel:
-    bestZcandidate = findBestCandidate(zCandidatesMu)
+def isInCategory(category, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", bestZcandidate=None):
+  """Check if the event enters category X. """
+  if bestZcandidate is None: bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle,muChannel=muChannel)
+  # category 0: All
+  if category==0:
+    return True
+  # category 1: Trigger
+  elif category==1:
+    return isTriggerOK(triggerInfo, muChannel)
+  # category 2: di-lepton
+  elif category==2:
+    if not isInCategory(1, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    return not (bestZcandidate is None)
+  # category 3: mass cut
+  elif category==3:
+    if not isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    return not (bestZcandidate is None)
+    return abs(bestZcandidate.mass()-91.1876)<30.
+  # category 4: Z+jet
+  elif category==4:
+    if not isInCategory(3, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    nJets    = 0
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        nJets += 1
+    return nJets>0
+  # category 5:  Z+b (HE)
+  elif category==5:
+    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        if isBJet(jet,"HE",btagging): return True
+    return False
+  # category 6:  Z+b (HP)
+  elif category==6:
+    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        if isBJet(jet,"HP",btagging): return True
+    return False
+  # category 7:  Z+b (HE+MET)
+  elif category==7:
+    return isInCategory(5, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+  # category 8:  Z+b (HP+MET)
+  elif category==8:
+    return isInCategory(6, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+  # categoty 9:  Z+bb (HEHE)
+  elif category==9:
+    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    nBjetsHE = 0
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        if isBJet(jet,"HE",btagging): nBjetsHE += 1
+    return nBjetsHE>1
+  # categoty 10: Z+bb (HEHP)
+  elif category==10:
+    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    nBjetsHE = 0
+    nBjetsHP = 0
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        if isBJet(jet,"HE",btagging): nBjetsHE += 1
+        if isBJet(jet,"HP",btagging): nBjetsHP += 1
+    return (nBjetsHE>0 and nBjetsHP>0)
+  # categoty 11: Z+bb (HPHP)
+  elif category==11:
+    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
+      return False
+    nBjetsHP = 0
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate):
+        if isBJet(jet,"HP",btagging): nBjetsHP += 1
+    return nBjetsHP>1
+  # categoty 12: Z+bb (HEHE+MET)
+  elif category==12:
+    return isInCategory(9, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+  # categoty 13: Z+bb (HEHP+MET)
+  elif category==13:
+    return isInCategory(10, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+  # categoty 14: Z+bb (HPHP+MET)
+  elif category==14:
+    return isInCategory(11, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+  # other does not exist
   else:
-    bestZcandidate = findBestCandidate(zCandidatesEle)
-  #looking for both would potentially introduce double counting and suffers from 
-  #the absence of trigger in MC.
-  #bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
-  if bestZcandidate is None : return 1
-  if abs(bestZcandidate.mass()-91.1876)>30. : return 2
-  nJets    = 0
-  nBjetsHE = 0
-  nBjetsHP = 0
-  for jet in jets:
-    if isGoodJet(jet,bestZcandidate):
-      nJets += 1
-      if isBJet(jet,"HE",btagging): nBjetsHE += 1
-      if isBJet(jet,"HP",btagging): nBjetsHP += 1
-  if nJets==0: return 3
-  if nBjetsHE==0: return 4
-  if not isGoodMet(met[0]): return 5
-  if nBjetsHP==0: return 6
-  if nBjetsHE==1: return 7
-  if nBjetsHP==1: return 8
-  return 9
+    return False
+
+def eventCategories(): return 15
 
