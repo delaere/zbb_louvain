@@ -1,3 +1,20 @@
+######################################################################################
+######################################################################################
+###                                                                                ### 
+### fitRDS.py (TdP)                                                                ### 
+###                                                                                ###  
+### Analyze the RooDataSet produced by makeRDS.py to perform a Higgs search        ###
+###                                                                                ###
+### To do:                                                                         ###
+### - check difference reco composite candidates (e.g. zbb vs home-brewn)          ###
+### - get proper MC sample                                                         ###
+### - allow for options to use both template and functional PDFs                   ###
+### - factorize data-getting/pdf-making/fitting/plotting/etc...a bit less ugly ;-) ###
+### - make profile likelihoods etc (using RooStats)                                ### 
+###                                                                                ### 
+######################################################################################
+######################################################################################
+
 import ROOT
 from ROOT import *
 

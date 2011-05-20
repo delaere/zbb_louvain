@@ -1,5 +1,23 @@
 #! /usr/bin/env python
 
+############################################################################################
+############################################################################################
+###                                                                                      ### 
+### makeRDS.py (TdP)                                                                     ### 
+###                                                                                      ###  
+### Construct a RooDataSet containing observables used in final fit in e.g. Higgs search ###
+### - m(Zbb)                                                                             ###
+### - m(bb)                                                                              ###
+### - m(SV)                                                                              ###
+### - category, etc...                                                                   ###
+###                                                                                      ###
+### To do:                                                                               ###
+### - check difference reco composite candidates (e.g. zbb vs home-brewn)                ###
+### - clean up (proper loops and flags etc...and trigger info)                           ###
+###                                                                                      ### 
+############################################################################################
+############################################################################################
+
 import ROOT
 import sys
 import os
