@@ -49,14 +49,18 @@ void yield(TCanvas* categoryPlot, unsigned initialStage)
     Double_t integral, error;
     Double_t totmc = 0;
     Double_t errmc = 0;
-    IntegralAndError(data,stage+1,data->GetNbinsX(),integral,error);
-    std::cout << setw(10) << setiosflags(ios::right) << integral << "+/-" << resetiosflags(ios::right);
-    std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << error << resetiosflags(ios::left);
+    //IntegralAndError(data,stage+1,data->GetNbinsX(),integral,error);
+    //std::cout << setw(10) << setiosflags(ios::right) << integral << "+/-" << resetiosflags(ios::right);
+    std::cout << setw(10) << setiosflags(ios::right) << data->GetBinContent(stage+1) << "+/-" << resetiosflags(ios::right);
+    //std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << error << resetiosflags(ios::left);
+    std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << data->GetBinError(stage+1) << resetiosflags(ios::left);
     while ((obj = mc->Next())) {
       TH1I* h = (TH1I*)obj;
-      IntegralAndError(h,stage+1,h->GetNbinsX(),integral,error);
-      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << integral << "+/-" << resetiosflags(ios::right);
-      std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << error << resetiosflags(ios::left);
+      //IntegralAndError(h,stage+1,h->GetNbinsX(),integral,error);
+      //std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << integral << "+/-" << resetiosflags(ios::right);
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) <<h->GetBinContent(stage+1) << "+/-" << resetiosflags(ios::right);
+      //std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << error << resetiosflags(ios::left);
+      std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << h->GetBinError(stage+1) << resetiosflags(ios::left);
       totmc += integral;
       errmc += error*error;
     }
