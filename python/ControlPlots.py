@@ -122,7 +122,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   # process events
   i = 0
   for event in events:
-    if i%1000==0 : print "Processing... event ", i
+    if i%100==0 : print "Processing... event ", i
     for muChannel in [True, False]:
       evtcategory = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo)
       if muChannel: 

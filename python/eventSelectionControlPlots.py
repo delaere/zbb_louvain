@@ -94,7 +94,7 @@ class EventSelectionControlPlots:
       self.h_nch = ROOT.TH1F("nch","charged multiplicity",50,0,50)
       self.h_cef = ROOT.TH1F("cef","charged EmEnergy fraction",101,0,1.01)
       self.h_jetid = ROOT.TH1F("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
-      
+
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.metHandle = Handle ("vector<pat::MET>")
