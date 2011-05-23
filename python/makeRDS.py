@@ -27,6 +27,7 @@ from ROOT import *
 
 rrv_SV_M    = RooRealVar("rrv_SV_M",   "rrv_SV_M"   ,-1.,   5.)
 rrv_bb_M    = RooRealVar("rrv_bb_M",   "rrv_bb_M"   ,-1.,1000.)
+rrv_zbb_M   = RooRealVar("rrv_zbb_M",  "rrv_zbb_M",  -1.,1000.)
 rrv_zeebb_M = RooRealVar("rrv_zeebb_M","rrv_zeebb_M",-1.,1000.)
 rrv_zmmbb_M = RooRealVar("rrv_zmmbb_M","rrv_zmmbb_M",-1.,1000.)
 
@@ -44,6 +45,7 @@ rc_cat.defineType("9",9)
 
 rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb",  RooArgSet(rrv_SV_M,
                                                          rrv_bb_M,
+                                                         rrv_zbb_M,
                                                          rrv_zeebb_M,
                                                          rrv_zmmbb_M,
                                                          rc_cat))
@@ -80,6 +82,7 @@ def dumpEventList(muChannel=True, stage=9, path="/home/fynu/jdf/store/Zbb-TuneZ2
 
         rrv_SV_M.setVal(-1)
         rrv_bb_M.setVal(-1)
+        rrv_zbb_M.setVal(-1)
         rrv_zeebb_M.setVal(-1)
         rrv_zmmbb_M.setVal(-1)
         rc_cat.setIndex(0)
@@ -107,19 +110,50 @@ def dumpEventList(muChannel=True, stage=9, path="/home/fynu/jdf/store/Zbb-TuneZ2
         bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEl)
         #category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEl, jets, met, muChannel)
         category = eventCategory(None, zCandidatesMu, zCandidatesEl, jets, met, muChannel)
-        if category > 7: print "cat = ", category
+        if category > 7:
+            print "cat = ", category
+            print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
 
+            
         rc_cat.setIndex(category)
-
+        
+        nJets = 0
+        bjet1 = None
+        bjet2 = None
         for jet in jets :
             tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
-            if tISV                    : rrv_SV_M.setVal(tISV.secondaryVertex(0).p4().M())
+            if tISV :
+                if tISV.secondaryVertex(0) :
+                    rrv_SV_M.setVal(tISV.secondaryVertex(0).p4().M())
             if len(bbs)>0              : rrv_bb_M.setVal(bbs.at(0).mass())
             if len(zmmbbs)>0           : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
             if len(zeebbs)>0           : rrv_zeebb_M.setVal(zeebbs.at(0).mass())
                     
+            if category>= 5:
+                btagging = "SSV"
+                if isGoodJet(jet,bestZcandidate):
+                    if isBJet(jet,"HE",btagging):
+                        nJets += 1
+                        if nJets==1:   bjet1 = jet
+                        elif nJets==2: bjet2 = jet
+                        else : break
+
+        if category>=8:
+            if bjet1 is None: return # we stop here is no bjet... should not be the case in category 
+            if bjet2 is None: return # we stop here is no bjet2... should not be the case in category 5
+            b1 = ROOT.TLorentzVector(bjet1.px(),bjet1.py(),bjet1.pz(),bjet1.energy())
+            z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+            Zb = z+b1
+            b2 = ROOT.TLorentzVector(bjet2.px(),bjet2.py(),bjet2.pz(),bjet2.energy())
+            bb = b1+b2
+            Zbb = z+b1+b2
+            rrv_bb_M.setVal(bb.M())
+            rrv_zbb_M.setVal(Zbb.M())
+                                                                                                    
+                    
         rds_zbb.add(RooArgSet(rrv_SV_M,
                               rrv_bb_M,
+                              rrv_zbb_M,
                               rrv_zmmbb_M,
                               rrv_zeebb_M,
                               rc_cat))

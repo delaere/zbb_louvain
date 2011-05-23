@@ -24,12 +24,21 @@ gROOT.SetStyle("Plain")
 
 f_Zbb = TFile("File_rds_zbb_el.root")
 ws_Zbb = f_Zbb.Get("ws")
-rds_zbb  = ws_Zbb.data("rds_zbb")
-rrv_SV_M  = ws_Zbb.var("rrv_SV_M")
-rrv_bb_M  = ws_Zbb.var("rrv_bb_M")
+rds_zbb     = ws_Zbb.data("rds_zbb")
+
+f_Zmmbb = TFile("File_rds_zbb_mu.root")
+ws_Zmmbb = f_Zmmbb.Get("ws")
+rds_zmmbb     = ws_Zmmbb.data("rds_zbb")
+
+rds_zbb.append(rds_zmmbb)
+
+rrv_SV_M    = ws_Zbb.var("rrv_SV_M")
+rrv_bb_M    = ws_Zbb.var("rrv_bb_M")
+rrv_bb_M.SetTitle("m(bb) (GeV/c^{2})")
+rrv_zbb_M   = ws_Zbb.var("rrv_zbb_M")
 rrv_zeebb_M = ws_Zbb.var("rrv_zeebb_M")
 rrv_zmmbb_M = ws_Zbb.var("rrv_zmmbb_M")
-rc_cat    = ws_Zbb.var("rc_cat")
+rc_cat     = ws_Zbb.var("rc_cat")
 
 rds_4 = rds_zbb.reduce("rc_cat>=4") #Zj
 rds_5 = rds_zbb.reduce("rc_cat>=5") #ZbHE
@@ -63,7 +72,7 @@ rds_zbb_MC_9 = rds_zbb_MC.reduce("rc_cat>=9") #ZbbHPHP
 #########################
 
 mean_bb  = RooRealVar("mean_bb", "mean_bb", 300,100,500)
-sigma_bb = RooRealVar("sigma_bb","sigma_bb", 50, 10,100)
+sigma_bb = RooRealVar("sigma_bb","sigma_bb", 30, 10,100)
 
 sig_bb = RooGaussian("sig_bb","sig_bb",rrv_bb_M,mean_bb,sigma_bb)
 
@@ -79,6 +88,8 @@ rdh_zbb_MC_8_SV_M = RooDataHist("rdh_zbb_MC_8_SV_M", "rdh_zbb_MC_8_SV_M", RooArg
 rdh_zbb_MC_8_bb_M = RooDataHist("rdh_zbb_MC_8_bb_M", "rdh_zbb_MC_8_bb_M", RooArgSet(rrv_bb_M), rds_zbb_MC_8)
 rhp_zbb_MC_8_SV_M = RooHistPdf( "rhp_zbb_MC_8_SV_M", "rhp_zbb_MC_8_SV_M", RooArgSet(rrv_SV_M), rdh_zbb_MC_8_SV_M);
 rhp_zbb_MC_8_bb_M = RooHistPdf( "rhp_zbb_MC_8_bb_M", "rhp_zbb_MC_8_bb_M", RooArgSet(rrv_bb_M), rdh_zbb_MC_8_bb_M);
+
+rhp_zbb_MC_8_bb_M = RooKeysPdf("rhp_zbb_MC_8_bb_M","rhp_zbb_MC_8_bb_M", rrv_bb_M, rds_zbb_MC_8)
 
 #RooDataHist* myRDH_c = new RooDataHist("myZc", "myRDH_Zc", RooArgSet(*SV_m), *RDS_Zcc);
 #RooDataHist* myRDH_l = new RooDataHist("myZl", "myRDH_Zl", RooArgSet(*SV_m), *RDS_Zll);
@@ -97,12 +108,14 @@ B_8=RooRealVar("B_8","B_8",0.2*rds_zbb_MC_8.numEntries(),0,rds_zbb_MC_8.numEntri
 
 sum_bb = RooAddPdf("sum_bb","sum_bb",RooArgList(sig_bb,bkg_bb),RooArgList(S_8,B_8))
 
+sum_bb.fitTo(rds_8,RooFit.Extended())
 
-frame = rrv_bb_M.frame(0,rrv_bb_M.getMax())
+frame = rrv_bb_M.frame(0,600,12)#rrv_bb_M.getMax())
 rds_8.plotOn(frame)
 sum_bb.plotOn(frame,RooFit.LineColor(kBlue))
 sum_bb.plotOn(frame,RooFit.Components("sig_bb"),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
-sum_bb.plotOn(frame,RooFit.Components("bkg_bb"),RooFit.LineColor(kRed),  RooFit.LineStyle(kDotted))
+sum_bb.plotOn(frame,RooFit.Components("bkg_bb"),RooFit.LineColor(kRed),  RooFit.LineStyle(kDashed))
+sum_bb.paramOn(frame,rds_8)
 frame.Draw()
 
 bla
