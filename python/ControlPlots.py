@@ -34,7 +34,7 @@ from DataFormats.FWLite import Events, Handle
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
-from eventSelection import eventCategories, isInCategory
+from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
 jetHandle = Handle ("vector<pat::Jet>")
@@ -42,7 +42,7 @@ metHandle = Handle ("vector<pat::MET>")
 zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
-def category(cat,event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
+def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
     genHandle = Handle ("vector<reco::GenParticle>")
@@ -61,7 +61,7 @@ def category(cat,event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return isInCategory(cat,triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
 
 def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False):
   """produce all the plots in one go"""
@@ -122,16 +122,17 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   for event in events:
     if i%100==0 : print "Processing... event ", i
     for muChannel in [True, False]:
+      categoryData = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo)
       if muChannel: 
         if onlyEle:
 	  plots = []
 	else:
-          plots = filter(lambda x: category(x,event,muChannel,ZjetFilter,checkTrigger,btagAlgo) ,levels)
+          plots = filter(lambda x: isInCategory(x,categoryData) ,levels)
       else:
         if onlyMu:
 	  plots = []
 	else:
-          plots = map(lambda x: x+eventCategories(),filter(lambda x: category(x,event,muChannel,ZjetFilter,checkTrigger,btagAlgo) ,levels))
+          plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
         eventWeight = 1. # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)

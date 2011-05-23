@@ -147,12 +147,13 @@ class EventSelectionControlPlots:
           self.h_ptBestEle.Fill(bestZcandidate.pt(),weight)
 
       # event category
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
       for category in range(eventCategories()):
-        if isInCategory(category, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
+        if isInCategory(category, categoryData):
 	  self.h_category.Fill(category,weight)
 
       # some topological quantities
-      if isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
+      if isInCategory(2, categoryData):
         #dilepton plots
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
@@ -178,7 +179,7 @@ class EventSelectionControlPlots:
           self.h_el2eta.Fill(abs(ele2.eta()),weight)
           self.h_el1etapm.Fill(ele1.eta(),weight)
           self.h_el2etapm.Fill(ele2.eta(),weight)
-      if isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
+      if isInCategory(2, categoryData):
         #jet plots
         nj  = 0
         nb  = 0
@@ -232,7 +233,7 @@ class EventSelectionControlPlots:
         self.h_njb.Fill(nj,nb,weight)
         self.h_met.Fill(met[0].pt(),weight)
         self.h_phimet.Fill(met[0].phi(),weight)
-      if isInCategory(5, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel):
+      if isInCategory(5, categoryData):
         #bjets plots
         nJets = 0
         bjet1 = None
@@ -313,6 +314,6 @@ def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/fa
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
-    bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
-    if isInCategory(stage, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel):
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
+    if isInCategory(stage, categoryData):
       print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

@@ -3,7 +3,7 @@ import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, isInCategory, findBestCandidate, isGoodJet
+from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet
 
 def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None):
   """Dump informations about a given event in the LHCO format for MadWeight"""
@@ -112,7 +112,7 @@ def dumpAll(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau
     for jet in jets:
       if isGoodJet(jet): 
         jetCount = jetCount+1
-    if isInCategory(stage, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel) and jetCount>1 :
+    if isInCategory(stage, eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)) and jetCount>1 :
       DumpLHCOEvent(event, out_file_INCL)
       if jetCount>2:
         DumpLHCOEvent(event, out_file_3j)

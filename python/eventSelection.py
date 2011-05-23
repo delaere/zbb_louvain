@@ -285,98 +285,100 @@ def findBestCandidate(muChannel, *zCandidates):
           bestZ = z
   return bestZ
 
-def isInCategory(category, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", bestZcandidate=None):
-  """Check if the event enters category X. """
-  if bestZcandidate is None: bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+def isInCategory(category, categoryTuple):
+  """Check if the event enters category X, given the tuple computed by eventCategory."""
   # category 0: All
   if category==0:
     return True
   # category 1: Trigger
   elif category==1:
-    return isTriggerOK(triggerInfo, muChannel)
+    return categoryTuple[0]==1
   # category 2: di-lepton
   elif category==2:
-    if not isInCategory(1, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    return not (bestZcandidate is None)
+    return isInCategory( 1, categoryTuple) and categoryTuple[1]==1
   # category 3: mass cut
   elif category==3:
-    if not isInCategory(2, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    return not (bestZcandidate is None)
-    return abs(bestZcandidate.mass()-91.1876)<30.
+    return isInCategory( 2, categoryTuple) and categoryTuple[2]==1
   # category 4: Z+jet
   elif category==4:
-    if not isInCategory(3, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    nJets    = 0
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        nJets += 1
-    return nJets>0
+    return isInCategory( 3, categoryTuple) and categoryTuple[3]>0
   # category 5:  Z+b (HE)
   elif category==5:
-    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        if isBJet(jet,"HE",btagging): return True
-    return False
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]>0
   # category 6:  Z+b (HP)
   elif category==6:
-    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        if isBJet(jet,"HP",btagging): return True
-    return False
+    return isInCategory( 4, categoryTuple) and categoryTuple[5]>0
   # category 7:  Z+b (HE+MET)
   elif category==7:
-    return isInCategory(5, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+    return isInCategory( 5, categoryTuple) and categoryTuple[7]>0
   # category 8:  Z+b (HP+MET)
   elif category==8:
-    return isInCategory(6, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+    return isInCategory( 6, categoryTuple) and categoryTuple[7]>0
   # categoty 9:  Z+bb (HEHE)
   elif category==9:
-    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    nBjetsHE = 0
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        if isBJet(jet,"HE",btagging): nBjetsHE += 1
-    return nBjetsHE>1
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]>1
   # categoty 10: Z+bb (HEHP)
   elif category==10:
-    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    nBjetsHE = 0
-    nBjetsHP = 0
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        if isBJet(jet,"HE",btagging): nBjetsHE += 1
-        if isBJet(jet,"HP",btagging): nBjetsHP += 1
-    return (nBjetsHE>0 and nBjetsHP>0)
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1 and categoryTuple[5] > 0
   # categoty 11: Z+bb (HPHP)
   elif category==11:
-    if not isInCategory(4, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate):
-      return False
-    nBjetsHP = 0
-    for jet in jets:
-      if isGoodJet(jet,bestZcandidate):
-        if isBJet(jet,"HP",btagging): nBjetsHP += 1
-    return nBjetsHP>1
+    return isInCategory( 4, categoryTuple) and categoryTuple[5]>1
   # categoty 12: Z+bb (HEHE+MET)
   elif category==12:
-    return isInCategory(9, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+    return isInCategory( 9, categoryTuple) and categoryTuple[7]>0
   # categoty 13: Z+bb (HEHP+MET)
   elif category==13:
-    return isInCategory(10, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+    return isInCategory(10, categoryTuple) and categoryTuple[7]>0
   # categoty 14: Z+bb (HPHP+MET)
   elif category==14:
-    return isInCategory(11, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, btagging, bestZcandidate) and isGoodMet(met[0])
+    return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # other does not exist
   else:
     return False
+
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV"):
+  """Check analysis requirements for various steps."""
+  output = []
+  bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+  # output[0]: Trigger
+  if isTriggerOK(triggerInfo, muChannel):
+    output.append(1)
+  else:
+    output.append(0)
+  # output[1], output[2]: di-lepton and mass cut
+  if bestZcandidate is None:
+    output.append(0)
+    output.append(0)
+  else: 
+    output.append(1)
+    if abs(bestZcandidate.mass()-91.1876)<30.:
+      output.append(1)
+    else:
+      output.append(0)
+  # output[3] -> output[6] : (b)jets
+  nJets = 0
+  nBjetsHE = 0
+  nBjetsHP = 0
+  nBjetsHEHP = 0
+  for jet in jets:
+    if isGoodJet(jet,bestZcandidate):
+      nJets += 1
+      HE = isBJet(jet,"HE",btagging)
+      HP = isBJet(jet,"HP",btagging)
+      if HE: nBjetsHE += 1
+      if HP: nBjetsHP += 1
+      if HE and HP: nBjetsHEHP +=1
+  output.append(nJets)
+  output.append(nBjetsHE)
+  output.append(nBjetsHP)
+  output.append(nBjetsHEHP)
+  # output[7] : MET
+  if isGoodMet(met[0]):
+    output.append(1)
+  else: 
+    output.append(0)
+  # return the list of results
+  return output
 
 def eventCategories(): return 15
 
