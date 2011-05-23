@@ -47,7 +47,7 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   # find the best z candidate
-  bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+  bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
   # print its constituents
   PrintLepton(bestZcandidate.daughter(0),file,1)
   PrintLepton(bestZcandidate.daughter(1),file,2)

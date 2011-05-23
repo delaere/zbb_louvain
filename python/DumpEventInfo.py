@@ -85,7 +85,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   for zmmbb in zmmbbs: 
     PrintCandidate("Zbb",zbb)
   # handcrafted candidates: bb Zb Zbb
-  bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+  bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
   for jet in jets:
     if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP") :
       b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())

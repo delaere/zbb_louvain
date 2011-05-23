@@ -45,6 +45,7 @@ class EventSelectionControlPlots:
       self.h_ZbbM = ROOT.TH1F("ZbbM","Zbb invariant mass",1000,0,1000)
       self.h_ZbbPt = ROOT.TH1F("ZbbPt","Zbb Pt",500,0,500)
       self.h_ZbbM2D = ROOT.TH2F("ZbbM2D","Zbb mass vs bb mass",100,0,1000,100,0,1000)
+#TODO: add angle Z vs bb
       self.h_category = ROOT.TH1F("category","event category",10,0,10)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
@@ -136,7 +137,7 @@ class EventSelectionControlPlots:
       for z in zCandidatesEle:
         self.h_zmassEle.Fill(z.mass(),weight)
         self.h_zptEle.Fill(z.pt(),weight)
-      bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle) 
+      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle) 
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
           self.h_massBestMu.Fill(bestZcandidate.mass(),weight)
@@ -312,6 +313,6 @@ def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/fa
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
-    bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle)
+    bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
     if isInCategory(stage, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel):
       print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

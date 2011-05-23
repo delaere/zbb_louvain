@@ -262,9 +262,10 @@ def isZcandidate(zCandidate):
   # if everything ok, return the result of the lepton check
   return result
 
-def findBestCandidate(*zCandidates, muChannel=None):
+def findBestCandidate(muChannel, *zCandidates):
   """Finds the best Z candidate. Might be none.
-     As input, the function takes an arbitrary number of collections of Z candidates."""
+     As input, the function takes an arbitrary number of collections of Z candidates.
+     muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
   bestZ = None
   bestM = -1000.
   if muChannel is None:
@@ -286,7 +287,7 @@ def findBestCandidate(*zCandidates, muChannel=None):
 
 def isInCategory(category, triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", bestZcandidate=None):
   """Check if the event enters category X. """
-  if bestZcandidate is None: bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEle,muChannel=muChannel)
+  if bestZcandidate is None: bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
   # category 0: All
   if category==0:
     return True

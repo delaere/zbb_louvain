@@ -107,7 +107,7 @@ def dumpEventList(muChannel=True, stage=9, path="/home/fynu/jdf/store/Zbb-TuneZ2
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
 
-        bestZcandidate = findBestCandidate(zCandidatesMu,zCandidatesEl)
+        bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEl)
         #category = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEl, jets, met, muChannel)
         category = eventCategory(None, zCandidatesMu, zCandidatesEl, jets, met, muChannel)
         if category > 7:
