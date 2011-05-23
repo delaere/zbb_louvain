@@ -96,15 +96,19 @@ rhp_zbb_MC_8_bb_M = RooKeysPdf("rhp_zbb_MC_8_bb_M","rhp_zbb_MC_8_bb_M", rrv_bb_M
 #RooHistPdf* myRHP_c = new RooHistPdf("myRHP_c","myRHP_c",RooArgSet(*SV_m),*myRDH_c);
 #RooHistPdf* myRHP_l = new RooHistPdf("myRHP_l","myRHP_l",RooArgSet(*SV_m),*myRDH_l);
 
-bkg_bb = rhp_zbb_MC_8_bb_M
+#rhp_zbb_MC_8_bb_M
+
+#bkg_yield = RooRealVar("bkg_yield","",25,0,300);
+B_8=RooRealVar("B_8","B_8",0.2*rds_8.numEntries(),0,rds_8.numEntries())
+bkg_bb = RooExtendPdf("bkg_ext_pdf","",rhp_zbb_MC_8_bb_M,B_8)#,bkg_yield)
+   
 bkg_bb.SetName("bkg_bb")
 
 ######################
 ### MAKE TOTAL PDF ###
 ######################
 
-S_8=RooRealVar("S_8","S_8",0.8*rds_zbb_MC_8.numEntries(),0,rds_zbb_MC_8.numEntries())
-B_8=RooRealVar("B_8","B_8",0.2*rds_zbb_MC_8.numEntries(),0,rds_zbb_MC_8.numEntries())
+S_8=RooRealVar("S_8","N_{S}",0.8*rds_8.numEntries(),0,rds_8.numEntries())
 
 sum_bb = RooAddPdf("sum_bb","sum_bb",RooArgList(sig_bb,bkg_bb),RooArgList(S_8,B_8))
 
@@ -118,7 +122,6 @@ sum_bb.plotOn(frame,RooFit.Components("bkg_bb"),RooFit.LineColor(kRed),  RooFit.
 sum_bb.paramOn(frame,rds_8)
 frame.Draw()
 
-bla
 
 ###########
 ### FIT ###
@@ -141,10 +144,88 @@ bla
 # can do 2D (see below)
 # 1D (number of signal events) should be sufficient
 
-print "likelihood of Phi_s alone"
+plc_S = RooStats.ProfileLikelihoodCalculator(rds_8,sum_bb,RooArgSet(S_8))
+plot_S = RooStats.LikelihoodIntervalPlot(plc_S.GetInterval())
 
-plc_Phi_s = RooStats.ProfileLikelihoodCalculator(data,myJpsiphiPdf,RooArgSet(Sf_s))
-plot_Phi_s = RooStats.LikelihoodIntervalPlot(plc_Phi_s.GetInterval())
+C=TCanvas("C","C",400,350)
+
+print "plotting likelihood of S alone"
+plot_S.Draw()
+
+###############
+###   CLs   ###
+###############
+
+ntoys = 1000
+
+### generate a data sample
+data = sum_bb.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
+### run HybridCalculator on those inputs
+### use interface from HypoTest calculator by default
+myHybridCalc = RooStats.HybridCalculatorOriginal(data, sum_bb , bkg_bb ,RooArgSet())
+#&nuisance_parameters, &bkg_yield_prior);
+## here I use the default test statistics: 2*lnQ (optional)
+myHybridCalc.SetTestStatistic(1);
+###//myHybridCalc.SetTestStatistic(3); // profile likelihood ratio
+myHybridCalc.SetNumberOfToys(ntoys)
+myHybridCalc.UseNuisance(false)
+### for speed up generation (do binned data)
+myHybridCalc.SetGenerateBinned(false);
+### calculate by running ntoys for the S+B and B hypothesis and retrieve the result
+myHybridResult = myHybridCalc.GetHypoTest()
+if not myHybridResult :
+    print "***Error returned from Hypothesis test" 
+
+### run 1000 toys without gaussian prior on the background yield
+### HybridResult* myHybridResult = myHybridCalc.Calculate(*data,1000,false);
+
+### save the toy-MC results to file, this way splitting into sub-batch jobs is possible
+###TFile fileOut("some_hybridresult.root","RECREATE");
+###fileOut.cd();
+###myHybridResult.Write();
+##fileOut.Close();
+
+### read the results from a file
+##TFile fileIn("some_hybridresult.root");
+##HybridResult* myOtherHybridResult = (HybridResult*) fileIn.Get("myHybridCalc");
+
+### example on how to merge with toy-MC results obtained in another job
+##HybridResult* mergedHybridResult = new HybridResult("mergedHybridResult","this object holds merged results");
+##mergedHybridResult->Add(myHybridResult);
+##mergedHybridResult->Add(myOtherHybridResult);
+## or
+##myHybridResult->Add(myOtherHybridResult);
+
+## nice plot of the results
+myHybridPlot = myHybridResult.GetPlot("myHybridPlot","Plot of results with HybridCalculatorOriginal",100)
+myHybridPlot.Draw()
+
+### recover and display the results
+clsb_data = myHybridResult.CLsplusb()
+clb_data = myHybridResult.CLb()
+cls_data = myHybridResult.CLs()
+data_significance = myHybridResult.Significance()
+min2lnQ_data = myHybridResult.GetTestStat_data()
+
+### compute the mean expected significance from toys
+mean_sb_toys_test_stat = myHybridPlot.GetSBmean()
+myHybridResult.SetDataTestStatistics(mean_sb_toys_test_stat)
+toys_significance = myHybridResult.Significance()
+
+print "Completed HybridCalculatorOriginal example"
+print " - -2lnQ = " , min2lnQ_data 
+print " - CL_sb = " , clsb_data 
+print " - CL_b  = " , clb_data
+print " - CL_s  = " , cls_data
+print " - significance of data  = " , data_significance
+print " - mean significance of toys  = " , toys_significance
+
+
+
+
+
+
+bla
 
 print "likelihood of dGG_s alone"
 
