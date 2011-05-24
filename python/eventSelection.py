@@ -296,13 +296,13 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
   for index in indices[:]:
     if isBJet(jets[index],"HP",btagging):
       jetList.append(index)
-      del indices[index]
+      indices.remove(index)
   if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
   # continue with HE b-jets
   for index in indices[:]:
     if isBJet(jets[index],"HE",btagging):
       jetList.append(index)
-      del indices[index]
+      indices.remove(index)
   if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
   # fill with remaining good jets
   for index in indices:
