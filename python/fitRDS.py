@@ -236,13 +236,17 @@ for m in mList :
     print " - significance of data  = " , data_significance[m]
     print " - mean significance of toys  = " , toys_significance[m]
 
-myTH1_cls      = TH1F("",   "",len(mList),min(mList)-25,max(mList)+25)
-myTH1_cls_plus = TH1F("xxx","",len(mList),min(mList)-25,max(mList)+25)
-myTH1_cls_min  = TH1F("yyy","",len(mList),min(mList)-25,max(mList)+25)
+myTH1_cls       = TH1F("",   "",len(mList),min(mList)-25,max(mList)+25)
+myTH1_cls_plus  = TH1F("xxx","",len(mList),min(mList)-25,max(mList)+25)
+myTH1_cls_2plus = TH1F("22x","",len(mList),min(mList)-25,max(mList)+25)
+myTH1_cls_min   = TH1F("yyy","",len(mList),min(mList)-25,max(mList)+25)
+myTH1_cls_2min  = TH1F("22y","",len(mList),min(mList)-25,max(mList)+25)
 for x in range(1,len(mList)+1):
     myTH1_cls.SetBinContent(     x, 1-cls_data[mList[x-1]])
-    myTH1_cls_plus.SetBinContent(x, 1-(cls_data[mList[x-1]]+cls_error[mList[x-1]]))
-    myTH1_cls_min.SetBinContent( x, 1-(cls_data[mList[x-1]]-cls_error[mList[x-1]]))
+    myTH1_cls_plus.SetBinContent(x, 1-(cls_data[mList[x-1]]-cls_error[mList[x-1]]))
+    myTH1_cls_min.SetBinContent( x, 1-(cls_data[mList[x-1]]+cls_error[mList[x-1]]))
+    myTH1_cls_2plus.SetBinContent(x, 1-(cls_data[mList[x-1]]-2*cls_error[mList[x-1]]))
+    myTH1_cls_2min.SetBinContent( x, 1-(cls_data[mList[x-1]]+2*cls_error[mList[x-1]]))
 
 g_cls      = TGraph(myTH1_cls)
 g_cls_plus = TGraph(myTH1_cls_plus)
@@ -250,20 +254,29 @@ g_cls_min  = TGraph(myTH1_cls_min)
 
 g_cls.GetYaxis().SetTitle("1-CL_{S}")
 g_cls.GetXaxis().SetTitle("m_{H} (GeV/c^{2})")
-
 g_cls.SetMaximum(1.)
-g_cls_min.SetMaximum(1.)
-g_cls_plus.SetMaximum(1.)
 g_cls.SetMinimum(0.)
-g_cls_min.SetMinimum(0.)
-g_cls_plus.SetMinimum(0.)
+
+#g_cls.GetXaxis().SetRange(min(mList),max(mList))
+#myTH1_cls_2plus.GetXaxis().SetRange(min(mList),max(mList))
+#myTH1_cls_plus.GetXaxis().SetRange(min(mList),max(mList))
+#myTH1_cls.GetXaxis().SetRange(min(mList),max(mList))
+#myTH1_cls_min.GetXaxis().SetRange(min(mList),max(mList))
+#myTH1_cls_2min.GetXaxis().SetRange(min(mList),max(mList))
 
 Ccls = TCanvas("Ccls","Ccls",500,400)
 
 g_cls.Draw("AC")
+myTH1_cls_2plus.Draw("AC,same")
+myTH1_cls_plus.Draw("AC,same")
 myTH1_cls.Draw("AC,same")
 myTH1_cls_min.Draw("AC,same")
-myTH1_cls_plus.Draw("AC,same")
+myTH1_cls_2min.Draw("AC,same")
+
+myTH1_cls_2plus.SetFillColor(kGreen)
+myTH1_cls_plus.SetFillColor(kYellow)
+myTH1_cls_min.SetFillColor(kGreen)
+myTH1_cls_2min.SetFillColor(1001)
 
 bla
 
