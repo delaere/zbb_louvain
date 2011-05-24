@@ -52,13 +52,14 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   PrintLepton(bestZcandidate.daughter(0),file,1)
   PrintLepton(bestZcandidate.daughter(1),file,2)
   # loop over jets and print
-  counter = 3
-  for jet in jets:
-    if isGoodJet(jet) :
-      PrintJet(jet,file,counter)
-      counter = counter + 1
+  dijet = findDijetPair(jets, bestZcandidate)
+  if dijet[1] is None:
+    print "DumpLHCOEvent Error: not enough jets"
+    return
+  PrintJet(dijet[0],file,3)
+  PrintJet(dijet[1],file,4)
   # print MET
-  PrintMET(met[0],file,counter)
+  PrintMET(met[0],file,5)
 
 def PrintEvent(event, file) :
   file.write('0' + srt(event.eventAuxiliary().run()) + ' ' +srt(event.eventAuxiliary().id().event())+' \n')
