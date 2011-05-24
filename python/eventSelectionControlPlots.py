@@ -26,10 +26,10 @@ class EventSelectionControlPlots:
       self.dir.cd()
       self.h_triggerSelection = ROOT.TH1F("triggerSelection","triggerSelection ",2,0,2)
       self.h_triggerBit = ROOT.TH1F("triggerBits","trigger bits",20,0,20)
-      self.h_zmassMu = ROOT.TH1F("zmassMu","zmassMu",2000,0,200)
-      self.h_massBestMu = ROOT.TH1F("bestzmassMu","bestzmassMu",2000,0,200)
-      self.h_zmassEle = ROOT.TH1F("zmassEle","zmassEle",2000,0,200)
-      self.h_massBestEle = ROOT.TH1F("bestzmassEle","bestzmassEle",2000,0,200)
+      self.h_zmassMu = ROOT.TH1F("zmassMu","zmassMu",10000,0,1000)
+      self.h_massBestMu = ROOT.TH1F("bestzmassMu","bestzmassMu",10000,0,1000)
+      self.h_zmassEle = ROOT.TH1F("zmassEle","zmassEle",10000,0,1000)
+      self.h_massBestEle = ROOT.TH1F("bestzmassEle","bestzmassEle",10000,0,1000)
       self.h_zptMu = ROOT.TH1F("zptMu","zptMu",500,0,500)
       self.h_ptBestMu = ROOT.TH1F("bestzptMu","bestzptMu",500,0,500)
       self.h_zptEle = ROOT.TH1F("zptEle","zptEle",500,0,500)
@@ -46,6 +46,7 @@ class EventSelectionControlPlots:
       self.h_ZbbPt = ROOT.TH1F("ZbbPt","Zbb Pt",500,0,500)
       self.h_ZbbM2D = ROOT.TH2F("ZbbM2D","Zbb mass vs bb mass",100,0,1000,100,0,1000)
 #TODO: add angle Z vs bb
+#TODO: add lb and Zlb masses
       self.h_category = ROOT.TH1F("category","event category",10,0,10)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
