@@ -36,8 +36,9 @@ class EventSelectionControlPlots:
       self.h_ptBestEle = ROOT.TH1F("bestzptEle","bestzptEle",500,0,500)
       self.h_scaldptZbj1 = ROOT.TH1F("scaldptZbj1","scaldptZbj1",1000,-500,500)
       self.h_drZbj1 = ROOT.TH1F("drZbj1","distance between Z and leading jet",100,0,5)
-      self.h_vecdptZbj1 = ROOT.TH1F("vecdptZbj1","vecdptZbj1",500,0,500)
       self.h_dphiZbj1 = ROOT.TH1F("dphiZbj1","dphiZbj1",40,0,4)
+      self.h_scaldptZbb = ROOT.TH1F("scaldptZbb","scaldptZbb",500,0,500)
+      self.h_dphiZbb = ROOT.TH1F("dphiZbb","dphiZbb",40,0,4)
       self.h_dijetM = ROOT.TH1F("dijetM","b bbar invariant mass",1000,0,1000)
       self.h_dijetPt = ROOT.TH1F("dijetPt","b bbar Pt",500,0,500)
       self.h_ZbM = ROOT.TH1F("ZbM","Zb invariant mass",1000,0,1000)
@@ -45,8 +46,6 @@ class EventSelectionControlPlots:
       self.h_ZbbM = ROOT.TH1F("ZbbM","Zbb invariant mass",1000,0,1000)
       self.h_ZbbPt = ROOT.TH1F("ZbbPt","Zbb Pt",500,0,500)
       self.h_ZbbM2D = ROOT.TH2F("ZbbM2D","Zbb mass vs bb mass",100,0,1000,100,0,1000)
-#TODO: add angle Z vs bb
-#TODO: add lb and Zlb masses
       self.h_category = ROOT.TH1F("category","event category",10,0,10)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
@@ -126,12 +125,19 @@ class EventSelectionControlPlots:
         triggerInfo = None
 
       ## trigger
+      #TODO: debug that plot (empty)
       self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel),weight)
       selTriggers = selectedTriggers(triggerInfo)
       for trigger,triggered in enumerate(selTriggers):
         if triggered : self.h_triggerBit.Fill(trigger,weight)
 
-      # Z boson
+      ## event category
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
+      for category in range(eventCategories()):
+        if isInCategory(category, categoryData):
+	  self.h_category.Fill(category,weight)
+
+      ## Z boson
       for z in zCandidatesMu:
         self.h_zmassMu.Fill(z.mass(),weight)
         self.h_zptMu.Fill(z.pt(),weight)
@@ -143,20 +149,6 @@ class EventSelectionControlPlots:
         if bestZcandidate.daughter(0).isMuon():
           self.h_massBestMu.Fill(bestZcandidate.mass(),weight)
           self.h_ptBestMu.Fill(bestZcandidate.pt(),weight)
-        if bestZcandidate.daughter(0).isElectron() :
-          self.h_massBestEle.Fill(bestZcandidate.mass(),weight)
-          self.h_ptBestEle.Fill(bestZcandidate.pt(),weight)
-
-      # event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
-      for category in range(eventCategories()):
-        if isInCategory(category, categoryData):
-	  self.h_category.Fill(category,weight)
-
-      # some topological quantities
-      if isInCategory(2, categoryData):
-        #dilepton plots
-        if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
           mu2 = bestZcandidate.daughter(1)
           if mu1.pt() < mu2.pt():
@@ -168,7 +160,9 @@ class EventSelectionControlPlots:
           self.h_mu1eta.Fill(abs(mu1.eta()),weight)
           self.h_mu2eta.Fill(abs(mu2.eta()),weight)
           self.h_mu2etapm.Fill(mu2.eta(),weight)
-        elif bestZcandidate.daughter(0).isElectron():
+        if bestZcandidate.daughter(0).isElectron() :
+          self.h_massBestEle.Fill(bestZcandidate.mass(),weight)
+          self.h_ptBestEle.Fill(bestZcandidate.pt(),weight)
           ele1 = bestZcandidate.daughter(0)
           ele2 = bestZcandidate.daughter(1)
           if ele1.pt() < ele2.pt():
@@ -180,8 +174,9 @@ class EventSelectionControlPlots:
           self.h_el2eta.Fill(abs(ele2.eta()),weight)
           self.h_el1etapm.Fill(ele1.eta(),weight)
           self.h_el2etapm.Fill(ele2.eta(),weight)
-      if isInCategory(2, categoryData):
-        #jet plots
+
+      ## jet plots
+      if isInCategory(4, categoryData):
         nj  = 0
         nb  = 0
         nbP = 0
@@ -234,30 +229,27 @@ class EventSelectionControlPlots:
         self.h_njb.Fill(nj,nb,weight)
         self.h_met.Fill(met[0].pt(),weight)
         self.h_phimet.Fill(met[0].phi(),weight)
-      if isInCategory(5, categoryData):
-        #bjets plots
-        nJets = 0
-        bjet1 = None
-        bjet2 = None
-        for jet in jets:
-          if isGoodJet(jet,bestZcandidate):
-            if isBJet(jet,"HE",self.btagging): 
-              nJets += 1
-              if nJets==1: bjet1 = jet
-              elif nJets==2: bjet2 = jet
-              else : break
-        if bjet1 is None: return # we stop here is no bjet... should not be the case in category 5
-        b1 = ROOT.TLorentzVector(bjet1.px(),bjet1.py(),bjet1.pz(),bjet1.energy())
+
+      ## plots looking for resonnances / kinematics
+      if isInCategory(4, categoryData):
+        # that method returns the best jet pair. When only one is btagged, it is the first one.
+        # when two bjets are present, these are the two.
+        # this means that in cat 4 we have here Zj and Zjj
+        # in cat 5 we have Zb and Zbl
+        # in cat 9 we have Zb and Zbb
+        # later on, variables are refering to b-jets, sometimes they are not.
         z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+        dijet = findDijetPair(jets, bestZcandidate, self.btagging)
+        if dijet[0] is None: return # this should never happen
+        b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
         Zb = z+b1
-        self.h_scaldptZbj1.Fill(bestZcandidate.pt()-bjet1.pt(),weight)
-        self.h_vecdptZbj1.Fill(Zb.Pt(),weight)
-        self.h_drZbj1.Fill(z.DeltaR(b1),weight)
-        self.h_dphiZbj1.Fill(abs(z.DeltaPhi(b1)),weight)
         self.h_ZbM.Fill(Zb.M(),weight)
         self.h_ZbPt.Fill(Zb.Pt(),weight)
-        if bjet2 is None: return # the rest is about bb pairs
-        b2 = ROOT.TLorentzVector(bjet2.px(),bjet2.py(),bjet2.pz(),bjet2.energy())
+        self.h_scaldptZbj1.Fill(bestZcandidate.pt()-dijet[0].pt(),weight)
+        self.h_dphiZbj1.Fill(abs(z.DeltaPhi(b1)),weight)
+        self.h_drZbj1.Fill(z.DeltaR(b1),weight)
+        if dijet[1] is None: return # from cat 5 to cat 9
+        b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
         bb = b1 + b2
         self.h_dijetM.Fill(bb.M(),weight)
         self.h_dijetPt.Fill(bb.Pt(),weight)
@@ -265,6 +257,8 @@ class EventSelectionControlPlots:
         self.h_ZbbM.Fill(Zbb.M(),weight)
         self.h_ZbbPt.Fill(Zbb.Pt(),weight)
         self.h_ZbbM2D.Fill(Zbb.M(),bb.M(),weight)
+        self.h_scaldptZbb.Fill(bestZcandidate.pt()-bb.Pt(),weight)
+        self.h_dphiZbb.Fill(abs(z.DeltaPhi(bb)),weight)
 
     def endJob(self):
       self.dir.cd()

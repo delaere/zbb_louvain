@@ -285,6 +285,30 @@ def findBestCandidate(muChannel, *zCandidates):
           bestZ = z
   return bestZ
 
+def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
+  """Find the best jet pair: high Pt and btagging."""
+  # check number of good jets
+  indices = [index for index,jet in enumerate(jets) if isGoodJet(jet,bestZcandidate) ]
+  if len(indices)<1: return (None, None)
+  if len(indices)<2: return (jets[indices[0]],None)
+  jetList = []
+  # start with HP b-jets
+  for index in indices[:]:
+    if isBJet(jets[index],"HP",btagging):
+      jetList.append(index)
+      del indices[index]
+  if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
+  # continue with HE b-jets
+  for index in indices[:]:
+    if isBJet(jets[index],"HE",btagging):
+      jetList.append(index)
+      del indices[index]
+  if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
+  # fill with remaining good jets
+  for index in indices:
+    jetList.append(index)
+  return (jets[jetList[0]],jets[jetList[1]])
+
 def isInCategory(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
   # category 0: All
