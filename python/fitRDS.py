@@ -76,6 +76,10 @@ sigma_bb = RooRealVar("sigma_bb","sigma_bb", 30, 10,100)
 
 sig_bb = RooGaussian("sig_bb","sig_bb",rrv_bb_M,mean_bb,sigma_bb)
 
+sig_bb_200 = RooGaussian("sig_bb_200","sig_bb_200",rrv_bb_M,RooFit.RooConst(200),RooFit.RooConst(25))
+sig_bb_300 = RooGaussian("sig_bb_300","sig_bb_300",rrv_bb_M,RooFit.RooConst(300),RooFit.RooConst(25))
+sig_bb_400 = RooGaussian("sig_bb_400","sig_bb_400",rrv_bb_M,RooFit.RooConst(400),RooFit.RooConst(25))
+
 #########################
 ### MAKE BACKGROUND PDF ### (analytic or template)
 #########################
@@ -111,6 +115,10 @@ bkg_bb.SetName("bkg_bb")
 S_8=RooRealVar("S_8","N_{S}",0.8*rds_8.numEntries(),0,rds_8.numEntries())
 
 sum_bb = RooAddPdf("sum_bb","sum_bb",RooArgList(sig_bb,bkg_bb),RooArgList(S_8,B_8))
+
+sum_bb_200 = RooAddPdf("sum_bb_200","sum_bb_200",RooArgList(sig_bb_200,bkg_bb),RooArgList(S_8,B_8))
+sum_bb_300 = RooAddPdf("sum_bb_300","sum_bb_300",RooArgList(sig_bb_300,bkg_bb),RooArgList(S_8,B_8))
+sum_bb_400 = RooAddPdf("sum_bb_400","sum_bb_400",RooArgList(sig_bb_400,bkg_bb),RooArgList(S_8,B_8))
 
 sum_bb.fitTo(rds_8,RooFit.Extended())
 
@@ -159,20 +167,42 @@ plot_S.Draw()
 ntoys = 1000
 
 ### generate a data sample
-data = sum_bb.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
+data     = sum_bb.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
+data_200 = sum_bb_200.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
+data_300 = sum_bb_300.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
+data_400 = sum_bb_400.generate(RooArgSet(rrv_bb_M),RooFit.Extended())
 ### run HybridCalculator on those inputs
 ### use interface from HypoTest calculator by default
-myHybridCalc = RooStats.HybridCalculatorOriginal(data, sum_bb , bkg_bb ,RooArgSet())
+myHybridCalc     = RooStats.HybridCalculatorOriginal(data, sum_bb , bkg_bb ,RooArgSet())
+myHybridCalc_200 = RooStats.HybridCalculatorOriginal(data_200, sum_bb_200 , bkg_bb ,RooArgSet())
+myHybridCalc_300 = RooStats.HybridCalculatorOriginal(data_300, sum_bb_300 , bkg_bb ,RooArgSet())
+myHybridCalc_400 = RooStats.HybridCalculatorOriginal(data_400, sum_bb_400 , bkg_bb ,RooArgSet())
 #&nuisance_parameters, &bkg_yield_prior);
 ## here I use the default test statistics: 2*lnQ (optional)
 myHybridCalc.SetTestStatistic(1);
+myHybridCalc_200.SetTestStatistic(1);
+myHybridCalc_300.SetTestStatistic(1);
+myHybridCalc_400.SetTestStatistic(1);
 ###//myHybridCalc.SetTestStatistic(3); // profile likelihood ratio
 myHybridCalc.SetNumberOfToys(ntoys)
+myHybridCalc_200.SetNumberOfToys(ntoys)
+myHybridCalc_300.SetNumberOfToys(ntoys)
+myHybridCalc_400.SetNumberOfToys(ntoys)
+##
 myHybridCalc.UseNuisance(false)
+myHybridCalc_200.UseNuisance(false)
+myHybridCalc_300.UseNuisance(false)
+myHybridCalc_400.UseNuisance(false)
 ### for speed up generation (do binned data)
 myHybridCalc.SetGenerateBinned(false);
+myHybridCalc_200.SetGenerateBinned(false);
+myHybridCalc_300.SetGenerateBinned(false);
+myHybridCalc_400.SetGenerateBinned(false);
 ### calculate by running ntoys for the S+B and B hypothesis and retrieve the result
 myHybridResult = myHybridCalc.GetHypoTest()
+myHybridResult_200 = myHybridCalc_200.GetHypoTest()
+myHybridResult_300 = myHybridCalc_300.GetHypoTest()
+myHybridResult_400 = myHybridCalc_400.GetHypoTest()
 if not myHybridResult :
     print "***Error returned from Hypothesis test" 
 
@@ -198,6 +228,9 @@ if not myHybridResult :
 
 ## nice plot of the results
 myHybridPlot = myHybridResult.GetPlot("myHybridPlot","Plot of results with HybridCalculatorOriginal",100)
+myHybridPlot_200 = myHybridResult_200.GetPlot("myHybridPlot_200","Plot of results with HybridCalculatorOriginal",100)
+myHybridPlot_300 = myHybridResult_300.GetPlot("myHybridPlot_300","Plot of results with HybridCalculatorOriginal",100)
+myHybridPlot_400 = myHybridResult_400.GetPlot("myHybridPlot_400","Plot of results with HybridCalculatorOriginal",100)
 myHybridPlot.Draw()
 
 ### recover and display the results
@@ -207,23 +240,86 @@ cls_data = myHybridResult.CLs()
 data_significance = myHybridResult.Significance()
 min2lnQ_data = myHybridResult.GetTestStat_data()
 
+### recover and display the results
+clsb_data_200 = myHybridResult_200.CLsplusb()
+clb_data_200 = myHybridResult_200.CLb()
+cls_data_200 = myHybridResult_200.CLs()
+data_significance_200 = myHybridResult_200.Significance()
+min2lnQ_data_200 = myHybridResult_200.GetTestStat_data()
+### recover and display the results
+clsb_data_300 = myHybridResult_300.CLsplusb()
+clb_data_300 = myHybridResult_300.CLb()
+cls_data_300 = myHybridResult_300.CLs()
+data_significance_300 = myHybridResult_300.Significance()
+min2lnQ_data_300 = myHybridResult_300.GetTestStat_data()
+### recover and display the results
+clsb_data_400 = myHybridResult_400.CLsplusb()
+clb_data_400 = myHybridResult_400.CLb()
+cls_data_400 = myHybridResult_400.CLs()
+data_significance_400 = myHybridResult_400.Significance()
+min2lnQ_data_400 = myHybridResult_400.GetTestStat_data()
+
 ### compute the mean expected significance from toys
 mean_sb_toys_test_stat = myHybridPlot.GetSBmean()
 myHybridResult.SetDataTestStatistics(mean_sb_toys_test_stat)
 toys_significance = myHybridResult.Significance()
+### compute the mean expected significance from toys
+mean_sb_toys_test_stat_200 = myHybridPlot_200.GetSBmean()
+myHybridResult_200.SetDataTestStatistics(mean_sb_toys_test_stat_200)
+toys_significance_200 = myHybridResult_200.Significance()
+### compute the mean expected significance from toys
+mean_sb_toys_test_stat_300 = myHybridPlot_300.GetSBmean()
+myHybridResult_300.SetDataTestStatistics(mean_sb_toys_test_stat_300)
+toys_significance_300 = myHybridResult_300.Significance()
+### compute the mean expected significance from toys
+mean_sb_toys_test_stat_400 = myHybridPlot_400.GetSBmean()
+myHybridResult_400.SetDataTestStatistics(mean_sb_toys_test_stat_400)
+toys_significance_400 = myHybridResult_400.Significance()
 
 print "Completed HybridCalculatorOriginal example"
+print "*** floating Higgs mass ***"
 print " - -2lnQ = " , min2lnQ_data 
 print " - CL_sb = " , clsb_data 
 print " - CL_b  = " , clb_data
 print " - CL_s  = " , cls_data
 print " - significance of data  = " , data_significance
 print " - mean significance of toys  = " , toys_significance
+print "*** m(Higgs)=200 ***"
+print " - -2lnQ = " , min2lnQ_data_200 
+print " - CL_sb = " , clsb_data_200
+print " - CL_b  = " , clb_data_200
+print " - CL_s  = " , cls_data_200
+print " - significance of data  = " , data_significance_200
+print " - mean significance of toys  = " , toys_significance_200
+print "*** m(Higgs)=300 ***"
+print " - -2lnQ = " , min2lnQ_data_300 
+print " - CL_sb = " , clsb_data_300
+print " - CL_b  = " , clb_data_300
+print " - CL_s  = " , cls_data_300
+print " - significance of data  = " , data_significance_300
+print " - mean significance of toys  = " , toys_significance_300
+print "*** m(Higgs)=400 ***"
+print " - -2lnQ = " , min2lnQ_data_400 
+print " - CL_sb = " , clsb_data_400
+print " - CL_b  = " , clb_data_400
+print " - CL_s  = " , cls_data_400
+print " - significance of data  = " , data_significance_400
+print " - mean significance of toys  = " , toys_significance_400
 
 
 
+myTH1 = TH1F("","",20,200,400)
+myTH1.SetBinContent(1,cls_data_200)
+myTH1.SetBinContent(10,cls_data_300)
+myTH1.SetBinContent(19,cls_data_400)
+myTH1.Draw()
 
-
+npmax = 50000
+pm = TPolyMarker(npmax)
+pm.SetPoint(0,200,cls_data_200)
+pm.SetPoint(1,300,cls_data_300)
+pm.SetPoint(2,400,cls_data_400)
+pm.Draw("*")
 
 bla
 
