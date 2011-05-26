@@ -2,29 +2,28 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_413_data_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
 
+from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
+from PhysicsTools.PatAlgos.patEventContent_cff import patExtraAodEventContent
+from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
+
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-#process.GlobalTag.globaltag = cms.string('FT_R_39X_V4A::All')
-#process.GlobalTag.globaltag = cms.string('GR_R_39X_V6::All')
-#process.GlobalTag.globaltag = cms.string('GR_P_V14::All')
-#process.GlobalTag.globaltag = cms.string('GR_P_V16::All')
-#process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
-#process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
-#process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All')
+process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
+#process.GlobalTag.globaltag = cms.string('START42_V12::All')
 
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string( 'GR_R_42_V14::All' )
-
 
 # running on data, remove genparticle references in objects
 from PhysicsTools.PatAlgos.tools.coreTools import *
+from PhysicsTools.PatAlgos.tools.jetTools import *
+
 removeMCMatching(process, ['All'])
 
 # scrapingveto:
@@ -38,7 +37,7 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 #---------------------------- Trigger
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
-# electron triggers are taken accroding to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
+# electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
 muontriggers      = cms.vstring("HLT_DoubleMu6_v*")
 
@@ -72,14 +71,14 @@ switchOnTrigger(process)
 
 # base matcher to define default values
 defaultTriggerMatch = cms.EDProducer(
-  "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
+  "PATTriggerMatcherDRDPtLessByR"                                               # match by DeltaR only, best match by DeltaR
 , src     = cms.InputTag( "selectedPatMuons" )
-, matched = cms.InputTag( "patTrigger" )          # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
+, matched = cms.InputTag( "patTrigger" )                                        # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
 , matchedCuts = cms.string( 'path( "HLT_DoubleMu6_v*" )' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.3 )
-, resolveAmbiguities    = cms.bool( True )        # only one match per trigger object
-, resolveByMatchQuality = cms.bool( True )        # take best match found per reco object: by DeltaR here (s. above)
+, resolveAmbiguities    = cms.bool( True )                                      # only one match per trigger object
+, resolveByMatchQuality = cms.bool( True )                                      # take best match found per reco object: by DeltaR here (s. above)
 )
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
@@ -120,7 +119,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 #                 doJTA        = True,
 #                 doBTagging   = True,
 #                 # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-#                 #jetCorrLabel = ('AK7PF',['L1Offset','L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #   'L2L3Residual' as default
+#                 #jetCorrLabel = ('AK7PF',['L1Offset','L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #   
 #                 jetCorrLabel = ('AK7PF',['L1Ofset','L2Relative', 'L3Absolute','L5Flavor','L7Parton']),  
 #                 doType1MET   = False,
 #                 doL1Cleaning = True,                 
@@ -147,19 +146,16 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
                     # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                    #jetCorrLabel = ('AK5PF',['L1Offset', 'L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #  'L2L3Residual' as default #
                     jetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L5Flavor','L7Parton']), # 
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
-                    #jetIdLabel   = "ak5"
+                    jetIdLabel   = "ak5"
                     )
 
-#switchJetCollection(usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=False, postfix = "1", jetCorrections=('AK5PFchs', ['L1FastJet','L2Relative','L3Absolute']) ))
     
 # selected Jets
 process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
-#process.selectedPatJetsAK7PF.cut = 'pt > 15. & abs(eta) < 2.4 '
 
 process.patJets.addTagInfos = cms.bool( True )
 
@@ -183,8 +179,8 @@ process.allMuons = process.cleanPatMuons.clone( preselection = 'pt > 5' )
 process.looseMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'innerTrack.numberOfValidHits > 10 &'
-                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice 
-                                                 #' trackIso < 3 &'                # VBTF choice
+                                                 '(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice 
+                                                 #' trackIso < 3 &'                                     # VBTF choice
                                                  'pt > 10 &'
                                                  'abs(eta) < 2.4'
                                                  )
@@ -193,13 +189,13 @@ process.looseMuons.src = "selectedMuonsMatched"
 process.tightMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'innerTrack.numberOfValidHits > 10 &'
-                                                 'abs(dB) < 0.02 &' # why not 0.2 for 2mm ???
+                                                 'abs(dB) < 0.02 &' 
                                                  'normChi2 < 10 &'
                                                  'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                                                 'numberOfMatches>1 &' # segments matched in at least two muon stations 
-                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &' # one muon hit matched to the global fit
-                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice
-                                                 #' trackIso < 3 &'                # VBTF choice
+                                                 'numberOfMatches>1 &'                                  # segments matched in at least two muon stations 
+                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'   # one muon hit matched to the global fit
+                                                 '(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
+                                                 #' trackIso < 3 &'                                     # VBTF choice
                                                  'pt > 20 &'
                                                  'abs(eta) < 2.1'
                                                  )
@@ -208,18 +204,18 @@ process.tightMuons.src = "selectedMuonsMatched"
 process.matchedMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'innerTrack.numberOfValidHits > 10 &'
-                                                 'abs(dB) < 0.02 &' # why not 0.2 for 2mm ???
+                                                 'abs(dB) < 0.02 &' 
                                                  'normChi2 < 10 &'
                                                  'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                                                 'numberOfMatches>1 &' # segments matched in at least two muon stations 
-                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &' # one muon hit matched to the global fit
-                                                 '(trackIso+caloIso)/pt < 0.15 &'  # Z+jet choice
-                                                 #' trackIso < 3 &'                # VBTF choice
+                                                 'numberOfMatches>1 &'                                  # segments matched in at least two muon stations 
+                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'   # one muon hit matched to the global fit
+                                                 '(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
+                                                 #' trackIso < 3 &'                                     # VBTF choice
                                                  'pt > 20 &'
                                                  'abs(eta) < 2.1 &'
-                                                 'triggerObjectMatches.size > 0' #Trigger Match DeltaR and DeltapT/pT to be really tight
-
+                                                 'triggerObjectMatches.size > 0'                        # Trigger Match DeltaR and DeltapT/pT to be really tight
                                                  )
+
 process.matchedMuons.src = "selectedMuonsMatched"
 
 process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -246,9 +242,8 @@ process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner",
 #*************************************** Electrons
 #*******************************************************
 ## Working point and electron id
-#process.load("RecoEgamma.ElectronIdentification.electronIdSequence_cff")
-#process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
-process.load("ZJetsAnalysis.ZJetsAnalysisV1.simpleEleIdSequence_cff")
+process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
+process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
 
 process.patElectrons.addElectronID = cms.bool(True)
 
@@ -258,29 +253,20 @@ process.patElectrons.electronIDSources = cms.PSet(
     simpleEleId85relIso= cms.InputTag("simpleEleId85relIso")
     )
 
-#process.patElectrons.electronIDSources = cms.PSet(
-#    eidRobustLoose= cms.InputTag("RobustLoose"),
-#    eidRobustTight= cms.InputTag("RobustTight"),
-#    eidRobustHighEnergy= cms.InputTag("RobustHighEnergy")
-#    )
-
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
-#process.patElectronIDs = cms.Sequence(process.eIdSequence)
-process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.patElectrons)
+process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectronIsolation*process.electronMatch*process.patElectrons)
 
 # clean pat Electrons should be isolated for cleaning purpose
 #process.cleanPatElectrons.src = "selectedElectronsMatched"
 
 process.cleanPatElectrons.preselection = 'electronID("simpleEleId85relIso") == 7 '
-#process.cleanPatElectrons.preselection = 'electronID("RobustHighEnergy") == 7 '
 
 # aditional collection of electrons with no cuts 
 process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' ) 
 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone( preselection =
-                                                 'electronID("simpleEleId85relIso") == 7 &' # temp
-                                                 #'electronID("RobustHighEnergy") == 7 &' # temp
+                                                 'electronID("simpleEleId85relIso") == 7 &' 
                                                   # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
                                                  'pt > 10. &'
                                                  'abs(eta) < 2.5 &'
@@ -290,13 +276,13 @@ process.tightElectrons = cleanPatElectrons.clone( preselection =
 process.tightElectrons.src = "selectedElectronsMatched"
 
 process.matchedElectrons = cleanPatElectrons.clone(preselection =
-                                                   'electronID("simpleEleId85relIso") == 7 &' # temp
+                                                   'electronID("simpleEleId85relIso") == 7 &' 
                                                    # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.5 &'
                                                    #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
-                                                   'abs(dB) < 0.02 &'
-                                                  'triggerObjectMatches.size > 0' #Trigger Match DeltaR and DeltapT/pT to be really tight
+                                                   'abs(dB) < 0.02 & '
+                                                   'triggerObjectMatches.size > 0'                           
 
                                                    )
 process.matchedElectrons.src = "selectedElectronsMatched"
@@ -433,7 +419,6 @@ process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber
 process.emutriggerp1= countPatMuons.clone(src = 'cleanPatMuons', minNumber = 1) 
 process.emutriggerp2=countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 1)
 
-#process.patDefaultSequence *= process.hltESSEcalSeverityLevel
 
 # trigger matching and embedding should be done at the end of the sequence
 process.patDefaultSequence *= process.selectedMuonsTriggerMatch
@@ -452,7 +437,7 @@ process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.goodPV
 
 # compute weight from trigger presscale
-process.patDefaultSequence *= process.WeightFromTrigger
+#process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
 process.patDefaultSequence *= process.Ztighttight
@@ -475,12 +460,9 @@ process.patDefaultSequence *= process.embb
 
 # Run it
 
-process.p1 = cms.Path(process.hlt *process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
-#process.p1 = cms.Path(process.hlt * process.scrapingVeto * process.kt6PFJets * process.ak5PFJets * process.patDefaultSequence * process.mutrigger * process.ZMuMuFilter)
-process.p2 = cms.Path(process.hlt *process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
-#process.p2 = cms.Path(process.hlt * process.scrapingVeto * process.kt6PFJets * process.ak5PFJets * process.patDefaultSequence * process.eltrigger * process.ZEEFilter)
-process.p3 = cms.Path(process.hlt *process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
-#process.p3 = cms.Path(process.hlt * process.scrapingVeto * process.kt6PFJets * process.ak5PFJets * process.patDefaultSequence * process.emutriggerp1 * process.emutriggerp2 * process.EMUFilter)
+process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
+process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
+process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
 
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
@@ -531,14 +513,13 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 
 process.source.fileNames = [
-    #"file:/scratch/lceard/store/dataset/data/DiLeptonMu-Dec22Skim_v2_0029_142EFD78-F010-E011-933A-003048D15D04.root"
-    #"file:/home/fynu/lceard/storage/test/Run2011ADoubleMu_AOD_PromptReco/local.root"
-    "file:/storage/data/cms/users/lceard/test/DoubleMuRun2011A_May10ReReco-v1_AOD_1.root"
+    "file:/home/fynu/lceard/storage/test/DoubleMuRun2011A_May10ReReco-v1_AOD_1.root"
+    #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     ]                                     
 
 process.maxEvents.input = 100
 
-process.out.fileName = 'LocalTestMu2011.root'
+process.out.fileName = 'LocalTestMu2011_data.root'
 
 #process.out.dropMetaData = cms.untracked.string("ALL")
 
