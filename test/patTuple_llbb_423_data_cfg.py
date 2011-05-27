@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -180,21 +180,6 @@ process.tightMuons = process.cleanPatMuons.clone(preselection =
                                                  )
 process.tightMuons.src = "selectedMuonsMatched"
 
-process.tagMuons = process.cleanPatMuons.clone(preselection =
-                                                 'isGlobalMuon & isTrackerMuon &'
-                                                 'innerTrack.numberOfValidHits > 10 &'
-                                                 'abs(dB) < 0.02 &' 
-                                                 'normChi2 < 10 &'
-                                                 'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                                                 'numberOfMatches>1 &'                                  # segments matched in at least two muon stations 
-                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'   # one muon hit matched to the global fit
-                                                 '(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
-                                                 #' trackIso < 3 &'                                     # VBTF choice
-                                                 'pt > 20 &'
-                                                 'abs(eta) < 2.1'
-                                                 )
-process.tagMuons.src = "selectedMuonsMatched"
-
 process.matchedMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'innerTrack.numberOfValidHits > 10 &'
@@ -232,11 +217,6 @@ process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner",
                                      name = cms.string('zcleanclean'),
                                      roles = cms.vstring('clean1', 'clean2')
                                      )
-
-process.tagProbes = cms.EDProducer("CandViewShallowCloneCombiner",
-                                   decay = cms.string("tagMuons@+ trkProbes@-"), # charge coniugate states are implied; 'tagMuons' and 'trkProbes' should be collections of Candidates
-                                   cut   = cms.string("2.5 < mass < 3.8"),
-                                   )
 
 #*************************************** Electrons
 #*******************************************************
@@ -436,7 +416,7 @@ process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.goodPV
 
 # compute weight from trigger presscale
-#process.patDefaultSequence *= process.WeightFromTrigger
+process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
 process.patDefaultSequence *= process.Ztighttight
@@ -462,7 +442,6 @@ process.patDefaultSequence *= process.embb
 process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
 process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
 process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
-
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
 
