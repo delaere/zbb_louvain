@@ -2,14 +2,10 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
-
-from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
-from PhysicsTools.PatAlgos.patEventContent_cff import patExtraAodEventContent
-from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
@@ -113,23 +109,6 @@ addPfMET(process, 'PF')
 #------------------------------------------------------------------------------------------------------------------------------------------------
 #
 from PhysicsTools.PatAlgos.tools.jetTools import *
-# add kt4calo for comparison (should switch to some cone thing)
-#addJetCollection(process,cms.InputTag('ak7PFJets'),
-#                 'AK7', 'PF',
-#                 doJTA        = True,
-#                 doBTagging   = True,
-#                 # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-#                 #jetCorrLabel = ('AK7PF',['L1Offset','L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']),  #   
-#                 jetCorrLabel = ('AK7PF',['L1Ofset','L2Relative', 'L3Absolute','L5Flavor','L7Parton']),  
-#                 doType1MET   = False,
-#                 doL1Cleaning = True,                 
-#                 doL1Counters = False,
-#                 genJetCollection=cms.InputTag("ak7GenJets"),
-#                 doJetID      = True,
-#                 jetIdLabel   = "ak7"
-#
-#                 )
-
 
 # Use ak5PF instead of ak5Calo
 ##-------------------- Import the JEC services -----------------------
@@ -201,6 +180,21 @@ process.tightMuons = process.cleanPatMuons.clone(preselection =
                                                  )
 process.tightMuons.src = "selectedMuonsMatched"
 
+process.tagMuons = process.cleanPatMuons.clone(preselection =
+                                                 'isGlobalMuon & isTrackerMuon &'
+                                                 'innerTrack.numberOfValidHits > 10 &'
+                                                 'abs(dB) < 0.02 &' 
+                                                 'normChi2 < 10 &'
+                                                 'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                                                 'numberOfMatches>1 &'                                  # segments matched in at least two muon stations 
+                                                 'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'   # one muon hit matched to the global fit
+                                                 '(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
+                                                 #' trackIso < 3 &'                                     # VBTF choice
+                                                 'pt > 20 &'
+                                                 'abs(eta) < 2.1'
+                                                 )
+process.tagMuons.src = "selectedMuonsMatched"
+
 process.matchedMuons = process.cleanPatMuons.clone(preselection =
                                                  'isGlobalMuon & isTrackerMuon &'
                                                  'innerTrack.numberOfValidHits > 10 &'
@@ -238,6 +232,11 @@ process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner",
                                      name = cms.string('zcleanclean'),
                                      roles = cms.vstring('clean1', 'clean2')
                                      )
+
+process.tagProbes = cms.EDProducer("CandViewShallowCloneCombiner",
+                                   decay = cms.string("tagMuons@+ trkProbes@-"), # charge coniugate states are implied; 'tagMuons' and 'trkProbes' should be collections of Candidates
+                                   cut   = cms.string("2.5 < mass < 3.8"),
+                                   )
 
 #*************************************** Electrons
 #*******************************************************
