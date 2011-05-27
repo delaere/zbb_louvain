@@ -3,7 +3,7 @@ import ROOT
 def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
-  triggers = ("HLT_DoubleMu6_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
+  triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu6_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v3")
     
   #triggers = ("HLT_Mu3_v3", "HLT_Mu5_v3", "HLT_Mu8_v1", "HLT_Mu12_v1", "HLT_Mu15_v2", "HLT_Mu20_v1", "HLT_Mu24_v1", "HLT_Mu30_v1", "HLT_DoubleMu3_v3", "HLT_DoubleMu6_v1", "HLT_DoubleMu7_v1","HLT_Ele8_v2", "HLT_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele8_CaloIdL_TrkIdVL_v2", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_v2",
               #"HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1", "HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3", "HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3",
@@ -31,10 +31,10 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_DoubleMu6_v*")
+      triggers = ("HLT_DoubleMu6_v1")
       #triggers = ("HLT_Mu3_v3", "HLT_Mu5_v3", "HLT_Mu8_v1", "HLT_Mu12_v1", "HLT_Mu15_v2", "HLT_Mu20_v1", "HLT_Mu24_v1", "HLT_Mu30_v1", "HLT_DoubleMu3_v3", "HLT_DoubleMu6_v1", "HLT_DoubleMu7_v1")
     else:
-      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
+      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1")
         
       #triggers = ("HLT_Ele8_v2", "HLT_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele8_CaloIdL_TrkIdVL_v2", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_v2",
       #        "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2", "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1", "HLT_DoubleEle8_CaloIdL_TrkIdVL_HT160_v3", "HLT_DoubleEle8_CaloIdT_TrkIdVL_HT160_v3",
@@ -313,7 +313,7 @@ def isInCategory(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
   # category 0: All
   if category==0:
-    return True
+    return categoryTuple[0]!= -1
   # category 1: Trigger
   elif category==1:
     return categoryTuple[0]==1

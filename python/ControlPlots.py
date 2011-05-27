@@ -47,7 +47,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   if ZjetFilter:
     genHandle = Handle ("vector<reco::GenParticle>")
     event.getByLabel ("genParticles",genHandle)
-    if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return -1
+    if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return [-1]
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
@@ -134,7 +134,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 	else:
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
-        eventWeight = 1. # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
+        eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
