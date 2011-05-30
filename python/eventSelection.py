@@ -5,7 +5,7 @@ def selectedTriggers(triggerInfo):
     return []
 
   triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu6_v2","HLT_DoubleMu6_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v4")
-              )
+              
 =======
   triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu6_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v3")
     
