@@ -42,10 +42,11 @@ metHandle = Handle ("vector<pat::MET>")
 zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
+genHandle = Handle ("vector<reco::GenParticle>")
+
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
-    genHandle = Handle ("vector<reco::GenParticle>")
     event.getByLabel ("genParticles",genHandle)
     if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return [-1]
   event.getByLabel ("cleanPatJets",jetHandle)
@@ -136,7 +137,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
-        jetmetAK7PFPlots[level].processEvent(event, eventWeight)
+        #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
         loosemuonsPlots[level].processEvent(event, eventWeight)
         tightmuonsPlots[level].processEvent(event, eventWeight)
