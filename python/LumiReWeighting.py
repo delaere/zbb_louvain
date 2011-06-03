@@ -37,8 +37,9 @@ class LumiReWeighting:
 
    def checkRelease(self, fwevent):
      # checks the release to see if OOTPU reweighting is needed.
-     PHist = fwevent.processHistory()
-     for process in PHist:
+     PHist = fwevent.object().event().processHistory()
+     for processIdx in range(PHist.size()):
+       process =  PHist.at(processIdx)
        Release =  process.releaseVersion()
        Step    =  process.processName()
        if Step=="HLT" and Release=="\"CMSSW_4_2_2_patch2\"": return True
@@ -47,6 +48,9 @@ class LumiReWeighting:
    def weight( self, npu=None, fwevent=None, PileupSummaryInfo="addPileupInfo" ):
      # returns the weight computed from the true number of interactions in the in-time beam crossing. 
      if not fwevent is None:
+       # for data, immediately return 1.
+       if fwevent.object().event().eventAuxiliary().isRealData(): return 1.
+       # check that fwevent and npu were not specified at the same time.
        if not npu is None:
          print "warning: Both npu and event are specified. npu will be ignored"
        # get pileup summary information
@@ -67,6 +71,9 @@ class LumiReWeighting:
    def weightWithOOTPU( self, npu=None, npu50ns=None, fwevent=None, PileupSummaryInfo="addPileupInfo" ):
      # returns the weight computed from the true number of interactions in the in-time beam crossing. 
      if not fwevent is None:
+       # for data, immediately return 1.
+       if fwevent.object().event().eventAuxiliary().isRealData(): return 1.
+       # check that fwevent and npu were not specified at the same time.
        if not npu is None:
          print "warning: Both npu and event are specified. npu will be ignored"
        # get pileup summary information
@@ -81,7 +88,7 @@ class LumiReWeighting:
      # now simply returns the weight for that amount of PU
      if not npu is None and not npu50ns is None:
        bin = self.weights.GetXaxis().FindBin(npu)
-       return self.weights.GetBinContent(bin)*WeightOOTPU_[bin-1][npv50ns-1] * Correct_Weights2011[bin-1]
+       return self.weights.GetBinContent(bin)*self.WeightOOTPU[bin-1][npu50ns-1] * self.Correct_Weights2011[bin-1]
      else:
        print "ERROR:  no in-time and/or +50ns beam crossing found! "
        return 0.
