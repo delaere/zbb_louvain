@@ -34,16 +34,32 @@ class LumiReWeighting:
         print bin, "PU events -> w=", self.weights.GetBinContent(bin+1) 
       # prepare the HAndle
       self.PupInfo = Handle ("std::vector< PileupSummaryInfo >")
+      # keep the last lumisection where release was tested
+      self.lastLS = -1
+      # do we need OOTPU ?
+      self.doNeedOOTPU = False
+
+   def weight_auto(self, fwevent, PileupSummaryInfo="addPileupInfo" ):
+     if checkRelease(fwevent):
+      return weightWithOOTPU(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
+     else:
+      return weight(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
 
    def checkRelease(self, fwevent):
      # checks the release to see if OOTPU reweighting is needed.
-     PHist = fwevent.object().event().processHistory()
-     for processIdx in range(PHist.size()):
-       process =  PHist.at(processIdx)
-       Release =  process.releaseVersion()
-       Step    =  process.processName()
-       if Step=="HLT" and Release=="\"CMSSW_4_2_2_patch2\"": return True
-     return False
+     thisLS = fwevent.eventAuxiliary().luminosityBlock()
+     if thisLS!=self.lastLS:
+       self.doNeedOOTPU = False
+       PHist = fwevent.object().event().processHistory()
+       for processIdx in range(PHist.size()):
+         process =  PHist.at(processIdx)
+         Release =  process.releaseVersion()
+         Step    =  process.processName()
+         if Step=="HLT" and Release=="\"CMSSW_4_2_2_patch2\"":
+           self.doNeedOOTPU = True
+           break
+     self.lastLS = thisLS
+     return self.doNeedOOTPU
 
    def weight( self, npu=None, fwevent=None, PileupSummaryInfo="addPileupInfo" ):
      # returns the weight computed from the true number of interactions in the in-time beam crossing. 
