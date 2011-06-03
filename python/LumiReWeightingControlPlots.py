@@ -41,6 +41,7 @@ class LumiReWeightingControlPlots:
     def processEvent(self,event, weight = 1.):
       w = self.engine.weight( fwevent=event, PileupSummaryInfo=self.PileupSummaryInfo )
       wprime = self.engine.weightWithOOTPU( fwevent=event, PileupSummaryInfo=self.PileupSummaryInfo )
+      w_auto = self.engine.weight_auto(event, PileupSummaryInfo=self.PileupSummaryInfo )
       self.h_weight.Fill(w)
       self.h_weightOOTPU.Fill(wprime)
       if self.engine.checkRelease( fwevent=event ):
@@ -55,10 +56,10 @@ class LumiReWeightingControlPlots:
       for pvi in pileup:
         if pvi.getBunchCrossing()==0:
           npu = pvi.getPU_NumInteractions()
-      self.h_pu.Fill(npu, w*weight)
-      self.h_pv.Fill(npv, w*weight)
-      self.h_pu_nw.Fill(npu, weight)
-      self.h_pv_nw.Fill(npv, weight)
+      self.h_pu.Fill(npu, weight)
+      self.h_pv.Fill(npv, weight)
+      self.h_pu_nw.Fill(npu, weight/w_auto)
+      self.h_pv_nw.Fill(npv, weight/w_auto)
 
     def endJob(self):
       self.dir.cd()

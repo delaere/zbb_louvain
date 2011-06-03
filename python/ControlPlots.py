@@ -31,9 +31,11 @@ parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
 import ROOT
 import os
 from DataFormats.FWLite import Events, Handle
+from LumiReWeighting import LumiReWeighting
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
+from LumiReWeightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
@@ -78,6 +80,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   jetmetAK7PFPlots=[]
   vertexPlots=[]
   selectionPlots=[]
+  lumiReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -94,6 +97,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       jetmetAK7PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK7PF")))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
+      lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
 
   dirList=os.listdir(path)
   files=[]
@@ -117,6 +121,11 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       jetmetAK7PFPlots[level].beginJob(jetlabel="cleanPatJetsAK7PF",btagging=btagAlgo)
       vertexPlots[level].beginJob()
       selectionPlots[level].beginJob(btagging=btagAlgo)
+      lumiReWeightingPlots[level].beginJob(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
+
+  # the PU reweighting engine
+  # TODO: MonteCarloFileName and DataFileName should be options
+  PileUp = LumiReWeighting(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
 
   # process events
   i = 0
@@ -136,6 +145,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
+        eventWeight *= PileUp.weight_auto(event)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
@@ -145,6 +155,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         tightelectronsPlots[level].processEvent(event, eventWeight)
         vertexPlots[level].processEvent(event, eventWeight)
         selectionPlots[level].processEvent(event, eventWeight)
+        lumiReWeightingPlots[level].processEvent(event, eventWeight)
     i += 1
 
   # save all
@@ -163,6 +174,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
      tightelectronsPlots[level].endJob()
      vertexPlots[level].endJob()
      selectionPlots[level].endJob()
+     lumiReWeightingPlots[level].endJob()
   output.Close()
 
 def main(options):

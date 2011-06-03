@@ -40,10 +40,10 @@ class LumiReWeighting:
       self.doNeedOOTPU = False
 
    def weight_auto(self, fwevent, PileupSummaryInfo="addPileupInfo" ):
-     if checkRelease(fwevent):
-      return weightWithOOTPU(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
+     if self.checkRelease(fwevent):
+      return self.weightWithOOTPU(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
      else:
-      return weight(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
+      return self.weight(fwevent=fwevent, PileupSummaryInfo=PileupSummaryInfo)
 
    def checkRelease(self, fwevent):
      # checks the release to see if OOTPU reweighting is needed.
