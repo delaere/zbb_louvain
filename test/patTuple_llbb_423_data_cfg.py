@@ -7,10 +7,14 @@ process.configurationMetadata = cms.untracked.PSet(
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
 
+from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
+from PhysicsTools.PatAlgos.patEventContent_cff import patExtraAodEventContent
+from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
+
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
-#process.GlobalTag.globaltag = cms.string('START42_V12::All')
-
+#process.GlobalTag.globaltag = cms.string('GR_R_42_V10::All')
+#process.GlobalTag.globaltag = cms.string('GR_P_V20::All')
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -35,7 +39,10 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 
 # electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
-muontriggers      = cms.vstring("HLT_DoubleMu6_v*")
+muontriggers      = cms.vstring(#"HLT_DoubleMu6_v*",
+                                "HLT_DoubleMu7_v*"
+                                ,"HLT_Mu13_Mu8_V*"
+                                )
 
 electrontriggers  = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
 
@@ -70,7 +77,7 @@ defaultTriggerMatch = cms.EDProducer(
   "PATTriggerMatcherDRDPtLessByR"                                               # match by DeltaR only, best match by DeltaR
 , src     = cms.InputTag( "selectedPatMuons" )
 , matched = cms.InputTag( "patTrigger" )                                        # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
-, matchedCuts = cms.string( 'path( "HLT_DoubleMu6_v*" )' )
+, matchedCuts = cms.string( 'path("HLT_DoubleMu7_v*")' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.3 )
 , resolveAmbiguities    = cms.bool( True )                                      # only one match per trigger object
@@ -79,8 +86,8 @@ defaultTriggerMatch = cms.EDProducer(
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*")')
-)
+        , matchedCuts = cms.string('path("HLT_Mu7_v*")|| filter("hltSingleMu13L3Filtered13")')   
+        )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatElectrons" )
@@ -416,7 +423,7 @@ process.patDefaultSequence *= process.allElectrons
 process.patDefaultSequence *= process.goodPV
 
 # compute weight from trigger presscale
-process.patDefaultSequence *= process.WeightFromTrigger
+#process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
 process.patDefaultSequence *= process.Ztighttight
@@ -439,9 +446,9 @@ process.patDefaultSequence *= process.embb
 
 # Run it
 
-process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
-process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
-process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
+process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence)# *process.ZMuMuFilter)
+process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence ) #*process.ZEEFilter)
+process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence)# * process.EMUFilter)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
 
@@ -470,6 +477,10 @@ tokeep_clean += [
                  # keep the weight from trigger info
                  'keep *_WeightFromTrigger_*_*',
 
+                 # keep gen particles and trigger
+                 'keep *_genParticles*_*_*',
+                 'keep *TriggerEvent*_*_*_*',
+
                  # keep candidates based on b jets
                  'keep *_bjets*_*_*',
                  'keep *_bbbar*_*_*',
@@ -479,8 +490,11 @@ tokeep_clean += [
                  
                  'keep *_emu_*_*',
                  'keep *_embb_*_*',
-                 
-                 'keep *_goodPV*_*_*' ]
+
+                 # keep vertex info
+
+                 'keep *_goodPV*_*_*',
+                 'keep *_electronGsfTracks*_*_*']
 
 # B-Tagging: is this needed ?
 tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCounting*BJetTags*_*_PAT']
@@ -489,19 +503,24 @@ tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCo
 process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 # process.out.outputCommands = cms.untracked.vstring( 'keep *' )
 
-
-process.source.fileNames = [
-    "file:/home/fynu/lceard/storage/test/DoubleMuRun2011A_May10ReReco-v1_AOD_1.root"
-    #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
-    ]                                     
-
-process.maxEvents.input = 100
-
-process.out.fileName = 'LocalTestMu2011_data.root'
-
 #process.out.dropMetaData = cms.untracked.string("ALL")
 
-#process.out.fileName = 'Mu_2011A_153pb.root'
-#process.out.fileName = 'Ele_2011A_153pb.root'
 
-process.options.wantSummary = False
+process.source.fileNames = [
+    #"file:/home/fynu/lceard/storage/test/DoubleMuRun2011A_May10ReReco-v1_AOD_1.root"
+    #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
+    #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
+    #"file:/home/fynu/lceard/storage/dilep_events/EE2_RECO.root"
+    "file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
+    ]                                     
+
+process.maxEvents.input = 1000
+
+#process.out.fileName = '4DiLep.root'
+#process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
+process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
+
+#process.out.fileName = 'Mu_V2_2011A_May10ReRe_204pb.root'
+#process.out.fileName = 'Ele_V2_2011A_May10ReRe_204pb.root'
+
+process.options.wantSummary = True
