@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.5 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -86,7 +86,7 @@ defaultTriggerMatch = cms.EDProducer(
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("HLT_Mu7_v*")|| filter("hltSingleMu13L3Filtered13")')   
+        , matchedCuts = cms.string('path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13")')   
         )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
@@ -446,9 +446,9 @@ process.patDefaultSequence *= process.embb
 
 # Run it
 
-process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence)# *process.ZMuMuFilter)
-process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence ) #*process.ZEEFilter)
-process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence)# * process.EMUFilter)
+process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZMuMuFilter)
+process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZEEFilter)
+process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.EMUFilter)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
 
