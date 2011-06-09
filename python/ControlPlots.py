@@ -48,7 +48,7 @@ from LumiReWeighting import LumiReWeighting
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
-#from LumiReWeightingControlPlots import *
+from LumiReWeightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
@@ -63,7 +63,8 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
     event.getByLabel ("genParticles",genHandle)
-    if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return [-1]
+    genParticles = genHandle.product()
+    if isZbEvent(genParticles) or isZcEvent(genParticles): return [-1]
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
@@ -97,7 +98,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   jetmetAK7PFPlots=[]
   vertexPlots=[]
   selectionPlots=[]
-  #lumiReWeightingPlots=[]
+  lumiReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
