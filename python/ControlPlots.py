@@ -34,7 +34,7 @@ parser.add_option("--noPU",action="store_true",dest="noPU",
                   help="Do not reweight according to PU.")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")
-parser.add_option("--jobNumber", type="int", dest='jobNumber', default="1",
+parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
                   help="Number of the job is a splitted set of jobs.")
 
   #Njobs, jobNumber
@@ -42,12 +42,13 @@ parser.add_option("--jobNumber", type="int", dest='jobNumber', default="1",
 
 import ROOT
 import os
+import itertools
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
-from LumiReWeightingControlPlots import *
+#from LumiReWeightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
@@ -96,7 +97,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   jetmetAK7PFPlots=[]
   vertexPlots=[]
   selectionPlots=[]
-  lumiReWeightingPlots=[]
+  #lumiReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -227,8 +228,8 @@ def main(options):
     parser.print_help()
     return
   if options.noPU:
-    PUDataFileName = None
-    PUMonteCarloFileName = None
+    options.PUDataFileName = None
+    options.PUMonteCarloFileName = None
   else:
     if not os.path.isfile(options.PUDataFileName):
       print "Error: ",options.PUDataFileName, ": No such file."
@@ -242,7 +243,7 @@ def main(options):
     print "Error: Njobs must be strictly positive."
     parser.print_help()
     return
-  if options.jobNumber>=Njobs:
+  if options.jobNumber>=options.Njobs:
     print "Error: jobNumber must be strictly smaller than Njobs."
     parser.print_help()
     return
