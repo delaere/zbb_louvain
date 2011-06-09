@@ -29,8 +29,11 @@ class LumiReWeightingControlPlots:
       self.h_pv_nw = ROOT.TH1F("pv_nw","pv_nw",50,0,50)
       self.h_pu = ROOT.TH1F("pu","pu",50,0,50)
       self.h_pv = ROOT.TH1F("pv","pv",50,0,50)
+      self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
       # reweighting engine
       self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName)
+      # fill the histogram with the configured weights
+      for i in range(50): self.h_weightSetup.SetBinContent(i+1,self.engine.weight(npu=i))
       # handles
       self.vertexHandle = Handle ("vector<reco::Vertex>")
       self.vertexlabel = (vertexlabel)

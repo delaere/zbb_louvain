@@ -30,8 +30,8 @@ class LumiReWeighting:
       # so now the average weight should be 1.0
       self.weights.Divide(self.DThisto)
       # printout at initialization
-      for bin in range(self.weights.GetNbinsX()):
-        print bin, "PU events -> w=", self.weights.GetBinContent(bin+1) 
+      #for bin in range(self.weights.GetNbinsX()):
+      #  print bin, "PU events -> w=", self.weights.GetBinContent(bin+1) 
       # prepare the HAndle
       self.PupInfo = Handle ("std::vector< PileupSummaryInfo >")
       # keep the last lumisection where release was tested
