@@ -4,12 +4,18 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
 )
+
+from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
+from PhysicsTools.PatAlgos.patEventContent_cff import patExtraAodEventContent
+from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
+
 
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 #process.GlobalTag.globaltag = cms.string( 'GR_R_42_V14::All' )
-process.GlobalTag.globaltag = cms.string('START42_V12::All')
+#process.GlobalTag.globaltag = cms.string('START42_V12::All')
+process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -469,6 +475,10 @@ tokeep_clean += [
                  # keep the weight from trigger info
                  'keep *_WeightFromTrigger_*_*',
 
+                 # keep gen particles and trigger
+                 'keep *_genParticles*_*_*',
+                 'keep *TriggerEvent*_*_*_*',
+                 
                  # keep candidates based on b jets
                  'keep *_bjets*_*_*',
                  'keep *_bbbar*_*_*',
@@ -479,7 +489,11 @@ tokeep_clean += [
                  'keep *_emu_*_*',
                  'keep *_embb_*_*',
                  
-                 'keep *_goodPV*_*_*' ]
+                 # keep vertex info
+                 'keep *_goodPV*_*_*',
+                 'keep *_electronGsfTracks*_*_*',
+                 
+                 'keep *_addPileupInfo_*_*']
 
 # B-Tagging: is this needed ?
 tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCounting*BJetTags*_*_PAT']
@@ -490,16 +504,20 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 
 process.source.fileNames = [
-    "file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
+    #"file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
+    "file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
+    #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
     ]                                     
 
 process.maxEvents.input = 100
 
-process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
+#process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
+process.out.fileName = 'TTjets_LocalTest_MC.root'
+#process.out.fileName = 'DYjets_LocalTest_MC.root'
 
 #process.out.dropMetaData = cms.untracked.string("ALL")
 
-#process.out.fileName = 'Mu_2011A_153pb.root'
-#process.out.fileName = 'Ele_2011A_153pb.root'
+#process.out.fileName = 'DYJetsToLL.root'
+#process.out.fileName = 'TTJets.root'
 
 process.options.wantSummary = False
