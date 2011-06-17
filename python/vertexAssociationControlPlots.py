@@ -17,7 +17,8 @@ class VertexAssociationControlPlots:
         self.f = None
         self.dir = dir
     
-    def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" ):
+    def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" , sigcut = 3.):
+      self.sigcut = sigcut
       # declare histograms
       self.dir.cd()
       self.h_nvertices = ROOT.TH1F("nvertices","nvertices",30,0,30)
@@ -53,7 +54,6 @@ class VertexAssociationControlPlots:
       zs = self.zHandle.product()
       vs = self.vertexHandle.product()
       self.h_nvertices.Fill(vs.size(), weight) # control plot
-      sigcut = 5.
       # only events with one Z candidate
       if zs.size()==0 : return
       # select the Z
@@ -83,27 +83,34 @@ class VertexAssociationControlPlots:
         ptsumx = 0.
         ptsumy = 0.
         ptsumall = 0.
-        #for i in range(jet.getPFConstituents().size()):
-        #  if jet.getPFConstituent(i).trackRef().isNull():
-        #    continue
-        #  distance = (jet.getPFConstituent(i).vz() - vertex.z())
-        #  self.h_distance.Fill(distance, weight)
-        #  error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
-        #  #error = vertex.zError()
-        #  sig = distance/error
-        #  self.h_sig.Fill(sig, weight) # control plot
-        #  if abs(sig)<sigcut :
-        #    ptsum += jet.getPFConstituent(i).pt()
-        #    ptsumx += jet.getPFConstituent(i).px()
-        #    ptsumy += jet.getPFConstituent(i).py()
-        #  ptsumall += jet.getPFConstituent(i).pt()
-        #self.h_ratio1.Fill(ptsum/jet.et(), weight) # control plot
-        #if ptsumall>0 : 
-        #  ratio = ptsum/ptsumall
-        #else:
-        #  ratio = -1.
-        #self.h_ratio2.Fill(ratio, weight) # control plot
-        #self.h_ratio3.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+        for i in range(jet.getPFConstituents().size()):
+          #make sure the object is usable
+          #the last condition is a fix if we miss muons and electrons in the file, for rare occurences... 
+          #apparently something in the vz() calculation.
+          if (not jet.getPFConstituent(i).isAvailable ()) or jet.getPFConstituent(i).isNull ():
+            continue
+          if jet.getPFConstituent(i).trackRef().isNull():
+            continue
+          if jet.getPFConstituent(i).muonRef().isNonnull () or jet.getPFConstituent(i).gsfTrackRef().isNonnull ():
+            continue
+          distance = (jet.getPFConstituent(i).vz() - vertex.z())
+          self.h_distance.Fill(distance, weight)
+          error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
+          #error = vertex.zError()
+          sig = distance/error
+          self.h_sig.Fill(sig, weight) # control plot
+          if abs(sig)<self.sigcut :
+            ptsum += jet.getPFConstituent(i).pt()
+            ptsumx += jet.getPFConstituent(i).px()
+            ptsumy += jet.getPFConstituent(i).py()
+          ptsumall += jet.getPFConstituent(i).pt()
+        self.h_ratio1.Fill(ptsum/jet.et(), weight) # control plot
+        if ptsumall>0 : 
+          ratio = ptsum/ptsumall
+        else:
+          ratio = -1.
+        self.h_ratio2.Fill(ratio, weight) # control plot
+        self.h_ratio3.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
       self.h_goodevent.Fill(checkVertexAssociation(bestZ, jets, vs), weight)
     
     def endJob(self):

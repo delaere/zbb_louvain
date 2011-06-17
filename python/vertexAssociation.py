@@ -44,7 +44,12 @@ def jetVertex(vertex, jet, algo, sigmaCut, fraction):
 def jetVertex_1(vertex, jet, sigcut, etcut):
   ptsum = 0.
   for i in range(jet.getPFConstituents().size()):
+    #make sure the object is usable
+    #the last condition is a fix if we miss muons and electrons in the file, for rare occurences... 
+    #apparently something in the vz() calculation.
     if jet.getPFConstituent(i).trackRef().isNull():
+      continue
+    if jet.getPFConstituent(i).muonRef().isNonnull () or jet.getPFConstituent(i).gsfTrackRef().isNonnull ():
       continue
     distance = (jet.getPFConstituent(i).vz() - vertex.z())
     error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
