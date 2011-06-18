@@ -68,6 +68,8 @@ def jetVertex_2(vertex, jet, sigcut, ptcut):
   for i in range(jet.getPFConstituents().size()):
     if jet.getPFConstituent(i).trackRef().isNull():
       continue
+    if jet.getPFConstituent(i).muonRef().isNonnull () or jet.getPFConstituent(i).gsfTrackRef().isNonnull ():
+      continue
     distance = (jet.getPFConstituent(i).vz() - vertex.z())
     error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
     #error = vertex.zError()
@@ -87,6 +89,8 @@ def jetVertex_3(vertex, jet, sigcut, etcut):
   ptsumy = 0.
   for i in range(jet.getPFConstituents().size()):
     if jet.getPFConstituent(i).trackRef().isNull():
+      continue
+    if jet.getPFConstituent(i).muonRef().isNonnull () or jet.getPFConstituent(i).gsfTrackRef().isNonnull ():
       continue
     distance = (jet.getPFConstituent(i).vz() - vertex.z())
     error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
