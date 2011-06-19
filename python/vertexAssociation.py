@@ -1,14 +1,14 @@
 def checkVertexAssociation(zcandidate, jets, vertices):
   # condition 1: both leptons are from the same vertex
-  if not zVertex(zcandidate, 0.1):
+  if not zVertex(zcandidate, 0.05):
     return False
   # condition 2: strict lepton to vertex association
   vertex = findPrimaryVertex(zcandidate, vertices)
-  if not zVertex(zcandidate, 0.1,vertex):
+  if not zVertex(zcandidate, 0.05,vertex):
     return False
   # condition 3: at least one of the jets is associated to the z vertex.
   for jet in jets:
-    if jetVertex(vertex, jet, 2, 5, 0.8):
+    if jetVertex(vertex, jet, 2, 2, 0.5):
       return True
   return False
 
@@ -38,7 +38,8 @@ def zVertex(zcandidate, cut, vertex=None):
 
 def jetVertex(vertex, jet, algo, sigmaCut, fraction):
   if algo==1 : return jetVertex_1(vertex, jet, sigmaCut, fraction)
-  if algo==2 : return jetVertex_2(vertex, jet, sigmaCut, fraction)
+  #if algo==2 : return jetVertex_2(vertex, jet, sigmaCut, fraction)
+  if algo==2 : return jetVertex_2b(vertex, jet, fraction)
   if algo==3 : return jetVertex_3(vertex, jet, sigmaCut, fraction)
 
 def jetVertex_1(vertex, jet, sigcut, etcut):
@@ -104,3 +105,25 @@ def jetVertex_3(vertex, jet, sigcut, etcut):
   else :
     return False
 
+def jetVertex_2b(vertex, jet, ptcut):
+  """ alternate to jetVertex_2 where we try to directly use tracks associated to the vertex.
+      This requires a patched DataFormat/RecoVertex where tracks are public (only a pb in python). """
+  ptsum = 0.
+  ptsumall = 0.
+  trackrefs = map(lambda x:vertex.tracks_[x].key(),range(vertex.tracks_.size()))
+  for i in range(jet.getPFConstituents().size()):
+    if jet.getPFConstituent(i).trackRef().isNull():
+      continue
+    try:
+      trackrefs.index(jet.getPFConstituent(i).trackRef().key())
+    except:
+      pass
+    else:
+      ptsum += jet.getPFConstituent(i).pt()
+    ptsumall += jet.getPFConstituent(i).pt()
+  if ptsumall==0.:
+     return False
+  if ptsum/ptsumall > ptcut :
+    return True
+  else :
+    return False
