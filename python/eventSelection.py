@@ -6,10 +6,6 @@ def selectedTriggers(triggerInfo):
 
   triggers = ("HLT_Mu13_Mu8_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5")
               
-<<<<<<< eventSelection.py
-=======
-
->>>>>>> 1.34
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
     if not path is None: 
@@ -31,22 +27,11 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-<<<<<<< eventSelection.py
       triggers = ("HLT_Mu13_Mu8_v2")      
-=======
-      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu6_v2","HLT_DoubleMu6_v3")
->>>>>>> 1.34
     else:
-<<<<<<< eventSelection.py
       triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5"
-=======
-      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v4"
->>>>>>> 1.34
                   )
-<<<<<<< eventSelection.py
-       
-=======
->>>>>>> 1.34
+
     intersect = list(set(pathnames) & set(triggers))
     outcome = len(intersect)>0
   else:
