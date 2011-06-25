@@ -10,6 +10,7 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -52,4 +53,7 @@ void pileupDistInMC::analyze(const edm::Event& event, const edm::EventSetup&) {
   // fill the histogram
   if(n>=0) histogram->Fill(n);
 }
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(pileupDistInMC);
 
