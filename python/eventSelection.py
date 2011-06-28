@@ -4,7 +4,7 @@ def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
 
-  triggers = ("HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5")
+  triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6")
               
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
@@ -27,9 +27,9 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2")      
+      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4")      
     else:
-      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5"
+      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6"
                   )
 
     intersect = list(set(pathnames) & set(triggers))
@@ -42,9 +42,11 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=146428 and runNumber<=147116 : outcome = "HLT_Mu9" in pathnames
       if runNumber>=147146 and runNumber<=148102 : outcome = "HLT_Mu11" in pathnames
       if runNumber>=148783 and runNumber<=149442 : outcome = "HLT_Mu15_v1" in pathnames
+
       if runNumber>=160410 and runNumber<163269 : outcome = "HLT_DoubleMu6_v1" in pathnames
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_DoubleMu7_v2" in pathnames
-      if runNumber>=165121  : outcome = "HLT_Mu13_Mu8_v2" in pathnames
+      if runNumber>=165121 and runNumber<167039 : outcome = "HLT_Mu13_Mu8_v2" in pathnames
+      if runNumber>=167039 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
     else:
       if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
       if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
@@ -57,8 +59,9 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=160410 and runNumber<161217 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1" in pathnames
       if runNumber>=161217 and runNumber<163269 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2" in pathnames
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3" in pathnames
-      if runNumber>=165121 and runNumber<=165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
-      if runNumber>=165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
+      if runNumber>=165121 and runNumber<165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
+      if runNumber>=165970 and runNumber<167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
+      if runNumber>=167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
 
   return outcome
   # this is what we could do with the TriggerWeight product:
