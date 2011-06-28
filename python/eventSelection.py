@@ -4,7 +4,7 @@ def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
 
-  triggers = ("HLT_Mu13_Mu8_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5")
+  triggers = ("HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5")
               
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
@@ -27,7 +27,7 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_Mu13_Mu8_v2")      
+      triggers = ("HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2")      
     else:
       triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5"
                   )

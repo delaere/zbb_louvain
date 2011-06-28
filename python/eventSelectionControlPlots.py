@@ -126,10 +126,10 @@ class EventSelectionControlPlots:
 
       ## trigger
       #TODO: debug that plot (empty)
-      self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel),weight)
-      selTriggers = selectedTriggers(triggerInfo)
-      for trigger,triggered in enumerate(selTriggers):
-        if triggered : self.h_triggerBit.Fill(trigger,weight)
+      #self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel),weight)
+      #selTriggers = selectedTriggers(triggerInfo)
+      #for trigger,triggered in enumerate(selTriggers):
+      #  if triggered : self.h_triggerBit.Fill(trigger,weight)
 
       ## event category
       categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)

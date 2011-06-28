@@ -105,6 +105,7 @@ class VertexAssociationControlPlots:
       self.h_l1v_dz.Fill(abs(lepton1.vz()-vertex.z()), weight) # control plot
       self.h_l2v_dz.Fill(abs(lepton2.vz()-vertex.z()), weight) # control plot
       # relevant quantities to monitor: jets vs primary vertex
+
       firstJet = True
       for jet in jets: 
         if not self.jetSelection(jet,bestZ) : continue
