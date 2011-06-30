@@ -26,16 +26,31 @@ parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
 parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
                   help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
+parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default="PUdist.root",
+                  help="Read estimated PU distribution for data from file.", metavar="file")
+parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default="PUdistMC.root",
+                  help="Read generated PU distribution for MC from file.", metavar="file")
+parser.add_option("--noPU",action="store_true",dest="noPU",
+                  help="Do not reweight according to PU.")
+parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
+                  help="Number of jobs when splitting the processing.")
+parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
+                  help="Number of the job is a splitted set of jobs.")
+
+#Njobs, jobNumber
 (options, args) = parser.parse_args()
 
 import ROOT
 import os
+import itertools
 from DataFormats.FWLite import Events, Handle
+from LumiReWeighting import LumiReWeighting
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
+from LumiReWeightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
-#from eventSelection_Test_JES import eventCategories, eventCategory, isInCategory
+ #from eventSelection_Test_JES import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
 jetHandle = Handle ("vector<pat::Jet>")
@@ -49,7 +64,8 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if ZjetFilter:
     event.getByLabel ("genParticles",genHandle)
-    if isZbEvent(genHandle.product()) or isZcEvent(genHandle.product()): return [-1]
+    genParticles = genHandle.product()
+    if isZbEvent(genParticles) or isZcEvent(genParticles): return [-1]
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
@@ -65,11 +81,15 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
 
-def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False):
+def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
-  # plots
+
+  # for the PU
+  handlePU = not (PUDataFileName is None or PUMonteCarloFileName is None)
+
+  # prepare the plots
   allmuonsPlots=[]
   loosemuonsPlots=[]
   tightmuonsPlots=[]
@@ -79,6 +99,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   jetmetAK7PFPlots=[]
   vertexPlots=[]
   selectionPlots=[]
+  lumiReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -95,11 +116,14 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       jetmetAK7PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK7PF")))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
+      if handlePU: 
+        lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
 
-  dirList=os.listdir(path)
+  # inputs
+  dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
   files=[]
   for fname in dirList:
-    files.append(path+fname)
+    files.append(path+"/"+fname)
   events = Events (files)
 
   # book histograms
@@ -118,6 +142,12 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       jetmetAK7PFPlots[level].beginJob(jetlabel="cleanPatJetsAK7PF",btagging=btagAlgo)
       vertexPlots[level].beginJob()
       selectionPlots[level].beginJob(btagging=btagAlgo)
+      if handlePU: 
+        lumiReWeightingPlots[level].beginJob(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
+
+  # the PU reweighting engine
+  if handlePU: 
+    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
 
   # process events
   i = 0
@@ -137,6 +167,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
+        if handlePU: eventWeight *= PileUp.weight_auto(event)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
@@ -146,6 +177,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         tightelectronsPlots[level].processEvent(event, eventWeight)
         vertexPlots[level].processEvent(event, eventWeight)
         selectionPlots[level].processEvent(event, eventWeight)
+        if handlePU: 
+          lumiReWeightingPlots[level].processEvent(event, eventWeight)
     i += 1
 
   # save all
@@ -164,6 +197,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
      tightelectronsPlots[level].endJob()
      vertexPlots[level].endJob()
      selectionPlots[level].endJob()
+     if handlePU: 
+       lumiReWeightingPlots[level].endJob()
   output.Close()
 
 def main(options):
@@ -194,9 +229,28 @@ def main(options):
     print "Error: --onlyMu and --onlyEle are exclusive."
     parser.print_help()
     return
+  if options.noPU:
+    options.PUDataFileName = None
+    options.PUMonteCarloFileName = None
+  else:
+    if not os.path.isfile(options.PUDataFileName):
+      print "Error: ",options.PUDataFileName, ": No such file."
+      parser.print_help()
+      return
+    if not os.path.isfile(options.PUMonteCarloFileName):
+      print "Error: ",options.PUMonteCarloFileName, ": No such file."
+      parser.print_help()
+      return
+  if options.Njobs<1:
+    print "Error: Njobs must be strictly positive."
+    parser.print_help()
+    return
+  if options.jobNumber>=options.Njobs:
+    print "Error: jobNumber must be strictly smaller than Njobs."
+    parser.print_help()
+    return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle)
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber)
 
 if __name__ == "__main__":
   main(options)
-
