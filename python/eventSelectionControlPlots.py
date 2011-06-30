@@ -46,7 +46,7 @@ class EventSelectionControlPlots:
       self.h_ZbbM = ROOT.TH1F("ZbbM","Zbb invariant mass",1000,0,1000)
       self.h_ZbbPt = ROOT.TH1F("ZbbPt","Zbb Pt",500,0,500)
       self.h_ZbbM2D = ROOT.TH2F("ZbbM2D","Zbb mass vs bb mass",100,0,1000,100,0,1000)
-      self.h_category = ROOT.TH1F("category","event category",10,0,10)  
+      self.h_category = ROOT.TH1F("category","event category",20,0,20)  
       self.h_mu1pt = ROOT.TH1F("mu1pt","leading muon Pt",500,0,500)
       self.h_mu2pt = ROOT.TH1F("mu2pt","subleading muon Pt",500,0,500)
       self.h_mu1eta = ROOT.TH1F("mu1eta","leading muon Eta",25,0,2.5)
