@@ -117,7 +117,7 @@ def CreateTheShellFile(argv):
 	elif argv[0]=='PYTHON':
 		if Jobs_RunHere==0:
                 	shell_file.write('cd -\n')
-	        shell_file.write('python %s ' % argv[1] + '\n EOF\n\n' )
+	        shell_file.write('python %s ' % argv[1] + '\n\n\n' )
 	        #shell_file.write('EOF\n\n')	
         elif argv[0]=='CMSSW':
 		CreateTheConfigFile(argv);
