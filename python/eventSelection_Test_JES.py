@@ -4,7 +4,9 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 
 AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
-test = JetCorrectionUncertainty("/home/fynu/jdf/scratch/CMSSW_4_1_5/src/CondFormats/JetMETObjects/data/Jec10V1_Uncertainty_KT4PF.txt")
+#test = JetCorrectionUncertainty("Jec10V1_Uncertainty_KT4PF.txt")
+test = JetCorrectionUncertainty("Jec11_V2_Uncertainty_AK5PF.txt")
+
 
 def selectedTriggers(triggerInfo):
   if triggerInfo is None:
@@ -50,7 +52,8 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=148783 and runNumber<=149442 : outcome = "HLT_Mu15_v1" in pathnames
       if runNumber>=160410 and runNumber<163269 : outcome = "HLT_DoubleMu6_v1" in pathnames
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_DoubleMu7_v2" in pathnames
-      if runNumber>=165121  : outcome = "HLT_Mu13_Mu8_v2" in pathnames
+      if runNumber>=165121 and runNumber<167039 : outcome = "HLT_Mu13_Mu8_v2" in pathnames
+      if runNumber>=167039 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
     else:
       if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
       if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
@@ -62,9 +65,11 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=160410 and runNumber<161217 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1" in pathnames
       if runNumber>=161217 and runNumber<163269 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2" in pathnames
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3" in pathnames
-      if runNumber>=165121 and runNumber<=165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
-      if runNumber>=165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
-    return outcome
+      if runNumber>=165121 and runNumber<165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
+      if runNumber>=165970 and runNumber<167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
+      if runNumber>=167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames 
+
+  return outcome
   # this is what we could do with the TriggerWeight product:
   #outcome = False
   #if runNumber is None:
@@ -200,19 +205,19 @@ def jetId(jet,level="loose"):
     print "Error: unknown jetid level:",level
     return False
 
-def unc_tot_jet(jet):
+def unc_jet(jet):
   test.setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
   test.setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
   unc = test.getUncertainty(1)
   #print unc
 
-  if 0 <abs(jet.eta())< 1.5 : unc_dep_eta=0.02
-  if 1.5 <=abs(jet.eta())<3.0  : unc_dep_eta=0.06
-  if 3.0 <=abs(jet.eta()) : unc_dep_eta=0.20
+  #if 0 <abs(jet.eta())< 1.5 : unc_dep_eta=0.02
+  #if 1.5 <=abs(jet.eta())<3.0  : unc_dep_eta=0.06
+  #if 3.0 <=abs(jet.eta()) : unc_dep_eta=0.20
   
-  unc_tot=sqrt(pow(unc,2)+pow(0.015,2)+pow((0.2*0.8*2.2*1/jet.pt()),2)+pow(unc_dep_eta,2))
-  #print unc_tot
-  return unc_tot
+  #unc_tot=sqrt(pow(unc,2)+pow(0.015,2)+pow((0.2*0.8*2.2*1/jet.pt()),2)+pow(unc_dep_eta,2))
+  ##print unc_tot
+  return unc
 
 def isGoodJet(jet, Z = None):
   """Perform additional checks that define a good jet"""  
@@ -220,12 +225,14 @@ def isGoodJet(jet, Z = None):
   # restrict in eta
   outcome = abs(jet.eta())<2.1
 
-  #Hight Jet collection : pt + unc_tot
-  #outcome = outcome and (jet.pt()+unc_tot_jet(jet))>25
-  #Low Jet collection: pt - unc_tot
-  #print unc_tot_jet(jet)
-  outcome = outcome and (jet.pt()-unc_tot_jet(jet))>25
-
+  #Hight Jet collection : pt + unc_tot*pt
+  outcome = outcome and ((jet.pt())*(1+unc_jet(jet)))>25
+  #print unc_jet(jet)
+  #Low Jet collection: pt - unc_tot*pt
+  #outcome = outcome and ((jet.pt())*(1-unc_jet(jet)))>25
+  #print unc_jet(jet)
+  print (1+unc_jet(jet))
+  
 # overlap checking
   # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
 #  if jet.hasOverlaps("muons"): return False
