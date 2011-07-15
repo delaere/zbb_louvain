@@ -30,8 +30,12 @@ parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default="PUdist.r
                   help="Read estimated PU distribution for data from file.", metavar="file")
 parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default="PUdistMC.root",
                   help="Read generated PU distribution for MC from file.", metavar="file")
-parser.add_option("--noPU",action="store_true",dest="noPU",
+parser.add_option("--noPUweight",action="store_true",dest="noPUweight",
                   help="Do not reweight according to PU.")
+parser.add_option("--noBweight",action="store_true",dest="noBweight",
+                  help="Do not reweight accodring to btagging.")
+parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default="performance_ssv.root",
+                  help="Read btagging efficiencies and SF from file.", metavar="file")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")
 parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
@@ -49,6 +53,7 @@ from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from LumiReWeightingControlPlots import *
+from btaggingWeight import btaggingWeight
 from eventSelection import eventCategories, eventCategory, isInCategory
  #from eventSelection_Test_JES import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
@@ -81,13 +86,16 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
 
-def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1):
+def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
 
   # for the PU
   handlePU = not (PUDataFileName is None or PUMonteCarloFileName is None)
+
+  # for the btag reweighting
+  handleBT = not (BtagEffDataFileName is None)
 
   # prepare the plots
   allmuonsPlots=[]
@@ -118,6 +126,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
       if handlePU: 
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
+      #TODO: we do not have control plots for Beff reweighting
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -148,6 +157,10 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   # the PU reweighting engine
   if handlePU: 
     PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
+  # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
+  if handleBT:
+    BeffW_HE = btaggingWeight(1,5,workingPoint="HE", algo="SSV", file=BtagEffDataFileName)
+    BeffW_HP = btaggingWeight(1,5,workingPoint="HP", algo="SSV", file=BtagEffDataFileName)
 
   # process events
   i = 0
@@ -168,6 +181,22 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight_auto(event)
+	if handleBT: 
+	  #TODO: Note that this is only strictly correct for single bjets, for now.
+	  try:
+	    HElevels=[5,7,9,10,12,13]
+	    HElevels.index(level)
+          except:
+	    pass
+	  else:
+            eventWeight *= BeffW_HE.weight(event)
+	  try:
+	    HPlevels=[6,8,10,11,13,14]
+	    HPlevels.index(level)
+          except:
+	    pass
+	  else:
+            eventWeight *= BeffW_HP.weight(event)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
@@ -229,7 +258,7 @@ def main(options):
     print "Error: --onlyMu and --onlyEle are exclusive."
     parser.print_help()
     return
-  if options.noPU:
+  if options.noPUweight:
     options.PUDataFileName = None
     options.PUMonteCarloFileName = None
   else:
@@ -241,6 +270,13 @@ def main(options):
       print "Error: ",options.PUMonteCarloFileName, ": No such file."
       parser.print_help()
       return
+  if options.noBweight:
+    options.BtagEffDataFileName = None
+  else:
+    if not os.path.isfile(options.BtagEffDataFileName):
+      print "Error: ",options.BtagEffDataFileName, ": No such file."
+      parser.print_help()
+      return
   if options.Njobs<1:
     print "Error: Njobs must be strictly positive."
     parser.print_help()
@@ -250,7 +286,7 @@ def main(options):
     parser.print_help()
     return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber)
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName)
 
 if __name__ == "__main__":
   main(options)
