@@ -20,8 +20,8 @@ parser.add_option("--onlyMu",action="store_true",dest="onlyMu",
                   help="Fill only the muon channel plots.")
 parser.add_option("--onlyEle",action="store_true",dest="onlyEle",
                   help="Fill only the electron channel plots.")
-parser.add_option("--Zjet",action="store_true",dest="ZjetFilter",
-                  help="Remove b and c contributions from Z+jets.")
+parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl"
+                  help="Jet flavor filter. Examples: --jetFlavor b or --jetFlavor cl")
 parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
 parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
@@ -67,10 +67,12 @@ genHandle = Handle ("vector<reco::GenParticle>")
 
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
-  if ZjetFilter:
+  if not ZjetFilter=="bcl":
     event.getByLabel ("genParticles",genHandle)
     genParticles = genHandle.product()
-    if isZbEvent(genParticles) or isZcEvent(genParticles): return [-1]
+    if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
+    if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
+    if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
   event.getByLabel ("cleanPatJets",jetHandle)
   event.getByLabel ("patMETsPF",metHandle)
   event.getByLabel ("Ztighttight",zmuHandle)
