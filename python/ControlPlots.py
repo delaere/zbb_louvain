@@ -158,7 +158,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 
   # the PU reweighting engine
   if handlePU: 
-    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
+    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup", systematicShift=0)
   # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
   if handleBT:
     BeffW_HE = btaggingWeight(1,5,workingPoint="HE", algo="SSV", file=BtagEffDataFileName)
@@ -182,7 +182,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
-        if handlePU: eventWeight *= PileUp.weight_auto(event)
+        if handlePU: eventWeight *= PileUp.weight(fwevent=event)
 	if handleBT: 
 	  #TODO: Note that this is only strictly correct for single bjets, for now.
 	  try:

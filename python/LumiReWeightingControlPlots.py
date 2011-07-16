@@ -23,8 +23,6 @@ class LumiReWeightingControlPlots:
       # declare histograms
       self.dir.cd()
       self.h_weight = ROOT.TH1F("LumiWeight","LumiWeight",1000,0,10)
-      self.h_weightOOTPU = ROOT.TH1F("LumiWeightOOTPU","LumiWeightOOTPU",1000,0,10)
-      self.h_weightType = ROOT.TH1F("weightType","weightType",2,0,2)
       self.h_pu_nw = ROOT.TH1F("pu_nw","pu_nw",50,0,50)
       self.h_pv_nw = ROOT.TH1F("pv_nw","pv_nw",50,0,50)
       self.h_pu = ROOT.TH1F("pu","pu",50,0,50)
@@ -43,14 +41,7 @@ class LumiReWeightingControlPlots:
     
     def processEvent(self,event, weight = 1.):
       w = self.engine.weight( fwevent=event, PileupSummaryInfo=self.PileupSummaryInfo )
-      wprime = self.engine.weightWithOOTPU( fwevent=event, PileupSummaryInfo=self.PileupSummaryInfo )
-      w_auto = self.engine.weight_auto(event, PileupSummaryInfo=self.PileupSummaryInfo )
       self.h_weight.Fill(w)
-      self.h_weightOOTPU.Fill(wprime)
-      if self.engine.checkRelease( fwevent=event ):
-        self.h_weightType.Fill(1,weight)
-      else:
-        self.h_weightType.Fill(0,weight)
       event.getByLabel (self.vertexlabel,self.vertexHandle)
       vs = self.vertexHandle.product()
       npv = vs.size()
@@ -61,8 +52,8 @@ class LumiReWeightingControlPlots:
           npu = pvi.getPU_NumInteractions()
       self.h_pu.Fill(npu, weight)
       self.h_pv.Fill(npv, weight)
-      self.h_pu_nw.Fill(npu, weight/w_auto)
-      self.h_pv_nw.Fill(npv, weight/w_auto)
+      self.h_pu_nw.Fill(npu, weight/w)
+      self.h_pv_nw.Fill(npv, weight/w)
 
     def endJob(self):
       self.dir.cd()
