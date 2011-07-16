@@ -35,23 +35,24 @@ pileupDistInMC::pileupDistInMC(const edm::ParameterSet& iConfig) {
 void pileupDistInMC::beginJob() {
   // create output
   edm::Service<TFileService> fileService;
-  histogram = fileService->make<TH1F>("pileup","pileup",50,0,50);
+  histogram = fileService->make<TH1F>("pileup","pileup",25,-0.5,24.5);
 }
 
 void pileupDistInMC::analyze(const edm::Event& event, const edm::EventSetup&) {
   // get summary info
   event.getByLabel(PUIlabel,handle);
   const std::vector<PileupSummaryInfo>* pui = handle.product();
-  int n = -1;
+  int n = 0;
+  int ni = 0;
   // find the right crossing
   for(std::vector<PileupSummaryInfo>::const_iterator pu = pui->begin(); pu!=pui->end(); ++pu) {
-    if(pu->getBunchCrossing()==0) {
-      n = pu->getPU_NumInteractions();
-      break;
+    if(pu->getBunchCrossing()==0 || pu->getBunchCrossing()==-1 || pu->getBunchCrossing()==1) {
+      n += pu->getPU_NumInteractions();
+      ni++;
     }
   }
   // fill the histogram
-  if(n>=0) histogram->Fill(n);
+  if(n>=0) histogram->Fill(float(n)/float(ni));
 }
 
 //define this as a plug-in
