@@ -73,10 +73,14 @@ class LumiReWeighting:
        fwevent.getByLabel(PileupSummaryInfo, self.PupInfo)
        pileup = self.PupInfo.product()
        # find the "BX0" and the number of PU interactions in there
+       npu = 0.
+       nbc = 0
        for pvi in pileup:
-         if pvi.getBunchCrossing()==0:
-           npu = pvi.getPU_NumInteractions()
+         if pvi.getBunchCrossing() in [-1,0,1]:
+           npu += pvi.getPU_NumInteractions()
+	   nbc += 1
            break
+       if nbc>0 : npu = npu/nbc
      # now simply returns the weight for that amount of PU
      if not npu is None:
        return self.weights.GetBinContent(self.weights.GetXaxis().FindBin(npu))
