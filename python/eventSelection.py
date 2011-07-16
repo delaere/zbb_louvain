@@ -214,6 +214,8 @@ def isGoodJet(jet, Z = None):
       return False 
   # check jetid (loose)
   outcome = outcome and jetId(jet,"loose")
+  # to study the impact of PU on MC, request the jet to be matched to a genjet
+  # outcome = outcome and not (jet.genJet() is None)
   return outcome
 
 def isGoodMet(met,cut=40):
