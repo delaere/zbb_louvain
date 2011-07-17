@@ -161,8 +161,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
     PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup", systematicShift=0)
   # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
   if handleBT:
-    BeffW_HE = btaggingWeight(1,5,workingPoint="HE", algo="SSV", file=BtagEffDataFileName)
-    BeffW_HP = btaggingWeight(1,5,workingPoint="HP", algo="SSV", file=BtagEffDataFileName)
+    BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)
 
   # process events
   i = 0
@@ -183,22 +182,22 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight(fwevent=event)
-	if handleBT: 
-	  #TODO: Note that this is only strictly correct for single bjets, for now.
-	  try:
-	    HElevels=[5,7,9,10,12,13]
-	    HElevels.index(level)
-          except:
-	    pass
-	  else:
-            eventWeight *= BeffW_HE.weight(event)
-	  try:
-	    HPlevels=[6,8,10,11,13,14]
-	    HPlevels.index(level)
-          except:
-	    pass
-	  else:
-            eventWeight *= BeffW_HP.weight(event)
+	if handleBT:
+	  if categoryName(level).find("(HE") != -1:
+	    BeffW.setMode("HE")
+	    eventWeight *= BeffW.weight2(event,muChannel)
+	  elif categoryName(level).find("(HP") != -1:
+	    BeffW.setMode("HP")
+	    eventWeight *= BeffW.weight2(event,muChannel)
+	  elif categoryName(level).find("(HEHE") != -1:
+	    BeffW.setMode("HEHE")
+	    eventWeight *= BeffW.weight2(event,muChannel)
+	  elif categoryName(level).find("(HEHP") != -1:
+	    BeffW.setMode("HEHP")
+	    eventWeight *= BeffW.weight2(event,muChannel)
+	  elif categoryName(level).find("(HPHP") != -1:
+	    BeffW.setMode("HPHP")
+	    eventWeight *= BeffW.weight2(event,muChannel)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)

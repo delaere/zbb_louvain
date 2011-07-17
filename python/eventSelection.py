@@ -316,6 +316,27 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
     jetList.append(index)
   return (jets[jetList[0]],jets[jetList[1]])
 
+def categoryName(category):
+  """Check if the event enters category X, given the tuple computed by eventCategory."""
+  if category==0: return "All"
+  elif category==1: return "Trigger"
+  elif category==2: return "di-lepton"
+  elif category==3: return "Z"
+  elif category==4: return "Z+jet"
+  elif category==5: return "Z+b (HE)"
+  elif category==6: return "Z+b (HP)"
+  elif category==7: return "Z+b (HE+MET)"
+  elif category==8: return "Z+b (HP+MET)"
+  elif category==9: return "Z+bb (HEHE)"
+  elif category==10: return "Z+bb (HEHP)"
+  elif category==11: return "Z+bb (HPHP)"
+  elif category==12: return "Z+bb (HEHE+MET)"
+  elif category==13: return "Z+bb (HEHP+MET)"
+  elif category==14: return "Z+bb (HPHP+MET)"
+  # other does not exist
+  else:
+    return "None"
+
 def isInCategory(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
   # category 0: All

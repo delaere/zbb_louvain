@@ -30,17 +30,26 @@ class JetSet {
 };
 
 // the algorithm.
-// TODO: that version only works for one or two jets of the same kind.
 class BTagWeight 
 {
  public:
-   BTagWeight(int jmin, int jmax): maxTags(jmax), minTags(jmin) {}
+   BTagWeight(int jmin1, int jmax1, int jmin2, int jmax2): maxTags1(jmax1), minTags1(jmin1), maxTags2(jmax2), minTags2(jmin2) {}
    virtual ~BTagWeight() {}
-   bool filter(int t);
-   float weight(std::vector<JetInfo> jets, int algo, int ntags);
-   float weight(JetSet jets, int algo, int ntags) { return weight(jets.getJets(),algo,ntags); }
+   void setLimits(int jmin1, int jmax1, int jmin2, int jmax2) { maxTags1=jmax1; minTags1=jmin1; maxTags2=jmax2; minTags2=jmin2; }
+   // check that the selection is fulfiled (one algo case)
+   bool filter(int t) const;
+   // check that the selection is fulfiled (two algos case)
+   bool filter(int t1, int t2) const;
+   // compute the weight in the 1 algo case
+   float weight(std::vector<JetInfo> jets, int algo, int ntags) const;
+   float weight(JetSet jets, int algo, int ntags) const { return weight(jets.getJets(),algo,ntags); }
+   // compute the weight in the 2 algos case
+   float weight2(std::vector<JetInfo> jets, int ntags1, int ntags2) const;
+   float weight2(JetSet jets, int ntags1, int ntags2) const { return weight2(jets.getJets(),ntags1,ntags2); }
  private:
-   int maxTags;
-   int minTags;
+   int maxTags1;
+   int minTags1;
+   int maxTags2;
+   int minTags2;
 };
 
