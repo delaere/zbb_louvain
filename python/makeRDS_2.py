@@ -76,16 +76,28 @@ rc_HE    = RooCategory("rc_HE",   "rc_HE")
 rc_HP    = RooCategory("rc_HP",   "rc_HP")
 rc_HEMET = RooCategory("rc_HEMET","rc_HEMET")
 rc_HPMET = RooCategory("rc_HPMET","rc_HPMET")
+rc_HE_excl    = RooCategory("rc_HE_excl",   "rc_HE_excl")
+rc_HP_excl    = RooCategory("rc_HP_excl",   "rc_HP_excl")
+rc_HEMET_excl = RooCategory("rc_HEMET_excl","rc_HEMET_excl")
+rc_HPMET_excl = RooCategory("rc_HPMET_excl","rc_HPMET_excl")
 
 rc_HE.defineType("not_acc",0)
 rc_HP.defineType("not_acc",0)
 rc_HEMET.defineType("not_acc",0)
 rc_HPMET.defineType("not_acc",0)
+rc_HE_excl.defineType("not_acc",0)
+rc_HP_excl.defineType("not_acc",0)
+rc_HEMET_excl.defineType("not_acc",0)
+rc_HPMET_excl.defineType("not_acc",0)
 
 rc_HE.defineType("acc",1)
 rc_HP.defineType("acc",1)
 rc_HEMET.defineType("acc",1)
 rc_HPMET.defineType("acc",1)
+rc_HE_excl.defineType("acc",1)
+rc_HP_excl.defineType("acc",1)
+rc_HEMET_excl.defineType("acc",1)
+rc_HPMET_excl.defineType("acc",1)
 
 #######################################
 ### Define RooArgSet and RooDataSet ###
@@ -102,7 +114,12 @@ obsSet = RooArgSet(rrv_SV_M,
                    rc_HE,
                    rc_HP,
                    rc_HEMET,
-                   rc_HPMET )
+                   rc_HPMET,
+                   rc_HE_excl,
+                   rc_HP_excl,
+                   rc_HEMET_excl,
+                   rc_HPMET_excl,
+                   )
 
 rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 
@@ -172,6 +189,10 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         rc_HP.setIndex(0)
         rc_HEMET.setIndex(0)
         rc_HPMET.setIndex(0)
+        rc_HE_excl.setIndex(0)
+        rc_HP_excl.setIndex(0)
+        rc_HEMET_excl.setIndex(0)
+        rc_HPMET_excl.setIndex(0)
         
         if i%1000==0 : print "Processing... event ", i
         i += 1
@@ -213,12 +234,13 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
 
                         rrv_ll_M.setVal(bestZcandidate.mass())
                         rc_HE.setIndex(1)
-                        if isInCategory(6, myCatData):
-                            rc_HP.setIndex(1)
-                        if isInCategory(7, myCatData):
-                            rc_HEMET.setIndex(1)
-                        if isInCategory(8, myCatData):
-                            rc_HPMET.setIndex(1)
+                        if isInCategory(6, myCatData):  rc_HP.setIndex(1)
+                        if isInCategory(7, myCatData):  rc_HEMET.setIndex(1)
+                        if isInCategory(8, myCatData):  rc_HPMET.setIndex(1)
+                        if isInCategory(15, myCatData): rc_HE_excl.setIndex(1)
+                        if isInCategory(16, myCatData): rc_HP_excl.setIndex(1)
+                        if isInCategory(17, myCatData): rc_HEMET_excl.setIndex(1)
+                        if isInCategory(18, myCatData): rc_HPMET_excl.setIndex(1)
                        
                         if len(bbs)>0    : rrv_bb_M.setVal(      bbs.at(0).mass())
                         if len(zmmbbs)>0 : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
