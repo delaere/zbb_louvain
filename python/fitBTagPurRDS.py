@@ -41,7 +41,7 @@ rrv_pT     = ws.var("rrv_pT")
 rrv_pT_unc = ws.var("rrv_pT_unc")
 rc_flav    = ws.cat("rc_flav")
 
-f_data = TFile("File_rds_zbb_Mu_DATA.root")
+f_data = TFile("File_rds_zbb_El_DATA.root")
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
 

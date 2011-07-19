@@ -386,16 +386,16 @@ def isInCategory(category, categoryTuple):
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # categoty 15: Z+1b (HE exclusive)
   elif category==15:
-    return categoryTuple[4]==1 and and categoryTuple[5]==categoryTuple[6]  
+    return categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
-    return categoryTuple[5]==1 and and categoryTuple[5]==categoryTuple[6]  
+    return categoryTuple[5]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 17: Z+1b (HE exclusive + MET)
   elif category==17:
-    return categoryTuple[4]==1 and and categoryTuple[5]==categoryTuple[6] and categoryTuple[7]>0
+    return isInCategory( 15, categoryTuple ) and categoryTuple[7]>0
   # categoty 18: Z+1b (HP exclusive + MET)
   elif category==18:
-    return categoryTuple[5]==1 and and categoryTuple[5]==categoryTuple[6] and categoryTuple[7]>0
+    return isInCategory( 16, categoryTuple ) and categoryTuple[7]>0
   # other does not exist
   else:
     return False

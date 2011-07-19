@@ -13,7 +13,7 @@
 ###                                                                                      ###
 ### To Do:                                                                               ###
 ### - check difference reco composite candidates (e.g. zbb vs home-brewn)                ###
-### - clean up: MC vs data, trigger info                                                 ###
+### - clean up: MC vs data, trigger info, parse options properly                         ###
 ###                                                                                      ### 
 ############################################################################################
 ############################################################################################
@@ -31,7 +31,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "Mu_DATA" #"El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "El_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 
 ############
 ### Maps ###
@@ -46,7 +46,7 @@ muChannel = { "Mu_DATA"     : True,
               }
 
 path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot702pb_PromptV4/Mu_2011A_702pb_v4/" ,
-         "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot702pb_PromptV4/Ele_2011A_702pb_v4/",
+         "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Ele_2011A_1078pb_v4/",
          "Ttbar_Mu_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Ttbar_El_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Mu_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/",
@@ -103,23 +103,23 @@ rc_HPMET_excl.defineType("acc",1)
 ### Define RooArgSet and RooDataSet ###
 #######################################
 
-obsSet = RooArgSet(rrv_SV_M,
-                   rrv_ll_M,
-                   rrv_bb_M,
-                   rrv_zeebb_M,
-                   rrv_zmmbb_M,
-                   rrv_pT,
-                   rrv_pT_unc,
-                   rrv_eta
-                   rc_HE,
-                   rc_HP,
-                   rc_HEMET,
-                   rc_HPMET,
-                   rc_HE_excl,
-                   rc_HP_excl,
-                   rc_HEMET_excl,
-                   rc_HPMET_excl,
-                   )
+obsSet = RooArgSet(rrv_SV_M)
+obsSet.add(rrv_ll_M)
+obsSet.add(rrv_bb_M)
+obsSet.add(rrv_zeebb_M)
+obsSet.add(rrv_zmmbb_M)
+obsSet.add(rrv_pT)
+obsSet.add(rrv_pT_unc)
+obsSet.add(rrv_eta)
+obsSet.add(rc_HE)
+obsSet.add(rc_HP)
+obsSet.add(rc_HEMET)
+obsSet.add(rc_HPMET)
+obsSet.add(rc_HE_excl)
+obsSet.add(rc_HP_excl)
+obsSet.add(rc_HEMET_excl)
+obsSet.add(rc_HPMET_excl)
+
 
 rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 
@@ -150,6 +150,9 @@ def unc_tot_jet(jet):
 ########################
 
 def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
+    print "channel   = ", channel
+    print "muChannel = ", _muChan
+    print "path      = ", _path
     i=0
     dirList=os.listdir(_path)
     files=[]
