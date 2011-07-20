@@ -20,14 +20,16 @@
 from ROOT import *
 import os
 
-WP =  "HE"
+WP =  "HP_excl"
 
 ### Getting a file and a tree
 
-file = { "HP"    : TFile("bTagPurRDS_HP.root") ,
-         "HPMET" : TFile("bTagPurRDS_HP.root") ,
-         "HE"    : TFile("bTagPurRDS_QCD_2_HE.root"),
-         "HEMET" : TFile("bTagPurRDS_QCD_2_HE.root")
+file = { "HP"      : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
+         "HPMET"   : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
+         "HP_excl" : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
+         "HE"      : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
+         "HEMET"   : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
+         "HE_excl" : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
          }
 ws = file[WP].Get("ws")
 myRDS = ws.data("myRDS");
@@ -45,10 +47,13 @@ f_data = TFile("File_rds_zbb_El_DATA.root")
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
 
-if WP=="HE"   : DATA=DATA.reduce("rc_HE==1")
-if WP=="HEMET": DATA=DATA.reduce("rc_HEMET==1")
-if WP=="HP"   : DATA=DATA.reduce("rc_HP==1")
-if WP=="HPMET": DATA=DATA.reduce("rc_HPMET==1")
+if WP=="HE"      : DATA=DATA.reduce("rc_HE==1")
+if WP=="HEMET"   : DATA=DATA.reduce("rc_HEMET==1")
+if WP=="HE_excl" : DATA=DATA.reduce("rc_HE_excl==1")
+if WP=="HP"      : DATA=DATA.reduce("rc_HP==1")
+if WP=="HPMET"   : DATA=DATA.reduce("rc_HPMET==1")
+if WP=="HP_excl" : DATA=DATA.reduce("rc_HP_excl==1")
+
 
 RAS = DATA.get()
 DATA_withunc = RooDataSet("rds_zbb_with_unc","rds_zbb_with_unc",RAS)
@@ -57,7 +62,7 @@ for i in range(0,DATA.numEntries()):
     RASi = DATA.get(i)
     ptVal = RASi.getRealValue("rrv_pT")
     ptuncVal = RASi.getRealValue("rrv_pT_unc")*ptVal
-    RAS.setRealValue("rrv_pT",ptVal+5.*ptuncVal)
+    RAS.setRealValue("rrv_pT",ptVal+0.*ptuncVal)
     DATA_withunc.add(RAS)
 
 DATA = DATA_withunc

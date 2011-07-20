@@ -400,7 +400,7 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV"):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", massWindow=30.):
   """Check analysis requirements for various steps."""
   output = []
   bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
@@ -415,7 +415,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(0)
   else: 
     output.append(1)
-    if abs(bestZcandidate.mass()-91.1876)<30.:
+    if abs(bestZcandidate.mass()-91.1876)<massWindow:
       output.append(1)
     else:
       output.append(0)
