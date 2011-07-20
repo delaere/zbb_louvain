@@ -355,27 +355,42 @@ C1.Divide(2)
 C1.cd(1)
 freem = rrv_msv.frame(0,5,40)
 
-DATA.plotOn(freem,RooLinkedList())
-sumPdf.plotOn(freem,RooFit.LineColor(kBlack))
-sumPdf.plotOn(freem,RooFit.Components("b_sumPdf"),RooFit.LineColor(kRed),  RooFit.LineStyle(kDashed))
-sumPdf.plotOn(freem,RooFit.Components("c_sumPdf"),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
-sumPdf.plotOn(freem,RooFit.Components("l_sumPdf"),RooFit.LineColor(kBlue), RooFit.LineStyle(kDashed))
+DATA.plotOn(freem,
+            RooLinkedList(),
+            RooFit.MarkerSize(1.3),
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
+sumPdf.plotOn(freem,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
+sumPdf.plotOn(freem,RooFit.Components("b_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kRed),  RooFit.LineStyle(kDashed))
+sumPdf.plotOn(freem,RooFit.Components("c_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
+sumPdf.plotOn(freem,RooFit.Components("l_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kBlue), RooFit.LineStyle(kDashed))
+DATA.plotOn(freem,
+            RooLinkedList(),
+            RooFit.MarkerSize(1.3),
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
 sumPdf.paramOn(freem,DATA)
 freem.Draw()
 
 C1.cd(2)
 freem2 = rrv_msv.frame(0,5,40)
-
+               
+DATA.plotOn(freem2,RooLinkedList(),
+            RooFit.MarkerSize(1.3),
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"), RooFit.FillColor(kBlue), RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("c_sumPdf,b_sumPdf"),          RooFit.FillColor(kGreen),RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("c_sumPdf,b_sumPdf"),          RooFit.FillColor(kGreen),RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
+sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.LineColor(kBlack))
 DATA.plotOn(freem2,RooLinkedList())
-sumPdf2.plotOn(freem2,RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"), RooFit.FillColor(kBlue), RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("c_sumPdf,b_sumPdf"),          RooFit.FillColor(kGreen),RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("c_sumPdf,b_sumPdf"),          RooFit.FillColor(kGreen),RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
-sumPdf2.plotOn(freem2,RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.LineColor(kBlack))
-DATA.plotOn(freem2,RooLinkedList())
-sumPdf2.paramOn(freem2,DATA)
+sumPdf2.paramOn(freem2,DATA,
+                RooFit.MarkerSize(1.3),
+                RooFit.XErrorSize(0.035),
+                RooFit.DrawOption("pe2"))
 freem2.Draw()
 
 #C1.cd(3)

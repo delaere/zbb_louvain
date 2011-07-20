@@ -104,7 +104,9 @@ DATA_HE.plotOn(frame1,
                RooFit.MarkerSize(1.3),
                RooFit.XErrorSize(0.035),
                RooFit.DrawOption("pe2"))
-sumPdf.plotOn(frame1,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
+sumPdf.plotOn(frame1,
+              RooFit.LineWidth(1),
+              RooFit.LineColor(kBlack))
 sumPdf.plotOn(frame1,
               RooFit.Components("myRHP_Ttbar_Mu_MC"),
               RooFit.LineStyle(kDashed),
@@ -132,9 +134,9 @@ DATA_HE.plotOn(frame2,
                RooFit.XErrorSize(0.035),
                RooFit.DrawOption("pe2"))
 sumPdf2.plotOn(frame2,
+               RooFit.FillColor(kBlue),
                RooFit.Components("myRHP_Ttbar_Mu_MC,myRHP_Mu_MC"),
                RooFit.DrawOption("F"),
-               RooFit.FillColor(kBlue),
                RooFit.LineColor(kBlack),
                RooFit.LineWidth(1))
 sumPdf2.plotOn(frame2,
@@ -159,20 +161,23 @@ DATA_HP.plotOn(frame3,
                RooFit.MarkerSize(1.3),
                RooFit.XErrorSize(0.035),
                RooFit.DrawOption("pe2"))
-sumPdf3.plotOn(frame3,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
 sumPdf3.plotOn(frame3,
-              RooFit.Components("myRHP_Ttbar_Mu_MC"),
-              RooFit.LineStyle(kDashed),
-              RooFit.LineColor(kYellow))
+               RooFit.LineWidth(1),
+               RooFit.LineColor(kBlack))
 sumPdf3.plotOn(frame3,
-              RooFit.Components("myRHP_Mu_MC"),      
-              RooFit.LineStyle(kDashed),
-              RooFit.LineColor(kBlue))
+               RooFit.Components("myRHP_Ttbar_Mu_MC"),
+               RooFit.LineWidth(1),
+               RooFit.LineStyle(kDashed),
+               RooFit.LineColor(kYellow))
+sumPdf3.plotOn(frame3,
+               RooFit.Components("myRHP_Mu_MC"),      
+               RooFit.LineWidth(1),
+               RooFit.LineStyle(kDashed),
+               RooFit.LineColor(kBlue))
 DATA_HP.plotOn(frame3,
                RooFit.MarkerSize(1.3),
                RooFit.XErrorSize(0.035),
                RooFit.DrawOption("pe2"))
-sumPdf3.paramOn(frame3,DATA_HP)
 frame3.Draw()
 
 sumPdf4=sumPdf2
@@ -199,7 +204,6 @@ DATA_HP.plotOn(frame4,
                RooFit.MarkerSize(1.3),
                RooFit.XErrorSize(0.035),
                RooFit.DrawOption("pe2"))
-sumPdf4.paramOn(frame4,DATA_HP)
 frame4.Draw()
 
 sumPdf5=sumPdf
@@ -215,13 +219,15 @@ sumPdf5.plotOn(frame5,
                RooFit.LineWidth(1),
                RooFit.LineColor(kBlack))
 sumPdf5.plotOn(frame5,
-              RooFit.Components("myRHP_Ttbar_Mu_MC"),
-              RooFit.LineStyle(kDashed),
-              RooFit.LineColor(kYellow))
+               RooFit.Components("myRHP_Ttbar_Mu_MC"),
+               RooFit.LineStyle(kDashed),
+               RooFit.LineWidth(1),
+               RooFit.LineColor(kYellow))
 sumPdf5.plotOn(frame5,
-              RooFit.Components("myRHP_Mu_MC"),      
-              RooFit.LineStyle(kDashed),
-              RooFit.LineColor(kBlue))
+               RooFit.Components("myRHP_Mu_MC"),      
+               RooFit.LineStyle(kDashed),
+               RooFit.LineWidth(1),
+               RooFit.LineColor(kBlue))
 DATA_HEMET.plotOn(frame5,
                   RooFit.MarkerSize(1.3),
                   RooFit.XErrorSize(0.035),
@@ -252,7 +258,6 @@ DATA_HEMET.plotOn(frame6,
                   RooFit.MarkerSize(1.3),
                   RooFit.XErrorSize(0.035),
                   RooFit.DrawOption("pe2"))
-sumPdf6.paramOn(frame6,DATA_HEMET)
 frame6.Draw()
 
 sumPdf7=sumPdf
@@ -265,18 +270,17 @@ DATA_HPMET.plotOn(frame7,
                   RooFit.XErrorSize(0.035),
                   RooFit.DrawOption("pe2"))
 sumPdf7.plotOn(frame7,
-               RooFit.LineWidth(1),RooFit.LineColor(kBlack))
+               RooFit.LineWidth(1),
+               RooFit.LineColor(kBlack))
 sumPdf7.plotOn(frame7,
               RooFit.Components("myRHP_Ttbar_Mu_MC"),
               RooFit.LineStyle(kDashed),
               RooFit.LineColor(kYellow),
-               RooFit.LineColor(kBlack),
                RooFit.LineWidth(1))
 sumPdf7.plotOn(frame7,
               RooFit.Components("myRHP_Mu_MC"),      
               RooFit.LineStyle(kDashed),
               RooFit.LineColor(kBlue),
-               RooFit.LineColor(kBlack),
                RooFit.LineWidth(1))
 DATA_HPMET.plotOn(frame7,
                   RooFit.MarkerSize(1.3),
@@ -294,13 +298,14 @@ DATA_HPMET.plotOn(frame8,
                   RooFit.MarkerSize(1.3),
                   RooFit.XErrorSize(0.035),
                   RooFit.DrawOption("pe2"))
-sumPdf8.plotOn(frame8)
-sumPdf8.plotOn(frame8,RooFit.Components("myRHP_Ttbar_Mu_MC,myRHP_Mu_MC"),      
+sumPdf8.plotOn(frame8,
+               RooFit.Components("myRHP_Ttbar_Mu_MC,myRHP_Mu_MC"),      
                RooFit.DrawOption("F"),
                RooFit.FillColor(kBlue),
                RooFit.LineColor(kBlack),
                RooFit.LineWidth(1))
-sumPdf8.plotOn(frame8,RooFit.Components("myRHP_Ttbar_Mu_MC"),
+sumPdf8.plotOn(frame8,
+               RooFit.Components("myRHP_Ttbar_Mu_MC"),
                RooFit.DrawOption("F"),
                RooFit.FillColor(kYellow),
                RooFit.LineColor(kBlack),
@@ -309,7 +314,6 @@ DATA_HPMET.plotOn(frame8,
                   RooFit.MarkerSize(1.3),
                   RooFit.XErrorSize(0.035),
                   RooFit.DrawOption("pe2"))
-sumPdf8.paramOn(frame8,DATA_HPMET)
 frame8.Draw()
 
-print "FRAC IN SIG RANGE", frac_in_sig_range
+print "FRAC IN SIG RANGE", frac_in_sig_range.getVal()
