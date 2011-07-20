@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+print "beginning of script"
+
 ############################################################################################
 ############################################################################################
 ###                                                                                      ### 
@@ -31,7 +33,11 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
+<<<<<<< makeRDS_2.py
+channel = "Mu_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+=======
 channel = "El_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+>>>>>>> 1.4
 
 ############
 ### Maps ###
@@ -45,8 +51,13 @@ muChannel = { "Mu_DATA"     : True,
               "Ttbar_El_MC" : False
               }
 
+<<<<<<< makeRDS_2.py
+path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Mu_2011A_1078pb_v4/" ,
+         "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Ele_2011A_1078pb_v4/",
+=======
 path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot702pb_PromptV4/Mu_2011A_702pb_v4/" ,
          "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Ele_2011A_1078pb_v4/",
+>>>>>>> 1.4
          "Ttbar_Mu_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Ttbar_El_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Mu_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/",
@@ -127,6 +138,8 @@ rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 ### JEC ###
 ###########
 
+print "getting JEC stuff"
+
 AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
 test = JetCorrectionUncertainty("./Jec10V1_Uncertainty_KT4PF.txt")
@@ -148,6 +161,8 @@ def unc_tot_jet(jet):
 ########################
 ### Run Forest, run! ###
 ########################
+
+print "before run"
 
 def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     print "channel   = ", channel
