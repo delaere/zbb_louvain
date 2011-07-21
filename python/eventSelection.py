@@ -333,6 +333,10 @@ def categoryName(category):
   elif category==12: return "Z+bb (HEHE+MET)"
   elif category==13: return "Z+bb (HEHP+MET)"
   elif category==14: return "Z+bb (HPHP+MET)"
+  elif category==15: return "Z+1b (HE exclusive)"
+  elif category==16: return "Z+1b (HP exclusive)"
+  elif category==17: return "Z+1b (HE exclusive + MET)"
+  elif category==18: return "Z+1b (HP exclusive + MET)"
   # other does not exist
   else:
     return "None"
@@ -386,10 +390,10 @@ def isInCategory(category, categoryTuple):
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # categoty 15: Z+1b (HE exclusive)
   elif category==15:
-    return categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
-    return categoryTuple[5]==1 and categoryTuple[5]==categoryTuple[6]  
+    return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 17: Z+1b (HE exclusive + MET)
   elif category==17:
     return isInCategory( 15, categoryTuple ) and categoryTuple[7]>0
