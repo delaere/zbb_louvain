@@ -48,7 +48,7 @@ muChannel = { "Mu_DATA"     : True,
 muSel = { True  : "muSel",
           False : "elSel" }
 
-path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot702pb_PromptV4/Mu_2011A_702pb_v4/" ,
+path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Mu_2011A_1078pb_v4/" ,
          "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Ele_2011A_1078pb_v4/",
          "Ttbar_Mu_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Ttbar_El_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
