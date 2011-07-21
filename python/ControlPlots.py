@@ -49,13 +49,13 @@ import os
 import itertools
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
+from btaggingWeight import btaggingWeight
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from LumiReWeightingControlPlots import *
-from btaggingWeight import btaggingWeight
+from BtaggingReWeightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
- #from eventSelection_Test_JES import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
 jetHandle = Handle ("vector<pat::Jet>")
@@ -110,13 +110,14 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   vertexPlots=[]
   selectionPlots=[]
   lumiReWeightingPlots=[]
+  btagReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
     else:
       channelDir = output.mkdir("EEChannel")
     for level in range(eventCategories()):
-      levelDir = channelDir.mkdir("stage_"+str(level))
+      levelDir = channelDir.mkdir("stage_"+str(level),categoryName(level))
       allmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("allmuons")))
       loosemuonsPlots.append(MuonsControlPlots(levelDir.mkdir("loosemuons")))
       tightmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("tightmuons")))
@@ -128,7 +129,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
       if handlePU: 
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
-      #TODO: we do not have control plots for Beff reweighting
+      if handleBT:
+        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -155,6 +157,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       selectionPlots[level].beginJob(btagging=btagAlgo)
       if handlePU: 
         lumiReWeightingPlots[level].beginJob(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
+      if handleBT:
+        btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
 
   # the PU reweighting engine
   if handlePU: 
@@ -209,6 +213,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         selectionPlots[level].processEvent(event, eventWeight)
         if handlePU: 
           lumiReWeightingPlots[level].processEvent(event, eventWeight)
+	if handleBT:
+	  btagReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
     i += 1
 
   # save all
@@ -229,6 +235,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
      selectionPlots[level].endJob()
      if handlePU: 
        lumiReWeightingPlots[level].endJob()
+     if handleBT:
+       btagReWeightingPlots[level].endJob()
   output.Close()
 
 def main(options):
