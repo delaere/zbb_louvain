@@ -31,7 +31,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "El_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 
 ############
 ### Maps ###
@@ -147,7 +147,7 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     for fname in dirList:
         files.append(_path+fname)
     print files
-    files = files[:1000]
+    files = files[:10]
     print files
     events = Events (files)
 
