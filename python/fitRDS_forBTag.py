@@ -20,7 +20,11 @@
 from ROOT import *
 import os
 
-WP =  "HP_excl"
+WP =  "HE"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
+channel = "Mu"    #"El","Mu"
+template = "hist" #"keys", "hist"
+jec = 0           #1,3,5  
+
 
 ### Getting a file and a tree
 
@@ -43,7 +47,10 @@ rrv_pT     = ws.var("rrv_pT")
 rrv_pT_unc = ws.var("rrv_pT_unc")
 rc_flav    = ws.cat("rc_flav")
 
-f_data = TFile("File_rds_zbb_El_DATA.root")
+f_data = 0
+if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA.root")
+elif channel == "Mu" : f_data = TFile("File_rds_zbb_Mu_DATA_muSel_forBTag.root")
+
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
 
@@ -62,7 +69,7 @@ for i in range(0,DATA.numEntries()):
     RASi = DATA.get(i)
     ptVal = RASi.getRealValue("rrv_pT")
     ptuncVal = RASi.getRealValue("rrv_pT_unc")*ptVal
-    RAS.setRealValue("rrv_pT",ptVal+0.*ptuncVal)
+    RAS.setRealValue("rrv_pT",ptVal+jec*ptuncVal)
     DATA_withunc.add(RAS)
 
 DATA = DATA_withunc
@@ -295,12 +302,9 @@ FRAME2.Draw()
 
 print "making the three keys pdfs" 
 
-b_sumPdf = RooAddPdf("b_sumPdf","b_sumPdf",b_pdfList,fracList)
-c_sumPdf = RooAddPdf("c_sumPdf","c_sumPdf",c_pdfList,fracList)
-l_sumPdf = RooAddPdf("l_sumPdf","l_sumPdf",l_pdfList,fracList)
-#b_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_l)
-#c_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_c)
-#l_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_b)
+b_sumPdf=0
+c_sumPdf=0
+l_sumPdf=0
 
 print "making the three hist pdfs"
 
@@ -308,29 +312,34 @@ myRDS_l = RDS_sum_weighted.reduce("rc_flav==1")
 myRDS_c = RDS_sum_weighted.reduce("rc_flav==4")
 myRDS_b = RDS_sum_weighted.reduce("rc_flav==5")
 
-#b_sumHist = RooDataHist("b_sumHist", "b_sumHist", RooArgSet(rrv_pT), myRDS_b)
-#b_sumPdf  = RooHistPdf( "b_sumPdf",  "b_sumPdf",  RooArgSet(rrv_pT), b_sumHist)
-#c_sumHist = RooDataHist("c_sumHist", "c_sumHist", RooArgSet(rrv_pT), myRDS_c)
-#c_sumPdf  = RooHistPdf( "c_sumPdf",  "c_sumPdf",  RooArgSet(rrv_pT), c_sumHist)
-#l_sumHist = RooDataHist("l_sumHist", "l_sumHist", RooArgSet(rrv_pT), myRDS_l)
-#l_sumPdf  = RooHistPdf( "l_sumPdf",  "l_sumPdf",  RooArgSet(rrv_pT), l_sumHist)
-
-
-
+if template == "keys":
+    b_sumPdf = RooAddPdf("b_sumPdf","b_sumPdf",b_pdfList,fracList)
+    c_sumPdf = RooAddPdf("c_sumPdf","c_sumPdf",c_pdfList,fracList)
+    l_sumPdf = RooAddPdf("l_sumPdf","l_sumPdf",l_pdfList,fracList)
+    #b_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_l)
+    #c_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_c)
+    #l_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_b)
+elif template == "hist":
+    b_sumHist = RooDataHist("b_sumHist", "b_sumHist", RooArgSet(rrv_msv), myRDS_b)
+    b_sumPdf  = RooHistPdf( "b_sumPdf",  "b_sumPdf",  RooArgSet(rrv_msv), b_sumHist)
+    c_sumHist = RooDataHist("c_sumHist", "c_sumHist", RooArgSet(rrv_msv), myRDS_c)
+    c_sumPdf  = RooHistPdf( "c_sumPdf",  "c_sumPdf",  RooArgSet(rrv_msv), c_sumHist)
+    l_sumHist = RooDataHist("l_sumHist", "l_sumHist", RooArgSet(rrv_msv), myRDS_l)
+    l_sumPdf  = RooHistPdf( "l_sumPdf",  "l_sumPdf",  RooArgSet(rrv_msv), l_sumHist)
 
 #Nb = RooRealVar("Nb","Nb",myRDS.numEntries()*0.6,0,myRDS.numEntries())
 #Nc = RooRealVar("Nc","Nc",myRDS.numEntries()*0.3,0,myRDS.numEntries())
 #Nl = RooRealVar("Nl","Nl",myRDS.numEntries()*0.1,0,myRDS.numEntries())
 
-Nb = RooRealVar("Nb","Nb",myRDS.numEntries()*0.6,0,myRDS.numEntries())
-Nc = RooRealVar("Nc","Nc",myRDS.numEntries()*0.3,0,myRDS.numEntries())
-Nl = RooRealVar("Nl","Nl",myRDS.numEntries()*0.1,0,myRDS.numEntries())
+Nb = RooRealVar("N_{b}","N_{b}",myRDS.numEntries()*0.6,0,myRDS.numEntries())
+Nc = RooRealVar("N_{c}","N_{c}",myRDS.numEntries()*0.3,0,myRDS.numEntries())
+Nl = RooRealVar("N_{l}","N_{l}",myRDS.numEntries()*0.1,0,myRDS.numEntries())
 
 #f_Sum_b = RooRealVar("f_Sum_b","f_Sum_b",0.6,0.,1.)
 #f_Sum_c = RooRealVar("f_Sum_c","f_Sum_c",0.6,0.,1.)
 
-f_Sum_b = RooRealVar("f_Sum_b","f_Sum_b",0.6,0.,1.)
-f_Sum_c = RooRealVar("f_Sum_c","f_Sum_c",0.3,0.,1.)
+f_Sum_b = RooRealVar("f_{b}","f_{b}",0.6,0.,1.)
+f_Sum_c = RooRealVar("f_{c}","f_{c}",0.3,0.,1.)
 
 
 
@@ -342,6 +351,7 @@ sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
                     RooArgList(f_Sum_b,  f_Sum_c            ) )
 
 rrv_msv.setRange("r",0,5)
+rrv_msv.SetTitle("m(SV) (GeV/c^{2})")
 
 print " fit DATA with JES"
 
@@ -349,14 +359,15 @@ sumPdf.fitTo(DATA,RooFit.Extended(),RooFit.Range("r"))
 
 sumPdf2.fitTo(DATA,RooFit.Range("r"))
 
-C1 = TCanvas("C1","C1",1000,400)
+gROOT.SetStyle("Plain")
+
+C1 = TCanvas("C1","C1",1000,450)
 C1.Divide(2)
 
 C1.cd(1)
 freem = rrv_msv.frame(0,5,40)
 
 DATA.plotOn(freem,
-            RooLinkedList(),
             RooFit.MarkerSize(1.3),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
@@ -365,7 +376,6 @@ sumPdf.plotOn(freem,RooFit.Components("b_sumPdf"),RooFit.LineWidth(1),RooFit.Lin
 sumPdf.plotOn(freem,RooFit.Components("c_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
 sumPdf.plotOn(freem,RooFit.Components("l_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kBlue), RooFit.LineStyle(kDashed))
 DATA.plotOn(freem,
-            RooLinkedList(),
             RooFit.MarkerSize(1.3),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
@@ -375,7 +385,7 @@ freem.Draw()
 C1.cd(2)
 freem2 = rrv_msv.frame(0,5,40)
                
-DATA.plotOn(freem2,RooLinkedList(),
+DATA.plotOn(freem2,
             RooFit.MarkerSize(1.3),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
@@ -386,18 +396,42 @@ sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("c_sumPdf,b_sumPdf")
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("c_sumPdf,b_sumPdf"),          RooFit.FillColor(kGreen),RooFit.LineColor(kBlack))
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.LineColor(kBlack))
-DATA.plotOn(freem2,RooLinkedList())
-sumPdf2.paramOn(freem2,DATA,
-                RooFit.MarkerSize(1.3),
-                RooFit.XErrorSize(0.035),
-                RooFit.DrawOption("pe2"))
+DATA.plotOn(freem2,
+            RooFit.MarkerSize(1.3),
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
+sumPdf2.paramOn(freem2,DATA)
 freem2.Draw()
+
+# TLegend* leg1 = new TLegend(0.50, 0.5625, 0.85, 0.95-0.20, "", "NDC");
+# // leg1->AddEntry( f_frac->getObject(0), "data ");
+# leg1->AddEntry( f_frac->getObject(0), "Data ","PLE");
+# leg1->AddEntry( f_frac->getObject(5), "b-jets"  ,"F");
+# leg1->AddEntry( f_frac->getObject(3), "c-jets"  ,"F");
+
+# leg1->SetFillColor(0);
+# leg1->SetShadowColor(0);
+
+# leg1->Draw();
+
+# TLatex lat;
+# lat.DrawLatex(2.,14.,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 36 pb^{-1}}");
+
+# TLatex lat;
+# lat.DrawLatex(2.5,6,"High purity b-tagging");
+            
 
 #C1.cd(3)
 #freem3 = rrv_pT.frame(0,250)
 #DATA.plotOn(freem3,RooLinkedList())
 #sumPdf2.plotOn(freem3,RooFit.LineColor(kBlack))
 #freem3.Draw()
+
+jecString=""
+if jec : jecString+=str(jec)+"sigmaJEC"
+
+if template == "hist":   C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_"+channel+"_"+WP+"_"+template+"_"+jecString+".pdf")
+elif template == "keys": C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_"+channel+"_"+WP+"_"+jecString+".pdf")
 
 C_msv_perpT_flav = TCanvas("C_msv_perpT_flav","C_msv_perpT_flav",1500,400)
 C_msv_perpT_flav.Divide(3)
