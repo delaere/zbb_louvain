@@ -34,7 +34,7 @@ parser.add_option("--noPUweight",action="store_true",dest="noPUweight",
                   help="Do not reweight according to PU.")
 parser.add_option("--noBweight",action="store_true",dest="noBweight",
                   help="Do not reweight accodring to btagging.")
-parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default="performance_ssv.root",
+parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default="performance_ssv_witheff.root",
                   help="Read btagging efficiencies and SF from file.", metavar="file")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")

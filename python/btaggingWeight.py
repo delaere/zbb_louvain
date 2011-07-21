@@ -10,7 +10,7 @@ ROOT.gSystem.Load("libUserCodezbb_louvain.so")
 class btaggingWeight:
   """compute the event weight based on btagging SF"""
 
-  def __init__(self,jmin1,jmax1,jmin2,jmax2, file="../testfiles/performance_ssv.root"):
+  def __init__(self,jmin1,jmax1,jmin2,jmax2, file="../testfiles/performance_ssv_witheff.root"):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
     self.jetHandle = Handle ("vector<pat::Jet>")
     self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")

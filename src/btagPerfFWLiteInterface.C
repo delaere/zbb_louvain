@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "TFile.h"
+#include "TH1F.h"
 #include "DataFormats/FWLite/interface/Record.h"
 #include "DataFormats/FWLite/interface/EventSetup.h"
 #include "DataFormats/FWLite/interface/ESHandle.h"
@@ -53,6 +54,15 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
     perfMISTAGSSVHPT_ = new BtagPerformance(*plHandleMISTAGSSVHPT_, *wpHandleMISTAGSSVHPT_);
   else 
     perfMISTAGSSVHPT_ = NULL;
+  // load data for the efficiency curves
+  h_eff_ssvhem_b_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb1_brl");
+  h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb1_fwd");
+  h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc1_brl");
+  h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc1_fwd");
+  h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb1_brl");
+  h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb1_fwd");
+  h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc1_brl");
+  h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc1_fwd");
 }
 
 btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
@@ -62,9 +72,17 @@ btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
   if(perfBTAGSSVHEM_) delete perfBTAGSSVHEM_;
   delete es_;
   esdata_->Close();
+  delete h_eff_ssvhem_b_brl_;
+  delete h_eff_ssvhem_b_fwd_;
+  delete h_eff_ssvhem_c_brl_;
+  delete h_eff_ssvhem_c_fwd_;
+  delete h_eff_ssvhpt_b_brl_;
+  delete h_eff_ssvhpt_b_fwd_;
+  delete h_eff_ssvhpt_c_brl_;
+  delete h_eff_ssvhpt_c_fwd_;
 }
 
-double btagPerfFWLiteInterface::getbEffScaleFactor(int flavor, int algo, double pt, double eta) {
+double btagPerfFWLiteInterface::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
   BinningPointByMap p;
   p.insert(BinningVariables::JetAbsEta,fabs(eta));
   p.insert(BinningVariables::JetEt,pt);
@@ -90,14 +108,32 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(int flavor, int algo, double 
   }
 }
 
-double btagPerfFWLiteInterface::getbEfficiency(int flavor, int algo, double pt, double eta) {
+double btagPerfFWLiteInterface::getbEfficiency(int flavor, int algo, double pt, double eta) const {
   switch(flavor) {
     case 5:
       // this is not in the db and must be parametrized from OUR mc
-      return algo==1 ? 0.6 : 0.4 ; // FAKE !!!
+      if(fabs(eta)<1.2 && algo==1) 
+        return h_eff_ssvhem_b_brl_->GetBinContent(h_eff_ssvhem_b_brl_->FindBin(pt));
+      else if(fabs(eta)>1.2 && algo==1)
+        return h_eff_ssvhem_b_fwd_->GetBinContent(h_eff_ssvhem_b_fwd_->FindBin(pt));
+      else if(fabs(eta)<1.2 && algo==2)
+        return h_eff_ssvhpt_b_brl_->GetBinContent(h_eff_ssvhpt_b_brl_->FindBin(pt));
+      else if(fabs(eta)>1.2 && algo==2)
+        return h_eff_ssvhpt_b_fwd_->GetBinContent(h_eff_ssvhpt_b_fwd_->FindBin(pt));
+      else 
+        return 0.;
     case 4:
       // this is not in the db and must be parametrized from OUR mc
-      return algo==1 ? 0.08 : 0.008; // FAKE !!!
+      if(fabs(eta)<1.2 && algo==1) 
+        return h_eff_ssvhem_c_brl_->GetBinContent(h_eff_ssvhem_c_brl_->FindBin(pt));
+      else if(fabs(eta)>1.2 && algo==1)
+        return h_eff_ssvhem_c_fwd_->GetBinContent(h_eff_ssvhem_c_fwd_->FindBin(pt));
+      else if(fabs(eta)<1.2 && algo==2)
+        return h_eff_ssvhpt_c_brl_->GetBinContent(h_eff_ssvhpt_c_brl_->FindBin(pt));
+      else if(fabs(eta)>1.2 && algo==2)
+        return h_eff_ssvhpt_c_fwd_->GetBinContent(h_eff_ssvhpt_c_fwd_->FindBin(pt));
+      else 
+        return 0.;
     default: {
       // difficult to measure the fake rate in our sample... use official mistag.
       BtagPerformance* perf_ = algo==1 ? perfMISTAGSSVHEM_ : perfMISTAGSSVHPT_ ;
