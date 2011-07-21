@@ -153,6 +153,7 @@ def unc_tot_jet(jet):
 ########################
 
 def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
+    print "*** RUN FOREST, RUN! ***" 
     print "channel   = ", channel
     print "muChannel = ", _muChan
     print "path      = ", _path
