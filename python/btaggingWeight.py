@@ -1,4 +1,3 @@
-
 from eventSelection import *
 # we use the class from Andrea, with an additional method to add jets to the "event"
 # that class also fills automatically the efficiency and SF.
@@ -6,7 +5,7 @@ import ROOT
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
-
+from DataFormats.FWLite import Events, Handle
 class btaggingWeight:
   """compute the event weight based on btagging SF"""
 
