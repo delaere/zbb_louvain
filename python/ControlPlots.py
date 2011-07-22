@@ -20,7 +20,7 @@ parser.add_option("--onlyMu",action="store_true",dest="onlyMu",
                   help="Fill only the muon channel plots.")
 parser.add_option("--onlyEle",action="store_true",dest="onlyEle",
                   help="Fill only the electron channel plots.")
-parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl"
+parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl",
                   help="Jet flavor filter. Examples: --jetFlavor b or --jetFlavor cl")
 parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
@@ -49,13 +49,13 @@ import os
 import itertools
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
-from btaggingWeight import btaggingWeight
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from LumiReWeightingControlPlots import *
-from BtaggingReWeightingControlPlots import *
+from btaggingWeight import btaggingWeight
 from eventSelection import eventCategories, eventCategory, isInCategory
+ #from eventSelection_Test_JES import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
 jetHandle = Handle ("vector<pat::Jet>")
@@ -110,14 +110,13 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   vertexPlots=[]
   selectionPlots=[]
   lumiReWeightingPlots=[]
-  btagReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
     else:
       channelDir = output.mkdir("EEChannel")
     for level in range(eventCategories()):
-      levelDir = channelDir.mkdir("stage_"+str(level),categoryName(level))
+      levelDir = channelDir.mkdir("stage_"+str(level))
       allmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("allmuons")))
       loosemuonsPlots.append(MuonsControlPlots(levelDir.mkdir("loosemuons")))
       tightmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("tightmuons")))
@@ -129,8 +128,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
       if handlePU: 
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
-      if handleBT:
-        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
+      #TODO: we do not have control plots for Beff reweighting
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -157,8 +155,6 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       selectionPlots[level].beginJob(btagging=btagAlgo)
       if handlePU: 
         lumiReWeightingPlots[level].beginJob(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
-      if handleBT:
-        btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
 
   # the PU reweighting engine
   if handlePU: 
@@ -213,8 +209,6 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         selectionPlots[level].processEvent(event, eventWeight)
         if handlePU: 
           lumiReWeightingPlots[level].processEvent(event, eventWeight)
-	if handleBT:
-	  btagReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
     i += 1
 
   # save all
@@ -235,8 +229,6 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
      selectionPlots[level].endJob()
      if handlePU: 
        lumiReWeightingPlots[level].endJob()
-     if handleBT:
-       btagReWeightingPlots[level].endJob()
   output.Close()
 
 def main(options):
