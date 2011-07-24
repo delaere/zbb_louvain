@@ -26,7 +26,7 @@ class JetSet {
     void reset() { jets_.clear(); }
   private:
     std::vector<JetInfo> jets_;
-    btagPerfFWLiteInterface* interface_;
+    boost::shared_ptr<btagPerfFWLiteInterface> interface_;
 };
 
 // the algorithm.
@@ -42,10 +42,10 @@ class BTagWeight
    bool filter(int t1, int t2) const;
    // compute the weight in the 1 algo case
    float weight(std::vector<JetInfo> jets, int algo, int ntags) const;
-   float weight(JetSet jets, int algo, int ntags) const { return weight(jets.getJets(),algo,ntags); }
+   float weight(JetSet& jets, int algo, int ntags) const { return weight(jets.getJets(),algo,ntags); }
    // compute the weight in the 2 algos case
    float weight2(std::vector<JetInfo> jets, int ntags1, int ntags2) const;
-   float weight2(JetSet jets, int ntags1, int ntags2) const { return weight2(jets.getJets(),ntags1,ntags2); }
+   float weight2(JetSet& jets, int ntags1, int ntags2) const { return weight2(jets.getJets(),ntags1,ntags2); }
  private:
    int maxTags1;
    int minTags1;

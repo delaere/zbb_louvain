@@ -8,9 +8,9 @@
 
 using namespace std; 
 
-JetSet::JetSet(const char* infile) { interface_ = new btagPerfFWLiteInterface(infile); }
+JetSet::JetSet(const char* infile) { interface_ = boost::shared_ptr<btagPerfFWLiteInterface>(new btagPerfFWLiteInterface(infile)); }
 
-JetSet::~JetSet() { delete interface_; }
+JetSet::~JetSet() { }
 
 void JetSet::addJet(int flavor, double et, double eta) { 
    jets_.push_back(JetInfo(interface_->getbEfficiency(flavor,1,et,eta),

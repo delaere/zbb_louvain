@@ -156,7 +156,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       vertexPlots[level].beginJob()
       selectionPlots[level].beginJob(btagging=btagAlgo)
       if handlePU: 
-        lumiReWeightingPlots[level].beginJob(MonteCarloFileName="MCpudist.root", DataFileName="pudist.root", MonteCarloHistName="pileup", DataHistName="pileup")
+        lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
       if handleBT:
         btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
 
@@ -189,19 +189,19 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 	if handleBT:
 	  if categoryName(level).find("(HE") != -1:
 	    BeffW.setMode("HE")
-	    eventWeight *= BeffW.weight2(event,muChannel)
+	    eventWeight *= BeffW.weight(event,muChannel)
 	  elif categoryName(level).find("(HP") != -1:
 	    BeffW.setMode("HP")
-	    eventWeight *= BeffW.weight2(event,muChannel)
+	    eventWeight *= BeffW.weight(event,muChannel)
 	  elif categoryName(level).find("(HEHE") != -1:
 	    BeffW.setMode("HEHE")
-	    eventWeight *= BeffW.weight2(event,muChannel)
+	    eventWeight *= BeffW.weight(event,muChannel)
 	  elif categoryName(level).find("(HEHP") != -1:
 	    BeffW.setMode("HEHP")
-	    eventWeight *= BeffW.weight2(event,muChannel)
+	    eventWeight *= BeffW.weight(event,muChannel)
 	  elif categoryName(level).find("(HPHP") != -1:
 	    BeffW.setMode("HPHP")
-	    eventWeight *= BeffW.weight2(event,muChannel)
+	    eventWeight *= BeffW.weight(event,muChannel)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
         #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)

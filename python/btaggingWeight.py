@@ -16,10 +16,10 @@ class btaggingWeight:
     self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
     self.myJetSet = ROOT.JetSet(file)
 
-  def setLimits(jmin1,jmax1,jmin2,jmax2):
+  def setLimits(self,jmin1,jmax1,jmin2,jmax2):
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
 
-  def setMode(mode):
+  def setMode(self,mode):
     if mode=="HE": self.engine.setLimits(1,999,0,999)
     elif mode=="HP": self.engine.setLimits(0,999,1,999)
     elif mode=="HEHE": self.engine.setLimits(2,999,0,999)
@@ -29,11 +29,11 @@ class btaggingWeight:
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)
     
-  def weight(event,muChannel):
+  def weight(self,event,muChannel):
     # retrieve the objects (jets and Z candidates)
-    event.getByLabel("cleanPatJets",jetHandle)
-    event.getByLabel("Ztighttight",zmuHandle)
-    event.getByLabel("Zelel",zeleHandle)
+    event.getByLabel("cleanPatJets",self.jetHandle)
+    event.getByLabel("Ztighttight",self.zmuHandle)
+    event.getByLabel("Zelel",self.zeleHandle)
     jets = self.jetHandle.product()
     zCandidatesMu  = self.zmuHandle.product()
     zCandidatesEle = self.zeleHandle.product()    
@@ -47,14 +47,14 @@ class btaggingWeight:
       # apply selection
       if not isGoodJet(jet, Z): continue
       # check flavor
-      flavor = jet.getPartonFlavor()
+      flavor = jet.partonFlavour()
       # check btagging
       if isBJet(jet,"HP","SSV"): ntagsHP += 1
       if isBJet(jet,"HE","SSV"): ntagsHE += 1
       # add to the jetset class
-      self.myJetSet.add(flavor,jet.et(),jet.eta())
+      self.myJetSet.addJet(flavor,jet.et(),jet.eta())
     return self.getWeight(self.myJetSet,ntagsHE,ntagsHP)
 
-  def getWeight(jetset, ntags1, ntags2):
+  def getWeight(self,jetset, ntags1, ntags2):
     return self.engine.weight2(jetset, ntags1, ntags2)
 

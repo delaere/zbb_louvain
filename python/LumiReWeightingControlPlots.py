@@ -29,7 +29,7 @@ class LumiReWeightingControlPlots:
       self.h_pv = ROOT.TH1F("pv","pv",50,0,50)
       self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
       # reweighting engine
-      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName)
+      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName, PileupSummaryInfo=self.PileupSummaryInfo)
       # fill the histogram with the configured weights
       for i in range(50): self.h_weightSetup.SetBinContent(i+1,self.engine.weight(npu=i))
       # handles
@@ -40,7 +40,7 @@ class LumiReWeightingControlPlots:
       self.pulabel = (pulabel)
     
     def processEvent(self,event, weight = 1.):
-      w = self.engine.weight( fwevent=event, PileupSummaryInfo=self.PileupSummaryInfo )
+      w = self.engine.weight( fwevent=event )
       self.h_weight.Fill(w)
       event.getByLabel (self.vertexlabel,self.vertexHandle)
       vs = self.vertexHandle.product()
@@ -52,8 +52,8 @@ class LumiReWeightingControlPlots:
           npu = pvi.getPU_NumInteractions()
       self.h_pu.Fill(npu, weight)
       self.h_pv.Fill(npv, weight)
-      self.h_pu_nw.Fill(npu, weight/w)
-      self.h_pv_nw.Fill(npv, weight/w)
+      if w>0: self.h_pu_nw.Fill(npu, weight/w)
+      if w>0: self.h_pv_nw.Fill(npv, weight/w)
 
     def endJob(self):
       self.dir.cd()

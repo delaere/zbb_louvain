@@ -21,11 +21,11 @@ class BtaggingReWeightingControlPlots:
     def beginJob(self, perfData="../testfiles/performance_ssv_witheff.root"):
       # declare histograms
       self.dir.cd()
-      self.h_he_w   = ROOT.TH1F("HE","HE",100,0,10)
-      self.h_hp_w   = ROOT.TH1F("HP","HP",100,0,10)
-      self.h_hehe_w = ROOT.TH1F("HEHE","HEHE",100,0,10)
-      self.h_hehp_w = ROOT.TH1F("HEHP","HEHP",100,0,10)
-      self.h_hphp_w = ROOT.TH1F("HPHP","HPHP",100,0,10)
+      self.h_he_w   = ROOT.TH1F("HE_w","HE",100,0,10)
+      self.h_hp_w   = ROOT.TH1F("HP_w","HP",100,0,10)
+      self.h_hehe_w = ROOT.TH1F("HEHE_w","HEHE",100,0,10)
+      self.h_hehp_w = ROOT.TH1F("HEHP_w","HEHP",100,0,10)
+      self.h_hphp_w = ROOT.TH1F("HPHP_w","HPHP",100,0,10)
       self.h_he   = ROOT.TH1F("HE","HE",100,0,10)
       self.h_hp   = ROOT.TH1F("HP","HP",100,0,10)
       self.h_hehe = ROOT.TH1F("HEHE","HEHE",100,0,10)
@@ -39,23 +39,23 @@ class BtaggingReWeightingControlPlots:
       self.engine.setMode("HE")
       w = self.engine.weight(event,muChannel)
       self.h_he_w.Fill(w,weight)
-      self.h_he.Fill(w)
+      if w!=0 : self.h_he.Fill(w,weight/w)
       self.engine.setMode("HP")
       w = self.engine.weight(event,muChannel)
       self.h_hp_w.Fill(w,weight)
-      self.h_hp.Fill(w)
+      if w!=0 : self.h_hp.Fill(w,weight/w)
       self.engine.setMode("HEHE")
       w = self.engine.weight(event,muChannel)
       self.h_hehe_w.Fill(w,weight)
-      self.h_hehe.Fill(w)
+      if w!=0 : self.h_hehe.Fill(w,weight/w)
       self.engine.setMode("HEHP")
       w = self.engine.weight(event,muChannel)
       self.h_hehp_w.Fill(w,weight)
-      self.h_hehp.Fill(w)
+      if w!=0 : self.h_hehp.Fill(w,weight/w)
       self.engine.setMode("HPHP")
       w = self.engine.weight(event,muChannel)
       self.h_hphp_w.Fill(w,weight)
-      self.h_hphp.Fill(w)
+      if w!=0 : self.h_hphp.Fill(w,weight/w)
 
     def endJob(self):
       self.dir.cd()
@@ -65,7 +65,7 @@ class BtaggingReWeightingControlPlots:
 
 def runTest():
   controlPlots = BtaggingReWeightingControlPlots()
-  path="/home/fynu/delaere/zbbAnalysis/CMSSW_4_2_3/src/UserCode/zbb_louvain/testfiles/"
+  path="../testfiles/ttbar/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -75,7 +75,7 @@ def runTest():
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
+    controlPlots.processEvent(event,muChannel=1)
     i += 1
   controlPlots.endJob()
 
