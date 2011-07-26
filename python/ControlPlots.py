@@ -33,7 +33,9 @@ parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default="PUdi
 parser.add_option("--noPUweight",action="store_true",dest="noPUweight",
                   help="Do not reweight according to PU.")
 parser.add_option("--noBweight",action="store_true",dest="noBweight",
-                  help="Do not reweight accodring to btagging.")
+                  help="Do not reweight according to btagging.")
+parser.add_option("--noLweight",action="store_true",dest="noLweight",
+                  help="Do not reweight according to leptons.")
 parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default="performance_ssv_witheff.root",
                   help="Read btagging efficiencies and SF from file.", metavar="file")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
@@ -49,6 +51,7 @@ import os
 import itertools
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
+from LeptonsReweighting import LeptonsReweighting
 from btaggingWeight import btaggingWeight
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
@@ -88,7 +91,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
 
-def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None):
+def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
@@ -131,6 +134,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
       if handleBT:
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
+      # TODO: no lepton reweighting control plots yet
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -166,6 +170,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
   if handleBT:
     BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)
+  if handleLeptonEff:
+    LeffW = LeptonsReWeighting()
 
   # process events
   i = 0
@@ -186,6 +192,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       for level in plots:
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight(fwevent=event)
+        if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event)
 	if handleBT:
 	  if categoryName(level).find("(HE") != -1:
 	    BeffW.setMode("HE")
@@ -295,7 +302,7 @@ def main(options):
     parser.print_help()
     return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName)
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight))
 
 if __name__ == "__main__":
   main(options)
