@@ -46,6 +46,15 @@ class VertexAssociationControlPlots:
       self.h_j1_ratio2b = ROOT.TH1F("j1_ratio2b","leading jet/vertex association ratio v2 using vertexing",100,0,1)
       self.h_j1_ratio3b = ROOT.TH1F("j1_ratio3b","leading jet/vertex association ratio v3 using vertexing",100,0,1)
       self.h_goodevent = ROOT.TH1F("goodevent","pass or not Z+jet to vertex association",2,0,2)
+      # some plots with only the jets associated to genjets. Filled only for MC, allows to check PU effect more directly.
+      # I do only duplicate some plots relevant for the PU study.
+      self.h_ratio1b_nopu = ROOT.TH1F("ratio1b_nopu","jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.h_ratio2b_nopu = ROOT.TH1F("ratio2b_nopu","jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.h_ratio3b_nopu = ROOT.TH1F("ratio3b_nopu","jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.h_j1_ratio1b_nopu = ROOT.TH1F("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.h_j1_ratio2b_nopu = ROOT.TH1F("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.h_j1_ratio3b_nopu = ROOT.TH1F("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
+      
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.zHandle = Handle ("vector<reco::CompositeCandidate>")
@@ -113,6 +122,7 @@ class VertexAssociationControlPlots:
         ptsumx = 0.
         ptsumy = 0.
         ptsumall = 0.
+        isMcPrimaryJet = not (jet.genJet() is None)
         for i in range(jet.getPFConstituents().size()):
           #make sure the object is usable
           #the last condition is a fix if we miss muons and electrons in the file, for rare occurences... 
@@ -162,15 +172,24 @@ class VertexAssociationControlPlots:
             ptsumy += jet.getPFConstituent(i).py()
           ptsumall += jet.getPFConstituent(i).pt()
         self.h_ratio1b.Fill(ptsum/jet.et(), weight) # control plot
-        if firstJet: self.h_j1_ratio1b.Fill(ptsum/jet.et(), weight) # control plot
+        if isMcPrimaryJet: self.h_ratio1b_nopu.Fill(ptsum/jet.et(), weight) # control plot
+        if firstJet: 
+          self.h_j1_ratio1b.Fill(ptsum/jet.et(), weight) # control plot
+          if isMcPrimaryJet: self.h_j1_ratio1b_nopu.Fill(ptsum/jet.et(), weight) # control plot
         if ptsumall>0 : 
           ratio = ptsum/ptsumall
         else:
           ratio = -1.
         self.h_ratio2b.Fill(ratio, weight) # control plot
-        if firstJet: self.h_j1_ratio2b.Fill(ratio, weight) # control plot
+        if isMcPrimaryJet: self.h_ratio2b_nopu.Fill(ratio, weight) # control plot
+        if firstJet: 
+          self.h_j1_ratio2b.Fill(ratio, weight) # control plot
+          if isMcPrimaryJet: self.h_j1_ratio2b_nopu.Fill(ratio, weight) # control plot
         self.h_ratio3b.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
-        if firstJet: self.h_j1_ratio3b.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+        if isMcPrimaryJet: self.h_ratio3b_nopu.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+        if firstJet: 
+          self.h_j1_ratio3b.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+          if isMcPrimaryJet: self.h_j1_ratio3b_nopu.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
         firstJet = False
       self.h_goodevent.Fill(checkVertexAssociation(bestZ, jets, vs), weight)
     
@@ -182,7 +201,8 @@ class VertexAssociationControlPlots:
 
 def runTest():
   controlPlots = VertexAssociationControlPlots()
-  path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
+  #path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
+  path="../testfiles/ttbar/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
