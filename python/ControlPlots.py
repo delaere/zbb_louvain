@@ -137,7 +137,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       if handleBT:
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
       if handleLeptonEff:
-        leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting")))
+        leptonsReWeightingPlots.append(LeptonsReWeightingControlPlots(levelDir.mkdir("leptonsReWeighting")))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
