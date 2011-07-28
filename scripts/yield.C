@@ -61,8 +61,10 @@ void yield(TCanvas* categoryPlot, unsigned initialStage)
       std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) <<h->GetBinContent(stage+1) << "+/-" << resetiosflags(ios::right);
       //std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << error << resetiosflags(ios::left);
       std::cout << setiosflags(ios::left) << setprecision(1) << setw(7) << h->GetBinError(stage+1) << resetiosflags(ios::left);
-      totmc += integral;
-      errmc += error*error;
+      //totmc += integral;
+      totmc += h->GetBinContent(stage+1);
+      //errmc += error*error;
+      errmc += h->GetBinError(stage+1)*h->GetBinError(stage+1);
     }
     std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << totmc << "+/-" << resetiosflags(ios::right);
     std::cout << setiosflags(ios::left) << setw(7) << sqrt(errmc) << resetiosflags(ios::left) << std::endl;
