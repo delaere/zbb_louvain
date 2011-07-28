@@ -195,6 +195,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 	else:
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       for level in plots:
+        # compute the weight 
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight(fwevent=event)
         if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event)
@@ -220,8 +221,10 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 	  if categoryName(level).find("(HPHP") != -1:
 	    BeffW.setMode("HPHP")
 	    eventWeight *= BeffW.weight(event,muChannel)
+        # security against negative weights 
+        if eventWeight<0: eventWeight=0
+        # fill the histograms
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)
-        #jetmetAK7PFPlots[level].processEvent(event, eventWeight)
         allmuonsPlots[level].processEvent(event, eventWeight)
         loosemuonsPlots[level].processEvent(event, eventWeight)
         tightmuonsPlots[level].processEvent(event, eventWeight)
