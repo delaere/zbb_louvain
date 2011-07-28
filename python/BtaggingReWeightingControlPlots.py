@@ -21,16 +21,16 @@ class BtaggingReWeightingControlPlots:
     def beginJob(self, perfData="../testfiles/performance_ssv_witheff.root"):
       # declare histograms
       self.dir.cd()
-      self.h_he_w   = ROOT.TH1F("HE_w","HE",100,0,10)
-      self.h_hp_w   = ROOT.TH1F("HP_w","HP",100,0,10)
-      self.h_hehe_w = ROOT.TH1F("HEHE_w","HEHE",100,0,10)
-      self.h_hehp_w = ROOT.TH1F("HEHP_w","HEHP",100,0,10)
-      self.h_hphp_w = ROOT.TH1F("HPHP_w","HPHP",100,0,10)
-      self.h_he   = ROOT.TH1F("HE","HE",100,0,10)
-      self.h_hp   = ROOT.TH1F("HP","HP",100,0,10)
-      self.h_hehe = ROOT.TH1F("HEHE","HEHE",100,0,10)
-      self.h_hehp = ROOT.TH1F("HEHP","HEHP",100,0,10)
-      self.h_hphp = ROOT.TH1F("HPHP","HPHP",100,0,10)
+      self.h_he_w   = ROOT.TH1F("HE_w","HE",200,0,2)
+      self.h_hp_w   = ROOT.TH1F("HP_w","HP",200,0,2)
+      self.h_hehe_w = ROOT.TH1F("HEHE_w","HEHE",200,0,2)
+      self.h_hehp_w = ROOT.TH1F("HEHP_w","HEHP",200,0,2)
+      self.h_hphp_w = ROOT.TH1F("HPHP_w","HPHP",200,0,2)
+      self.h_he   = ROOT.TH1F("HE","HE",200,0,2)
+      self.h_hp   = ROOT.TH1F("HP","HP",200,0,2)
+      self.h_hehe = ROOT.TH1F("HEHE","HEHE",200,0,2)
+      self.h_hehp = ROOT.TH1F("HEHP","HEHP",200,0,2)
+      self.h_hphp = ROOT.TH1F("HPHP","HPHP",200,0,2)
       # reweighting engine
       self.engine = btaggingWeight(0,999,0,999,perfData)
       # handles
