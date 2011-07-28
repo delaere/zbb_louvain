@@ -58,6 +58,7 @@ from eventSelectionControlPlots import *
 from vertexAssociationControlPlots import *
 from LumiReWeightingControlPlots import *
 from BtaggingReWeightingControlPlots import *
+from LeptonsReweightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
 
@@ -114,6 +115,7 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   selectionPlots=[]
   lumiReWeightingPlots=[]
   btagReWeightingPlots=[]
+  leptonsReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -134,7 +136,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
       if handleBT:
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
-      # TODO: no lepton reweighting control plots yet
+      if handleLeptonEff:
+        leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting")))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -163,6 +166,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
       if handleBT:
         btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
+      if handleLeptonEff:
+        leptonsReWeightingPlots[level].beginJob()
 
   # the PU reweighting engine
   if handlePU: 
@@ -228,6 +233,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
           lumiReWeightingPlots[level].processEvent(event, eventWeight)
 	if handleBT:
 	  btagReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
+        if handleLeptonEff:
+          leptonsReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
     i += 1
 
   # save all
