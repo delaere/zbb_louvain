@@ -33,8 +33,8 @@ class btaggingWeight:
     
   def weight(self,event,muChannel):
     # for data, immediately return 1.
-      if event.object().event().eventAuxiliary().isRealData():
-        return 1.
+    if event.object().event().eventAuxiliary().isRealData():
+      return 1.
     # retrieve the objects (jets and Z candidates)
     event.getByLabel("cleanPatJets",self.jetHandle)
     event.getByLabel("Ztighttight",self.zmuHandle)
