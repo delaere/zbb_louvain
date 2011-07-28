@@ -195,18 +195,24 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event)
 	if handleBT:
 	  if categoryName(level).find("(HE") != -1:
-	    BeffW.setMode("HE")
+            if categoryName(level).find("exclusive") != -1:
+              BeffW.setMode("HEexcl")
+            else:
+              BeffW.setMode("HE")
 	    eventWeight *= BeffW.weight(event,muChannel)
-	  elif categoryName(level).find("(HP") != -1:
-	    BeffW.setMode("HP")
+	  if categoryName(level).find("(HP") != -1:
+            if categoryName(level).find("exclusive") != -1:
+              BeffW.setMode("HPexcl")
+            else:
+              BeffW.setMode("HP")
 	    eventWeight *= BeffW.weight(event,muChannel)
-	  elif categoryName(level).find("(HEHE") != -1:
+	  if categoryName(level).find("(HEHE") != -1:
 	    BeffW.setMode("HEHE")
 	    eventWeight *= BeffW.weight(event,muChannel)
-	  elif categoryName(level).find("(HEHP") != -1:
+	  if categoryName(level).find("(HEHP") != -1:
 	    BeffW.setMode("HEHP")
 	    eventWeight *= BeffW.weight(event,muChannel)
-	  elif categoryName(level).find("(HPHP") != -1:
+	  if categoryName(level).find("(HPHP") != -1:
 	    BeffW.setMode("HPHP")
 	    eventWeight *= BeffW.weight(event,muChannel)
         jetmetAK5PFPlots[level].processEvent(event, eventWeight)

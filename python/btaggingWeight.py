@@ -22,6 +22,8 @@ class btaggingWeight:
   def setMode(self,mode):
     if mode=="HE": self.engine.setLimits(1,999,0,999)
     elif mode=="HP": self.engine.setLimits(0,999,1,999)
+    elif mode=="HEexcl": self.engine.setLimits(1,1,0,0)
+    elif mode=="HPexcl": self.engine.setLimits(1,1,1,1)
     elif mode=="HEHE": self.engine.setLimits(2,999,0,999)
     elif mode=="HEHP": self.engine.setLimits(1,999,1,999)
     elif mode=="HPHP": self.engine.setLimits(0,999,2,999)
@@ -30,6 +32,9 @@ class btaggingWeight:
       self.engine.setLimits(0,999,0,999)
     
   def weight(self,event,muChannel):
+    # for data, immediately return 1.
+      if event.object().event().eventAuxiliary().isRealData():
+        return 1.
     # retrieve the objects (jets and Z candidates)
     event.getByLabel("cleanPatJets",self.jetHandle)
     event.getByLabel("Ztighttight",self.zmuHandle)
