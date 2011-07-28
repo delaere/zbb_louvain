@@ -1,3 +1,6 @@
+from DataFormats.FWLite import Events, Handle
+from eventSelection import *
+
 class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
 
@@ -32,7 +35,7 @@ class LeptonsReWeighting:
      lBin1 = 2*lBinEta1+lBinpT;
      lBin2 = 2*lBinEta2+lBinpT;
      # return the proper weight
-     return mEleTPID_[lBin1]*mEleTPISO_[lBin2]*mEleTPTRG_[lBin2]
+     return self.mEleTPID_[lBin1]*self.mEleTPISO_[lBin2]*self.mEleTPTRG_[lBin2]
 
    def muWeight( self, pt, eta):
      # binning
@@ -46,7 +49,7 @@ class LeptonsReWeighting:
      lBin1 = 2*lBinEta1+lBinpT;
      lBin2 = 2*lBinEta2+lBinpT;
      # return the proper weight
-     return mMuTPID_[lBin1]*mMuTPISO_[lBin1]*mMuTPTRG_[lBin2]
+     return self.mMuTPID_[lBin1]*self.mMuTPISO_[lBin1]*self.mMuTPTRG_[lBin2]
 
    def weight( self, fwevent=None, electrons=None, muons=None, muChannel=True):
      lw = 1
@@ -62,21 +65,25 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         if muChannel :
-           fwevent.getByLabel ("Ztighttight", self.zmuHandle)
-           zCandidatesMu = zmuHandle.product()
-           muons = [ zCandidatesMu.daughter(0), zCandidatesMu.daughter(1) ]
-         else :
-           fwevent.getByLabel ("Zelel", self.zeleHandle)
-           zCandidatesEle = zeleHandle.product()
-           electrons = [ zCandidatesEle.daughter(0), zCandidatesEle.daughter(1) ]
+         fwevent.getByLabel ("Ztighttight", self.zmuHandle_)
+         zCandidatesMu = self.zmuHandle_.product()
+         fwevent.getByLabel ("Zelel", self.zeleHandle_)
+         zCandidatesEle = self.zeleHandle_.product()
+         bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+         if not bestZcandidate is None:
+           if muChannel :
+             muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
+           else :
+             electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
      # sanity check
      if not(electrons is None) and not(muons is None):
        print "Warning: LeptonsReWeighting: electrons and muon collections are both defined."
      # now compute the weight with electrons and muons that we have
-     for electron in electrons:
-       lw *= self.eleWeight(electron.pt(), electron.eta())
-     for muon in muons:
-       lw *= self.muWeight(electron.pt(), electron.eta())
+     if not(electrons is None):
+       for electron in electrons:
+         lw *= self.eleWeight(electron.pt(), electron.eta())
+     if not(muons is None):
+       for muon in muons:
+         lw *= self.muWeight(muon.pt(), muon.eta())
      return lw
 
