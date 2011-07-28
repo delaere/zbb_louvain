@@ -51,7 +51,7 @@ import os
 import itertools
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
-from LeptonsReweighting import LeptonsReweighting
+from LeptonsReweighting import LeptonsReWeighting
 from btaggingWeight import btaggingWeight
 from objectsControlPlots import *
 from eventSelectionControlPlots import *
