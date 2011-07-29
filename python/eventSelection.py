@@ -419,7 +419,8 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(0)
   else: 
     output.append(1)
-    if abs(bestZcandidate.mass()-91.1876)<massWindow:
+    if abs(bestZcandidate.mass()-90)<massWindow: #to comply with the others
+#    if abs(bestZcandidate.mass()-91.1876)<massWindow:
       output.append(1)
     else:
       output.append(0)
