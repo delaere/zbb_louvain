@@ -13,6 +13,9 @@ class JetInfo {
     float eff_SSVHPT;
     float sf_SSVHPT;
     int   flavor;
+    bool isValid() const {
+      return eff_SSVHEM>=0 && eff_SSVHEM<=1 && eff_SSVHPT>=0 && eff_SSVHPT<=1 && sf_SSVHEM>=0 && sf_SSVHEM<=10 && sf_SSVHPT>=0 && sf_SSVHPT<=10;
+    }
 };
 
 // a vector of jetsets, easily handled in python
@@ -21,7 +24,7 @@ class JetSet {
     JetSet(const char* infile);
     ~JetSet();
     void addJet(int flavor, double et, double eta);
-    void addJet(JetInfo jet);
+    void addJet(const JetInfo& jet);
     const std::vector<JetInfo>& getJets() const { return jets_; }
     void reset() { jets_.clear(); }
   private:

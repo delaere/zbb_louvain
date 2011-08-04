@@ -12,22 +12,30 @@ JetSet::JetSet(const char* infile) { interface_ = boost::shared_ptr<btagPerfFWLi
 
 JetSet::~JetSet() { }
 
+// add a jet to the set. 
+// Efficiencies and scale factors are automatically extracted from the db,
+// and the jet is added to the set only if meaningful data can be obtained.
 void JetSet::addJet(int flavor, double et, double eta) { 
-   jets_.push_back(JetInfo(interface_->getbEfficiency(flavor,1,et,eta),
-                           interface_->getbEffScaleFactor(flavor,1,et,eta),
-			   interface_->getbEfficiency(flavor,2,et,eta),
-			   interface_->getbEffScaleFactor(flavor,2,et,eta),
-                           flavor)
-                  );
+  addJet(JetInfo(interface_->getbEfficiency(flavor,1,et,eta),
+                 interface_->getbEffScaleFactor(flavor,1,et,eta),
+                 interface_->getbEfficiency(flavor,2,et,eta),
+                 interface_->getbEffScaleFactor(flavor,2,et,eta),
+                 flavor)
+        );
 }
 
-void JetSet::addJet(JetInfo jet) {
-  jets_.push_back(jet);
+// add a jet to the set, checking that the efficiencies and scale factors are well defined.
+void JetSet::addJet(const JetInfo& jet) {
+  if(jet.isValid()) jets_.push_back(jet);
+  else std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl
+                 << jet.eff_SSVHEM << " " << jet.sf_SSVHEM << " " 
+                 << jet.eff_SSVHPT << " " << jet.sf_SSVHPT << " "
+                 << jet.flavor << std::endl; 
 }
 
 // filter events passing the selection
 bool BTagWeight::filter(int t) const {
- return (t >= minTags1 && t <= maxTags1);
+  return (t >= minTags1 && t <= maxTags1);
 }
 
 // compute the weight for jets of one kind (algo1 = HE, algo2 = HP)

@@ -10,11 +10,11 @@
 #include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
 
 btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
-  std::cout << "btagPerfFWLiteInterface: Initializing..." << std::endl;
+  //std::cout << "btagPerfFWLiteInterface: Initializing..." << std::endl;
   esdata_ = TFile::Open(inputfile);
   es_ = esdata_ ? new fwlite::EventSetup(esdata_) : NULL;
   if ( es_ && es_->exists("BTagPerformanceRecord") ) {
-    std::cout << "btagPerfFWLiteInterface: Got the performance tree" << std::endl;
+    //std::cout << "btagPerfFWLiteInterface: Got the performance tree" << std::endl;
   } else {
     std::cerr << "btagPerfFWLiteInterface: Can't find performance tree" << std::endl;
     perfBTAGSSVHEM_ = NULL;
@@ -25,7 +25,7 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   }
   fwlite::RecordID testRecID = es_->recordID("BTagPerformanceRecord");
   es_->syncTo(edm::EventID(1001,0,0),edm::Timestamp());
-  std::cout << "btagPerfFWLiteInterface: Got record ID " << testRecID << es_->get(testRecID).startSyncValue().eventID()<<std::endl;
+  //std::cout << "btagPerfFWLiteInterface: Got record ID " << testRecID << es_->get(testRecID).startSyncValue().eventID()<<std::endl;
 
   es_->get(testRecID).get(plHandleBTAGSSVHEM_,"BTAGSSVHEM"); 
   es_->get(testRecID).get(wpHandleBTAGSSVHEM_,"BTAGSSVHEM");
@@ -101,6 +101,10 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(int flavor, int algo, double 
 }
 
 double btagPerfFWLiteInterface::getbEfficiency(int flavor, int algo, double pt, double eta) const {
+  // small protection against large pt (shere we have no measurement).
+  // the subject is a bit delicate, but I think it is better to use 
+  // the efficiency for the last bin than to set it to 0.
+  if(pt>249) pt=249;
   switch(abs(flavor)) {
     case 5:
       // this is not in the db and must be parametrized from OUR mc
