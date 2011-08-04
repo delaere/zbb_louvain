@@ -4,38 +4,32 @@ import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
+from baseControlPlots import BaseControlPlots
 from LeptonsReweighting import *
+#from myFuncTimer import print_timing
 
-class LeptonsReWeightingControlPlots:
+class LeptonsReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None):
+    def __init__(self, dir=None, muChannel=True):
       # create output file if needed. If no file is given, it means it is delegated
-      if dir is None:
-        self.f = ROOT.TFile("controlPlots.root", "RECREATE")
-        self.dir = self.f.mkdir("LeptonsReweighting")
-      else :
-        self.f = None
-        self.dir = dir
+      BaseControlPlots.__init__(self, dir=dir, purpose="LeptonsReweighting")
+      self.muChannel = muChannel
     
     def beginJob(self):
       # declare histograms
-      self.dir.cd()
-      self.h_weight = ROOT.TH1F("weight","weight",200,0,2)
-      self.h_weight_w = ROOT.TH1F("weight_w","weight",200,0,2)
+      self.addHisto("weight","weight",200,0,2)
       # reweighting engine
       self.engine = LeptonsReWeighting()
-    
-    def processEvent(self,event, muChannel, weight = 1.):
-      w = self.engine.weight(fwevent=event, muChannel=muChannel)
-      self.h_weight_w.Fill(w,weight)
-      if w!=0 : self.h_weight.Fill(w,weight/w)
 
-    def endJob(self):
-      self.dir.cd()
-      self.dir.Write()
-      if not self.f is None:
-        self.f.Close()
+    #@print_timing
+    def process(self, event):
+      """LeptonsReWeightingControlPlots"""
+      result = { }
+      w = self.engine.weight(fwevent=event, muChannel=self.muChannel)
+      result["weight"] = w
+      return result
+
 
 def runTest():
   controlPlots = LeptonsReWeightingControlPlots()
@@ -49,7 +43,7 @@ def runTest():
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event,muChannel=1)
+    controlPlots.processEvent(event)
     i += 1
   controlPlots.endJob()
 

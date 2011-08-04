@@ -6,6 +6,8 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
 from DataFormats.FWLite import Events, Handle
+#from myFuncTimer import print_timing
+
 class btaggingWeight:
   """compute the event weight based on btagging SF"""
 
@@ -30,8 +32,10 @@ class btaggingWeight:
     else: 
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)
-    
+
+  #@print_timing    
   def weight(self,event,muChannel):
+    """btag eff weight"""
     # for data, immediately return 1.
     if event.object().event().eventAuxiliary().isRealData():
       return 1.

@@ -1,5 +1,6 @@
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
+#from myFuncTimer import print_timing
 
 class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
@@ -51,7 +52,9 @@ class LeptonsReWeighting:
      # return the proper weight
      return self.mMuTPID_[lBin1]*self.mMuTPISO_[lBin1]*self.mMuTPTRG_[lBin2]
 
+   #@print_timing
    def weight( self, fwevent=None, electrons=None, muons=None, muChannel=True):
+     """Lepton eff weight"""
      lw = 1
      # if fwevent is defined, get electrons and muons from there
      if not(fwevent is None):

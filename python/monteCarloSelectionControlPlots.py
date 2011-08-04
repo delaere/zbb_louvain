@@ -4,54 +4,53 @@ import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
+from baseControlPlots import BaseControlPlots
 from monteCarloSelection import *
+#from myFuncTimer import print_timing
 
-class MonteCarloSelectionControlPlots:
+class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
 
     def __init__(self, dir=None):
       # create output file if needed. If no file is given, it means it is delegated
-      if dir is None:
-        self.f = ROOT.TFile("controlPlots.root", "RECREATE")
-        self.dir = self.f.mkdir("mcSelection")
-      else :
-        self.f = None
-        self.dir = dir
+      BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection")
 
     def beginJob(self, genlabel="genParticles"):
       # declare histograms
-      self.dir.cd()
-      self.h_eventType = ROOT.TH1F("eventType","Event Type (0,l,c,b)+Z",4,0,4)
+      self.addHisto("eventType","Event Type (0,l,c,b)+Z",4,0,4)
+      # prepare handles
       self.genlabel=genlabel
       self.genHandle = Handle ("vector<reco::GenParticle>")
+      # various local variables
       self.cjet = 0
       self.bjet = 0
       self.ljet = 0
       self.i = 0
-      
-    def processEvent(self,event, weight = 1.):
+
+    #@print_timing      
+    def process(self,event):
+      """monteCarloSelectionControlPlots"""
+      result = { }
       event.getByLabel (self.genlabel,self.genHandle)
       particles = self.genHandle.product()
       self.i += 1
       if isZbEvent(particles):
         self.bjet += 1
-        self.h_eventType.Fill(3,weight)
-        return
+        result["eventType"] = 3
+        return result
       if isZcEvent(particles):
         self.cjet += 1
-        self.h_eventType.Fill(2,weight)
-        return
+        result["eventType"] = 2
+        return result
       if isZlEvent(particles):
         self.ljet += 1
-        self.h_eventType.Fill(1,weight)
-        return
-      self.h_eventType.Fill(0,weight)
+        result["eventType"] = 1
+        return result
+      result["eventType"] = 0
+      return result
 
     def endJob(self):
-      self.dir.cd()
-      self.dir.Write()
-      if not self.f is None:
-        self.f.Close()
+      BaseControlPlots.endJob(self)
       print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
 
 def runTest():

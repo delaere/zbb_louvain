@@ -3,6 +3,8 @@ from DataFormats.FWLite import Events, Handle
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libPhysicsToolsUtilities.so")
+#from myFuncTimer import print_timing
+
 
 class LumiReWeighting:
    """A class to reweight MC according to number of pileup events."""
@@ -15,7 +17,9 @@ class LumiReWeighting:
       self.PileupSummaryInfo = PileupSummaryInfo
       self.PupInfo = Handle ("std::vector< PileupSummaryInfo >")
 
+   #@print_timing
    def weight( self, npu=None, fwevent=None):
+     """Lumi (PU) weight"""
      # returns the weight computed from the true number of interactions. 
      # apply systematic shift ?
      if not fwevent is None:

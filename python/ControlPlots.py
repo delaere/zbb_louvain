@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 
 from optparse import OptionParser
 import sys
@@ -49,6 +49,7 @@ parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
 import ROOT
 import os
 import itertools
+import time
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
 from LeptonsReweighting import LeptonsReWeighting
@@ -61,6 +62,7 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
+#from myFuncTimer import print_timing
 
 jetHandle = Handle ("vector<pat::Jet>")
 metHandle = Handle ("vector<pat::MET>")
@@ -69,6 +71,7 @@ zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 
+#@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if not ZjetFilter=="bcl":
@@ -77,16 +80,16 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
     if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
     if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
-  event.getByLabel ("cleanPatJets",jetHandle)
-  event.getByLabel ("patMETsPF",metHandle)
-  event.getByLabel ("Ztighttight",zmuHandle)
-  event.getByLabel ("Zelel",zeleHandle)
+  event.getByLabel("cleanPatJets",jetHandle)
+  event.getByLabel("patMETsPF",metHandle)
+  event.getByLabel("Ztighttight",zmuHandle)
+  event.getByLabel("Zelel",zeleHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   if checkTrigger:
-    event.getByLabel ("patTriggerEvent",trigInfoHandle)
+    event.getByLabel("patTriggerEvent",trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
@@ -110,7 +113,6 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   allelectronsPlots=[]
   tightelectronsPlots=[]
   jetmetAK5PFPlots=[]
-  jetmetAK7PFPlots=[]
   vertexPlots=[]
   selectionPlots=[]
   lumiReWeightingPlots=[]
@@ -129,15 +131,14 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       allelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("allelectrons")))
       tightelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("tightelectrons")))
       jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF")))
-      jetmetAK7PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK7PF")))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
       if handlePU: 
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
       if handleBT:
-        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting")))
+        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel))
       if handleLeptonEff:
-        leptonsReWeightingPlots.append(LeptonsReWeightingControlPlots(levelDir.mkdir("leptonsReWeighting")))
+        leptonsReWeightingPlots.append(LeptonsReWeightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -159,15 +160,11 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       allelectronsPlots[level].beginJob(electronlabel="allElectrons", electronType="none")
       tightelectronsPlots[level].beginJob(electronlabel="matchedElectrons", electronType="tight")
       jetmetAK5PFPlots[level].beginJob(jetlabel="cleanPatJets",btagging=btagAlgo)
-      jetmetAK7PFPlots[level].beginJob(jetlabel="cleanPatJetsAK7PF",btagging=btagAlgo)
       vertexPlots[level].beginJob()
       selectionPlots[level].beginJob(btagging=btagAlgo)
-      if handlePU: 
-        lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
-      if handleBT:
-        btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
-      if handleLeptonEff:
-        leptonsReWeightingPlots[level].beginJob()
+      if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
+      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
+      if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
 
   # the PU reweighting engine
   if handlePU: 
@@ -180,8 +177,11 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 
   # process events
   i = 0
+  t0 = time.time()
   for event in events:
-    if i%100==0 : print "Processing... event ", i
+    if i%100==0 : 
+      print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
+      t0 = time.time()
     for muChannel in [True, False]:
       categoryData = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo)
       if muChannel: 
@@ -194,6 +194,22 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
 	  plots = []
 	else:
           plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
+      # process event
+      if len(plots)>0: 
+        jetmetAK5PFPlotsData = jetmetAK5PFPlots[plots[0]].process(event)
+        allmuonsPlotsData = allmuonsPlots[plots[0]].process(event)
+        loosemuonsPlotsData = loosemuonsPlots[plots[0]].process(event)
+        tightmuonsPlotsData = tightmuonsPlots[plots[0]].process(event)
+        allelectronsPlotsData = allelectronsPlots[plots[0]].process(event)
+        tightelectronsPlotsData = tightelectronsPlots[plots[0]].process(event)
+        vertexPlotsData = vertexPlots[plots[0]].process(event)
+        selectionPlotsData = selectionPlots[plots[0]].process(event)
+        if handlePU: 
+            lumiReWeightingPlotsData = lumiReWeightingPlots[plots[0]].process(event)
+        if handleBT:
+          btagReWeightingPlotsData = btagReWeightingPlots[plots[0]].process(event)
+        if handleLeptonEff:
+          leptonsReWeightingPlotsData = leptonsReWeightingPlots[plots[0]].process(event)
       for level in plots:
         # compute the weight 
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
@@ -224,20 +240,20 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         # security against negative weights 
         if eventWeight<0: eventWeight=0
         # fill the histograms
-        jetmetAK5PFPlots[level].processEvent(event, eventWeight)
-        allmuonsPlots[level].processEvent(event, eventWeight)
-        loosemuonsPlots[level].processEvent(event, eventWeight)
-        tightmuonsPlots[level].processEvent(event, eventWeight)
-        allelectronsPlots[level].processEvent(event, eventWeight)
-        tightelectronsPlots[level].processEvent(event, eventWeight)
-        vertexPlots[level].processEvent(event, eventWeight)
-        selectionPlots[level].processEvent(event, eventWeight)
+        jetmetAK5PFPlots[level].fill(jetmetAK5PFPlotsData, eventWeight)
+        allmuonsPlots[level].fill(allmuonsPlotsData, eventWeight)
+        loosemuonsPlots[level].fill(loosemuonsPlotsData, eventWeight)
+        tightmuonsPlots[level].fill(tightmuonsPlotsData, eventWeight)
+        allelectronsPlots[level].fill(allelectronsPlotsData, eventWeight)
+        tightelectronsPlots[level].fill(tightelectronsPlotsData, eventWeight)
+        vertexPlots[level].fill(vertexPlotsData, eventWeight)
+        selectionPlots[level].fill(selectionPlotsData, eventWeight)
         if handlePU: 
-          lumiReWeightingPlots[level].processEvent(event, eventWeight)
-	if handleBT:
-	  btagReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
+            lumiReWeightingPlots[level].fill(lumiReWeightingPlotsData, eventWeight)
+        if handleBT:
+          btagReWeightingPlots[level].fill(btagReWeightingPlotsData, eventWeight)
         if handleLeptonEff:
-          leptonsReWeightingPlots[level].processEvent(event, muChannel, eventWeight)
+          leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData, eventWeight)
     i += 1
 
   # save all
@@ -248,7 +264,6 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
       plots = map(lambda x: x+eventCategories(),levels)
     for level in plots:
      jetmetAK5PFPlots[level].endJob()
-     jetmetAK7PFPlots[level].endJob()
      allmuonsPlots[level].endJob()
      loosemuonsPlots[level].endJob()
      tightmuonsPlots[level].endJob()
@@ -260,6 +275,8 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
        lumiReWeightingPlots[level].endJob()
      if handleBT:
        btagReWeightingPlots[level].endJob()
+     if handleLeptonEff:
+       leptonsReWeightingPlots[level].endJob()
   output.Close()
 
 def main(options):
@@ -274,6 +291,7 @@ def main(options):
     levels = range(eventCategories())
   elif not options.levels is None:
     levels= map(int,options.levels.split(','))
+  levels.sort()
   if len(levels)==0:
     print "Error: no level specified for processing."
     parser.print_help()

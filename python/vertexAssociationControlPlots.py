@@ -3,58 +3,53 @@
 import ROOT
 import sys
 from DataFormats.FWLite import Events, Handle
+from baseControlPlots import BaseControlPlots
 from vertexAssociation import *
+#from myFuncTimer import print_timing
 
-class VertexAssociationControlPlots:
+class VertexAssociationControlPlots(BaseControlPlots):
     """A class to create control plots for vertex association"""
 
     def __init__(self, dir=None):
       # create output file if needed. If no file is given, it means it is delegated
-      if dir is None:
-        self.f = ROOT.TFile("controlPlots.root", "RECREATE")
-        self.dir = self.f.mkdir("vertexAssociation")
-      else :
-        self.f = None
-        self.dir = dir
+      BaseControlPlots.__init__(self, dir=dir, purpose="vertexAssociation")
     
     def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" , sigcut = 2.):
       self.sigcut = sigcut
       # declare histograms
-      self.dir.cd()
-      self.h_nvertices = ROOT.TH1F("nvertices","nvertices",30,0,30)
-      self.h_vx = ROOT.TH1F("vx","vx",400,-0.2,0.2)
-      self.h_vy = ROOT.TH1F("vy","vy",400,-0.2,0.2)
-      self.h_vz = ROOT.TH1F("vz","vz",100,-25,25)
-      self.h_vxerr = ROOT.TH1F("vxerr","vxerr",100,0,0.01)
-      self.h_vyerr = ROOT.TH1F("vyerr","vyerr",100,0,0.01)
-      self.h_vzerr = ROOT.TH1F("vzerr","vzerr",100,0,0.02)
-      self.h_lepton_dz = ROOT.TH1F("lepton_dz","z distance between the two Z leptons",100,0,0.2)
-      self.h_l1v_dz = ROOT.TH1F("l1v_dz","z distance between lepton and vertex",100,0,1.)
-      self.h_l2v_dz = ROOT.TH1F("l2v_dz","z distance between lepton and vertex",100,0,1.)
-      self.h_distance = ROOT.TH1F("distance","vertex/track distance in z",2000,-10,10)
-      self.h_sig = ROOT.TH1F("sig","vertex/track significance in z",2000,-10,10)
-      self.h_ratio1 = ROOT.TH1F("ratio1","jet/vertex association ratio v1",100,0,1)
-      self.h_ratio2 = ROOT.TH1F("ratio2","jet/vertex association ratio v2",100,0,1)
-      self.h_ratio3 = ROOT.TH1F("ratio3","jet/vertex association ratio v3",100,0,1)
-      self.h_ratio1b = ROOT.TH1F("ratio1b","jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.h_ratio2b = ROOT.TH1F("ratio2b","jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.h_ratio3b = ROOT.TH1F("ratio3b","jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.h_j1_ratio1 = ROOT.TH1F("j1_ratio1","leading jet/vertex association ratio v1",100,0,1)
-      self.h_j1_ratio2 = ROOT.TH1F("j1_ratio2","leading jet/vertex association ratio v2",100,0,1)
-      self.h_j1_ratio3 = ROOT.TH1F("j1_ratio3","leading jet/vertex association ratio v3",100,0,1)
-      self.h_j1_ratio1b = ROOT.TH1F("j1_ratio1b","leading jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.h_j1_ratio2b = ROOT.TH1F("j1_ratio2b","leading jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.h_j1_ratio3b = ROOT.TH1F("j1_ratio3b","leading jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.h_goodevent = ROOT.TH1F("goodevent","pass or not Z+jet to vertex association",2,0,2)
+      self.addHisto("nvertices","nvertices",30,0,30)
+      self.addHisto("vx","vx",400,-0.2,0.2)
+      self.addHisto("vy","vy",400,-0.2,0.2)
+      self.addHisto("vz","vz",100,-25,25)
+      self.addHisto("vxerr","vxerr",100,0,0.01)
+      self.addHisto("vyerr","vyerr",100,0,0.01)
+      self.addHisto("vzerr","vzerr",100,0,0.02)
+      self.addHisto("lepton_dz","z distance between the two Z leptons",100,0,0.2)
+      self.addHisto("l1v_dz","z distance between lepton and vertex",100,0,1.)
+      self.addHisto("l2v_dz","z distance between lepton and vertex",100,0,1.)
+      self.addHisto("distance","vertex/track distance in z",2000,-10,10)
+      self.addHisto("sig","vertex/track significance in z",2000,-10,10)
+      self.addHisto("ratio1","jet/vertex association ratio v1",100,0,1)
+      self.addHisto("ratio2","jet/vertex association ratio v2",100,0,1)
+      self.addHisto("ratio3","jet/vertex association ratio v3",100,0,1)
+      self.addHisto("ratio1b","jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.addHisto("ratio2b","jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.addHisto("ratio3b","jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.addHisto("j1_ratio1","leading jet/vertex association ratio v1",100,0,1)
+      self.addHisto("j1_ratio2","leading jet/vertex association ratio v2",100,0,1)
+      self.addHisto("j1_ratio3","leading jet/vertex association ratio v3",100,0,1)
+      self.addHisto("j1_ratio1b","leading jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.addHisto("j1_ratio2b","leading jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.addHisto("j1_ratio3b","leading jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.addHisto("goodevent","pass or not Z+jet to vertex association",2,0,2)
       # some plots with only the jets associated to genjets. Filled only for MC, allows to check PU effect more directly.
       # I do only duplicate some plots relevant for the PU study.
-      self.h_ratio1b_nopu = ROOT.TH1F("ratio1b_nopu","jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.h_ratio2b_nopu = ROOT.TH1F("ratio2b_nopu","jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.h_ratio3b_nopu = ROOT.TH1F("ratio3b_nopu","jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.h_j1_ratio1b_nopu = ROOT.TH1F("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.h_j1_ratio2b_nopu = ROOT.TH1F("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.h_j1_ratio3b_nopu = ROOT.TH1F("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
-      
+      self.addHisto("ratio1b_nopu","jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.addHisto("ratio2b_nopu","jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.addHisto("ratio3b_nopu","jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.addHisto("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.addHisto("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.addHisto("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.zHandle = Handle ("vector<reco::CompositeCandidate>")
@@ -81,7 +76,10 @@ class VertexAssociationControlPlots:
       dr2 = jv.DeltaR(l2v)
       return nhf<0.99 and nef<0.99 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99 and dr1>0.5 and dr2>0.5
 
-    def processEvent(self,event, weight = 1.):
+    #@print_timing
+    def process(self,event):
+      """vertexAssociationControlPlots"""
+      result = { }
       # load event
       event.getByLabel (self.jetlabel,self.jetHandle)
       event.getByLabel (self.zlabel,self.zHandle)
@@ -89,9 +87,9 @@ class VertexAssociationControlPlots:
       jets = self.jetHandle.product()
       zs = self.zHandle.product()
       vs = self.vertexHandle.product()
-      self.h_nvertices.Fill(vs.size(), weight) # control plot
+      result["nvertices"] = vs.size()
       # only events with one Z candidate
-      if zs.size()==0 : return
+      if zs.size()==0 : return result
       # select the Z
       bestZ = zs[0]
       bestM = -1000.
@@ -101,21 +99,40 @@ class VertexAssociationControlPlots:
           bestZ = z
       # select the vertex
       vertex = findPrimaryVertex(bestZ, vs)
-      self.h_vx.Fill(vertex.x(), weight) # control plot
-      self.h_vy.Fill(vertex.y(), weight) # control plot
-      self.h_vz.Fill(vertex.z(), weight) # control plot
-      self.h_vxerr.Fill(vertex.xError(), weight) # control plot
-      self.h_vyerr.Fill(vertex.yError(), weight) # control plot
-      self.h_vzerr.Fill(vertex.zError(), weight) # control plot
+      result["vx"] = vertex.x()
+      result["vy"] = vertex.y()
+      result["vz"] = vertex.z()
+      result["vxerr"] = vertex.xError()
+      result["vyerr"] = vertex.yError()
+      result["vzerr"] = vertex.zError()
       # relevant quantities to monitor: Z vs primary vertex
       lepton1 = bestZ.daughter(0)
       lepton2 = bestZ.daughter(1)
-      self.h_lepton_dz.Fill(abs(lepton1.vz()-lepton2.vz()), weight)  # control plot
-      self.h_l1v_dz.Fill(abs(lepton1.vz()-vertex.z()), weight) # control plot
-      self.h_l2v_dz.Fill(abs(lepton2.vz()-vertex.z()), weight) # control plot
+      result["lepton_dz"] = abs(lepton1.vz()-lepton2.vz())
+      result["l1v_dz"] = abs(lepton1.vz()-vertex.z())
+      result["l2v_dz"] = abs(lepton2.vz()-vertex.z())
       # relevant quantities to monitor: jets vs primary vertex
-
       firstJet = True
+      result["ratio1"] = [ ]
+      result["ratio2"] = [ ]
+      result["ratio3"] = [ ]
+      result["ratio1b"] = [ ]
+      result["ratio2b"] = [ ]
+      result["ratio3b"] = [ ]
+      result["ratio1b_nopu"] = [ ]
+      result["ratio2b_nopu"] = [ ]
+      result["ratio3b_nopu"] = [ ]
+      result["j1_ratio1"] = 0
+      result["j1_ratio2"] = 0
+      result["j1_ratio3"] = 0
+      result["j1_ratio1b"] = 0
+      result["j1_ratio2b"] = 0
+      result["j1_ratio3b"] = 0
+      result["j1_ratio1b_nopu"] = 0
+      result["j1_ratio2b_nopu"] = 0
+      result["j1_ratio3b_nopu"] = 0
+      result["distance"] = [ ]
+      result["sig"] = [ ]
       for jet in jets: 
         if not self.jetSelection(jet,bestZ) : continue
         ptsum = 0.
@@ -134,25 +151,25 @@ class VertexAssociationControlPlots:
           if jet.getPFConstituent(i).muonRef().isNonnull () or jet.getPFConstituent(i).gsfTrackRef().isNonnull ():
             continue
           distance = (jet.getPFConstituent(i).vz() - vertex.z())
-          self.h_distance.Fill(distance, weight)
+          result["distance"].append(distance)
           error = (jet.getPFConstituent(i).trackRef().dzError()**2 + vertex.zError()**2)**(1/2.)
           sig = distance/error
-          self.h_sig.Fill(sig, weight) # control plot
+          result["sig"].append(sig)
           if abs(sig)<self.sigcut :
             ptsum += jet.getPFConstituent(i).pt()
             ptsumx += jet.getPFConstituent(i).px()
             ptsumy += jet.getPFConstituent(i).py()
           ptsumall += jet.getPFConstituent(i).pt()
-        self.h_ratio1.Fill(ptsum/jet.et(), weight) # control plot
-        if firstJet: self.h_j1_ratio1.Fill(ptsum/jet.et(), weight) # control plot
+        result["ratio1"].append(ptsum/jet.et())
+        if firstJet: result["j1_ratio1"] = ptsum/jet.et()
         if ptsumall>0 : 
           ratio = ptsum/ptsumall
         else:
           ratio = -1.
-        self.h_ratio2.Fill(ratio, weight) # control plot
-        if firstJet: self.h_j1_ratio2.Fill(ratio, weight) # control plot
-        self.h_ratio3.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
-        if firstJet: self.h_j1_ratio3.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+        result["ratio2"].append(ratio)
+        if firstJet: result["j1_ratio2"] = ratio
+        result["ratio3"].append((ptsumx**2+ptsumy**2)**(0.5)/jet.et())
+        if firstJet: result["j1_ratio3"] = (ptsumx**2+ptsumy**2)**(0.5)/jet.et() 
         # now, the same methods but using directly the vertex for the matching
         ptsumx = 0.
         ptsumy = 0.
@@ -171,33 +188,29 @@ class VertexAssociationControlPlots:
             ptsumx += jet.getPFConstituent(i).px()
             ptsumy += jet.getPFConstituent(i).py()
           ptsumall += jet.getPFConstituent(i).pt()
-        self.h_ratio1b.Fill(ptsum/jet.et(), weight) # control plot
-        if isMcPrimaryJet: self.h_ratio1b_nopu.Fill(ptsum/jet.et(), weight) # control plot
+        result["ratio1b"].append(ptsum/jet.et())
+        if isMcPrimaryJet: result["ratio1b_nopu"].append(ptsum/jet.et())
         if firstJet: 
-          self.h_j1_ratio1b.Fill(ptsum/jet.et(), weight) # control plot
-          if isMcPrimaryJet: self.h_j1_ratio1b_nopu.Fill(ptsum/jet.et(), weight) # control plot
+          result["j1_ratio1b"] = ptsum/jet.et()
+          if isMcPrimaryJet: result["j1_ratio1b_nopu"] = ptsum/jet.et()
         if ptsumall>0 : 
           ratio = ptsum/ptsumall
         else:
           ratio = -1.
-        self.h_ratio2b.Fill(ratio, weight) # control plot
-        if isMcPrimaryJet: self.h_ratio2b_nopu.Fill(ratio, weight) # control plot
+        result["ratio2b"].append(ratio)
+        if isMcPrimaryJet: result["ratio2b_nopu"].append(ratio)
         if firstJet: 
-          self.h_j1_ratio2b.Fill(ratio, weight) # control plot
-          if isMcPrimaryJet: self.h_j1_ratio2b_nopu.Fill(ratio, weight) # control plot
-        self.h_ratio3b.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
-        if isMcPrimaryJet: self.h_ratio3b_nopu.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+          result["j1_ratio2b"] = ratio
+          if isMcPrimaryJet: result["j1_ratio2b_nopu"] = ratio
+        result["ratio3b"].append((ptsumx**2+ptsumy**2)**(0.5)/jet.et())
+        if isMcPrimaryJet: result["ratio3b_nopu"].append((ptsumx**2+ptsumy**2)**(0.5)/jet.et())
         if firstJet: 
-          self.h_j1_ratio3b.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
-          if isMcPrimaryJet: self.h_j1_ratio3b_nopu.Fill((ptsumx**2+ptsumy**2)**(0.5)/jet.et(), weight) # control plot
+          result["j1_ratio3b"] = (ptsumx**2+ptsumy**2)**(0.5)/jet.et()
+          if isMcPrimaryJet: result["j1_ratio3b_nopu"] = (ptsumx**2+ptsumy**2)**(0.5)/jet.et()
         firstJet = False
-      self.h_goodevent.Fill(checkVertexAssociation(bestZ, jets, vs), weight)
+      result["goodevent"] = checkVertexAssociation(bestZ, jets, vs)
+      return result
     
-    def endJob(self):
-      self.dir.cd()
-      self.dir.Write()
-      if not self.f is None:
-        self.f.Close()
 
 def runTest():
   controlPlots = VertexAssociationControlPlots()
