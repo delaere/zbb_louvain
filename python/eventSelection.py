@@ -390,7 +390,7 @@ def isInCategory(category, categoryTuple):
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # categoty 15: Z+1b (HE exclusive)
   elif category==15:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[4]==categoryTuple[6]  
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
     return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[5]==categoryTuple[6]  
