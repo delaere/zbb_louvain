@@ -316,30 +316,33 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
     jetList.append(index)
   return (jets[jetList[0]],jets[jetList[1]])
 
+categoryNames = [ 
+  "All", 
+  "Trigger", 
+  "di-lepton", 
+  "Z", 
+  "Z+jet", 
+  "Z+b (HE)", 
+  "Z+b (HP)", 
+  "Z+b (HE+MET)", 
+  "Z+b (HP+MET)", 
+  "Z+bb (HEHE)", 
+  "Z+bb (HEHP)", 
+  "Z+bb (HPHP)", 
+  "Z+bb (HEHE+MET)", 
+  "Z+bb (HEHP+MET)", 
+  "Z+bb (HPHP+MET)", 
+  "Z+1b (HE exclusive)", 
+  "Z+1b (HP exclusive)",
+  "Z+1b (HE exclusive + MET)",
+  "Z+1b (HP exclusive + MET)" ]
+
+def eventCategories(): return len(categoryNames)
+
 def categoryName(category):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
-  if category==0: return "All"
-  elif category==1: return "Trigger"
-  elif category==2: return "di-lepton"
-  elif category==3: return "Z"
-  elif category==4: return "Z+jet"
-  elif category==5: return "Z+b (HE)"
-  elif category==6: return "Z+b (HP)"
-  elif category==7: return "Z+b (HE+MET)"
-  elif category==8: return "Z+b (HP+MET)"
-  elif category==9: return "Z+bb (HEHE)"
-  elif category==10: return "Z+bb (HEHP)"
-  elif category==11: return "Z+bb (HPHP)"
-  elif category==12: return "Z+bb (HEHE+MET)"
-  elif category==13: return "Z+bb (HEHP+MET)"
-  elif category==14: return "Z+bb (HPHP+MET)"
-  elif category==15: return "Z+1b (HE exclusive)"
-  elif category==16: return "Z+1b (HP exclusive)"
-  elif category==17: return "Z+1b (HE exclusive + MET)"
-  elif category==18: return "Z+1b (HP exclusive + MET)"
-  # other does not exist
-  else:
-    return "None"
+  if category<eventCategories() and category>=0: return categoryNames[category]
+  else: return "None"
 
 def isInCategory(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
@@ -448,6 +451,4 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(0)
   # return the list of results
   return output
-
-def eventCategories(): return 15
 
