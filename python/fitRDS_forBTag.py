@@ -1,3 +1,4 @@
+
 #######################################################
 #
 # Loop over entries
@@ -20,7 +21,7 @@
 from ROOT import *
 import os
 
-WP =  "HE"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
+WP =  "HE"   #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
 channel = "Mu"    #"El","Mu"
 template = "hist" #"keys", "hist"
 jec = 0           #1,3,5  
@@ -28,12 +29,14 @@ jec = 0           #1,3,5
 
 ### Getting a file and a tree
 
-file = { "HP"      : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
-         "HPMET"   : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
-         "HP_excl" : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_HP.root") ,
-         "HE"      : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
-         "HEMET"   : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
-         "HE_excl" : TFile("/scratch/tdupree/bTagPurity/bTagPurRDS_QCD_2_HE.root"),
+file = { "HP"         : TFile("bTagPurRDS_QCD_2.root") ,
+         "HPMET"      : TFile("bTagPurRDS_QCD_2.root") ,
+         "HP_excl"    : TFile("bTagPurRDS_QCD_2.root") ,
+         "HPMET_excl" : TFile("bTagPurRDS_QCD_2.root") ,
+         "HE"         : TFile("bTagPurRDS_QCD_2.root"),
+         "HEMET"      : TFile("bTagPurRDS_QCD_2.root"),
+         "HE_excl"    : TFile("bTagPurRDS_QCD_2.root"),
+         "HEMET_excl" : TFile("bTagPurRDS_QCD_2.root")
          }
 ws = file[WP].Get("ws")
 myRDS = ws.data("myRDS");
@@ -44,22 +47,40 @@ rrv_msv    = ws.var("rrv_msv")
 rrv_bTagHE = ws.var("rrv_bTagHE")
 rrv_bTagHP = ws.var("rrv_bTagHP")
 rrv_pT     = ws.var("rrv_pT")
+rrv_eta    = ws.var("rrv_eta")
+rrv_nPV    = ws.var("rrv_nPV")
 rrv_pT_unc = ws.var("rrv_pT_unc")
 rc_flav    = ws.cat("rc_flav")
+rc_sel     = ws.cat("rc_sel")
+
+rrv_msv.setMin(0)
+rrv_msv.setMax(10)
+rrv_msv.setBins(20)
+
+rrv_nPV.setMin(0)
+rrv_nPV.setMax(20)
+rrv_nPV.setBins(20)
 
 f_data = 0
-if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA.root")
+if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA_elSel_forBTag.root")
 elif channel == "Mu" : f_data = TFile("File_rds_zbb_Mu_DATA_muSel_forBTag.root")
 
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
 
-if WP=="HE"      : DATA=DATA.reduce("rc_HE==1")
-if WP=="HEMET"   : DATA=DATA.reduce("rc_HEMET==1")
-if WP=="HE_excl" : DATA=DATA.reduce("rc_HE_excl==1")
-if WP=="HP"      : DATA=DATA.reduce("rc_HP==1")
-if WP=="HPMET"   : DATA=DATA.reduce("rc_HPMET==1")
-if WP=="HP_excl" : DATA=DATA.reduce("rc_HP_excl==1")
+#DATA = DATA.reduce("rrv_nPV>7.5")
+#DATA = DATA.reduce("rrv_nPV<7.5")
+
+if WP=="HE"         : DATA=DATA.reduce("rc_HE==1")
+if WP=="HEMET"      : DATA=DATA.reduce("rc_HEMET==1")
+if WP=="HE_excl"    : DATA=DATA.reduce("rc_HE_excl==1")
+if WP=="HEMET_excl" : DATA=DATA.reduce("rc_HEMET_excl==1")
+if WP=="HP"         : DATA=DATA.reduce("rc_HP==1")
+if WP=="HPMET"      : DATA=DATA.reduce("rc_HPMET==1")
+if WP=="HP_excl"    : DATA=DATA.reduce("rc_HP_excl==1")
+if WP=="HPMET_excl" : DATA=DATA.reduce("rc_HPMET_excl==1")
+
+print "DATA.numEntries() = ", DATA.numEntries()
 
 
 RAS = DATA.get()
@@ -74,16 +95,19 @@ for i in range(0,DATA.numEntries()):
 
 DATA = DATA_withunc
 
+if WP[:2]=="HP":  myRDS = myRDS.reduce("rc_sel==6")
 
 #myRDS.tree().Draw("rrv_msv")
 
 myRDS_l = myRDS.reduce("rc_flav==1")
 myRDS_c = myRDS.reduce("rc_flav==4")
 myRDS_b = myRDS.reduce("rc_flav==5")
+myRDS_g = myRDS.reduce("rc_flav==6")
 
 print "myRDS_l.numEntries() = ", myRDS_l.numEntries()
 print "myRDS_c.numEntries() = ", myRDS_c.numEntries()
 print "myRDS_b.numEntries() = ", myRDS_b.numEntries()
+print "myRDS_g.numEntries() = ", myRDS_g.numEntries()
 
 ### This takes too long:
 #print "redduced datasets, making keys"
@@ -99,6 +123,7 @@ print "making roodatahist"
 
 myRDH   = RooDataHist("myRDH",   "myRDH",   RooArgSet(rrv_msv), myRDS  )
 myRDH_b = RooDataHist("myRDH_b", "myRDH_b", RooArgSet(rrv_msv), myRDS_b)
+myRDH_g = RooDataHist("myRDH_g", "myRDH_g", RooArgSet(rrv_msv), myRDS_g)
 myRDH_c = RooDataHist("myRDH_c", "myRDH_c", RooArgSet(rrv_msv), myRDS_c)
 myRDH_l = RooDataHist("myRDH_l", "myRDH_l", RooArgSet(rrv_msv), myRDS_l)
 
@@ -106,6 +131,7 @@ print "made datahists, making histpdfs"
 
 myRHP   = RooHistPdf("myRHP",  "myRHP",  RooArgSet(rrv_msv),myRDH  )
 myRHP_b = RooHistPdf("myRHP_b","myRHP_b",RooArgSet(rrv_msv),myRDH_b)
+myRHP_g = RooHistPdf("myRHP_g","myRHP_g",RooArgSet(rrv_msv),myRDH_g)
 myRHP_c = RooHistPdf("myRHP_c","myRHP_c",RooArgSet(rrv_msv),myRDH_c)
 myRHP_l = RooHistPdf("myRHP_l","myRHP_l",RooArgSet(rrv_msv),myRDH_l)
 
@@ -134,11 +160,12 @@ freem3 = rrv_msv.frame(40)
 myRHP_l.plotOn(freem3,RooFit.LineColor(kBlue))
 myRHP_c.plotOn(freem3,RooFit.LineColor(kGreen))
 myRHP_b.plotOn(freem3,RooFit.LineColor(kRed))
+myRHP_g.plotOn(freem3,RooFit.LineColor(kMagenta))
 freem3.Draw()
 
-
-
-pTRegion = RooThresholdCategory("pTRegion","region of x",rrv_pT,"Background") ;
+pTRegion  = RooThresholdCategory("pTRegion", "region of pT", rrv_pT, "pT") 
+etaRegion = RooThresholdCategory("etaRegion","region of eta",rrv_eta,"eta") 
+npvRegion = RooThresholdCategory("npvRegion","region of nPV",rrv_nPV,"nPV") 
 
 # Specify thresholds and state assignments one-by-one.
 # Each statement specifies that all values _below_ the given value
@@ -147,77 +174,192 @@ pTRegion = RooThresholdCategory("pTRegion","region of x",rrv_pT,"Background") ;
 #
 # Background | SideBand | Signal | SideBand | Background
 #     4.23       5.23     8.23       9.23
-pTRegion.addThreshold(             30, "1") 
-pTRegion.addThreshold(             50, "2") 
-pTRegion.addThreshold(             80, "3") 
+pTRegion.addThreshold(             38, "1") 
+pTRegion.addThreshold(             45, "2") 
+pTRegion.addThreshold(             65, "3") 
 pTRegion.addThreshold(            150, "4") 
 pTRegion.addThreshold(rrv_pT.getMax(), "5") 
+
+etaRegion.addThreshold(            3., "1")
+
+#etaRegion.addThreshold(            -1., "1") 
+#etaRegion.addThreshold(             1., "2") 
+#etaRegion.addThreshold(rrv_eta.getMax(), "3") 
+
+npvRegion.addThreshold(             15, "1") 
+
+#npvRegion.addThreshold(             3.5, "1") 
+#npvRegion.addThreshold(             4.5, "2") 
+#npvRegion.addThreshold(             6.5, "3") 
+#npvRegion.addThreshold(             8.5, "4") 
+#npvRegion.addThreshold(rrv_nPV.getMax(), "5") 
 
 # Add values of threshold function to dataset so that it can be used as observable
 myRDS.addColumn(pTRegion) 
 myRDS_b.addColumn(pTRegion) 
+myRDS_g.addColumn(pTRegion) 
 myRDS_c.addColumn(pTRegion) 
 myRDS_l.addColumn(pTRegion) 
 DATA.addColumn(pTRegion) 
+
+myRDS.addColumn(etaRegion) 
+myRDS_b.addColumn(etaRegion) 
+myRDS_g.addColumn(etaRegion) 
+myRDS_c.addColumn(etaRegion) 
+myRDS_l.addColumn(etaRegion) 
+DATA.addColumn(etaRegion) 
+
+myRDS.addColumn(npvRegion) 
+myRDS_b.addColumn(npvRegion) 
+myRDS_g.addColumn(npvRegion) 
+myRDS_c.addColumn(npvRegion) 
+myRDS_l.addColumn(npvRegion) 
+DATA.addColumn(npvRegion) 
+
+
+RDS_per_pT = {}
+
+RDS_b_per_pT = {}
+RDS_g_per_pT = {}
+RDS_c_per_pT = {}
+RDS_l_per_pT = {}
+
+RKP_b_per_pT = {}
+RKP_g_per_pT = {}
+RKP_c_per_pT = {}
+RKP_l_per_pT = {}
+
+myRDH_b = {}
+myRDH_g = {}
+myRDH_c = {}
+myRDH_l = {}
+
+myRHP_b = {}
+myRHP_g = {}
+myRHP_c = {}
+myRHP_l = {}
+
+myRKP_g = {}
+myRKP_b = {}
+myRKP_c = {}
+myRKP_l = {}
+
+b_pdfList = RooArgList()
+g_pdfList = RooArgList()
+c_pdfList = RooArgList()
+l_pdfList = RooArgList()
+
+f_b={}
+fracList = RooArgList()
+
+
+DATA_per_pT = {}
+
+### TODO: add #PV, eta
+### First produce them also in data
+### (Long term: properly produce data/MC RooDataSets in same way)
+
+rrv_weight = RooRealVar("weight","weight",0)
+
+RDS_weighted_per_pT = {}
+
+for i in range(1,5):
+    for j in range(1,2):
+        for k in range(1,2):
+
+            str_i = "pTRegion==pTRegion::"+str(i)
+            str_j = "etaRegion==etaRegion::"+str(j)
+            str_k = "npvRegion==npvRegion::"+str(k)
+            #str_ijk = "pTRegion==pTRegion::"+str(i)+",etaRegion==etaRegion::"+str(j)+",npvRegion==npvRegion::"+str(k)
+            print "str_i = ", str_i
+            print "str_j = ", str_j
+            
+            RDS_per_pT[i,j,k]    = myRDS.reduce(str_i)
+            RDS_per_pT[i,j,k]    = RDS_per_pT[i,j,k].reduce(str_j)
+            RDS_per_pT[i,j,k]    = RDS_per_pT[i,j,k].reduce(str_k)
+            
+            print "RDS_per_pT[", i , j, k, "].numEntries() = ", RDS_per_pT[i,j,k].numEntries()
+
+            RDS_b_per_pT[i,j,k]  = myRDS_b.reduce(str_i)
+            RDS_b_per_pT[i,j,k]  = RDS_b_per_pT[i,j,k].reduce(str_j)
+            RDS_b_per_pT[i,j,k]  = RDS_b_per_pT[i,j,k].reduce(str_k)
+            
+            RDS_g_per_pT[i,j,k]  = myRDS_g.reduce(str_i)
+            RDS_g_per_pT[i,j,k]  = RDS_g_per_pT[i,j,k].reduce(str_j)
+            RDS_g_per_pT[i,j,k]  = RDS_g_per_pT[i,j,k].reduce(str_k)
+            
+            RDS_c_per_pT[i,j,k]  = myRDS_c.reduce(str_i)
+            RDS_c_per_pT[i,j,k]  = RDS_c_per_pT[i,j,k].reduce(str_j)
+            RDS_c_per_pT[i,j,k]  = RDS_c_per_pT[i,j,k].reduce(str_k)
+            
+            RDS_l_per_pT[i,j,k]  = myRDS_l.reduce(str_i) 
+            RDS_l_per_pT[i,j,k]  = RDS_l_per_pT[i,j,k].reduce(str_j) 
+            RDS_l_per_pT[i,j,k]  = RDS_l_per_pT[i,j,k].reduce(str_k) 
+
+            DATA_per_pT[i,j,k] = DATA.reduce(str_i)
+            DATA_per_pT[i,j,k] = DATA_per_pT[i,j,k].reduce(str_j)
+            DATA_per_pT[i,j,k] = DATA_per_pT[i,j,k].reduce(str_k)
+            
+            #RKP_per_pT[i]    = RooKeysPdf("RKP_per_pT"+str(i),  "RKP_per_pT"+str(i),rrv_msv,RDS_per_pT[i])
+
+            myRKP_b[i,j,k]  = RooKeysPdf("RKP_b_per_pT"+str(i)+str(j)+str(k),
+                                         "RKP_b_per_pT"+str(i)+str(j)+str(k),
+                                         rrv_msv,
+                                         RDS_b_per_pT[i,j,k])
+            myRKP_g[i,j,k]  = RooKeysPdf("RKP_g_per_pT"+str(i)+str(j)+str(k),
+                                         "RKP_g_per_pT"+str(i)+str(j)+str(k),
+                                         rrv_msv,
+                                         RDS_g_per_pT[i,j,k])
+            myRKP_c[i,j,k]  = RooKeysPdf("RKP_c_per_pT"+str(i)+str(j)+str(k),
+                                         "RKP_c_per_pT"+str(i)+str(j)+str(k),
+                                         rrv_msv,
+                                         RDS_c_per_pT[i,j,k])
+            myRKP_l[i,j,k]  = RooKeysPdf("RKP_l_per_pT"+str(i)+str(j)+str(k),
+                                         "RKP_l_per_pT"+str(i)+str(j)+str(k),
+                                         rrv_msv,
+                                         RDS_l_per_pT[i,j,k])
+
+           #myRDH   = RooDataHist("myRDH",   "myRDH",   RooArgSet(rrv_msv), myRDS  )
+            myRDH_b[i,j,k] = RooDataHist("myRDH_b"+str(i)+str(j)+str(k), "myRDH_b"+str(i)+str(j)+str(k), RooArgSet(rrv_msv), RDS_b_per_pT[i,j,k])
+            myRDH_g[i,j,k] = RooDataHist("myRDH_g"+str(i)+str(j)+str(k), "myRDH_g"+str(i)+str(j)+str(k), RooArgSet(rrv_msv), RDS_g_per_pT[i,j,k])
+            myRDH_c[i,j,k] = RooDataHist("myRDH_c"+str(i)+str(j)+str(k), "myRDH_c"+str(i)+str(j)+str(k), RooArgSet(rrv_msv), RDS_c_per_pT[i,j,k])
+            myRDH_l[i,j,k] = RooDataHist("myRDH_l"+str(i)+str(j)+str(k), "myRDH_l"+str(i)+str(j)+str(k), RooArgSet(rrv_msv), RDS_l_per_pT[i,j,k])
+
+            print "made datahists, making histpdfs"
+    
+            #myRHP   = RooHistPdf("myRHP",  "myRHP",  RooArgSet(rrv_msv),myRDH  )
+            myRHP_b[i,j,k] = RooHistPdf("myRHP_b"+str(i)+str(j)+str(k),"myRHP_b"+str(i)+str(j)+str(k),RooArgSet(rrv_msv),myRDH_b[i,j,k])
+            myRHP_g[i,j,k] = RooHistPdf("myRHP_g"+str(i)+str(j)+str(k),"myRHP_g"+str(i)+str(j)+str(k),RooArgSet(rrv_msv),myRDH_g[i,j,k])
+            myRHP_c[i,j,k] = RooHistPdf("myRHP_c"+str(i)+str(j)+str(k),"myRHP_c"+str(i)+str(j)+str(k),RooArgSet(rrv_msv),myRDH_c[i,j,k])
+            myRHP_l[i,j,k] = RooHistPdf("myRHP_l"+str(i)+str(j)+str(k),"myRHP_l"+str(i)+str(j)+str(k),RooArgSet(rrv_msv),myRDH_l[i,j,k])
+
+
+            print "DATA_per_pT[", i , j, k, "].numEntries() = ", DATA_per_pT[i,j,k].numEntries()
+
+            f_b[i,j,k] = RooConstVar("f"+str(i)+str(j)+str(k),
+                                     "f"+str(i)+str(j)+str(k),
+                                     RDS_per_pT[i,j,k].numEntries()*1.0/DATA_per_pT[i,j,k].numEntries())
+            print "frac ", i,j,k, " = ", f_b[i,j,k].getVal()
+            fracList.add(f_b[i,j,k])
+
+            b_pdfList.add(myRKP_b[i,j,k])
+            g_pdfList.add(myRKP_g[i,j,k])
+            c_pdfList.add(myRKP_c[i,j,k])
+            l_pdfList.add(myRKP_l[i,j,k])
+
+            rrv_weight.setVal(1./f_b[i,j,k].getVal())
+            RDS_per_pT[i,j,k].addColumn(rrv_weight)
+
 
 # Make plot of data in x
 # Use calculated category to select sideband data
 testframe = rrv_msv.frame()
 myRDS.plotOn(testframe)
 myRDS.plotOn(testframe,RooFit.Cut("pTRegion==pTRegion::1"),RooFit.MarkerColor(kRed),RooFit.LineColor(kRed)) 
-                    
+                  
 
-RDS_per_pT = {}
-RDS_b_per_pT = {}
-RDS_c_per_pT = {}
-RDS_l_per_pT = {}
-RKP_b_per_pT = {}
-RKP_c_per_pT = {}
-RKP_l_per_pT = {}
-
-myRDH_b = {}
-myRDH_c = {}
-myRDH_l = {}
-
-myRHP_b = {}
-myRHP_c = {}
-myRHP_l = {}
-
-myRKP_b = {}
-myRKP_c = {}
-myRKP_l = {}
-
-
-DATA_per_pT = {}
-
-for i in range(1,5):
-    RDS_per_pT[i]    = myRDS.reduce("pTRegion==pTRegion::"+str(i))
-    print "RDS_per_pT[", i , "].numEntries() = ", RDS_per_pT[i].numEntries()
-    RDS_b_per_pT[i]  = myRDS_b.reduce("pTRegion==pTRegion::"+str(i)) 
-    RDS_c_per_pT[i]  = myRDS_c.reduce("pTRegion==pTRegion::"+str(i)) 
-    RDS_l_per_pT[i]  = myRDS_l.reduce("pTRegion==pTRegion::"+str(i)) 
-    DATA_per_pT[i] = DATA.reduce("pTRegion==pTRegion::"+str(i)) 
-    #RKP_per_pT[i]    = RooKeysPdf("RKP_per_pT"+str(i),  "RKP_per_pT"+str(i),rrv_msv,RDS_per_pT[i])
-    myRKP_b[i]  = RooKeysPdf("RKP_b_per_pT"+str(i),"RKP_b_per_pT"+str(i),rrv_msv,RDS_b_per_pT[i])
-    myRKP_c[i]  = RooKeysPdf("RKP_c_per_pT"+str(i),"RKP_c_per_pT"+str(i),rrv_msv,RDS_c_per_pT[i])
-    myRKP_l[i]  = RooKeysPdf("RKP_l_per_pT"+str(i),"RKP_l_per_pT"+str(i),rrv_msv,RDS_l_per_pT[i])
-
-    #myRDH   = RooDataHist("myRDH",   "myRDH",   RooArgSet(rrv_msv), myRDS  )
-    myRDH_b[i] = RooDataHist("myRDH_b"+str(i), "myRDH_b"+str(i), RooArgSet(rrv_msv), RDS_b_per_pT[i])
-    myRDH_c[i] = RooDataHist("myRDH_c"+str(i), "myRDH_c"+str(i), RooArgSet(rrv_msv), RDS_c_per_pT[i])
-    myRDH_l[i] = RooDataHist("myRDH_l"+str(i), "myRDH_l"+str(i), RooArgSet(rrv_msv), RDS_l_per_pT[i])
-
-    print "made datahists, making histpdfs"
-    
-    #myRHP   = RooHistPdf("myRHP",  "myRHP",  RooArgSet(rrv_msv),myRDH  )
-    myRHP_b[i] = RooHistPdf("myRHP_b"+str(i),"myRHP_b"+str(i),RooArgSet(rrv_msv),myRDH_b[i])
-    myRHP_c[i] = RooHistPdf("myRHP_c"+str(i),"myRHP_c"+str(i),RooArgSet(rrv_msv),myRDH_c[i])
-    myRHP_l[i] = RooHistPdf("myRHP_l"+str(i),"myRHP_l"+str(i),RooArgSet(rrv_msv),myRDH_l[i])
-
-
-
-RDS_per_pT[1].plotOn(testframe,RooFit.MarkerColor(kRed),RooFit.LineColor(kRed)) 
-RDS_per_pT[2].plotOn(testframe,RooFit.MarkerColor(kBlue),RooFit.LineColor(kBlue)) 
+RDS_per_pT[1,1,1].plotOn(testframe,RooFit.MarkerColor(kRed),RooFit.LineColor(kRed)) 
+RDS_per_pT[2,1,1].plotOn(testframe,RooFit.MarkerColor(kBlue),RooFit.LineColor(kBlue)) 
 
 testframe.Draw()
 
@@ -232,43 +374,21 @@ testframe.Draw()
 #testframe2.Draw()
 
 
-b_pdfList = RooArgList()
-c_pdfList = RooArgList()
-l_pdfList = RooArgList()
 
-f_b={}
-fracList = RooArgList()
-thresholdList = RooArgList(RooConstVar("t0","t0",rrv_pT.getMin()),
-                           RooConstVar("t1","t1",30),
-                           RooConstVar("t2","t2",50),
-                           RooConstVar("t3","t3",80),
-                           RooConstVar("t4","t4",150))
-
-### TODO: add #PV, eta
-### First produce them also in data
-### (Long term: properly produce data/MC RooDataSets in same way)
-
-rrv_weight = RooRealVar("weight","weight",0)
-
-RDS_weighted_per_pT = {}
+#thresholdList = RooArgList(RooConstVar("t0","t0",rrv_pT.getMin()),
+#                           RooConstVar("t1","t1",30),
+#                           RooConstVar("t2","t2",50),
+#                           RooConstVar("t3","t3",80),
+#                           RooConstVar("t4","t4",150))
 
 
+
+
+RDS_sum = RooDataSet("RDS_sum","RDS_sum",RDS_per_pT[i,j,k].get())
 for i in range(1,5):
-    f_b[i] = RooConstVar("f"+str(i),"f"+str(i),RDS_per_pT[i].numEntries()*1.0/DATA_per_pT[i].numEntries())
-    print "frac ", i, " = ", f_b[i].getVal()
-    fracList.add(f_b[i])
-    b_pdfList.add(myRKP_b[i])
-    c_pdfList.add(myRKP_c[i])
-    l_pdfList.add(myRKP_l[i])
-
-    rrv_weight.setVal(1./f_b[i].getVal())
-    RDS_per_pT[i].addColumn(rrv_weight)
-
-
-RDS_sum = RooDataSet("RDS_sum","RDS_sum",RDS_per_pT[i].get())
-for i in range(1,5): RDS_sum.append(RDS_per_pT[i])
-
-
+    for j in range(1,2):
+        for k in range(1,2):
+            RDS_sum.append(RDS_per_pT[i,j,k])
 
 RDS_sum_weighted = RooDataSet("RDS_sum_weighted",
                               "RDS_sum_weighted",
@@ -277,14 +397,13 @@ RDS_sum_weighted = RooDataSet("RDS_sum_weighted",
                               "",
                               "weight")
 
+RDH_tot          = RooDataHist("myRDH_tot",   "myRDH_tot",   RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDS_sum)
+RDH_tot_weighted = RooDataHist("myRDH_tot_w", "myRDH_tot_w", RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDS_sum_weighted)
+RHP_tot          = RooHistPdf( "myRHP_tot",   "myRHP_tot",   RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDH_tot  )
+RHP_tot_weighted = RooHistPdf( "myRHP_tot_w", "myRHP_tot_w", RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDH_tot_weighted)
 
-RDH_tot          = RooDataHist("myRDH_tot",   "myRDH_tot",   RooArgSet(rrv_pT), RDS_sum)
-RDH_tot_weighted = RooDataHist("myRDH_tot_w", "myRDH_tot_w", RooArgSet(rrv_pT), RDS_sum_weighted)
-RHP_tot          = RooHistPdf( "myRHP_tot",   "myRHP_tot",   RooArgSet(rrv_pT), RDH_tot  )
-RHP_tot_weighted = RooHistPdf( "myRHP_tot_w", "myRHP_tot_w", RooArgSet(rrv_pT), RDH_tot_weighted)
-
-Cee=TCanvas("Cee","Cee",800,400)
-Cee.Divide(2)
+Cee=TCanvas("Cee","Cee",600,1000)
+Cee.Divide(2,3)
 
 Cee.cd(1)
 FRAME1 = rrv_pT.frame(0,150,30)
@@ -300,9 +419,39 @@ RHP_tot.plotOn(FRAME2,RooFit.LineColor(kRed))
 RHP_tot_weighted.plotOn(FRAME2,RooFit.LineColor(kGreen))
 FRAME2.Draw()
 
+Cee.cd(3)
+FRAME3 = rrv_eta.frame(0,3,30)
+DATA.plotOn(FRAME3)
+RHP_tot.plotOn(FRAME3,RooFit.LineColor(kRed))
+RHP_tot_weighted.plotOn(FRAME3,RooFit.LineColor(kGreen))
+FRAME3.Draw()
+
+Cee.cd(4).SetLogy()
+FRAME4 = rrv_eta.frame(0,3,30)
+DATA.plotOn(FRAME4)
+RHP_tot.plotOn(FRAME4,RooFit.LineColor(kRed))
+RHP_tot_weighted.plotOn(FRAME4,RooFit.LineColor(kGreen))
+FRAME4.Draw()
+
+Cee.cd(5)
+FRAME5 = rrv_nPV.frame(0,20,20)
+DATA.plotOn(FRAME5)
+RHP_tot.plotOn(FRAME5,RooFit.LineColor(kRed))
+RHP_tot_weighted.plotOn(FRAME5,RooFit.LineColor(kGreen))
+FRAME5.Draw()
+
+Cee.cd(6).SetLogy()
+FRAME6 = rrv_nPV.frame(0,20,20)
+DATA.plotOn(FRAME6)
+RHP_tot.plotOn(FRAME6,RooFit.LineColor(kRed))
+RHP_tot_weighted.plotOn(FRAME6,RooFit.LineColor(kGreen))
+FRAME6.Draw()
+
+
 print "making the three keys pdfs" 
 
 b_sumPdf=0
+g_sumPdf=0
 c_sumPdf=0
 l_sumPdf=0
 
@@ -311,9 +460,11 @@ print "making the three hist pdfs"
 myRDS_l = RDS_sum_weighted.reduce("rc_flav==1")
 myRDS_c = RDS_sum_weighted.reduce("rc_flav==4")
 myRDS_b = RDS_sum_weighted.reduce("rc_flav==5")
+myRDS_g = RDS_sum_weighted.reduce("rc_flav==6")
 
 if template == "keys":
     b_sumPdf = RooAddPdf("b_sumPdf","b_sumPdf",b_pdfList,fracList)
+    g_sumPdf = RooAddPdf("g_sumPdf","g_sumPdf",g_pdfList,fracList)
     c_sumPdf = RooAddPdf("c_sumPdf","c_sumPdf",c_pdfList,fracList)
     l_sumPdf = RooAddPdf("l_sumPdf","l_sumPdf",l_pdfList,fracList)
     #b_sumPdf = RooKeysPdf("myRKP_b","myRKP_b",rrv_msv,myRDS_l)
@@ -322,6 +473,8 @@ if template == "keys":
 elif template == "hist":
     b_sumHist = RooDataHist("b_sumHist", "b_sumHist", RooArgSet(rrv_msv), myRDS_b)
     b_sumPdf  = RooHistPdf( "b_sumPdf",  "b_sumPdf",  RooArgSet(rrv_msv), b_sumHist)
+    g_sumHist = RooDataHist("g_sumHist", "g_sumHist", RooArgSet(rrv_msv), myRDS_g)
+    g_sumPdf  = RooHistPdf( "g_sumPdf",  "g_sumPdf",  RooArgSet(rrv_msv), g_sumHist)
     c_sumHist = RooDataHist("c_sumHist", "c_sumHist", RooArgSet(rrv_msv), myRDS_c)
     c_sumPdf  = RooHistPdf( "c_sumPdf",  "c_sumPdf",  RooArgSet(rrv_msv), c_sumHist)
     l_sumHist = RooDataHist("l_sumHist", "l_sumHist", RooArgSet(rrv_msv), myRDS_l)
@@ -331,24 +484,32 @@ elif template == "hist":
 #Nc = RooRealVar("Nc","Nc",myRDS.numEntries()*0.3,0,myRDS.numEntries())
 #Nl = RooRealVar("Nl","Nl",myRDS.numEntries()*0.1,0,myRDS.numEntries())
 
-Nb = RooRealVar("N_{b}","N_{b}",myRDS.numEntries()*0.6,0,myRDS.numEntries())
-Nc = RooRealVar("N_{c}","N_{c}",myRDS.numEntries()*0.3,0,myRDS.numEntries())
-Nl = RooRealVar("N_{l}","N_{l}",myRDS.numEntries()*0.1,0,myRDS.numEntries())
+Nb = RooRealVar("N_{b}","N_{b}",DATA.numEntries()*0.70,0,DATA.numEntries())
+Ng = RooRealVar("N_{g}","N_{g}",DATA.numEntries()*0.01                     )
+Nc = RooRealVar("N_{c}","N_{c}",DATA.numEntries()*0.20,0,DATA.numEntries())
+Nl = RooRealVar("N_{l}","N_{l}",DATA.numEntries()*0.10,0,DATA.numEntries())
 
 #f_Sum_b = RooRealVar("f_Sum_b","f_Sum_b",0.6,0.,1.)
 #f_Sum_c = RooRealVar("f_Sum_c","f_Sum_c",0.6,0.,1.)
 
-f_Sum_b = RooRealVar("f_{b}","f_{b}",0.6,0.,1.)
-f_Sum_c = RooRealVar("f_{c}","f_{c}",0.3,0.,1.)
+f_Sum_b = RooRealVar("f_{b}","f_{b}", 0.70, 0.00, 1.  )
+f_Sum_g = RooRealVar("f_{g}","f_{g}", 0.01, 0.01, 0.01)
+f_Sum_c = RooRealVar("f_{c}","f_{c}", 0.20, 0.00, 1.  )
 
 
 
 sumPdf = RooAddPdf("sumPdf","sumPdf",
                    RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
-                   RooArgList(Nb,       Nc       ,Nl        ) )
+                   RooArgList(Nb,      Nc       ,Nl        ) )
 sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
                     RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
                     RooArgList(f_Sum_b,  f_Sum_c            ) )
+#sumPdf = RooAddPdf("sumPdf","sumPdf",
+#                   RooArgList(b_sumPdf, g_sumPdf, c_sumPdf, l_sumPdf),
+#                   RooArgList(Nb,       Ng,       Nc       ,Nl        ) )
+#sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
+#                    RooArgList(b_sumPdf, g_sumPdf, c_sumPdf, l_sumPdf),
+#                    RooArgList(f_Sum_b,  f_Sum_g,  f_Sum_c            ) )
 
 rrv_msv.setRange("r",0,5)
 rrv_msv.SetTitle("m(SV) (GeV/c^{2})")
@@ -365,7 +526,7 @@ C1 = TCanvas("C1","C1",1000,450)
 C1.Divide(2)
 
 C1.cd(1)
-freem = rrv_msv.frame(0,5,40)
+freem = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
 
 DATA.plotOn(freem,
             RooFit.MarkerSize(1.3),
@@ -373,6 +534,7 @@ DATA.plotOn(freem,
             RooFit.DrawOption("pe2"))
 sumPdf.plotOn(freem,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
 sumPdf.plotOn(freem,RooFit.Components("b_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kRed),  RooFit.LineStyle(kDashed))
+sumPdf.plotOn(freem,RooFit.Components("g_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kMagenta),RooFit.LineStyle(kDashed))
 sumPdf.plotOn(freem,RooFit.Components("c_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
 sumPdf.plotOn(freem,RooFit.Components("l_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kBlue), RooFit.LineStyle(kDashed))
 DATA.plotOn(freem,
@@ -383,7 +545,7 @@ sumPdf.paramOn(freem,DATA)
 freem.Draw()
 
 C1.cd(2)
-freem2 = rrv_msv.frame(0,5,40)
+freem2 = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
                
 DATA.plotOn(freem2,
             RooFit.MarkerSize(1.3),
@@ -428,36 +590,43 @@ freem2.Draw()
 #freem3.Draw()
 
 jecString=""
-if jec : jecString+=str(jec)+"sigmaJEC"
+if jec : jecString+="_"+str(jec)+"sigmaJEC"
 
-if template == "hist":   C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_"+channel+"_"+WP+"_"+template+"_"+jecString+".pdf")
-elif template == "keys": C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_"+channel+"_"+WP+"_"+jecString+".pdf")
+C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_"+channel+"_"+WP+"_"+template+jecString+".pdf")
 
 C_msv_perpT_flav = TCanvas("C_msv_perpT_flav","C_msv_perpT_flav",1500,400)
-C_msv_perpT_flav.Divide(3)
+C_msv_perpT_flav.Divide(4)
 
 C_msv_perpT_flav.cd(1)        
 f_msv_perpT_b = rrv_msv.frame(0,5,40)
-myRKP_b[1].plotOn(f_msv_perpT_b,RooFit.LineColor(kBlack))
-myRKP_b[2].plotOn(f_msv_perpT_b,RooFit.LineColor(kBlue))
-myRKP_b[3].plotOn(f_msv_perpT_b,RooFit.LineColor(kGreen))
-myRKP_b[4].plotOn(f_msv_perpT_b,RooFit.LineColor(kOrange))
+myRKP_b[1,1,1].plotOn(f_msv_perpT_b,RooFit.LineColor(kBlack))
+myRKP_b[2,1,1].plotOn(f_msv_perpT_b,RooFit.LineColor(kBlue))
+myRKP_b[3,1,1].plotOn(f_msv_perpT_b,RooFit.LineColor(kGreen))
+myRKP_b[4,1,1].plotOn(f_msv_perpT_b,RooFit.LineColor(kOrange))
 f_msv_perpT_b.Draw()
 
 C_msv_perpT_flav.cd(2)        
-f_msv_perpT_c = rrv_msv.frame(0,5,40)
-myRKP_c[1].plotOn(f_msv_perpT_c,RooFit.LineColor(kBlack))
-myRKP_c[2].plotOn(f_msv_perpT_c,RooFit.LineColor(kBlue))
-myRKP_c[3].plotOn(f_msv_perpT_c,RooFit.LineColor(kGreen))
-myRKP_c[4].plotOn(f_msv_perpT_c,RooFit.LineColor(kOrange))
-f_msv_perpT_c.Draw()
+f_msv_perpT_g = rrv_msv.frame(0,5,40)
+myRKP_g[1,1,1].plotOn(f_msv_perpT_g,RooFit.LineColor(kBlack))
+myRKP_g[2,1,1].plotOn(f_msv_perpT_g,RooFit.LineColor(kBlue))
+myRKP_g[3,1,1].plotOn(f_msv_perpT_g,RooFit.LineColor(kGreen))
+myRKP_g[4,1,1].plotOn(f_msv_perpT_g,RooFit.LineColor(kOrange))
+f_msv_perpT_g.Draw()
 
 C_msv_perpT_flav.cd(3)        
+f_msv_perpT_c = rrv_msv.frame(0,5,40)
+myRKP_c[1,1,1].plotOn(f_msv_perpT_c,RooFit.LineColor(kBlack))
+myRKP_c[2,1,1].plotOn(f_msv_perpT_c,RooFit.LineColor(kBlue))
+myRKP_c[3,1,1].plotOn(f_msv_perpT_c,RooFit.LineColor(kGreen))
+myRKP_c[4,1,1].plotOn(f_msv_perpT_c,RooFit.LineColor(kOrange))
+f_msv_perpT_c.Draw()
+
+C_msv_perpT_flav.cd(4)        
 f_msv_perpT_l = rrv_msv.frame(0,5,40)
-myRKP_l[1].plotOn(f_msv_perpT_l,RooFit.LineColor(kBlack))
-myRKP_l[2].plotOn(f_msv_perpT_l,RooFit.LineColor(kBlue))
-myRKP_l[3].plotOn(f_msv_perpT_l,RooFit.LineColor(kGreen))
-myRKP_l[4].plotOn(f_msv_perpT_l,RooFit.LineColor(kOrange))
+myRKP_l[1,1,1].plotOn(f_msv_perpT_l,RooFit.LineColor(kBlack))
+myRKP_l[2,1,1].plotOn(f_msv_perpT_l,RooFit.LineColor(kBlue))
+myRKP_l[3,1,1].plotOn(f_msv_perpT_l,RooFit.LineColor(kGreen))
+myRKP_l[4,1,1].plotOn(f_msv_perpT_l,RooFit.LineColor(kOrange))
 f_msv_perpT_l.Draw()
 
 C_msv_perpT_all = TCanvas("C_msv_perpT_all","C_msv_perpT_all",1000,400)
@@ -465,18 +634,18 @@ C_msv_perpT_all.Divide(2)
 
 C_msv_perpT_all.cd(1)        
 f_msv_perpT_MC = rrv_msv.frame(0,5,40)
-RDS_per_pT[1].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kBlack), RooFit.LineColor(kBlack)) 
-RDS_per_pT[2].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kBlue),  RooFit.LineColor(kBlue)) 
-RDS_per_pT[3].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kGreen), RooFit.LineColor(kGreen)) 
-RDS_per_pT[4].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kOrange),RooFit.LineColor(kOrange)) 
+RDS_per_pT[1,1,1].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kBlack), RooFit.LineColor(kBlack)) 
+RDS_per_pT[2,1,1].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kBlue),  RooFit.LineColor(kBlue)) 
+RDS_per_pT[3,1,1].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kGreen), RooFit.LineColor(kGreen)) 
+RDS_per_pT[4,1,1].plotOn(f_msv_perpT_MC,RooFit.MarkerColor(kOrange),RooFit.LineColor(kOrange)) 
 f_msv_perpT_MC.Draw()
 
 C_msv_perpT_all.cd(2)        
 f_msv_perpT_DATA = rrv_msv.frame(0,5,40)
-DATA_per_pT[1].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kBlack) ,RooFit.LineColor(kBlack))
-DATA_per_pT[2].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kBlue)  ,RooFit.LineColor(kBlue) )
-DATA_per_pT[3].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kGreen) ,RooFit.LineColor(kGreen) )
-DATA_per_pT[4].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kOrange),RooFit.LineColor(kOrange) )
+DATA_per_pT[1,1,1].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kBlack) ,RooFit.LineColor(kBlack))
+DATA_per_pT[2,1,1].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kBlue)  ,RooFit.LineColor(kBlue) )
+DATA_per_pT[3,1,1].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kGreen) ,RooFit.LineColor(kGreen) )
+DATA_per_pT[4,1,1].plotOn(f_msv_perpT_DATA,RooFit.MarkerColor(kOrange),RooFit.LineColor(kOrange) )
 f_msv_perpT_DATA.Draw()
 
 
@@ -603,3 +772,19 @@ f_msv_perpT_DATA.Draw()
 ##f.cd("JetTree_10_1_Hth.root.root:/mistag")
 ##tree = gDirectory.Get("ttree;3")
 #mytsjeen = f.Get("mistag/ttree;3")
+
+filename = "/afs/cern.ch/user/t/tdupree/public/ZbbLeptonPhoton/bPurPlots/"+channel+"_"+"_"+WP+".txt"
+
+my_file = open(filename,"w")
+print "filename = ", filename
+print >> my_file, "##############################################################"
+print >> my_file, "WP = ", WP
+print >> my_file, "channel = ", channel
+
+print >> my_file, "--------------------> for di-", channel, "sample at selection step ", WP
+print >> my_file, "--------------------> "
+print >> my_file, "--------------------> P = (", f_Sum_b.getVal()*100. , " +/- ",  f_Sum_b.getError()*100. , " ) % "
+
+print "VOILA!!!"
+
+

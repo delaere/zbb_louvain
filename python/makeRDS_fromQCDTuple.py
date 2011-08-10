@@ -22,8 +22,7 @@ import os
 
 #####
 
-whichSample = 3
-
+whichSample = 2
 
 ### Getting a file and a tree
 
@@ -87,6 +86,8 @@ rc_flav = RooCategory("rc_flav","rc_flav")
 rc_flav.defineType("l",1) 
 rc_flav.defineType("c",4) 
 rc_flav.defineType("b",5) 
+rc_flav.defineType("g",6) 
+rc_flav.defineType("x",9) 
 
 rc_sel = RooCategory("rc_sel","rc_sel")
 rc_sel.defineType("HE",5) 
@@ -144,15 +145,40 @@ for tree in trees:
             rrv_eta.setVal(    tree.Jet_eta[i]       )
             rrv_nPU.setVal(    tree.nPU              )
             rrv_nPV.setVal(    tree.nPV              )
-            rc_flav.setLabel("l")
             if tree.Jet_Svx[ i ] > 1.74 and tree.Jet_pt[i] < 150:
                 rc_sel.setLabel("HE")
-                if tree.Jet_SvxHP[ i ] > 2.00 :
-                    rc_sel.setLabel("HP")
-                if tree.Jet_flavour[ i ] == 4 :
-                    rc_flav.setLabel("c")
-                elif tree.Jet_flavour[ i ] == 5 :
-                    rc_flav.setLabel("b")
+                if tree.Jet_SvxHP[ i ] > 2.00               : rc_sel.setLabel("HP")
+                if tree.Jet_flavour[ i ] == ( 1 or 2 or 3 ) : rc_flav.setLabel("l")
+                elif tree.Jet_flavour[ i ] == 4             : rc_flav.setLabel("c")
+                elif tree.Jet_flavour[ i ] == 5             : rc_flav.setLabel("b")
+                else                                        : rc_flav.setLabel("x")
+
+#                    for gl in range(0,tree.nBFromGSplit):
+#                        if tree.Jet_pt[i] < 1.1*tree.bFromGSplit_pT[gl]:
+#                            if tree.bFromGSplit_phi[gl] < 1.1*tree.Jet_phi[i] and tree.bFromGSplit_phi[gl] > 0.9*tree.Jet_phi[i] :
+#                                if tree.bFromGSplit_eta[gl] < 1.1*tree.Jet_eta[i] and tree.bFromGSplit_eta[gl] > 0.9*tree.Jet_phi[i] :
+#                                    if tree.bFromGSplit_eta[gl] < 2.5 :
+#                                        rc_flav.setLabel("g")
+#                                        print "b from gluon splitting!!!"
+                
+#   #check if (nBFromGSplit>0) {
+#   #    for (int igluon =0; igluon<nBFromGSplit; igluon++){
+#   #    double comp = fabs( bFromGSplit_pT[igluon] - ptjet) ;  comp = comp/bFromGSplit_pT[igluon] ;
+#   #    if ( comp > 1.1 )  continue;
+#   #    if (bFromGSplit_eta[igluon] < 0.8*EtaMin )  continue;
+#   #    if (bFromGSplit_eta[igluon] > 1.2*EtaMax )  continue;
+#   #    double test = deltaR(etajet, phijet , bFromGSplit_eta[igluon],bFromGSplit_phi[igluon]) ;
+#   #    DeltaRGluonSp->Fill(test,ww);
+#   #
+#   #    if (test < 0.15){issplit = 1 ; DeltaRGluonMass->Fill(test,mass2vx); break;}#
+##
+#
+
+
+                #elif tree.Jet_flavour[ i ] == 5                         :
+                #    rc_flav.setLabel("b")
+                #    print "JUST b"
+                #else                                                    : rc_flav.setLabel("x")
                 weight = Double(1.)
                 numSaved += 1
                 myRDS.add(RooArgSet(rrv_msv,

@@ -25,13 +25,15 @@ from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from ROOT import *
 
+from monteCarloSelection import *
+
 from eventSelection import eventCategories, eventCategory, isInCategory
 
 ###################
 ### Run options ###
 ###################
 
-channel = "Mu_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 
 ############
 ### Maps ###
@@ -104,6 +106,15 @@ rc_HP_excl.defineType("acc",1)
 rc_HEMET_excl.defineType("acc",1)
 rc_HPMET_excl.defineType("acc",1)
 
+
+rc_flav = RooCategory("rc_flav","rc_flav")
+rc_flav.defineType("l",1)
+rc_flav.defineType("c",4)
+rc_flav.defineType("b",5)
+rc_flav.defineType("g",6)
+rc_flav.defineType("x",9)
+
+
 #######################################
 ### Define RooArgSet and RooDataSet ###
 #######################################
@@ -125,6 +136,7 @@ obsSet.add(rc_HE_excl)
 obsSet.add(rc_HP_excl)
 obsSet.add(rc_HEMET_excl)
 obsSet.add(rc_HPMET_excl)
+obsSet.add(rc_flav)
 
 
 rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
@@ -178,6 +190,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     zmmbblabel="Zmmbb"
     zeebblabel="Zeebb"
     bblabel ="bbbar"
+    genlabel="genParticles"
     #triggerlabel="patTriggerEvent"
     vertexlabel="goodPV"
 
@@ -189,6 +202,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
     bbHandle    = Handle ("vector<reco::CompositeCandidate>")
     #trigInfoHandle = Handle ("pat::TriggerEvent")
+    genHandle   = Handle ("vector<reco::GenParticle>")
     vertexHandle = Handle ("vector<reco::Vertex>")
     
     for event in events:
@@ -229,6 +243,11 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
         vertexs       = vertexHandle.product()
+        
+        genparts      = 0
+        if WP[:2]=="MC" :
+            event.getByLabel (genlabel,genHandle)
+            genHandle.product()
 
         rrv_nPV.setVal( vertexs.size() )
 
@@ -266,6 +285,21 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
                         if len(zmmbbs)>0 : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
                         if len(zeebbs)>0 : rrv_zeebb_M.setVal(zeebbs.at(0).mass())
 
+                        if WP[:2]=="MC" :
+                            if isZlEvent(genparts)   :
+                                print "*** l!"
+                                rc_flav.setLabel("l")
+                            elif isZcEvent(genparts) :
+                                print "*** c!"
+                                rc_flav.setLabel("c")
+                            elif isZbEvent(genparts) :
+                                print "*** b!"
+                                rc_flav.setLabel("b")
+                            else                     : rc_flav.setLabel("x")
+
+
+                        
+                        rds_zbb.add(obsSet)              
                         numJets+=1
                         if numJets==1: rds_zbb.add(obsSet)              
                                              
