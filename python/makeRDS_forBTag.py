@@ -62,6 +62,8 @@ path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_
 ### Define RooRealVars and RooCategories ###
 ############################################
 
+### event
+rrv_nPV     = RooRealVar("rrv_nPV",    "rrv_nPV", 0,20) 
 ### leptons
 rrv_ll_M    = RooRealVar("rrv_ll_M",   "rrv_ll_M"   ,-1.,1000.)
 ### b-jets 
@@ -114,6 +116,7 @@ obsSet.add(rrv_zmmbb_M)
 obsSet.add(rrv_pT)
 obsSet.add(rrv_pT_unc)
 obsSet.add(rrv_eta)
+obsSet.add(rrv_nPV)
 obsSet.add(rc_HE)
 obsSet.add(rc_HP)
 obsSet.add(rc_HEMET)
@@ -176,6 +179,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     zeebblabel="Zeebb"
     bblabel ="bbbar"
     #triggerlabel="patTriggerEvent"
+    vertexlabel="goodPV"
 
     jetHandle   = Handle ("vector<pat::Jet>")
     metHandle   = Handle ("vector<pat::MET>")
@@ -185,6 +189,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
     bbHandle    = Handle ("vector<reco::CompositeCandidate>")
     #trigInfoHandle = Handle ("pat::TriggerEvent")
+    vertexHandle = Handle ("vector<reco::Vertex>")
     
     for event in events:
 
@@ -193,6 +198,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         rrv_bb_M.setVal(-1)
         rrv_zeebb_M.setVal(-1)
         rrv_zmmbb_M.setVal(-1)
+        rrv_nPV.setVal(0)
         rc_HE.setIndex(0)
         rc_HP.setIndex(0)
         rc_HEMET.setIndex(0)
@@ -212,6 +218,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         event.getByLabel (  zeebblabel,   zeebbHandle)
         event.getByLabel (  zmmbblabel,   zmmbbHandle)
         event.getByLabel (     bblabel,      bbHandle)
+        event.getByLabel ( vertexlabel,  vertexHandle)
 
         jets          = jetHandle.product()
         met           = metHandle.product()
@@ -221,6 +228,10 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         zmmbbs        = zmmbbHandle.product()
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
+        vertexs       = vertexHandle.product()
+
+        rrv_nPV.setVal( vertexs.size() )
+
 
         bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEl)
 
@@ -230,6 +241,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
 
         if bestZcandidate and isInCategory(5, myCatData):
             print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
+            numJets = 0
             for jet in jets :
                 tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
                 if tISV :
@@ -254,7 +266,8 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
                         if len(zmmbbs)>0 : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
                         if len(zeebbs)>0 : rrv_zeebb_M.setVal(zeebbs.at(0).mass())
 
-                        rds_zbb.add(obsSet)              
+                        numJets+=1
+                        if numJets==1: rds_zbb.add(obsSet)              
                                              
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)

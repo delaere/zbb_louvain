@@ -31,7 +31,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "Ttbar_Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 
 ############
 ### Maps ###
@@ -62,6 +62,8 @@ path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_
 ### Define RooRealVars and RooCategories ###
 ############################################
 
+### event
+rrv_nPV     = RooRealVar("rrv_nPV",    "rrv_nPV", 0,20) 
 ### leptons
 rrv_ll_M    = RooRealVar("rrv_ll_M",   "rrv_ll_M"   ,-1.,1000.)
 ### selection
@@ -97,6 +99,7 @@ rc_HPMET_excl.defineType("acc",1)
 #######################################
 
 obsSet = RooArgSet(rrv_ll_M)
+obsSet.add(rrv_nPV)
 obsSet.add(rc_HE)
 obsSet.add(rc_HP)
 obsSet.add(rc_HEMET)
@@ -147,7 +150,7 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     for fname in dirList:
         files.append(_path+fname)
     print files
-    files = files[:10]
+    files = files[:100]
     print files
     events = Events (files)
 
@@ -159,6 +162,7 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     zeebblabel="Zeebb"
     bblabel ="bbbar"
     #triggerlabel="patTriggerEvent"
+    vertexlabel="goodPV"
 
     jetHandle   = Handle ("vector<pat::Jet>")
     metHandle   = Handle ("vector<pat::MET>")
@@ -168,10 +172,12 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
     bbHandle    = Handle ("vector<reco::CompositeCandidate>")
     #trigInfoHandle = Handle ("pat::TriggerEvent")
+    vertexHandle = Handle ("vector<reco::Vertex>")
     
     for event in events:
 
         rrv_ll_M.setVal(-1)
+        rrv_nPV.setVal(0)
 
         rc_HE.setIndex(0)
         rc_HP.setIndex(0)
@@ -192,6 +198,7 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
         event.getByLabel (  zeebblabel,   zeebbHandle)
         event.getByLabel (  zmmbblabel,   zmmbbHandle)
         event.getByLabel (     bblabel,      bbHandle)
+        event.getByLabel ( vertexlabel,  vertexHandle)
 
         jets          = jetHandle.product()
         met           = metHandle.product()
@@ -201,6 +208,9 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
         zmmbbs        = zmmbbHandle.product()
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
+        vertexs       = vertexHandle.product()
+
+        rrv_nPV.setVal( vertexs.size() )
 
         bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEl)
 
@@ -208,6 +218,7 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
 
         if bestZcandidate and isInCategory(5, myCatData):
             #print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
+            numJets = 0
             for jet in jets :
                 tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
                 if tISV :
@@ -223,8 +234,11 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
                         if isInCategory(16, myCatData): rc_HP_excl.setIndex(1)
                         if isInCategory(17, myCatData): rc_HEMET_excl.setIndex(1)
                         if isInCategory(18, myCatData): rc_HPMET_excl.setIndex(1)
-                       
-                        rds_zbb.add(obsSet)              
+
+                        numJets+=1
+                        if numJets==1: rds_zbb.add(obsSet)
+
+            print "number of jets = ", numJets            
                                              
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)
