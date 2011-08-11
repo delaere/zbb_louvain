@@ -95,7 +95,9 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   setTDRStyle();
   // retrieve the frame
   TFrame* frame = (TFrame*) canvas->FindObject("TFrame");
+  // draw the canvas
   canvas->Draw();
+  // fix the size
   float borderX = canvas->GetWindowWidth()-canvas->GetWw();
   float borderY = canvas->GetWindowHeight()-canvas->GetWh();
   canvas->SetCanvasSize(500,500);
@@ -115,7 +117,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   canvas->UseCurrentStyle();
   canvas->SetLogx(logx);
   canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 36 pb^{-1}}");
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 1.0 fb^{-1}}");
   if(SSVHE) {
     x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
     y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
@@ -139,3 +141,79 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   canvas->RedrawAxis();
   // now it is up to you to arrange things and save
 }
+
+TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
+{
+  // get data and total MC from the canvas
+  TIter next(canvas->GetListOfPrimitives());
+  TIter* mc = NULL;
+  TH1F* data = NULL;
+  TObject* obj = NULL;
+  while ((obj = next())) {
+    if(string(obj->GetName())==string(canvas->GetName()) && obj->InheritsFrom("TH1")) {
+      data = (TH1F*)obj;
+    }
+    if(string(obj->GetName())==string(canvas->GetName()) && obj->InheritsFrom("THStack")) {
+      mc = new TIter(((THStack*)obj)->GetHists());
+    }
+  }
+  TH1F* histo_ratio = data ? data->Clone() : NULL;
+  TH1F* totmc = NULL;
+  if(mc) {
+    while ((obj = mc->Next())) {
+      if(totmc) {
+        totmc->Add((TH1*)obj);
+      } else {
+        totmc = (TH1F*)((TH1*)obj)->Clone();
+      }
+    }
+  }
+  // if data or MC is missing, simply return the input
+  if(totmc == NULL || histo_ratio == NULL) {
+    return (TCanvas*) canvas->DrawClone();
+  }
+  // create the ratio histogram
+  histo_ratio->SetName("histo_ratio");
+  histo_ratio->SetTitle("");
+  histo_ratio->Sumw2();
+  histo_ratio->Divide(totmc);
+  // create the uncertainty histogram
+  TH1F* mc_uncertainty = (TH1F*)totmc->Clone();
+  //for(unsigned bin = 0; bin<=mc_uncertainty->GetNbinsx(); ++bin) mc_uncertainty->SetBinContent(mc_uncertainty->GetBinError());
+  mc_uncertainty->Divide(totmc);
+  // create a new canvas with two pads
+  TCanvas* c = new TCanvas(Form("%s_withRatio",canvas->GetName()),Form("%s with ratio",canvas->GetTitle()),500,640);
+  TPad *canvas_1 = new TPad("canvas_1", canvas->GetTitle(),0,0.22,1.0,1.0);
+  canvas_1->Draw();
+  TPad *canvas_2 = new TPad("canvas_2", Form("%s ratio",canvas->GetTitle()),0,0.,1.0,0.22);
+  canvas_2->Draw();
+  // in pad 1, put a copy of the input
+  canvas_1->cd();
+  canvas->DrawClonePad();
+  // in pad 2, put the ratio plot and the relative uncertainty from MC
+  canvas_2->cd();
+  gPad->SetBottomMargin(0.375);
+  gPad->SetGridy();
+  gPad->SetGridx();
+  mc_uncertainty->Draw("E3");
+  mc_uncertainty->GetYaxis()->SetTitle("Data/MC");
+  mc_uncertainty->GetYaxis()->SetTitleFont(42);
+  mc_uncertainty->GetYaxis()->SetTitleOffset( 0.4 );
+  mc_uncertainty->GetYaxis()->SetTitleSize( 0.17 );
+  mc_uncertainty->GetYaxis()->SetLabelFont(42);
+  mc_uncertainty->GetYaxis()->SetLabelSize(0.16);
+  mc_uncertainty->GetYaxis()->SetNdivisions( 505 );
+  mc_uncertainty->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
+  mc_uncertainty->GetXaxis()->SetTitleFont(42);
+  mc_uncertainty->GetXaxis()->SetTitleSize( 0.17 );
+  mc_uncertainty->GetXaxis()->SetLabelSize(0.16);
+  mc_uncertainty->GetXaxis()->SetLabelFont(42);
+  mc_uncertainty->SetMinimum(0.);
+  mc_uncertainty->SetMaximum(2.);
+  histo_ratio->SetMarkerStyle(20);
+  histo_ratio->SetMarkerSize(0.7);
+  histo_ratio->Draw("E1X0 same");
+  // return the new canvas
+  return c;
+}
+
