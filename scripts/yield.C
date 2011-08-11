@@ -7,7 +7,7 @@
 #include <THStack.h>
 #include <TList.h>
 #include <TKey.h>
-#include <TH1I.h>
+#include <TH1F.h>
 #include <TFile.h>
 #include <TGraphErrors.h>
 
@@ -23,11 +23,11 @@ void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRati
   //get the plots
   TIter next(categoryPlot->GetListOfPrimitives());
   TIter* mc = NULL;
-  TH1I* data = NULL;
+  TH1F* data = NULL;
   TObject* obj = NULL;
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
-      data = (TH1I*)obj;
+      data = (TH1F*)obj;
     }
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
       mc = new TIter(((THStack*)obj)->GetHists());
@@ -54,11 +54,11 @@ std::vector<TGraphErrors*> initGraphs(TCanvas* categoryPlot)
   //get the plots
   TIter next(categoryPlot->GetListOfPrimitives());
   TIter* mc = NULL;
-  TH1I* data = NULL;
+  TH1F* data = NULL;
   TObject* obj = NULL;
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
-      data = (TH1I*)obj;
+      data = (TH1F*)obj;
     }
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
       mc = new TIter(((THStack*)obj)->GetHists());
@@ -105,11 +105,11 @@ std::vector<std::pair<float,float> > yieldData(TCanvas* categoryPlot, unsigned s
   //get the plots
   TIter next(categoryPlot->GetListOfPrimitives());
   TIter* mc = NULL;
-  TH1I* data = NULL;
+  TH1F* data = NULL;
   TObject* obj = NULL;
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
-      data = (TH1I*)obj;
+      data = (TH1F*)obj;
     }
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
       mc = new TIter(((THStack*)obj)->GetHists());
@@ -123,7 +123,7 @@ std::vector<std::pair<float,float> > yieldData(TCanvas* categoryPlot, unsigned s
   output.reserve(10);
   output.push_back(std::make_pair(data->GetBinContent(stage+1),data->GetBinError(stage+1)));
   while ((obj = mc->Next())) {
-    TH1I* h = (TH1I*)obj;
+    TH1F* h = (TH1F*)obj;
     output.push_back(std::make_pair(h->GetBinContent(stage+1),h->GetBinError(stage+1)));
     totmc += h->GetBinContent(stage+1);
     if(string(h->GetTitle())==signalName) signal+= h->GetBinContent(stage+1);
