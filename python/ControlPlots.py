@@ -214,25 +214,32 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         # compute the weight 
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight(fwevent=event)
-        if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event)
+        if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event,muChannel=muChannel)
 	if handleBT:
-	  if categoryName(level).find("(HE") != -1:
-            if categoryName(level).find("exclusive") != -1:
+          catName = categoryName(level%eventCategories())
+	  if catName.find("(HEHE") != -1:
+	    BeffW.setMode("HEHE")
+	    eventWeight *= BeffW.weight(event,muChannel)
+	  elif catName.find("(HEHP") != -1:
+	    BeffW.setMode("HEHP")
+	    eventWeight *= BeffW.weight(event,muChannel)
+	  elif catName.find("(HPHP") != -1:
+	    BeffW.setMode("HPHP")
+	    eventWeight *= BeffW.weight(event,muChannel)
+	  elif catName.find("(HE") != -1:
+            if catName.find("exclusive") != -1:
               BeffW.setMode("HEexcl")
+	      eventWeight *= BeffW.weight(event,muChannel)
             else:
               BeffW.setMode("HE")
-	  if categoryName(level).find("(HP") != -1:
-            if categoryName(level).find("exclusive") != -1:
+	      eventWeight *= BeffW.weight(event,muChannel)
+	  elif catName.find("(HP") != -1:
+            if catName.find("exclusive") != -1:
               BeffW.setMode("HPexcl")
+	      eventWeight *= BeffW.weight(event,muChannel)
             else:
               BeffW.setMode("HP")
-	  if categoryName(level).find("(HEHE") != -1:
-	    BeffW.setMode("HEHE")
-	  if categoryName(level).find("(HEHP") != -1:
-	    BeffW.setMode("HEHP")
-	  if categoryName(level).find("(HPHP") != -1:
-	    BeffW.setMode("HPHP")
-	  eventWeight *= BeffW.weight(event,muChannel)
+	      eventWeight *= BeffW.weight(event,muChannel)
         # security against negative weights 
         if eventWeight<0: eventWeight=0
         # fill the histograms
