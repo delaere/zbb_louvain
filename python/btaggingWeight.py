@@ -22,13 +22,14 @@ class btaggingWeight:
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
 
   def setMode(self,mode):
+    #reminder: in the engine, the HP includes always HE.
     if mode=="HE": self.engine.setLimits(1,999,0,999)
-    elif mode=="HP": self.engine.setLimits(0,999,1,999)
-    elif mode=="HEexcl": self.engine.setLimits(1,1,0,0)
+    elif mode=="HP": self.engine.setLimits(1,999,1,999)
+    elif mode=="HEexcl": self.engine.setLimits(1,1,0,1)
     elif mode=="HPexcl": self.engine.setLimits(1,1,1,1)
     elif mode=="HEHE": self.engine.setLimits(2,999,0,999)
-    elif mode=="HEHP": self.engine.setLimits(1,999,1,999)
-    elif mode=="HPHP": self.engine.setLimits(0,999,2,999)
+    elif mode=="HEHP": self.engine.setLimits(2,999,1,999)
+    elif mode=="HPHP": self.engine.setLimits(2,999,2,999)
     else: 
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)

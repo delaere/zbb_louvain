@@ -326,7 +326,7 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
           (*it)->GetObject(key->GetName(),dir);
           mcitems.push_back(dir);
         }
-        CombineDir(dataitems, mcitems, output->mkdir(key->GetName()));
+        CombineDir(dataitems, mcitems, output->mkdir(key->GetName(),key->GetTitle()));
      } else if (key->ReadObj()->InheritsFrom("TH1")) {
         CombineHistos(key->GetName(),datadirs,mcdirs,output);
      }

@@ -1,48 +1,69 @@
 import FWCore.ParameterSet.Config as cms
-from ROOT import EColor
-palette=-6
+
+class EColor:
+ """ROOT colors taken from RTypes.h"""
+ kWhite  = 0
+ kBlack  = 1
+ kGray   = 920
+ kRed    = 632
+ kGreen  = 416
+ kBlue   = 600
+ kYellow = 400
+ kMagenta= 616
+ kCyan   = 432
+ kOrange = 800
+ kSpring = 820
+ kTeal   = 840
+ kAzure  = 860
+ kViolet = 880
+ kPink   = 900 
+
+palette=-7
 
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('mergedPlots_ZjZcZb_MCFM_all.root'),
+  outputFile = cms.string('mergedPlots_ZlZcZb.root'),
+
   data = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('controlPlots_Ele_2010A_Dec22_all.root')
+     fileName = cms.string('May10ReReco_204pb.root')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_Ele_2010B_Dec22_all.root')
-   ), 
-   cms.PSet(
-     fileName = cms.string('controlPlots_Mu_2010A_Dec22_all.root')
-   ), 
-   cms.PSet(
-     fileName = cms.string('controlPlots_Mu_2010B_Dec22_all.root')
+     fileName = cms.string('PromptRecoV4_1078pb.root')
    ) 
   ),
   mc   = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('controlPlots_TTJets_TuneZ2_v3_all.root'),
-     color = cms.uint32(EColor.kYellow-palette),
-     scale = cms.double(0.0045916), #NLO MCFM
+     fileName = cms.string('TTJets_Summer11.root'),
+     #color = cms.uint32(5),
+     color = cms.uint32(EColor.kYellow+palette),
+     scale = cms.double(168.*1090./((21./25.)*3701947.)), #NLO MCFM
+     #scale = cms.double(0.0045916), #NLO MCFM
      role = cms.string('t#bar{t}')
    ),
    cms.PSet(
-     fileName = cms.string('controlPlots_Zbb-TuneZ2_v3_all.root'),
-     color = cms.uint32(EColor.kRed-palette),
-     scale = cms.double(0.0355249), #NLO MCFM
+     fileName = cms.string('Zb_fromDYJets_Summer11.root'),
+     #color = cms.uint32(2),
+     color = cms.uint32(EColor.kRed+palette),
+     scale = cms.double(3048.*1090./30008836.), #NLO MCFM
+     #scale = cms.double(0.0355249), #NLO MCFM
      role = cms.string('Z+b')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_Zcc-TuneZ2_v3_all.root'),
-     color = cms.uint32(EColor.kGreen-palette),
-     scale = cms.double(0.0365163), #NLO MCFM
+     fileName = cms.string('Zc_fromDYJets_Summer11.root'),
+     #color = cms.uint32(3),
+     color = cms.uint32(EColor.kGreen+palette),
+     scale = cms.double(3048.*1090./30008836.), #NLO MCFM
+     #scale = cms.double(0.0365163), #NLO MCFM
      role = cms.string('Z+c')
    ), 
    cms.PSet(
-     fileName = cms.string('controlPlots_DYJetsToLL_TuneZ2_Zl_all.root'),
-     color = cms.uint32(EColor.kBlue-palette),
-     scale = cms.double(0.0207567), #NNLO
+     fileName = cms.string('Zl_fromDYJets_Summer11.root'),
+     #color = cms.uint32(4),
+     color = cms.uint32(EColor.kBlue+palette),
+     scale = cms.double(3048.*1090./30008836.), #NNLO
+     #scale = cms.double(0.0207567), #NNLO
      role = cms.string('Z+l')
    ),
   ),

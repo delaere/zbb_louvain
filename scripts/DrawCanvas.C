@@ -208,6 +208,7 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   mc_uncertainty->GetXaxis()->SetTitleSize( 0.17 );
   mc_uncertainty->GetXaxis()->SetLabelSize(0.16);
   mc_uncertainty->GetXaxis()->SetLabelFont(42);
+  mc_uncertainty->GetXaxis()->SetRange(data->GetXaxis()->GetFirst(), data->GetXaxis()->GetLast());
   mc_uncertainty->SetMinimum(0.);
   mc_uncertainty->SetMaximum(2.);
   histo_ratio->SetMarkerStyle(20);

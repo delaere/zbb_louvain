@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.5 $'),
+    version = cms.untracked.string('$Revision: 1.6 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -86,7 +86,7 @@ defaultTriggerMatch = cms.EDProducer(
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13")')   
+        , matchedCuts = cms.string('path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")')   
         )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
@@ -132,7 +132,7 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
                     # for MC, use only L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'
-                    jetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L5Flavor','L7Parton']), # 
+                    jetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual','L5Flavor','L7Parton']), # 
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
@@ -204,6 +204,13 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
 
 process.matchedMuons.src = "selectedMuonsMatched"
 
+process.Zmatchedmatched = cms.EDProducer("CandViewShallowCloneCombiner",
+                                     decay = cms.string("matchedMuons@+ matchedMuons@-"),
+                                     cut = cms.string("mass > 12.0"), 
+                                     name = cms.string('zmumu'),
+                                     roles = cms.vstring('matched1', 'matched2'),
+                                     )
+
 process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
                                      decay = cms.string("matchedMuons@+ tightMuons@-"),
                                      cut = cms.string("mass > 12.0"), 
@@ -253,7 +260,7 @@ process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone( preselection =
                                                  'electronID("simpleEleId85relIso") == 7 &' 
-                                                  # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                 'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
                                                  'pt > 10. &'
                                                  'abs(eta) < 2.5 &'
                                                  #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -263,7 +270,7 @@ process.tightElectrons.src = "selectedElectronsMatched"
 
 process.matchedElectrons = cleanPatElectrons.clone(preselection =
                                                    'electronID("simpleEleId85relIso") == 7 &' 
-                                                   # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                   'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.5 &'
                                                    #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -274,10 +281,10 @@ process.matchedElectrons = cleanPatElectrons.clone(preselection =
 process.matchedElectrons.src = "selectedElectronsMatched"
 
 process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("tightElectrons@+ matchedElectrons@-"),
+                               decay = cms.string("matchedElectrons@+ matchedElectrons@-"),
                                cut = cms.string("mass > 12.0"),
                                name = cms.string('zelel'), 
-                               roles = cms.vstring('tight', 'matched')
+                               roles = cms.vstring('matched1', 'matched2')
                               )
 
 #-----------------tracks
@@ -405,7 +412,7 @@ process.eltrigger = countPatElectrons.clone(src = 'cleanPatElectrons', minNumber
 process.emutriggerp1= countPatMuons.clone(src = 'cleanPatMuons', minNumber = 1) 
 process.emutriggerp2=countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 1)
 
-
+process.patMuons.usePV = False
 # trigger matching and embedding should be done at the end of the sequence
 process.patDefaultSequence *= process.selectedMuonsTriggerMatch
 process.patDefaultSequence *= process.selectedMuonsMatched
@@ -492,7 +499,7 @@ tokeep_clean += [
                  'keep *_embb_*_*',
 
                  # keep vertex info
-
+                 'keep *_usePV*_*_*',
                  'keep *_goodPV*_*_*',
                  'keep *_electronGsfTracks*_*_*']
 
@@ -511,16 +518,18 @@ process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
     #"file:/home/fynu/lceard/storage/dilep_events/EE2_RECO.root"
-    "file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
+    #"file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
     ]                                     
 
-process.maxEvents.input = 1000
+process.maxEvents.input = -1
 
 #process.out.fileName = '4DiLep.root'
 #process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
-process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
+#process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
 
-#process.out.fileName = 'Mu_V2_2011A_May10ReRe_204pb.root'
-#process.out.fileName = 'Ele_V2_2011A_May10ReRe_204pb.root'
+#process.out.fileName = 'Mu_2011A_166512_Prompt_v4.root'
+process.out.fileName = 'Ele_2011A_166512_Prompt_v4.root'
+#process.out.fileName = 'Mu_2011A_166841_Prompt_v4.root'
+#process.out.fileName = 'Ele_2011A_166841_Prompt_v4.root'
 
 process.options.wantSummary = True

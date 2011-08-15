@@ -9,6 +9,7 @@
 #include <TKey.h>
 #include <TH1F.h>
 #include <TFile.h>
+#include <TMath.h>
 #include <TGraphErrors.h>
 
 //NOTE: this code grew a lot... 
@@ -225,10 +226,12 @@ void yield(TFile* file, bool verbose = false, bool graphOutput = false)
         }
       }
       // write the graphs
-      if(output) { output->mkdir(key->GetName()); output->cd(key->GetName()); }
-      for(std::vector<TGraphErrors*>::iterator g = graphs.begin(); g != graphs.end(); ++g) { 
-        (*g)->Write();
-	delete (*g);
+      if(output) { 
+        output->mkdir(key->GetName()); output->cd(key->GetName()); 
+        for(std::vector<TGraphErrors*>::iterator g = graphs.begin(); g != graphs.end(); ++g) { 
+          (*g)->Write();
+	  delete (*g);
+        }
       }
     }
   }

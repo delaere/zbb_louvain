@@ -221,22 +221,18 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
               BeffW.setMode("HEexcl")
             else:
               BeffW.setMode("HE")
-	    eventWeight *= BeffW.weight(event,muChannel)
 	  if categoryName(level).find("(HP") != -1:
             if categoryName(level).find("exclusive") != -1:
               BeffW.setMode("HPexcl")
             else:
               BeffW.setMode("HP")
-	    eventWeight *= BeffW.weight(event,muChannel)
 	  if categoryName(level).find("(HEHE") != -1:
 	    BeffW.setMode("HEHE")
-	    eventWeight *= BeffW.weight(event,muChannel)
 	  if categoryName(level).find("(HEHP") != -1:
 	    BeffW.setMode("HEHP")
-	    eventWeight *= BeffW.weight(event,muChannel)
 	  if categoryName(level).find("(HPHP") != -1:
 	    BeffW.setMode("HPHP")
-	    eventWeight *= BeffW.weight(event,muChannel)
+	  eventWeight *= BeffW.weight(event,muChannel)
         # security against negative weights 
         if eventWeight<0: eventWeight=0
         # fill the histograms
@@ -249,11 +245,11 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
         vertexPlots[level].fill(vertexPlotsData, eventWeight)
         selectionPlots[level].fill(selectionPlotsData, eventWeight)
         if handlePU: 
-            lumiReWeightingPlots[level].fill(lumiReWeightingPlotsData, eventWeight)
+            lumiReWeightingPlots[level].fill(lumiReWeightingPlotsData) #no weight
         if handleBT:
-          btagReWeightingPlots[level].fill(btagReWeightingPlotsData, eventWeight)
+          btagReWeightingPlots[level].fill(btagReWeightingPlotsData) #no weight
         if handleLeptonEff:
-          leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData, eventWeight)
+          leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData) #no weight
     i += 1
 
   # save all

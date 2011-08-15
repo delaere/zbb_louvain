@@ -1,4 +1,5 @@
 import ROOT
+import string
 
 def selectedTriggers(triggerInfo):
   if triggerInfo is None:
@@ -104,8 +105,17 @@ def isTightMuon(muon):
 
   # anything else on top of PAT cfg ?
   # cleaning ?
+  
+  if muon.hasMasterClone():
+    mu = muon.masterClone()
+    ROOT.SetOwnership( mu, False ) 
+  else:
+    mu = muon
+  isMatched = mu.triggerObjectMatches().size()>0
+  # don't impose matching for tight muons because the trigger
+  isMatched = True
 
-  return (isLooseMuon(muon) and True)
+  return (isLooseMuon(muon) and isMatched)
 
 def isMatchedMuon(muon):
   """Perform additional checks that define a matched muon"""
@@ -118,10 +128,10 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
-  if role=="loose" : return isLooseMuon(muon)
-  if role=="tight" : return isTightMuon(muon)
-  if role=="matched" : return isMatchedMuon(muon)
-  if role=="none" : return True
+  if string.find(role,"loose")!=-1   : return isLooseMuon(muon)
+  if string.find(role,"tight")!=-1   : return isTightMuon(muon)
+  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
+  if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
 
@@ -144,7 +154,18 @@ def isTightElectron(electron):
   #if electron.hasOverlaps("muons"): return False
   if electron.pt()<25. : return False
 
-  return (isLooseElectron(electron) and True)
+  # impose matching and fiducial cut
+  if electron.hasMasterClone():
+    el = electron.masterClone()
+    ROOT.SetOwnership( el, False ) 
+  else:
+    el = electron
+  isMatched = el.triggerObjectMatches().size()>0
+  isMatched = True # for MC
+  superclusterEta = abs(el.superCluster().eta())
+  fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
+
+  return (isLooseElectron(electron) and isMatched and fiducialCut)
 
 def isMatchedElectron(electron):
 
@@ -161,10 +182,10 @@ def isMatchedElectron(electron):
 
 def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
-  if role=="loose" : return isLooseElectron(electron)
-  if role=="tight" : return isTightElectron(electron)
-  if role=="matched" : return isMatchedElectron(electron)
-  if role=="none" : return True
+  if string.find(role,"loose")!=-1   : return isLooseElectron(electron)
+  if string.find(role,"tight")!=-1   : return isTightElectron(electron)
+  if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
+  if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
 
@@ -396,7 +417,7 @@ def isInCategory(category, categoryTuple):
     return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
-    return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[5]==categoryTuple[6]  
+    return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[4]==categoryTuple[6]  
   # categoty 17: Z+1b (HE exclusive + MET)
   elif category==17:
     return isInCategory( 15, categoryTuple ) and categoryTuple[7]>0

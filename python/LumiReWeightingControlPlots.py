@@ -17,13 +17,14 @@ class LumiReWeightingControlPlots(BaseControlPlots):
       self.PileupSummaryInfo = PileupSummaryInfo
     
     def beginJob(self, MonteCarloFileName, DataFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel="goodPV", pulabel="addPileupInfo"):
+      # reweighting engine
+      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName, PileupSummaryInfo=self.PileupSummaryInfo)
       # declare histograms
       self.addHisto("LumiWeight","LumiWeight",1000,0,10)
       self.addHisto("pu","pu",50,0,50)
       self.addHisto("pv","pv",50,0,50)
-      # reweighting engine
-      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName, PileupSummaryInfo=self.PileupSummaryInfo)
       # fill the histogram with the configured weights
+      self.dir.cd()
       self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
       for i in range(50): self.h_weightSetup.SetBinContent(i+1,self.engine.weight(npu=i))
       # handles
