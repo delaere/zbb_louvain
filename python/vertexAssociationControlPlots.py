@@ -60,7 +60,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
 
     def jetSelection(self, jet, Z):
       """This corresponds to the loose jet id selection for PF jets and avoid overlap with leptons"""
-      rawjet = jet  
+      rawjet = jet.correctedJet("Uncorrected")
       nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
       nef = rawjet.neutralEmEnergyFraction()
       nconstituents = rawjet.numberOfDaughters()

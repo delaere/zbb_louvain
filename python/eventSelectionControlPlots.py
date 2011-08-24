@@ -190,7 +190,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["SSVHPdisc"] = [ ]
       for jet in jets:
         if isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
-          rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW")
+          rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jet.pt())
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())

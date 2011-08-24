@@ -188,7 +188,7 @@ def hasNoOverlap(jet, Z):
     
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
-  rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") 
+  rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
   nconstituents = rawjet.numberOfDaughters()

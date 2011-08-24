@@ -261,7 +261,7 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscTCHP  = -1
       for jet in jets:
         if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
-          rawjet = jet # TODO: in principle, one should do: rawjet = jet.correctedJet("RAW") but one needs RAW factors in the tuple
+          rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jet.pt())
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
