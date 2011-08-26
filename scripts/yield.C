@@ -12,12 +12,8 @@
 #include <TMath.h>
 #include <TGraphErrors.h>
 
-//NOTE: this code grew a lot... 
-//The structure is now typical of a code whose scope extended with time.
-//It would be worth rewriting it as a class, using members for inter-methods communication.
-
 const char signalName[30] = "Z+b";
-unsigned int nstages = 20;
+unsigned int nstages = 19;
 
 void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRatio=false, bool printSig=false)
 {
@@ -244,41 +240,5 @@ void yield(const char* filename,bool verbose = false, bool graphOutput = false)
   TFile* file = TFile::Open(filename);
   yield(file,verbose,graphOutput);
   file->Close();
-}
-
-void ratioData(double DataZb, double DataZj, double MCttbar, double purity, double efficiency, 
-               double purityErr = 0.15, double efficiencyErr = 0.2, double MCttbarError = 0.0, double JESError = 0.03)
-{
-  // first compute the ratio
-  double ratio = ((DataZb*purity)-MCttbar)/DataZj/efficiency;
-  // now, compute the statistical error
-  double stat = sqrt((purity*purity*DataZb+MCttbarError*MCttbarError)/((DataZb*purity-MCttbar)*(DataZb*purity-MCttbar))+1/DataZj);
-  stat *= ratio;
-  // and finally the systematic error
-  double syst = sqrt(purityErr*purityErr+efficiencyErr*efficiencyErr+JESError*JESError);
-  syst *= ratio;
-
-  // print
-  std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst)" << std::endl;
-}
-
-void ratioMC(double MCZb, double MCZj, double MCZbError, double MCZjError, double MCZbErrorTh, double MCZjErrorTh,
-             double JESError = 0.03)
-{
-  // first compute the ratio
-  double ratio = MCZb/MCZj;
-  // now, compute the statistical error
-  MCZbError/=MCZb;
-  MCZjError/=MCZj;
-  double stat = sqrt(MCZbError*MCZbError+MCZjError*MCZjError);
-  stat*=ratio;
-  // now, compute thesystematic error
-  double syst = ratio*JESError;
-  // and finally the theoretical error
-  double theo = sqrt(MCZbErrorTh*MCZbErrorTh+MCZjErrorTh*MCZjErrorTh);
-  theo*=ratio;
-
-  // print
-  std::cout << "ratio = " << ratio << " +/- " << stat << " (stat) +/- " << syst << " (syst) +/- " << theo << " (theo)" << std::endl;
 }
 

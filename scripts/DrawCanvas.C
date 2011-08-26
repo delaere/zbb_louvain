@@ -117,7 +117,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   canvas->UseCurrentStyle();
   canvas->SetLogx(logx);
   canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 1.0 fb^{-1}}");
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 1.14 fb^{-1}}");
   if(SSVHE) {
     x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
     y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
@@ -136,7 +136,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   TLegend* legend = ((TLegend*)canvas->FindObject("TPave"));
   if(legend) {
     legend->SetFillColor(kWhite);
-    legend->SetBorderSize(1);
+    legend->SetBorderSize(0);
   }
   canvas->RedrawAxis();
   // now it is up to you to arrange things and save

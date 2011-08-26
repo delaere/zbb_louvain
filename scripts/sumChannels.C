@@ -78,7 +78,7 @@ void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* outpu
         TDirectory* dirB;
         dir2->GetObject(key->GetName(),dirB);
 	if(!dirA || !dirB) continue;
-        sumDir(dirA,dirB, output->mkdir(key->GetName()));
+        sumDir(dirA,dirB, output->mkdir(key->GetName(),key->GetTitle()));
      } else if (key->ReadObj()->InheritsFrom("TH1")) {
         sumHistos(key->GetName(),dir1,dir2,output);
      }

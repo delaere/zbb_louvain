@@ -5,7 +5,7 @@ import ROOT
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet
+from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet, isGoodElectron, isGoodMuon, eventCategory
 
 def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   """Dump informations about a given event"""
@@ -39,6 +39,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+  trigInfoHandle = Handle ("pat::TriggerEvent")
   fwevent.getByLabel ("matchedElectrons",electronHandle)
   fwevent.getByLabel ("matchedMuons",muonHandle)
   fwevent.getByLabel ("cleanPatJets",jetHandle)
@@ -46,6 +47,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   fwevent.getByLabel ("Ztighttight",zmuHandle)
   fwevent.getByLabel ("Zelel",zeleHandle)
   fwevent.getByLabel ("goodPV",vertexHandle)
+  fwevent.getByLabel ("patTriggerEvent",trigInfoHandle)
+  triggerInfo = trigInfoHandle.product()
   vertices = vertexHandle.product()
   electrons = electronHandle.product()
   muons = muonHandle.product()
@@ -53,6 +56,11 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
+  # category
+  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", massWindow=30.)
+  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=False, btagging="SSV", massWindow=30.)
+  print "Event category info in muon channel:",catMu
+  print "Event category info in electron channel:",catEle
   # loop on objects
   print len(vertices), "vertices in the event."
   for vertex in vertices:
@@ -81,37 +89,38 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   for dijet in dijets:
     PrintCandidate("dijet",dijet)
   for zeebb in zeebbs:
-    PrintCandidate("Zbb",zb)
+    PrintCandidate("Zbb",zeebb)
   for zmmbb in zmmbbs: 
-    PrintCandidate("Zbb",zbb)
+    PrintCandidate("Zbb",zmmbb)
   # handcrafted candidates: bb Zb Zbb
   bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
-  for jet in jets:
-    if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP") :
-      b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
-      z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
-      Zb = z+b
-      PrintLorentzVector("Zb (HP)",Zb)
-  for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP"),jets),2) :
-    b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
-    b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
-    bb = b1 + b2
-    Zbb = bb+z
-    PrintLorentzVector("bb (HP)",bb)
-    PrintLorentzVector("zbb (HP)",Zbb)
-  for jet in jets:
-    if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE") :
-      b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
-      z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
-      Zb = z+b
-      PrintLorentzVector("Zb (HE)",Zb)
-  for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE"),jets),2) :
-    b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
-    b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
-    bb = b1 + b2
-    Zbb = bb+z
-    PrintLorentzVector("bb (HE)",bb)
-    PrintLorentzVector("zbb (HE)",Zbb)
+  if bestZcandidate is not None:
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP") :
+        b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
+        z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+        Zb = z+b
+        PrintLorentzVector("Zb (HP)",Zb)
+    for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP"),jets),2) :
+      b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
+      b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
+      bb = b1 + b2
+      Zbb = bb+z
+      PrintLorentzVector("bb (HP)",bb)
+      PrintLorentzVector("zbb (HP)",Zbb)
+    for jet in jets:
+      if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE") :
+        b = ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
+        z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+        Zb = z+b
+        PrintLorentzVector("Zb (HE)",Zb)
+    for bbpair in combinations(filter(lambda jet: isGoodJet(jet,bestZcandidate) and isBJet(jet,"HE"),jets),2) :
+      b1 = ROOT.TLorentzVector(bbpair[0].px(),bbpair[0].py(),bbpair[0].pz(),bbpair[0].energy())
+      b2 = ROOT.TLorentzVector(bbpair[1].px(),bbpair[1].py(),bbpair[1].pz(),bbpair[1].energy())
+      bb = b1 + b2
+      Zbb = bb+z
+      PrintLorentzVector("bb (HE)",bb)
+      PrintLorentzVector("zbb (HE)",Zbb)
 
 def PrintEvent(event) :
   print "================================================================="
@@ -131,6 +140,7 @@ def PrintMuon(muon) :
   if muon.isTrackerMuon() and muon.isGlobalMuon():
     print "  Chi2:",muon.normChi2()
   print "  Isolation: (",muon.trackIso(),"+",muon.caloIso(),")/pt = ",(muon.trackIso()+muon.caloIso())/muon.pt()
+  print "  good muon: ", isGoodMuon(muon,"loose"),isGoodMuon(muon,"tight"),isGoodMuon(muon,"matched")
   print "-----------------------------------------------------------------"
 
 def PrintElectron(electron) :
@@ -148,6 +158,14 @@ def PrintElectron(electron) :
   print "  deta:",electron.deltaEtaEleClusterTrackAtCalo()
   print "  inin:",electron.scSigmaIEtaIEta()
   print "  d0:",abs(electron.dB())
+  superclusterEta = abs(electron.superCluster().eta())
+  print "  supercluster eta:",electron.superCluster().eta(),
+  if superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 ):
+    print " => in fiducial region"
+  else:
+    print " => out of fiducial region"
+  print "  trigger object matches:",electron.triggerObjectMatches().size()
+  print "  good electron: ", isGoodElectron(electron,"loose"),isGoodElectron(electron,"tight"),isGoodElectron(electron,"matched")
   print "-----------------------------------------------------------------"
 
 def PrintJet(jet) :
@@ -168,7 +186,7 @@ def PrintJet(jet) :
   print "     SSVHE:",jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
   print "     SSVHP:",jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
   taginfo = jet.tagInfoSecondaryVertex("secondaryVertex")
-  if not taginfo is None:
+  if not taginfo is None and jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>0 :
     sv = taginfo.secondaryVertex(0)
     if not sv is None:
       print "     details about the secondary vertex:"
