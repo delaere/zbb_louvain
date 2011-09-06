@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.7 $'),
+    version = cms.untracked.string('$Revision: 1.8 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -40,12 +40,14 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 
 # electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
-muontriggers      = cms.vstring(#"HLT_DoubleMu6_v*",
+muontriggers      = cms.vstring("HLT_DoubleMu6_v*",
                                 "HLT_DoubleMu7_v*"
                                 ,"HLT_Mu13_Mu8_V*"
                                 )
 
-electrontriggers  = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
+electrontriggers  = cms.vstring(#"HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*",
+                                 "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
+                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
 
 alltriggers       = muontriggers + electrontriggers
 
@@ -87,12 +89,12 @@ defaultTriggerMatch = cms.EDProducer(
 
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")')   
+        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*")|| path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")')   
         )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatElectrons" )
-        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")')
+        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")')
 )
 
 # trigger object embedders for the same collections
