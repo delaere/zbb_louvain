@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.6 $'),
+    version = cms.untracked.string('$Revision: 1.7 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -12,7 +12,8 @@ from PhysicsTools.PatAlgos.patEventContent_cff import patExtraAodEventContent
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
+process.GlobalTag.globaltag = cms.string('GR_R_42_V20::All')
+#process.GlobalTag.globaltag = cms.string('GR_R_42_V14::All')
 #process.GlobalTag.globaltag = cms.string('GR_R_42_V10::All')
 #process.GlobalTag.globaltag = cms.string('GR_P_V20::All')
 
