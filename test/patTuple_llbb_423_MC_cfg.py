@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
 )
@@ -15,7 +15,8 @@ from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 #process.GlobalTag.globaltag = cms.string( 'GR_R_42_V14::All' )
 #process.GlobalTag.globaltag = cms.string('START42_V12::All')
-process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
+#process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
+process.GlobalTag.globaltag = cms.string('MC_42_V13::All')
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -41,9 +42,15 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 
 # electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
-muontriggers      = cms.vstring("HLT_DoubleMu6_v*")
+muontriggers      = cms.vstring("HLT_DoubleMu6_v*",
+                                "HLT_DoubleMu7_v*"
+                                ,"HLT_Mu13_Mu8_V*"
+                                )
 
-electrontriggers  = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")
+electrontriggers  = cms.vstring(#"HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*",
+                                  "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
+                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
+
 
 alltriggers       = muontriggers + electrontriggers
 
@@ -201,11 +208,11 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
 
 #process.matchedMuons.src = "selectedMuonsMatched"
 
-process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
+process.Zmatchedmatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                      decay = cms.string("matchedMuons@+ tightMuons@-"),
                                      cut = cms.string("mass > 12.0"), 
                                      name = cms.string('ztighttight'),
-                                     roles = cms.vstring('matched', 'tight'),
+                                     roles = cms.vstring('matched1', 'matched2'),
                                      )
 
 process.Ztightloose = cms.EDProducer("CandViewShallowCloneCombiner", 
@@ -249,8 +256,8 @@ process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' 
 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone( preselection =
-                                                 'electronID("simpleEleId85relIso") == 7 &'           
-                                                  # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                 'electronID("simpleEleId85relIso") == 7 &'
+                                                  'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &'
                                                  'pt > 10. &'
                                                  'abs(eta) < 2.5 &'
                                                  #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -271,10 +278,10 @@ process.matchedElectrons = cleanPatElectrons.clone(preselection =
 #process.matchedElectrons.src = "selectedElectronsMatched"
 
 process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("tightElectrons@+ matchedElectrons@-"),
+                               decay = cms.string("matchedElectrons@+ matchedElectrons@-"),
                                cut = cms.string("mass > 12.0"),
                                name = cms.string('zelel'), 
-                               roles = cms.vstring('tight', 'matched')
+                               roles = cms.vstring('matched1', 'matched2')
                               )
 
 #-----------------tracks
@@ -403,6 +410,7 @@ process.emutriggerp1= countPatMuons.clone(src = 'cleanPatMuons', minNumber = 1)
 process.emutriggerp2=countPatElectrons.clone(src = 'cleanPatElectrons', minNumber = 1)
 
 #process.patDefaultSequence *= process.hltESSEcalSeverityLevel
+process.patMuons.usePV = False
 
 # trigger matching and embedding should be done at the end of the sequence
 #process.patDefaultSequence *= process.selectedMuonsTriggerMatch
@@ -490,6 +498,7 @@ tokeep_clean += [
                  'keep *_embb_*_*',
                  
                  # keep vertex info
+                 'keep *_usePV*_*_*',
                  'keep *_goodPV*_*_*',
                  'keep *_electronGsfTracks*_*_*',
                  
@@ -509,7 +518,7 @@ process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
     ]                                     
 
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 #process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
 process.out.fileName = 'TTjets_LocalTest_MC.root'
