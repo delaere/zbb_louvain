@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.9 $'),
+    version = cms.untracked.string('$Revision: 1.10 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -207,31 +207,31 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
 
 process.matchedMuons.src = "selectedMuonsMatched"
 
-process.Zmatchedmatched = cms.EDProducer("CandViewShallowCloneCombiner",
+process.ZmuMatchedmuMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                      decay = cms.string("matchedMuons@+ matchedMuons@-"),
                                      cut = cms.string("mass > 12.0"), 
-                                     name = cms.string('zmumu'),
+                                     name = cms.string('zmumatchedmumatched'),
                                      roles = cms.vstring('matched1', 'matched2'),
                                      )
 
-process.Ztighttight = cms.EDProducer("CandViewShallowCloneCombiner",
+process.ZmuMatchedmuTight = cms.EDProducer("CandViewShallowCloneCombiner",
                                      decay = cms.string("matchedMuons@+ tightMuons@-"),
                                      cut = cms.string("mass > 12.0"), 
-                                     name = cms.string('ztighttight'),
+                                     name = cms.string('zmumatchedmutight'),
                                      roles = cms.vstring('matched', 'tight'),
                                      )
 
-process.Ztightloose = cms.EDProducer("CandViewShallowCloneCombiner", 
+process.ZmuTightmuLoose = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("matchedMuons@+ looseMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
-                                     name = cms.string('ztightloose'),
+                                     name = cms.string('zmutightmuloose'),
                                      roles = cms.vstring('matched', 'loose')
                                      )
 
-process.Zcleanclean = cms.EDProducer("CandViewShallowCloneCombiner", 
+process.ZmuCleanmuClean = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("cleanPatMuons@+ cleanPatMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
-                                     name = cms.string('zcleanclean'),
+                                     name = cms.string('zmucleanmuclean'),
                                      roles = cms.vstring('clean1', 'clean2')
                                      )
 
@@ -283,13 +283,19 @@ process.matchedElectrons = cleanPatElectrons.clone(preselection =
                                                    )
 process.matchedElectrons.src = "selectedElectronsMatched"
 
-process.Zelel = cms.EDProducer("CandViewShallowCloneCombiner",
+process.ZelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("matchedElectrons@+ matchedElectrons@-"),
                                cut = cms.string("mass > 12.0"),
-                               name = cms.string('zelel'), 
+                               name = cms.string('zelmatchedelmatched'), 
                                roles = cms.vstring('matched1', 'matched2')
                               )
 
+process.ZelMatchedelTight = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("matchedElectrons@+ tightElectrons@-"),
+                               cut = cms.string("mass > 12.0"),
+                               name = cms.string('zelmatchedeltight'), 
+                               roles = cms.vstring('matched', 'tight')
+                              )
 #-----------------tracks
 process.patMuons.embedTrack = True
 process.patElectrons.embedTrack = True
@@ -319,7 +325,7 @@ process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Zelel selectedPatJets"),
+                               decay = cms.string("ZelMatchedelMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zb'),
                                roles = cms.vstring('Z', 'j'),
@@ -327,7 +333,7 @@ process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Ztighttight selectedPatJets"),
+                               decay = cms.string("ZmuMatchedmuMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zbb'),
                                roles = cms.vstring('Z', 'b'),
@@ -335,7 +341,7 @@ process.Zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zeeb = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Zelel bjets"),
+                               decay = cms.string("ZelMatchedelMatched bjets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zb'),
                                roles = cms.vstring('Z', 'b'),
@@ -343,7 +349,7 @@ process.Zeeb = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zmmb = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Ztighttight bjets"),
+                               decay = cms.string("ZmuMatchedmuMatched bjets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zbb'),
                                roles = cms.vstring('Z', 'b'),
@@ -351,7 +357,7 @@ process.Zmmb = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Zelel bbbar"),
+                               decay = cms.string("ZelMatchedelMatched bbbar"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zbb'),
                                roles = cms.vstring('Z', 'b'),
@@ -359,7 +365,7 @@ process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
                               )
 
 process.Zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("Ztighttight bbbar"),
+                               decay = cms.string("ZmuMatchedmuMatched bbbar"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zbb'),
                                roles = cms.vstring('Z', 'b'),
@@ -387,12 +393,12 @@ process.embb = cms.EDProducer("CandViewShallowCloneCombiner",
 
 #------------------------------ Filter
 process.ZMuMuFilter = cms.EDFilter("CandViewCountFilter",
-                                src = cms.InputTag("Ztighttight"),
+                                src = cms.InputTag("ZmuMatchedmuMatched"),
                                 minNumber = cms.uint32(1),
                                 )
 
 process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
-                                src = cms.InputTag("Zelel"),
+                                src = cms.InputTag("ZelMatchedelMatched"),
                                 minNumber = cms.uint32(1),
                                 )
 
@@ -436,11 +442,12 @@ process.patDefaultSequence *= process.goodPV
 #process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
-process.patDefaultSequence *= process.Zmatchedmatched
-process.patDefaultSequence *= process.Ztighttight
-process.patDefaultSequence *= process.Ztightloose
-process.patDefaultSequence *= process.Zcleanclean
-process.patDefaultSequence *= process.Zelel
+process.patDefaultSequence *= process.ZmuMatchedmuMatched
+process.patDefaultSequence *= process.ZmuMatchedmuTight
+process.patDefaultSequence *= process.ZmuTightmuLoose
+process.patDefaultSequence *= process.ZmuCleanmuClean
+process.patDefaultSequence *= process.ZelMatchedelMatched
+process.patDefaultSequence *= process.ZelMatchedelTight
 process.patDefaultSequence *= process.emu
 
 # run additional collections and candidates
@@ -522,17 +529,17 @@ process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
     #"file:/home/fynu/lceard/storage/dilep_events/EE2_RECO.root"
-    #"file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
+    "file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
     ]                                     
 
 process.maxEvents.input = -1
 
 #process.out.fileName = '4DiLep.root'
 #process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
-#process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
+process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
 
 #process.out.fileName = 'Mu_2011A_166512_Prompt_v4.root'
-process.out.fileName = 'Ele_2011A_166512_Prompt_v4.root'
+#process.out.fileName = 'Ele_2011A_166512_Prompt_v4.root'
 #process.out.fileName = 'Mu_2011A_166841_Prompt_v4.root'
 #process.out.fileName = 'Ele_2011A_166841_Prompt_v4.root'
 
