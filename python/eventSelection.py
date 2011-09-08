@@ -28,9 +28,9 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4")      
+      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Mu13_Mu8_v6")      
     else:
-      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6"
+      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6"
                   )
 
     intersect = list(set(pathnames) & set(triggers))
@@ -47,7 +47,8 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=160410 and runNumber<163269 : outcome = "HLT_DoubleMu6_v1" in pathnames
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_DoubleMu7_v2" in pathnames
       if runNumber>=165121 and runNumber<167039 : outcome = "HLT_Mu13_Mu8_v2" in pathnames
-      if runNumber>=167039 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
+      if runNumber>=167039 and runNumber<170249 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
+      if runNumber>=170249  : outcome = "HLT_Mu13_Mu8_v6" in pathnames
     else:
       if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
       if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
@@ -62,8 +63,8 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3" in pathnames
       if runNumber>=165121 and runNumber<165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
       if runNumber>=165970 and runNumber<167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
-      if runNumber>=167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
-
+      if runNumber>=167039 and runNumber<170249 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
+      if runNumber>=170249  : outcome ="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6 " in pathnames
   return outcome
   # this is what we could do with the TriggerWeight product:
   #outcome = False
@@ -102,7 +103,9 @@ def isLooseMuon(muon):
 def isTightMuon(muon):
   """Perform additional checks that define a tight muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
-
+  # to requires both muons to be matched
+  #if muon().triggerObjectMatches().size()>0 :
+  #if muMatches(muon).size() > 0 :
   # anything else on top of PAT cfg ?
   # cleaning ?
   
@@ -203,6 +206,7 @@ def hasNoOverlap(jet, Z):
     
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
+
   rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
@@ -271,6 +275,7 @@ def isZcandidate(zCandidate):
   result = True
   flavor = 1
   charge = 1
+  triggerMatch = 1
   for r in zCandidate.roles():
     daughter = zCandidate.daughter(r)
     charge *= daughter.charge()
@@ -414,7 +419,10 @@ def isInCategory(category, categoryTuple):
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # categoty 15: Z+1b (HE exclusive)
   elif category==15:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]  
+    #if isInCategory( 4, categoryTuple and categoryTuple[4]==1 :
+                     #print " " categoryTuple[4],categoryTuple[5], categoryTuple[6] 
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]
+  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
     return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[4]==categoryTuple[6]  
@@ -472,4 +480,6 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(0)
   # return the list of results
   return output
+
+def eventCategories(): return 19
 
