@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
 )
@@ -209,9 +209,9 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
 #process.matchedMuons.src = "selectedMuonsMatched"
 
 process.Zmatchedmatched = cms.EDProducer("CandViewShallowCloneCombiner",
-                                     decay = cms.string("matchedMuons@+ tightMuons@-"),
+                                     decay = cms.string("matchedMuons@+ matchedMuons@-"),
                                      cut = cms.string("mass > 12.0"), 
-                                     name = cms.string('ztighttight'),
+                                     name = cms.string('zmatchedmatched'),
                                      roles = cms.vstring('matched1', 'matched2'),
                                      )
 
@@ -257,7 +257,7 @@ process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone( preselection =
                                                  'electronID("simpleEleId85relIso") == 7 &'
-                                                  'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &'
+                                                 'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &'
                                                  'pt > 10. &'
                                                  'abs(eta) < 2.5 &'
                                                  #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -267,7 +267,7 @@ process.tightElectrons = cleanPatElectrons.clone( preselection =
 
 process.matchedElectrons = cleanPatElectrons.clone(preselection =
                                                    'electronID("simpleEleId85relIso") == 7 &' 
-                                                   # abs(eta)< 1.442 || 1.566 <abs(eta)<2.50 & included in WP85
+                                                   'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.5 &'
                                                    #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -432,7 +432,7 @@ process.patDefaultSequence *= process.goodPV
 #process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
-process.patDefaultSequence *= process.Ztighttight
+process.patDefaultSequence *= process.Zmatchedmatched
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
 process.patDefaultSequence *= process.Zelel
@@ -514,19 +514,19 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
-    "file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
+    #"file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
     #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
     ]                                     
 
 process.maxEvents.input = -1
 
 #process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
-process.out.fileName = 'TTjets_LocalTest_MC.root'
+#process.out.fileName = 'TTjets_LocalTest_MC.root'
 #process.out.fileName = 'DYjets_LocalTest_MC.root'
-
-#process.out.dropMetaData = cms.untracked.string("ALL")
 
 #process.out.fileName = 'DYJetsToLL.root'
 #process.out.fileName = 'TTJets.root'
+
+process.out.fileName = '2HDM.root'
 
 process.options.wantSummary = False

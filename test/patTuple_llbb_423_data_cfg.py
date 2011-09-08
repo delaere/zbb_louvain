@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.8 $'),
+    version = cms.untracked.string('$Revision: 1.9 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
 )
@@ -436,6 +436,7 @@ process.patDefaultSequence *= process.goodPV
 #process.patDefaultSequence *= process.WeightFromTrigger
 
 # combine leptons to get Z candidates
+process.patDefaultSequence *= process.Zmatchedmatched
 process.patDefaultSequence *= process.Ztighttight
 process.patDefaultSequence *= process.Ztightloose
 process.patDefaultSequence *= process.Zcleanclean
