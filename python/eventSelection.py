@@ -115,7 +115,7 @@ def isTightMuon(muon):
   else:
     mu = muon
   isMatched = mu.triggerObjectMatches().size()>0
-  # don't impose matching for tight muons because the trigger
+  # don't impose matching for tight muons because the trigger -> should now be in the PAT anyway.
   isMatched = True
 
   return (isLooseMuon(muon) and isMatched)
@@ -164,7 +164,7 @@ def isTightElectron(electron):
   else:
     el = electron
   isMatched = el.triggerObjectMatches().size()>0
-  isMatched = True # for MC
+  isMatched = True # for MC and data: now matching is enforced directly in the PAT.
   superclusterEta = abs(el.superCluster().eta())
   fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
 
@@ -361,7 +361,12 @@ categoryNames = [
   "Z+1b (HE exclusive)", 
   "Z+1b (HP exclusive)",
   "Z+1b (HE exclusive + MET)",
-  "Z+1b (HP exclusive + MET)" ]
+  "Z+1b (HP exclusive + MET)",
+  "Z+bb (HEHE) + Zpt cut",
+  "Z+bb (HEHE) + dR(SV) cut",
+  "Z+bb (HPHP+MET) + Zpt cut",
+  "Z+bb (HPHP+MET) + dR(SV) cut",
+]
 
 def eventCategories(): return len(categoryNames)
 
@@ -429,6 +434,15 @@ def isInCategory(category, categoryTuple):
   # categoty 18: Z+1b (HP exclusive + MET)
   elif category==18:
     return isInCategory( 16, categoryTuple ) and categoryTuple[7]>0
+  # some temporary stuff
+  elif category==19:
+    return isInCategory(9, categoryTuple) and categoryTuple[8]>80 and categoryTuple[8]<120
+  elif category==20:
+    return isInCategory(9, categoryTuple) and categoryTuple[10]>0.5 and categoryTuple[10]<1.0
+  elif category==21:
+    return isInCategory(14, categoryTuple) and categoryTuple[8]>80 and categoryTuple[8]<120
+  elif category==22:
+    return isInCategory(14, categoryTuple) and categoryTuple[10]>0.5 and categoryTuple[10]<1.0
   # other does not exist
   else:
     return False
@@ -477,22 +491,28 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(0)
   # additional quantities. For now, put the floats... might become cuts later on.
   # output[8] : Z Pt
-  output.append(bestZcandidate.pt())
+  if bestZcandidate is None:
+    output.append(-1)
+  else:
+    output.append(bestZcandidate.pt())
   # output[9] : delta R (bb)
   # output[10] : delta R (bb) via SV
   dijet = findDijetPair(jets, bestZcandidate, btagging)
   if dijet[0] is None or dijet[1] is None: 
-    output.append(0)
-    output.append(0)
+    output.append(-1)
+    output.append(-1)
   else:
     b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-    b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-    b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
     b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-    b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-    b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
     output.append(b1.DeltaR(b2))
-    output.append(b1SV.DeltaR(b2SV))
+    if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0:
+      b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+      b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
+      b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+      b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+      output.append(b1SV.DeltaR(b2SV))
+    else:
+      output.append(-1)
   # return the list of results
   return output
 

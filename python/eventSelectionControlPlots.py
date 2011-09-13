@@ -253,8 +253,6 @@ class EventSelectionControlPlots(BaseControlPlots):
         dijet = findDijetPair(jets, bestZcandidate, self.btagging)
         if dijet[0] is None: return result # this should never happen
         b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-        b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-        b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
         Zb = z+b1
         result["ZbM"] = Zb.M()
         result["ZbPt"] = Zb.Pt()
@@ -263,14 +261,20 @@ class EventSelectionControlPlots(BaseControlPlots):
         result["drZbj1"] = z.DeltaR(b1)
         if dijet[1] is None: return result
         b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-        b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-        b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+        if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
+          b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+          b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
+          b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+          b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+          svdr = b1SV.DeltaR(b2SV)
+        else:
+          svdr = -1
         bb = b1 + b2
         Zbb = Zb + b2
         result["dijetM"] = bb.M()
         result["dijetPt"] = bb.Pt()
         result["dijetdR"] = b1.DeltaR(b2)
-        result["dijetSVdR"] = b1SV.DeltaR(b2SV)
+        result["dijetSVdR"] = svdr
         result["ZbbM"] = Zbb.M()
         result["ZbbPt"] = Zbb.Pt()
         result["scaldptZbb"] = bestZcandidate.pt()-bb.Pt()
