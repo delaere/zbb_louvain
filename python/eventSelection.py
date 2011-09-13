@@ -419,10 +419,7 @@ def isInCategory(category, categoryTuple):
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
   # categoty 15: Z+1b (HE exclusive)
   elif category==15:
-    #if isInCategory( 4, categoryTuple and categoryTuple[4]==1 :
-                     #print " " categoryTuple[4],categoryTuple[5], categoryTuple[6] 
     return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]
-  
   # categoty 16: Z+1b (HP exclusive)
   elif category==16:
     return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[4]==categoryTuple[6]  
@@ -478,8 +475,24 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChann
     output.append(1)
   else: 
     output.append(0)
+  # additional quantities. For now, put the floats... might become cuts later on.
+  # output[8] : Z Pt
+  output.append(bestZcandidate.pt())
+  # output[9] : delta R (bb)
+  # output[10] : delta R (bb) via SV
+  dijet = findDijetPair(jets, bestZcandidate, btagging)
+  if dijet[0] is None or dijet[1] is None: 
+    output.append(0)
+    output.append(0)
+  else:
+    b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+    b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+    b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
+    b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+    b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+    b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+    output.append(b1.DeltaR(b2))
+    output.append(b1SV.DeltaR(b2SV))
   # return the list of results
   return output
-
-def eventCategories(): return 19
 
