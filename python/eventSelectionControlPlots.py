@@ -33,10 +33,13 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.addHisto("scaldptZbj1","scaldptZbj1",1000,-500,500)
       self.addHisto("drZbj1","distance between Z and leading jet",100,0,5)
       self.addHisto("dphiZbj1","dphiZbj1",40,0,4)
-      self.addHisto("scaldptZbb","scaldptZbb",500,0,500)
+      self.addHisto("scaldptZbb","scaldptZbb",1000,-500,500)
       self.addHisto("dphiZbb","dphiZbb",40,0,4)
+      self.addHisto("drZbb","dphiZbb",100,0,5)
       self.addHisto("dijetM","b bbar invariant mass",1000,0,1000)
       self.addHisto("dijetPt","b bbar Pt",500,0,500)
+      self.addHisto("dijetdR","#Delta R (b bbar)",100,0,5)
+      self.addHisto("dijetSVdR","#Delta R (b bbar SV)",100,0,5)
       self.addHisto("ZbM","Zb invariant mass",1000,0,1000)
       self.addHisto("ZbPt","Zb Pt",500,0,500)
       self.addHisto("ZbbM","Zbb invariant mass",1000,0,1000)
@@ -189,8 +192,11 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
       for jet in jets:
+        #jetPt = jetpt(jet) 
+        jetPt = jet.pt()
         if isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
           rawjet = jet.correctedJet("Uncorrected")
+          #result["jetpt"].append(jetPt)
           result["jetpt"].append(jet.pt())
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
@@ -212,21 +218,21 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
           nj += 1
           if nj==1: 
-            result["jet1pt"] = jet.pt()
+            result["jet1pt"] = jetPt #jet.pt()
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
           elif nj==2:
-            result["jet2pt"] = jet.pt()
+            result["jet2pt"] = jetPt #jet.pt()
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
-              result["bjet1pt"] = jet.pt()
+              result["bjet1pt"] = jetPt #jet.pt()
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
             elif nb==2:
-              result["bjet2pt"] = jet.pt()
+              result["bjet2pt"] = jetPt #jet.pt()
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
           if isBJet(jet,"HP",self.btagging): nbP += 1
@@ -247,6 +253,8 @@ class EventSelectionControlPlots(BaseControlPlots):
         dijet = findDijetPair(jets, bestZcandidate, self.btagging)
         if dijet[0] is None: return result # this should never happen
         b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+        b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+        b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
         Zb = z+b1
         result["ZbM"] = Zb.M()
         result["ZbPt"] = Zb.Pt()
@@ -255,19 +263,24 @@ class EventSelectionControlPlots(BaseControlPlots):
         result["drZbj1"] = z.DeltaR(b1)
         if dijet[1] is None: return result
         b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+        b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+        b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
         bb = b1 + b2
         Zbb = Zb + b2
         result["dijetM"] = bb.M()
         result["dijetPt"] = bb.Pt()
+        result["dijetdR"] = b1.DeltaR(b2)
+        result["dijetSVdR"] = b1SV.DeltaR(b2SV)
         result["ZbbM"] = Zbb.M()
         result["ZbbPt"] = Zbb.Pt()
         result["scaldptZbb"] = bestZcandidate.pt()-bb.Pt()
         result["dphiZbb"] = abs(z.DeltaPhi(bb))
+        result["drZbb"] = z.DeltaR(bb)
       return result
 
 def runTest():
   controlPlots = EventSelectionControlPlots(muChannel=True)
-  path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
+  path="/home/fynu/lceard/store/Prod_AOD_2011A/Round2_ReRecoMay10_204pb/Mu_2011A_May10ReRe_204pb/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -308,6 +321,6 @@ def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/fa
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
     if isInCategory(stage, categoryData):
       print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

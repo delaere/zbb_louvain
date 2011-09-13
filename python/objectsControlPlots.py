@@ -9,6 +9,15 @@ from baseControlPlots import BaseControlPlots
 from eventSelection import *
 #from myFuncTimer import print_timing
 
+## TODO: Remove later... for data only
+#ROOT.gSystem.Load("libFWCoreFWLite.so");
+#ROOT.AutoLibraryLoader.enable()
+#L2L3res = ROOT.FactorizedJetCorrector("L2Relative","../testfiles/JEC/GR_R_42_V20_AK5PF_L2Relative_L2L3Residual.txt")
+#def jetpt(jet):
+#  L2L3res.setJetEta(jet.pt())
+#  L2L3res.setJetPt(jet.eta())
+#  return jet.pt()*L2L3res.getCorrection()
+############
 
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
@@ -260,9 +269,11 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscTCHE  = -1
       maxbdiscTCHP  = -1
       for jet in jets:
+        #jetPt = jetpt(jet)
+        jetPt = jet.pt()
         if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           rawjet = jet.correctedJet("Uncorrected")
-          result["jetpt"].append(jet.pt())
+          result["jetpt"].append(jetPt)
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
           result["jetphi"].append(jet.phi())
@@ -289,8 +300,8 @@ class JetmetControlPlots(BaseControlPlots):
 	  maxbdiscTCHP = max(maxbdiscSSVHP,jet.bDiscriminator("trackCountingHighPurBJetTags"))
           nj += 1
           if nj==1: 
-	    j1pt=jet.pt()
-            result["jet1pt"] = jet.pt()
+	    j1pt=jetPt#jet.pt()
+            result["jet1pt"] = jetPt#jet.pt()
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
             result["SSVHEdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -298,22 +309,22 @@ class JetmetControlPlots(BaseControlPlots):
             result["TCHEdiscJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
             result["TCHPdiscJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           elif nj==2:
-            result["jet2pt"] = jet.pt()
+            result["jet2pt"] = jetPt#jet.pt()
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
-              result["bjet1pt"] = jet.pt()
+              result["bjet1pt"] = jetPt#jet.pt()
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
               result["SSVHEdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["SSVHPdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
               result["TCHEdiscbJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
               result["TCHPdiscbJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
-	      result["dptj1b1"] = jet.pt()-j1pt
+	      result["dptj1b1"] = jetPt-j1pt#jet.pt()-j1pt
             elif nb==2:
-              result["bjet2pt"] = jet.pt()
+              result["bjet2pt"] = jetPt#jet.pt()
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
           if isBJet(jet,"HP",self.btagging): nbP += 1
