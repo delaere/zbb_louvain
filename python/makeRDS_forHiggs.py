@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+print "beginning of script"
+
 ############################################################################################
 ############################################################################################
 ###                                                                                      ### 
@@ -45,15 +47,12 @@ muChannel = { "Mu_DATA"     : True,
               "Ttbar_El_MC" : False
               }
 
-muSel = { True  : "muSel",
-          False : "elSel" }
-
-path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Mu_2011A_1078pb_v4/" ,
-         "El_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_PromptV4/Ele_2011A_1078pb_v4/",
-         "Ttbar_Mu_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
-         "Ttbar_El_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
-         "Mu_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/",
-         "El_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/"
+path = { "Mu_DATA"     : "/home/fynu/tdupree/store/zbb_13Sep/Mu_Data/",
+         "El_DATA"     : "/home/fynu/tdupree/store/zbb_13Sep/El_Data/",
+         "Ttbar_Mu_MC" : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/",
+         "Ttbar_El_MC" : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/",
+         "Mu_MC"       : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/",
+         "El_MC"       : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/"
          }
 
 #def dumpEventList(muChannel=True, stage=9, path="/home/fynu/jdf/store/Zbb-TuneZ2_2/"):
@@ -62,15 +61,31 @@ path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_
 ### Define RooRealVars and RooCategories ###
 ############################################
 
-### event
-rrv_nPV     = RooRealVar("rrv_nPV",    "rrv_nPV", 0,20) 
 ### leptons
 rrv_ll_M    = RooRealVar("rrv_ll_M",   "rrv_ll_M"   ,-1.,1000.)
+rrv_ll_pT   = RooRealVar("rrv_ll_pT",  "rrv_ll_pT"  ,-1.,1000.)
+### b-jets 
+rrv_SV_M    = RooRealVar("rrv_msv",   "rrv_msv"   ,  -1,   10.)
+rrv_pT      = RooRealVar("rrv_pT",    "rrv_pT"    ,   0, 1000.)
+rrv_pT_unc  = RooRealVar("rrv_pT_unc","rrv_pT_unc",   0,  100.)
+rrv_eta     = RooRealVar("rrv_eta",   "rrv_eta"   , -10,   10.)
+### NP
+rrv_bb_M    = RooRealVar("rrv_bb_M",   "rrv_bb_M"   ,-1.,1000.)
+rrv_bb_dR   = RooRealVar("rrv_bb_dR",  "rrv_bb_dR"  ,-10.,10.)
+rrv_zbb_M   = RooRealVar("rrv_zbb_M",  "rrv_zbb_M",  -1.,1000.)
+rrv_zeebb_M = RooRealVar("rrv_zeebb_M","rrv_zeebb_M",-1.,1000.)
+rrv_zmmbb_M = RooRealVar("rrv_zmmbb_M","rrv_zmmbb_M",-1.,1000.)
 ### selection
 rc_HE    = RooCategory("rc_HE",   "rc_HE")
+rc_HEHE  = RooCategory("rc_HEHE", "rc_HEHE")
 rc_HP    = RooCategory("rc_HP",   "rc_HP")
 rc_HEMET = RooCategory("rc_HEMET","rc_HEMET")
 rc_HPMET = RooCategory("rc_HPMET","rc_HPMET")
+
+rc_HEHE  = RooCategory("rc_HEHE", "rc_HEHE")
+rc_HEHP  = RooCategory("rc_HEHP", "rc_HEHP")
+rc_HPHP  = RooCategory("rc_HPHP", "rc_HPHP")
+
 rc_HE_excl    = RooCategory("rc_HE_excl",   "rc_HE_excl")
 rc_HP_excl    = RooCategory("rc_HP_excl",   "rc_HP_excl")
 rc_HEMET_excl = RooCategory("rc_HEMET_excl","rc_HEMET_excl")
@@ -80,6 +95,11 @@ rc_HE.defineType("not_acc",0)
 rc_HP.defineType("not_acc",0)
 rc_HEMET.defineType("not_acc",0)
 rc_HPMET.defineType("not_acc",0)
+
+rc_HEHE.defineType("not_acc",0)
+rc_HEHP.defineType("not_acc",0)
+rc_HPHP.defineType("not_acc",0)
+
 rc_HE_excl.defineType("not_acc",0)
 rc_HP_excl.defineType("not_acc",0)
 rc_HEMET_excl.defineType("not_acc",0)
@@ -89,6 +109,11 @@ rc_HE.defineType("acc",1)
 rc_HP.defineType("acc",1)
 rc_HEMET.defineType("acc",1)
 rc_HPMET.defineType("acc",1)
+
+rc_HEHE.defineType("acc",1)
+rc_HEHP.defineType("acc",1)
+rc_HPHP.defineType("acc",1)
+
 rc_HE_excl.defineType("acc",1)
 rc_HP_excl.defineType("acc",1)
 rc_HEMET_excl.defineType("acc",1)
@@ -98,12 +123,23 @@ rc_HPMET_excl.defineType("acc",1)
 ### Define RooArgSet and RooDataSet ###
 #######################################
 
-obsSet = RooArgSet(rrv_ll_M)
-obsSet.add(rrv_nPV)
+obsSet = RooArgSet(rrv_SV_M)
+obsSet.add(rrv_ll_M)
+obsSet.add(rrv_ll_pT)
+obsSet.add(rrv_bb_M)
+obsSet.add(rrv_bb_dR)
+obsSet.add(rrv_zeebb_M)
+obsSet.add(rrv_zmmbb_M)
+obsSet.add(rrv_pT)
+obsSet.add(rrv_pT_unc)
+obsSet.add(rrv_eta)
 obsSet.add(rc_HE)
 obsSet.add(rc_HP)
 obsSet.add(rc_HEMET)
 obsSet.add(rc_HPMET)
+obsSet.add(rc_HEHE)
+obsSet.add(rc_HEHP)
+obsSet.add(rc_HPHP)
 obsSet.add(rc_HE_excl)
 obsSet.add(rc_HP_excl)
 obsSet.add(rc_HEMET_excl)
@@ -116,6 +152,8 @@ rds_zbb   = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 ### JEC ###
 ###########
 
+print "getting JEC stuff"
+
 AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
 test = JetCorrectionUncertainty("./Jec10V1_Uncertainty_KT4PF.txt")
@@ -124,7 +162,7 @@ def unc_tot_jet(jet):
     test.setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
     test.setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
     unc = test.getUncertainty(1)
-    #print "unc = ", unc
+    print "unc = ", unc
     
     if 0 <abs(jet.eta())< 1.5 : unc_dep_eta=0.02
     if 1.5 <=abs(jet.eta())<3.0  : unc_dep_eta=0.06
@@ -138,19 +176,22 @@ def unc_tot_jet(jet):
 ### Run Forest, run! ###
 ########################
 
-def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
-    print "*** RUN FOREST, RUN! ***" 
+abb=0
+
+print "before run"
+
+def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     print "channel   = ", channel
     print "muChannel = ", _muChan
     print "path      = ", _path
-    print "muon or electron selection...", muSel[muChannel[channel]]
     i=0
     dirList=os.listdir(_path)
     files=[]
     for fname in dirList:
         files.append(_path+fname)
     print files
-    files = files[:100]
+    #files = files[]#:11
+    files = files[:len(files)/10]
     print files
     events = Events (files)
 
@@ -162,7 +203,6 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     zeebblabel="Zeebb"
     bblabel ="bbbar"
     #triggerlabel="patTriggerEvent"
-    vertexlabel="goodPV"
 
     jetHandle   = Handle ("vector<pat::Jet>")
     metHandle   = Handle ("vector<pat::MET>")
@@ -172,17 +212,23 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
     zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
     bbHandle    = Handle ("vector<reco::CompositeCandidate>")
     #trigInfoHandle = Handle ("pat::TriggerEvent")
-    vertexHandle = Handle ("vector<reco::Vertex>")
     
     for event in events:
 
+        rrv_SV_M.setVal(-1)
         rrv_ll_M.setVal(-1)
-        rrv_nPV.setVal(0)
-
+        rrv_ll_pT.setVal(-1)
+        rrv_bb_M.setVal(-1)
+        rrv_bb_dR.setVal(-10)
+        rrv_zeebb_M.setVal(-1)
+        rrv_zmmbb_M.setVal(-1)
         rc_HE.setIndex(0)
         rc_HP.setIndex(0)
         rc_HEMET.setIndex(0)
         rc_HPMET.setIndex(0)
+        rc_HEHE.setIndex(0)
+        rc_HEHP.setIndex(0)
+        rc_HPHP.setIndex(0)
         rc_HE_excl.setIndex(0)
         rc_HP_excl.setIndex(0)
         rc_HEMET_excl.setIndex(0)
@@ -198,7 +244,6 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
         event.getByLabel (  zeebblabel,   zeebbHandle)
         event.getByLabel (  zmmbblabel,   zmmbbHandle)
         event.getByLabel (     bblabel,      bbHandle)
-        event.getByLabel ( vertexlabel,  vertexHandle)
 
         jets          = jetHandle.product()
         met           = metHandle.product()
@@ -208,41 +253,62 @@ def makeRDS(_muChan=muChannel[channel], _path=path[channel]) :
         zmmbbs        = zmmbbHandle.product()
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
-        vertexs       = vertexHandle.product()
-
-        rrv_nPV.setVal( vertexs.size() )
 
         bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEl)
 
-        myCatData = eventCategory(None, zCandidatesMu, zCandidatesEl, jets, met, muChannel[channel], massWindow=100)    
+#        if bestZcandidate : print "bestZcandidate.mass() = ", bestZcandidate.mass()
+        
+        myCatData = eventCategory(None, zCandidatesMu, zCandidatesEl, jets, met, muChannel[channel])    
 
         if bestZcandidate and isInCategory(5, myCatData):
-            #print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
-            numJets = 0
+            print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
             for jet in jets :
                 tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
                 if tISV :
                     if tISV.secondaryVertex(0) :
+                        rrv_SV_M.setVal(tISV.secondaryVertex(0).p4().mass())
+                        
+                        rrv_pT_unc.setVal(unc_tot_jet(jet))
+                        rrv_pT.setVal(jet.pt())
+                        rrv_eta.setVal(jet.eta())
 
                         rrv_ll_M.setVal(bestZcandidate.mass())
-
+                        rrv_ll_pT.setVal(bestZcandidate.pt())
                         rc_HE.setIndex(1)
                         if isInCategory(6, myCatData):  rc_HP.setIndex(1)
                         if isInCategory(7, myCatData):  rc_HEMET.setIndex(1)
                         if isInCategory(8, myCatData):  rc_HPMET.setIndex(1)
+
+                        if isInCategory(9, myCatData):  rc_HEHE.setIndex(1)
+                        if isInCategory(10, myCatData): rc_HEHP.setIndex(1)
+                        if isInCategory(11, myCatData): rc_HPHP.setIndex(1)
+
                         if isInCategory(15, myCatData): rc_HE_excl.setIndex(1)
                         if isInCategory(16, myCatData): rc_HP_excl.setIndex(1)
                         if isInCategory(17, myCatData): rc_HEMET_excl.setIndex(1)
                         if isInCategory(18, myCatData): rc_HPMET_excl.setIndex(1)
+                       
+                        if len(bbs)>0    :
+                            rrv_bb_M.setVal(      bbs.at(0).mass())
+                            abb = bbs.at(0)
+                            b0 = abb.daughter(0)
+                            b1 = abb.daughter(1)
 
-                        numJets+=1
-                        if numJets==1: rds_zbb.add(obsSet)
+                            b0v = ROOT.TLorentzVector(b0.px(),b0.py(),b0.pz(),b0.energy())
+                            b1v = ROOT.TLorentzVector(b1.px(),b1.py(),b1.pz(),b1.energy())
+                            bb_dr = b0v.DeltaR(b1v)
+                            
+                            print "dR(bb) = " , bb_dr
+                            rrv_bb_dR.setVal( bb_dr )
 
-            print "number of jets = ", numJets            
+                        if len(zmmbbs)>0 : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
+                        if len(zeebbs)>0 : rrv_zeebb_M.setVal(zeebbs.at(0).mass())
+
+                        rds_zbb.add(obsSet)              
                                              
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    ws.writeToFile("File_rds_zbb_"+channel+"_"+muSel[muChannel[channel]]+"_forTtbar.root") 
+    ws.writeToFile("File_rds_zbb_"+channel+".root") 
     gDirectory.Add(ws)

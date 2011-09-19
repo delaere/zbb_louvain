@@ -33,7 +33,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "Higgs_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 
 ############
 ### Maps ###
@@ -44,7 +44,9 @@ muChannel = { "Mu_DATA"     : True,
               "Mu_MC"       : True,
               "El_MC"       : False,
               "Ttbar_Mu_MC" : True,
-              "Ttbar_El_MC" : False
+              "Ttbar_El_MC" : False,
+              "Higgs_Mu_MC" : True,
+              "Higgs_El_MC" : False
               }
 
 muSel = { True  : "muSel",
@@ -55,7 +57,9 @@ path = { "Mu_DATA"     : "/home/fynu/lceard/store/Prod_AOD_2011A/Json_Tot1078pb_
          "Ttbar_Mu_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Ttbar_El_MC" : "/home/fynu/lceard/store/MC_Summer11/TTJets/",
          "Mu_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/",
-         "El_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/"
+         "El_MC"       : "/home/fynu/lceard/store/MC_Summer11/DYJetsToLL/",
+         "Higgs_Mu_MC" : "./HiggsMC/",
+         "Higgs_El_MC" : "./HiggsMC/"
          }
 
 #def dumpEventList(muChannel=True, stage=9, path="/home/fynu/jdf/store/Zbb-TuneZ2_2/"):
@@ -167,7 +171,7 @@ def unc_tot_jet(jet):
 ### Run Forest, run! ###
 ########################
 
-def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
+def makeRDS_forBTag(_muChan=muChannel[channel], _path=path[channel]) :
     print "*** RUN FOREST, RUN! ***" 
     print "channel   = ", channel
     print "muChannel = ", _muChan
@@ -179,9 +183,13 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     for fname in dirList:
         files.append(_path+fname)
     print files
-    files = files[:1000]
+    files = files[:50]
     print files
     events = Events (files)
+    print "channel   = ", channel
+    print "muChannel = ", _muChan
+    print "path      = ", _path
+    print "muon or electron selection...", muSel[muChannel[channel]]
 
     metlabel="patMETsPF"
     jetlabel="cleanPatJets"
@@ -233,6 +241,7 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         event.getByLabel (  zmmbblabel,   zmmbbHandle)
         event.getByLabel (     bblabel,      bbHandle)
         event.getByLabel ( vertexlabel,  vertexHandle)
+        event.getByLabel (    genlabel,     genHandle)
 
         jets          = jetHandle.product()
         met           = metHandle.product()
@@ -243,14 +252,12 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
         zeebbs        = zeebbHandle.product()
         bbs           = bbHandle.product()
         vertexs       = vertexHandle.product()
+        genparts      = genHandle.product()
         
-        genparts      = 0
-        if WP[:2]=="MC" :
-            event.getByLabel (genlabel,genHandle)
-            genHandle.product()
-
         rrv_nPV.setVal( vertexs.size() )
 
+        if zCandidatesMu>0: print "zCandidatesMu!"
+        if zCandidatesEl>0: print "zCandidatesEl!"
 
         bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEl)
 
@@ -285,16 +292,16 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
                         if len(zmmbbs)>0 : rrv_zmmbb_M.setVal(zmmbbs.at(0).mass())
                         if len(zeebbs)>0 : rrv_zeebb_M.setVal(zeebbs.at(0).mass())
 
-                        if WP[:2]=="MC" :
-                            if isZlEvent(genparts)   :
-                                print "*** l!"
-                                rc_flav.setLabel("l")
+                        if channel[-2:]=="MC" :
+                            if isZbEvent(genparts) :
+                                print "*** b!"
+                                rc_flav.setLabel("b")
                             elif isZcEvent(genparts) :
                                 print "*** c!"
                                 rc_flav.setLabel("c")
-                            elif isZbEvent(genparts) :
-                                print "*** b!"
-                                rc_flav.setLabel("b")
+                            elif isZlEvent(genparts)   :
+                                print "*** l!"
+                                rc_flav.setLabel("l")
                             else                     : rc_flav.setLabel("x")
 
 
@@ -307,5 +314,5 @@ def dumpEventList(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    ws.writeToFile("File_rds_zbb_"+muSel[muChannel[channel]]+"_"+channel+"_forBTag.root") 
+    ws.writeToFile("File_rds_zbb_"+channel+"_"+muSel[muChannel[channel]]+"_forBTag.root") 
     gDirectory.Add(ws)
