@@ -22,7 +22,7 @@ import os
 
 #####
 
-whichSample = 2
+whichSample = 5
 
 ### Getting a file and a tree
 
@@ -113,6 +113,7 @@ myRDS = RooDataSet("myRDS","myRDS",RooArgSet(rrv_msv,
 numSaved = 0
 
 for tree in trees:
+    print "tree = ", tree
     entries = tree.GetEntriesFast()
 
     for jentry in xrange(entries) :
@@ -126,7 +127,12 @@ for tree in trees:
         if nb <= 0:
             continue
 
+        numJets = 0
+        
+        #print "going to loop over jets"
         for i in range(0,len(tree.Jet_pt)):
+            #print "b from g = ", tree.nBFromGSplit 
+            #print "this is the ", i ,"th jet"
             #print "Jet_pt      = ", tree.Jet_pt[ i ]
             #print "Jet_eta     = ", tree.Jet_eta[ i ]
             #print "Jet_flavour = ", tree.Jet_flavour[ i ]
@@ -146,11 +152,25 @@ for tree in trees:
             rrv_nPU.setVal(    tree.nPU              )
             rrv_nPV.setVal(    tree.nPV              )
             if tree.Jet_Svx[ i ] > 1.74 and tree.Jet_pt[i] < 150:
+                if str(tree.Evt)[:5] == "43919":
+                    print "===========> going to save event!"
+                    print " event = ", tree.Evt
                 rc_sel.setLabel("HE")
                 if tree.Jet_SvxHP[ i ] > 2.00               : rc_sel.setLabel("HP")
                 if tree.Jet_flavour[ i ] == ( 1 or 2 or 3 ) : rc_flav.setLabel("l")
                 elif tree.Jet_flavour[ i ] == 4             : rc_flav.setLabel("c")
-                elif tree.Jet_flavour[ i ] == 5             : rc_flav.setLabel("b")
+                elif tree.Jet_flavour[ i ] == 5             :
+                    rc_flav.setLabel("b")
+                    #print "found b!"
+                    if not tree.nBFromGSplit == 0 :
+                        #print "jet-pt = ", tree.Jet_pt[i]
+                        #print "tree.nBFromGSplit = ", tree.nBFromGSplit 
+                        for j in range(0,tree.nBFromGSplit):
+                            #print "b(g", j ,")-pt = ", tree.bFromGSplit_pT[j]
+                            if 0.9*tree.bFromGSplit_pT[j] < tree.Jet_pt[i] and tree.Jet_pt[i] < 1.1*tree.bFromGSplit_pT[j]:
+                                rc_flav.setLabel("g")
+                                # TODO: check DeltaR
+                                #print "==========================> from g!!!"
                 else                                        : rc_flav.setLabel("x")
 
 #                    for gl in range(0,tree.nBFromGSplit):
@@ -181,16 +201,24 @@ for tree in trees:
                 #else                                                    : rc_flav.setLabel("x")
                 weight = Double(1.)
                 numSaved += 1
-                myRDS.add(RooArgSet(rrv_msv,
-                                    rrv_pT,
-                                    rrv_eta,
-                                    rrv_bTagHE,
-                                    rrv_bTagHP,
-                                    rrv_nPU,
-                                    rrv_nPV,
-                                    rc_flav,
-                                    rc_sel
-                                    ))
+                numJets+=1
+                if numJets==1 : myRDS.add(RooArgSet(rrv_msv,
+                                                    rrv_pT,
+                                                    rrv_eta,
+                                                    rrv_bTagHE,
+                                                    rrv_bTagHP,
+                                                    rrv_nPU,
+                                                    rrv_nPV,
+                                                    rc_flav,
+                                                    rc_sel
+                                                    ))
+
+
+print "#l = ",        myRDS.reduce("rc_flav==1").numEntries()
+print "#c = ",        myRDS.reduce("rc_flav==4").numEntries()
+print "#b = ",        myRDS.reduce("rc_flav==5").numEntries()
+print "#b from g = ", myRDS.reduce("rc_flav==6").numEntries()
+
 
 
 ws = RooWorkspace("ws","workspace")

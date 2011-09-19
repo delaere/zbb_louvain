@@ -1,7 +1,9 @@
 from ROOT import *
 
-WP =  "HP_excl"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
-channel = "Mu"
+WP       = "HP"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
+channel  = "El"
+PVreduce = 3
+
 sel= {"Mu":"muSel",
       "El":"elSel"}
 
@@ -26,6 +28,14 @@ myRDS[TtbarMC] = ws[TtbarMC].data("rds_zbb")
 myRDS[DYMC]    = myRDS[DYMC].reduce("rc_"+WP+"==1")
 myRDS[TtbarMC] = myRDS[TtbarMC].reduce("rc_"+WP+"==1")
 DATA=myRDS[Data].reduce("rc_"+WP+"==1")
+
+if PVreduce == 1: DATA = DATA.reduce("rrv_nPV<4.5")
+if PVreduce == 2:
+    DATA = DATA.reduce("rrv_nPV>4.5")
+    DATA = DATA.reduce("rrv_nPV<7.5")
+if PVreduce == 3: DATA = DATA.reduce("rrv_nPV>7.5")
+
+                                            
 
 print "DATA("+WP+").numEntries() = ", DATA.numEntries()
 
@@ -92,6 +102,7 @@ sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
                    RooArgList(frac_ttbar))
 
 gROOT.SetStyle("Plain")
+gStyle.SetErrorX(0)
 
 C=TCanvas("C","C",1000,450)
 C.Divide(2)
@@ -159,9 +170,12 @@ DATA.plotOn(frame2,
 frame2.SetMinimum(0.9)
 frame2.Draw()
 
-C.SaveAs("~/public/ZbbLeptonPhoton/ttbarPlots/ttbarFit_"+channel+"_"+WP+".pdf")
+pvString=""
+if PVreduce : pvString+="_"+"PVregion"+str(PVreduce)
 
-filename = "/afs/cern.ch/user/t/tdupree/public/ZbbLeptonPhoton/ttbarPlots/"+channel+"_"+"_"+WP+".txt"
+C.SaveAs("~/public/ZbbLeptonPhoton/ttbarPlots/ttbarFit_"+channel+"_"+WP+pvString+".pdf")
+
+filename = "/afs/cern.ch/user/t/tdupree/public/ZbbLeptonPhoton/ttbarPlots/"+channel+"_"+"_"+WP+pvString+".txt"
 
 my_file = open(filename,"w")
 print "filename = ", filename
@@ -177,6 +191,6 @@ print >> my_file, "=> N(tt) [60-120]= ", N_tt_sig
 
 print >> my_file, "--------------------> for di-", channel, "sample at selection step ", WP
 print >> my_file, "--------------------> "
-print >> my_file, "--------------------> f_tt = N(tt)/[N(ll)+(tt)] = ( ", N_tt_sig/(N_ll.getVal()+N_tt_sig)*100. , " +/- ", frac_ttbar.getError()*100. , " ) % "
+print >> my_file, "--------------------> f_tt = N(tt)/[N(ll)+(tt)] = ( ", str(N_tt_sig/(N_ll.getVal()+N_tt_sig)*100.)[:4] , " +/- ", str(frac_ttbar.getError()*100.)[:4] , " ) % "
 
 print "VOILA!!!"
