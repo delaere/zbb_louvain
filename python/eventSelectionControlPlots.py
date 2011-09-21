@@ -20,6 +20,7 @@ class EventSelectionControlPlots(BaseControlPlots):
     def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent", btagging="SSV"):
       self.btagging = btagging
       # declare histograms
+      self.addHisto("run","Run number",15000,160000,175000)
       self.addHisto("triggerSelection","triggerSelection ",2,0,2)
       self.addHisto("triggerBits","trigger bits",20,0,20)
       self.addHisto("zmassMu","zmassMu",10000,0,1000)
@@ -40,11 +41,12 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.addHisto("dijetPt","b bbar Pt",500,0,500)
       self.addHisto("dijetdR","#Delta R (b bbar)",100,0,5)
       self.addHisto("dijetSVdR","#Delta R (b bbar SV)",100,0,5)
+      self.addHisto("dphidijetMET","#Delta #phi (b bbar MET)",40,0,4)
       self.addHisto("ZbM","Zb invariant mass",1000,0,1000)
       self.addHisto("ZbPt","Zb Pt",500,0,500)
       self.addHisto("ZbbM","Zbb invariant mass",1000,0,1000)
       self.addHisto("ZbbPt","Zbb Pt",500,0,500)
-      self.addHisto("category","event category",20,0,20)  
+      self.addHisto("category","event category",eventCategories()+1,0,eventCategories()+1)  
       self.addHisto("mu1pt","leading muon Pt",500,0,500)
       self.addHisto("mu2pt","subleading muon Pt",500,0,500)
       self.addHisto("mu1eta","leading muon Eta",25,0,2.5)
@@ -131,6 +133,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
           result["category"].append(category)
+      result["run"] = event.eventAuxiliary().run()
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]
@@ -271,6 +274,7 @@ class EventSelectionControlPlots(BaseControlPlots):
           svdr = -1
         bb = b1 + b2
         Zbb = Zb + b2
+        met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
         result["dijetM"] = bb.M()
         result["dijetPt"] = bb.Pt()
         result["dijetdR"] = b1.DeltaR(b2)
@@ -280,6 +284,7 @@ class EventSelectionControlPlots(BaseControlPlots):
         result["scaldptZbb"] = bestZcandidate.pt()-bb.Pt()
         result["dphiZbb"] = abs(z.DeltaPhi(bb))
         result["drZbb"] = z.DeltaR(bb)
+        result["dphidijetMET"] = bb.DeltaPhi(met4v)
       return result
 
 def runTest():
