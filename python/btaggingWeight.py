@@ -42,6 +42,8 @@ class btaggingWeight:
       return 1.
     # retrieve the objects (jets and Z candidates)
     event.getByLabel("cleanPatJets",self.jetHandle)
+    #event.getByLabel("ZmuMatchedmuMatched",self.zmuHandle)
+    #event.getByLabel("ZelMatchedelMatched",self.zeleHandle)
     event.getByLabel("Ztighttight",self.zmuHandle)
     event.getByLabel("Zelel",self.zeleHandle)
     jets = self.jetHandle.product()

@@ -142,8 +142,10 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
+         #fwevent.getByLabel ("ZmuMatchedmuMatched", self.zmuHandle_)
          fwevent.getByLabel ("Ztighttight", self.zmuHandle_)
          zCandidatesMu = self.zmuHandle_.product()
+         #fwevent.getByLabel ("ZelMatchedelMatched", self.zeleHandle_)
          fwevent.getByLabel ("Zelel", self.zeleHandle_)
          zCandidatesEle = self.zeleHandle_.product()
          bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)

@@ -52,13 +52,13 @@ class LumiReWeightingControlPlots(BaseControlPlots):
 
 def runTest():
   controlPlots = LumiReWeightingControlPlots()
-  path="/home/fynu/delaere/zbbAnalysis/CMSSW_4_2_3/src/UserCode/zbb_louvain/testfiles/"
+  path="/home/fynu/delaere/scratch/zbbAnalysis/store/September11/ttbar/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  controlPlots.beginJob(MonteCarloFileName="pudistCopy.root", DataFileName="pudist.root")
+  controlPlots.beginJob(MonteCarloFileName="../testfiles/MCpileup.root", DataFileName="../testfiles/Pileup_2011_to_173692_LPLumiScale_68mb.root")
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
