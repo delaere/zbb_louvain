@@ -49,7 +49,6 @@ class LumiReWeighting:
        if pvi.getBunchCrossing() in [-1,0,1]:
          npu += pvi.getPU_NumInteractions()
          nbc += 1
-         break
      if nbc>0 : npu = npu/nbc
      return npu
 
