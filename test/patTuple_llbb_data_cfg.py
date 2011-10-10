@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.11 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_data_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_data_cfg.py,v $')
 )
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
@@ -221,10 +221,10 @@ process.ZmuMatchedmuTight = cms.EDProducer("CandViewShallowCloneCombiner",
                                      roles = cms.vstring('matched', 'tight'),
                                      )
 
-process.ZmuTightmuLoose = cms.EDProducer("CandViewShallowCloneCombiner", 
+process.ZmuMatchedmuLoose = cms.EDProducer("CandViewShallowCloneCombiner", 
                                      decay = cms.string("matchedMuons@+ looseMuons@-"), 
                                      cut = cms.string("60.0 < mass < 120.0"), 
-                                     name = cms.string('zmutightmuloose'),
+                                     name = cms.string('zmumatchedmuloose'),
                                      roles = cms.vstring('matched', 'loose')
                                      )
 
@@ -444,7 +444,7 @@ process.patDefaultSequence *= process.goodPV
 # combine leptons to get Z candidates
 process.patDefaultSequence *= process.ZmuMatchedmuMatched
 process.patDefaultSequence *= process.ZmuMatchedmuTight
-process.patDefaultSequence *= process.ZmuTightmuLoose
+process.patDefaultSequence *= process.ZmuMatchedmuLoose
 process.patDefaultSequence *= process.ZmuCleanmuClean
 process.patDefaultSequence *= process.ZelMatchedelMatched
 process.patDefaultSequence *= process.ZelMatchedelTight
@@ -529,18 +529,18 @@ process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
     #"file:/home/fynu/lceard/storage/dilep_events/EE2_RECO.root"
-    "file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
+    #"file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
     ]                                     
 
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 #process.out.fileName = '4DiLep.root'
 #process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
-process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
+#process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
 
-#process.out.fileName = 'Mu_2011A_166512_Prompt_v4.root'
-#process.out.fileName = 'Ele_2011A_166512_Prompt_v4.root'
-#process.out.fileName = 'Mu_2011A_166841_Prompt_v4.root'
-#process.out.fileName = 'Ele_2011A_166841_Prompt_v4.root'
+#process.out.fileName = 'Mu_2011A_Prompt_v4.root'
+#process.out.fileName = 'Ele_2011A_Prompt_v4.root'
+#process.out.fileName = 'Mu_2011A_.....root'
+#process.out.fileName = 'Ele_2011A_....root'
 
 process.options.wantSummary = True
