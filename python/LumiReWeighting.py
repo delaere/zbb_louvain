@@ -33,7 +33,7 @@ class LumiReWeighting:
          npu = self.npu(fwevent)
      if not npu is None:
        # return the weight, maybe shifted for systematic studies
-       return self.engine.weight3BX(npu)*self.shiftWeight(npu)
+       return self.engine.weight(npu)*self.shiftWeight(npu)
      else:
        print "ERROR:  no in-time beam crossing found! "
        return 0.
@@ -42,15 +42,20 @@ class LumiReWeighting:
      # get pileup summary information
      fwevent.getByLabel(self.PileupSummaryInfo, self.PupInfo)
      pileup = self.PupInfo.product()
+     # average PU in 3BX
+     #npu = 0.
+     #nbc = 0
+     #for pvi in pileup:
+     #  if pvi.getBunchCrossing() in [-1,0,1]:
+     #    npu += pvi.getPU_NumInteractions()
+     #    nbc += 1
+     #if nbc>0 : npu = npu/nbc
+     #return npu
      # find the "BX0" and the number of PU interactions in there
-     npu = 0.
-     nbc = 0
      for pvi in pileup:
-       if pvi.getBunchCrossing() in [-1,0,1]:
-         npu += pvi.getPU_NumInteractions()
-         nbc += 1
-     if nbc>0 : npu = npu/nbc
-     return npu
+       if pvi.getBunchCrossing()==0:
+         return pvi.getPU_NumInteractions()
+     return None
 
    def shiftWeight( self, npu):
      if self.systematicShift==0 :
