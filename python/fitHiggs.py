@@ -26,49 +26,120 @@ from ROOT import *
 
 gROOT.SetStyle("Plain")
 
+
 #######################
 ### GET DATA AND MC ###
 #######################
 
+cutstring = "rrv_ll_pT>0"
+#cutstring = "rrv_bb_dR<1.5&&rrv_ll_pT>50"
+#cutstring =  0
+
 WP =  "HEHE"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
-channel = "Mu"
+channel = "El"
 sel= {"Mu":"muSel",
-      "El":"elSel"}
+      "El":"elSel",
+      "Sum":"sumSel"}
 
 TtbarMC = "Ttbar_"+channel+"_MC"
 Data    = channel+"_DATA"
 DYMC    = channel+"_MC"
 
-file = {  Data    : TFile("File_rds_zbb_"+Data+".root"),
-          DYMC    : TFile("File_rds_zbb_"+DYMC+".root"),
-          TtbarMC : TFile("File_rds_zbb_"+TtbarMC+".root")
+TtbarMC_mu = "Ttbar_Mu_MC"
+Data_mu    = "Mu_DATA"
+DYMC_mu    = "Mu_MC"
+
+TtbarMC_el = "Ttbar_El_MC"
+Data_el    = "El_DATA"
+DYMC_el    = "El_MC"
+
+if channel=="Sum":
+    Data    = Data_el
+    DYMC    = DYMC_el
+    TtbarMC = TtbarMC_el
+
+file = {  Data      : TFile("File_rds_zbb_"+Data+".root"),
+          DYMC       : TFile("File_rds_zbb_"+DYMC+".root"),
+          TtbarMC    : TFile("File_rds_zbb_"+TtbarMC+".root"),
+          Data_mu    : TFile("File_rds_zbb_"+Data_mu+".root"),
+          DYMC_mu    : TFile("File_rds_zbb_"+DYMC_mu+".root"),
+          TtbarMC_mu : TFile("File_rds_zbb_"+TtbarMC_mu+".root"),
+          Data_el    : TFile("File_rds_zbb_"+Data_el+".root"),
+          DYMC_el    : TFile("File_rds_zbb_"+DYMC_el+".root"),
+          TtbarMC_el : TFile("File_rds_zbb_"+TtbarMC_el+".root")
           }
-                    
+
 #file = {  Data    : TFile("File_rds_zbb_"+Data+"_"+sel[channel]+".root"),
 #          DYMC    : TFile("File_rds_zbb_"+DYMC+"_"+sel[channel]+".root"),
 #          TtbarMC : TFile("File_rds_zbb_"+TtbarMC+"_"+sel[channel]+".root")
 #                    }
 
 ws={}
-ws[Data]    = file[Data].Get("ws")
-ws[DYMC]    = file[DYMC].Get("ws")
-ws[TtbarMC] = file[TtbarMC].Get("ws")
 
 myRDS ={}
-myRDS[Data]    = ws[Data].data("rds_zbb")
-myRDS[DYMC]    = ws[DYMC].data("rds_zbb")
-myRDS[TtbarMC] = ws[TtbarMC].data("rds_zbb")
+
+if channel=="Sum":
+    ws[Data_el]    = file[Data_el].Get("ws")
+    ws[DYMC_el]    = file[DYMC_el].Get("ws")
+    ws[TtbarMC_el] = file[TtbarMC_el].Get("ws")
+    ws[Data_mu]    = file[Data_mu].Get("ws")
+    ws[DYMC_mu]    = file[DYMC_mu].Get("ws")
+    ws[TtbarMC_mu] = file[TtbarMC_mu].Get("ws")
+
+    myRDS[Data]    = ws[Data_el].data("rds_zbb")
+    myRDS[DYMC]    = ws[DYMC_el].data("rds_zbb")
+    myRDS[TtbarMC] = ws[TtbarMC_el].data("rds_zbb")
+
+    myRDS[Data_mu]    = ws[Data_mu].data("rds_zbb")
+    myRDS[DYMC_mu]    = ws[DYMC_mu].data("rds_zbb")
+    myRDS[TtbarMC_mu] = ws[TtbarMC_mu].data("rds_zbb")
+
+    myRDS[Data].append(myRDS[Data_mu])
+    myRDS[DYMC].append(myRDS[DYMC_mu])
+    myRDS[TtbarMC].append(myRDS[TtbarMC_mu])
+else :
+    ws[Data]    = file[Data].Get("ws")
+    ws[DYMC]    = file[DYMC].Get("ws")
+    ws[TtbarMC] = file[TtbarMC].Get("ws")
+
+    myRDS[Data]    = ws[Data].data("rds_zbb")
+    myRDS[DYMC]    = ws[DYMC].data("rds_zbb")
+    myRDS[TtbarMC] = ws[TtbarMC].data("rds_zbb")
 
 myRDS[DYMC]    = myRDS[DYMC].reduce("rc_"+WP+"==1")
 myRDS[TtbarMC] = myRDS[TtbarMC].reduce("rc_"+WP+"==1")
 DATA=myRDS[Data].reduce("rc_"+WP+"==1")
 
+if cutstring:
+    myRDS[DYMC]    = myRDS[DYMC].reduce(cutstring)
+    myRDS[TtbarMC] = myRDS[TtbarMC].reduce(cutstring)
+    DATA=DATA.reduce(cutstring)
+
 print "DATA("+WP+").numEntries() = ", DATA.numEntries()
 
 rrv_SV_M    = ws[Data].var("rrv_SV_M")
 rrv_bb_M    = ws[Data].var("rrv_bb_M")
+rrv_bb_M.setMax(750)
+rrv_bb_M.setBins(25)
 rrv_bb_M.SetTitle("m(bb) (GeV/c^{2})")
-rrv_zbb_M   = ws[Data].var("rrv_zbb_M")
+
+rrv_ll_pT    = ws[Data].var("rrv_ll_pT")
+rrv_ll_pT.setMax(400)
+rrv_ll_pT.setBins(20)
+rrv_ll_pT.SetTitle("p_{T}(l^{+}l^{-})")
+
+rrv_zbb_M   = ws[Data].var("rrv_zmmbb_M")
+if channel=="El" : rrv_zbb_M   = ws[Data].var("rrv_zeebb_M")
+rrv_zbb_M.setMax(750)
+rrv_zbb_M.setBins(15)
+rrv_zbb_M.SetTitle("M(l^{+}l^{-}bb)")
+
+rrv_bb_dR   = ws[Data].var("rrv_bb_dR")
+rrv_bb_dR.setMin(0)
+rrv_bb_dR.setMax(6)
+rrv_bb_dR.setBins(12)
+rrv_bb_dR.SetTitle("#Delta R(b_{1},b_{2})")
+
 rrv_zeebb_M = ws[Data].var("rrv_zeebb_M")
 rrv_zmmbb_M = ws[Data].var("rrv_zmmbb_M")
 rc_cat      = ws[Data].var("rc_cat")
@@ -87,7 +158,7 @@ mean_bb  = RooRealVar("mean_bb", "mean_bb", 300,100,500)
 sigma_bb = RooRealVar("sigma_bb","sigma_bb", 30, 10,100)
 Sig_bb = RooGaussian("Sig_bb","Sig_bb",rrv_bb_M,mean_bb,sigma_bb)
 
-S = RooRealVar("S","S",10,0,30)
+S = RooRealVar("S","S",0.01,0,30)
 
 sig_pdf = RooExtendPdf("sig_pdf",
                        "sig_pdf",
@@ -101,69 +172,250 @@ sig_pdf = RooExtendPdf("sig_pdf",
 rdh_zbb_MC_bb_M = {}
 rhp_zbb_MC_bb_M = {}
 
-rdh_zbb_MC_bb_M[DYMC]    = RooDataHist("rdh_zbb_MC_bb_M"+DYMC,
-                                       "rdh_zbb_MC_SV_M"+DYMC,
-                                       RooArgSet(rrv_bb_M),
-                                       myRDS[DYMC])
-rdh_zbb_MC_bb_M[TtbarMC] = RooDataHist("rdh_zbb_MC_bb_M"+TtbarMC,
-                                       "rdh_zbb_MC_bb_M"+TtbarMC,
-                                        RooArgSet(rrv_bb_M),
-                                        myRDS[TtbarMC])
-rhp_zbb_MC_bb_M[DYMC]    = RooHistPdf( "rhp_zbb_MC_bb_M"+DYMC,
-                                       "rhp_zbb_MC_bb_M"+DYMC,
-                                        RooArgSet(rrv_bb_M),
-                                        rdh_zbb_MC_bb_M[DYMC])
-rhp_zbb_MC_bb_M[TtbarMC] = RooHistPdf( "rhp_zbb_MC_bb_M"+TtbarMC,
-                                       "rhp_zbb_MC_bb_M"+TtbarMC,
-                                        RooArgSet(rrv_bb_M),
-                                        rdh_zbb_MC_bb_M[TtbarMC])
-
-#rhp_zbb_MC_8_bb_M = RooKeysPdf("rhp_zbb_MC_8_bb_M","rhp_zbb_MC_8_bb_M", rrv_bb_M, rds_zbb_MC_8)
-
 B={}
-
-B[DYMC]    = RooRealVar("B"+DYMC,   "B"+DYMC,   myRDS[DYMC].numEntries()*2/11.8)
-B[TtbarMC] = RooRealVar("B"+TtbarMC,"B"+TtbarMC,myRDS[TtbarMC].numEntries()*(2/23)/10)
-
-ext_pdf={}
-ext_pdf[DYMC] = RooExtendPdf("ext_pdf"+DYMC,
-                             "ext_pdf"+DYMC,
-                             rhp_zbb_MC_bb_M[DYMC],
-                             B[DYMC])
-ext_pdf[TtbarMC] = RooExtendPdf("ext_pdf"+TtbarMC,
-                                "ext_pdf"+TtbarMC,
-                                rhp_zbb_MC_bb_M[TtbarMC],
-                                B[TtbarMC])
-   
-#bkg_bb.SetName("bkg_bb")
-
-######################
-### MAKE TOTAL PDF ###
-######################
-
-#S_8=RooRealVar("S_8","N_{S}",0.8*rds_8.numEntries(),0,rds_8.numEntries())
-
-Sum_bb = RooAddPdf("Sum_bb","Sum_bb",
-                   RooArgList(Sig_bb,rhp_zbb_MC_bb_M[DYMC],rhp_zbb_MC_bb_M[TtbarMC]),
-                   RooArgList(S,     B[DYMC],              B[TtbarMC]) )
 
 ###########
 ### FIT ###
 ###########
 
+C_fit  = {}
+frame  = {}  
+frame2 = {}  
+
 ### more statistical methods? see http://root.cern.ch/root/html/tutorials/roostats/index.html
 
-Sum_bb.fitTo(DATA,RooFit.Extended())
+#Sum_bb.fitTo(DATA,RooFit.Extended())
 
-frame = rrv_bb_M.frame(0,600,12)#rrv_bb_M.getMax())
-DATA.plotOn(frame)
-Sum_bb.plotOn(frame,RooFit.LineColor(kBlue))
-Sum_bb.plotOn(frame,RooFit.Components("Sig_bb"),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
-Sum_bb.plotOn(frame,RooFit.Components("bkg_bb"),RooFit.LineColor(kRed),  RooFit.LineStyle(kDashed))
-Sum_bb.paramOn(frame,DATA)
+varList = [rrv_bb_M,
+           rrv_ll_pT,
+           rrv_zbb_M,
+           rrv_bb_dR] 
 
-C_fit=TCanvas("C_fit","C_fit",800,700)
-frame.Draw()
+Canvas=TCanvas("Canvas","Canvas",650,650)
+Canvas.Divide(2,2)
+
+dir =0
+
+for var in varList:
+    C_fit[var]=TCanvas("C_fit"+var.GetName(),"C_fit"+var.GetName(),800,400)
+    C_fit[var].Divide(2)
+    frame[var] = var.frame()#0,600,12)#rrv_bb_M.getMax())
+
+    rdh_zbb_MC_bb_M[DYMC]    = RooDataHist("rdh_zbb_MC_bb_M"+DYMC,
+                                           "rdh_zbb_MC_SV_M"+DYMC,
+                                           RooArgSet(var),
+                                           myRDS[DYMC])
+    rdh_zbb_MC_bb_M[TtbarMC] = RooDataHist("rdh_zbb_MC_bb_M"+TtbarMC,
+                                           "rdh_zbb_MC_bb_M"+TtbarMC,
+                                           RooArgSet(var),
+                                           myRDS[TtbarMC])
+    rhp_zbb_MC_bb_M[DYMC]    = RooHistPdf( "rhp_zbb_MC_bb_M"+DYMC,
+                                           "rhp_zbb_MC_bb_M"+DYMC,
+                                           RooArgSet(var),
+                                           rdh_zbb_MC_bb_M[DYMC])
+    rhp_zbb_MC_bb_M[TtbarMC] = RooHistPdf( "rhp_zbb_MC_bb_M"+TtbarMC,
+                                           "rhp_zbb_MC_bb_M"+TtbarMC,
+                                           RooArgSet(var),
+                                           rdh_zbb_MC_bb_M[TtbarMC])
+    
+    #rhp_zbb_MC_8_bb_M = RooKeysPdf("rhp_zbb_MC_8_bb_M","rhp_zbb_MC_8_bb_M", rrv_bb_M, rds_zbb_MC_8)
+
+    #B[DYMC]    = RooRealVar("B"+DYMC,   "B"+DYMC,   myRDS[DYMC].numEntries()*(2.0/11.8)*10.)
+    #B[TtbarMC] = RooRealVar("B"+TtbarMC,"B"+TtbarMC,myRDS[TtbarMC].numEntries()*(2.0/23.))
+
+    lumi_of_TT = 3297203./158.
+    lumi_of_DY = 29369902./3048.
+
+    lumi_data = { "Mu" : 2006.8,
+                  "El" : 1794.1 }
+    lumi_data["Sum"] = lumi_data["Mu"]+lumi_data["El"]
+
+    print "*** LUMI of DY = ", lumi_of_DY
+    print "*** LUMI of TT = ", lumi_of_TT
+
+    B[DYMC]    = RooRealVar("B"+DYMC,    "B"+DYMC,     myRDS[DYMC].numEntries()*lumi_data[channel]/lumi_of_DY*20./20.)
+    B[TtbarMC] = RooRealVar("B"+TtbarMC, "B"+TtbarMC,  myRDS[TtbarMC].numEntries()*lumi_data[channel]/lumi_of_TT)
+    
+    SM_MC = B[DYMC].getVal() + B[TtbarMC].getVal()
+
+    norm = 1.#SM_MC/DATA.numEntries()#1.
+    
+    ext_pdf={}
+    ext_pdf[DYMC] = RooExtendPdf("ext_pdf"+DYMC,
+                                 "ext_pdf"+DYMC,
+                                 rhp_zbb_MC_bb_M[DYMC],
+                                 B[DYMC])
+    ext_pdf[TtbarMC] = RooExtendPdf("ext_pdf"+TtbarMC,
+                                    "ext_pdf"+TtbarMC,
+                                    rhp_zbb_MC_bb_M[TtbarMC],
+                                    B[TtbarMC])
+    
+    #bkg_bb.SetName("bkg_bb")
+     
+    ######################
+    ### MAKE TOTAL PDF ###
+    ######################
+
+    #S_8=RooRealVar("S_8","N_{S}",0.8*rds_8.numEntries(),0,rds_8.numEntries())
+     
+    Sum_bb = RooAddPdf("Sum_bb","Sum_bb",
+                       RooArgList(Sig_bb,rhp_zbb_MC_bb_M[DYMC],rhp_zbb_MC_bb_M[TtbarMC]),
+                       RooArgList(S,     B[DYMC],              B[TtbarMC]) )
+    
+    print "----> FRACTIONS!!!!"
+    print "#S  = ", S.getVal()
+    print "#DY = ", B[DYMC].getVal()
+    print "#TT = ", B[TtbarMC].getVal()
+    
+    DATA.plotOn(frame[var],
+                RooFit.MarkerSize(1.3),
+                RooFit.XErrorSize(0.035),
+                RooFit.DrawOption("pe2"))
+    Sum_bb.plotOn(frame[var],
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame[var],
+                  RooFit.Components("rhp_zbb_MC_bb_M"+DYMC),
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kRed),
+                  RooFit.LineStyle(kDashed),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame[var],
+                  RooFit.Components("rhp_zbb_MC_bb_M"+TtbarMC),
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kYellow),
+                  RooFit.LineStyle(kDashed),
+                  RooFit.Normalization(norm)
+                  )
+    DATA.plotOn(frame[var],
+                RooFit.MarkerSize(1.3),
+                RooFit.XErrorSize(0.035),
+                RooFit.DrawOption("pe2"))
+    #Sum_bb.paramOn(frame,DATA)
+
+    C_fit[var].cd(1).SetLogy()
+    frame[var].Draw()
+
+
+    print "NORMALIZATION = ", norm
+
+    frame2[var] = var.frame()#,600,12)#rrv_bb_M.getMax())
+    DATA.plotOn(frame2[var],
+                RooFit.MarkerSize(1.3),
+                RooFit.XErrorSize(0.035),
+                RooFit.DrawOption("pe2"))
+    Sum_bb.plotOn(frame2[var],
+                  RooFit.LineWidth(1),
+                  RooFit.DrawOption("F"),
+                  RooFit.FillColor(kRed),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame2[var],
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Components("rhp_zbb_MC_bb_M"+TtbarMC+",rhp_zbb_MC_bb_M"+DYMC),
+                  RooFit.DrawOption("F"),
+                  RooFit.FillColor(kRed),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame2[var],
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Components("rhp_zbb_MC_bb_M"+TtbarMC+",rhp_zbb_MC_bb_M"+DYMC),
+                  RooFit.FillColor(kRed),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame2[var],
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Components("rhp_zbb_MC_bb_M"+TtbarMC),
+                  RooFit.DrawOption("F"),
+                  RooFit.FillColor(kYellow),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    Sum_bb.plotOn(frame2[var],
+                  RooFit.LineWidth(1),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Components("rhp_zbb_MC_bb_M"+TtbarMC),
+                  RooFit.FillColor(kYellow),
+                  RooFit.LineColor(kBlack),
+                  RooFit.Normalization(norm)
+                  )
+    DATA.plotOn(frame2[var],
+                RooFit.MarkerSize(1.3),
+                RooFit.XErrorSize(0.035),
+                RooFit.DrawOption("pe2"))
+    C_fit[var].cd(2)
+    frame2[var].Draw()
+
+    dir+=1
+    Canvas.cd(dir)
+    frame2[var].Draw()
+
+Canvas.SaveAs(channel+"_"+WP+"_"+cutstring+".pdf")
+
+Canvas2 = TCanvas("C2","C2",1200,400)
+Canvas2.Divide(3)
+
+gStyle.SetPalette(1)
+
+#rrv_bb_M,
+#rrv_ll_pT,
+#rrv_zbb_M,
+#rrv_bb_dR
+
+CorrCanvas = {}
+th2_data   = {}
+th2_dymc   = {}
+th2_ttmc   = {}
+
+for var1 in varList :
+    for var2 in varList :
+        corrVar = var1.GetName()+"__VS__"+var2.GetName()
+        print "*** looking at correlation ", corrVar
+
+for var1 in varList :
+    for var2 in varList :
+        corrVar = var1.GetName()+"__VS__"+var2.GetName()
+        print "*** looking at correlation ", corrVar
+        CorrCanvas[corrVar] = TCanvas("C"+corrVar,"C"+corrVar,1200,800)
+        CorrCanvas[corrVar].Divide(3,2)
+        
+        th2_data[corrVar] = var1.createHistogram(corrVar,var2 )
+        th2_data[corrVar].SetName("th2_data_"+corrVar)
+        th2_dymc[corrVar] = var1.createHistogram(corrVar,var2 )
+        th2_dymc[corrVar].SetName("th2_dymc_"+corrVar)
+        th2_ttmc[corrVar] = var1.createHistogram(corrVar,var2 )
+        th2_ttmc[corrVar].SetName("th2_ttmc_"+corrVar)
+        
+        DATA.fillHistogram(          th2_data[corrVar], RooArgList(var1,var2))
+        myRDS[DYMC].fillHistogram(   th2_dymc[corrVar], RooArgList(var1,var2))
+        myRDS[TtbarMC].fillHistogram(th2_ttmc[corrVar], RooArgList(var1,var2))
+        
+        CorrCanvas[corrVar].cd(1)
+        th2_data[corrVar].Draw("col2z")
+        CorrCanvas[corrVar].cd(2)
+        th2_dymc[corrVar].Draw("col2z")
+        CorrCanvas[corrVar].cd(3)
+        th2_ttmc[corrVar].Draw("col2z")
+        CorrCanvas[corrVar].cd(4)
+        th2_data[corrVar].Draw("contz")
+        CorrCanvas[corrVar].cd(5)
+        th2_dymc[corrVar].Draw("contz")
+        CorrCanvas[corrVar].cd(6)
+        th2_ttmc[corrVar].Draw("contz")
+
+
+bla
+
+
 
 ##########################
 ### PROFILE LIKELIHOOD ###
