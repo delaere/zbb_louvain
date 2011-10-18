@@ -24,7 +24,7 @@ import os
 gROOT.SetStyle("Plain")
 gStyle.SetErrorX(0)
 
-WP       = "HE"   #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+WP       = "HP"   #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
 channel  = "El"   #"El","Mu"
 template = "hist" #"keys", "hist"
 jec      = 0      #1,3,5  
@@ -32,7 +32,7 @@ numbins  = 40     #20,40,80
 
 ### Getting a file and a tree
 
-file  = TFile("bTagPurRDS_QCD_5.root")
+file  = TFile("bTagPurRDS_QCD_3.root")
 ws    = file.Get("ws")
 myRDS = ws.data("myRDS");
 
@@ -171,8 +171,9 @@ npvRegion = RooThresholdCategory("npvRegion","region of nPV",rrv_nPV,"nPV")
 pTRegion.addThreshold(             35, "1") 
 pTRegion.addThreshold(             45, "2") 
 pTRegion.addThreshold(             65, "3") 
-pTRegion.addThreshold(            150, "4") 
-pTRegion.addThreshold(rrv_pT.getMax(), "5") 
+pTRegion.addThreshold(            100, "4") 
+pTRegion.addThreshold(            150, "5") 
+pTRegion.addThreshold(rrv_pT.getMax(), "6") 
 
 etaRegion.addThreshold(            3., "1")
 
@@ -180,11 +181,11 @@ etaRegion.addThreshold(            3., "1")
 #etaRegion.addThreshold(             1., "2") 
 #etaRegion.addThreshold(rrv_eta.getMax(), "3") 
 
-#npvRegion.addThreshold(             15, "1") 
+npvRegion.addThreshold(             15, "1") 
 
-npvRegion.addThreshold(             4.5, "1") 
-npvRegion.addThreshold(             7.5, "2") 
-npvRegion.addThreshold(             20., "3") 
+#npvRegion.addThreshold(             4.5, "1") 
+#npvRegion.addThreshold(             7.5, "2") 
+#npvRegion.addThreshold(             20., "3") 
 #npvRegion.addThreshold(             6.5, "3") 
 #npvRegion.addThreshold(             8.5, "4") 
 #npvRegion.addThreshold(rrv_nPV.getMax(), "5") 
@@ -258,9 +259,9 @@ rrv_weight = RooRealVar("weight","weight",0)
 
 RDS_weighted_per_pT = {}
 
-for i in range(1,5):
+for i in range(1,6):
     for j in range(1,2):
-        for k in range(1,4):
+        for k in range(1,2):
 
             str_i = "pTRegion==pTRegion::"+str(i)
             str_j = "etaRegion==etaRegion::"+str(j)
@@ -384,9 +385,9 @@ testframe.Draw()
 
 
 RDS_sum = RooDataSet("RDS_sum","RDS_sum",RDS_per_pT[i,j,k].get())
-for i in range(1,5):
+for i in range(1,6):
     for j in range(1,2):
-        for k in range(1,4):
+        for k in range(1,2):
             RDS_sum.append(RDS_per_pT[i,j,k])
 
 RDS_sum_weighted = RooDataSet("RDS_sum_weighted",
@@ -674,6 +675,8 @@ jecString=""
 if jec : jecString+="_"+str(jec)+"sigmaJEC"
 
 C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_QCDtemplate"+channel+"_"+WP+"_"+template+jecString+".pdf")
+
+bla
 
 C_msv_perpT_flav = TCanvas("C_msv_perpT_flav","C_msv_perpT_flav",1100,400)
 C_msv_perpT_flav.Divide(3)
