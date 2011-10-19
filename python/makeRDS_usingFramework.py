@@ -56,6 +56,13 @@ path = { "Mu_DATA"     : "/home/fynu/tdupree/store/zbb_13Sep/Mu_Data/",
 ### Proxy for eventCategory ###
 ###############################
 
+jetHandle = Handle ("vector<pat::Jet>")
+metHandle = Handle ("vector<pat::MET>")
+zmuHandle = Handle ("vector<reco::CompositeCandidate>")
+zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+trigInfoHandle = Handle ("pat::TriggerEvent")
+genHandle = Handle ("vector<reco::GenParticle>")
+
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if not ZjetFilter=="bcl":
