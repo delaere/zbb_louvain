@@ -15,6 +15,8 @@ print "beginning of script"
 import ROOT
 import sys
 import os
+import itertools
+import time
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from eventSelectionControlPlots import *
@@ -27,6 +29,8 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ###################
 
 channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+jobNumber = 1
+Njobs = 1
 
 ############
 ### Maps ###
@@ -88,12 +92,12 @@ escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], che
 dirList=list(itertools.islice(os.listdir(path[channel]), jobNumber, None, Njobs))
 files=[]
 for fname in dirList:
-  files.append(path+"/"+fname)
+  files.append(path[channel]+"/"+fname)
 events = Events (files)
 
 ### booking
 
-escp.beginJob(btagging=btagAlgo, zmulabel="Ztighttight", zelelabel="Zelel")
+escp.beginJob(btagging="SSV", zmulabel="Ztighttight", zelelabel="Zelel")
 
 ### categories
 
@@ -102,7 +106,7 @@ for i in range(eventCategories()):
   rc = RooCategory("rc_"+str(i),categoryName(i))
   rc.defineType("not_acc",0)
   rc.defineType("acc",1)
-  rooCategories.append(rc)
+  rooCategories[i] = rc
   rds_zbb.addColumn(rc)
   escp._obsSet.add(rc) # this is not clean at all -> shows that this has to move somehow to the base class itself.
 
@@ -129,6 +133,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
 	else: rooCategories[i].setIndex(0)
       escp.processEvent(event)
       i += 1
+
+    escp.endJob()
 
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)
