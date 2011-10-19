@@ -23,8 +23,10 @@ class BaseControlPlots:
         self._obsSet = ROOT.RooArgSet()
         if dataset is None:
           self._rds = ROOT.RooDataSet("rds_zbb",  "rds_zbb", self._obsSet) # Q: is that ok, or do we have to create the rds once the ArgSet is fully defined?
+	  self._ownedRDS = True
 	else:
 	  self._rds = dataset
+	  self._ownedRDS = False
         self._rrv_vector = { }
     
     def beginJob(self):
@@ -81,7 +83,7 @@ class BaseControlPlots:
 	  #for now, we only store scalars, not vectors
 	  pass
         else:
-	  self._h_vector[self._purpose+"_"+name].setVal(value)
+	  self._rrv_vector[self._purpose+"_"+name].setVal(value)
       self._rds.add(self._obsSet)  
 
     def fill(self, data, weight = 1.):
@@ -99,7 +101,7 @@ class BaseControlPlots:
         if not self._f is None:
           self._f.Close()
       else:
-        if dataset is None:
+        if self._ownedRDS:
           ws  = ROOT.RooWorkspace(self._purpose,self._purpose) # need a way to share a workspace (as we do for dirs)
           getattr(ws,'import')(self._rds) 
           ws.writeToFile("File_rds_zbb_"+self._purpose+".root") 
