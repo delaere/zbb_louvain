@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.4 $'),
+    version = cms.untracked.string('$Revision: 1.5 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
 )
@@ -530,15 +530,32 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 
 process.source.fileNames = [
+<<<<<<< patTuple_llbb_423_MC_cfg.py
+    #"file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
+    #"file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
+=======
     "file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
     #"file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
+>>>>>>> 1.5
     #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
+    "file:/home/fynu/jdf/scratch/CMSSW_4_2_3/src/UserCode/zbb_louvain/test/ZA_bbll.root"
     ]                                     
 
-process.maxEvents.input = -1
+<<<<<<< patTuple_llbb_423_MC_cfg.py
+process.maxEvents.input = 10000
 
+process.out.fileName = 'Higgs_LocalTest_MC.root'
+=======
+process.maxEvents.input = -1
+>>>>>>> 1.5
+
+<<<<<<< patTuple_llbb_423_MC_cfg.py
+#process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
+#process.out.fileName = 'TTjets_LocalTest_MC.root'
+=======
 process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
 #process.out.fileName = 'TTjets_LocalTest_MC.root'
+>>>>>>> 1.5
 #process.out.fileName = 'DYjets_LocalTest_MC.root'
 
 #process.out.fileName = 'DYJetsToLL.root'
