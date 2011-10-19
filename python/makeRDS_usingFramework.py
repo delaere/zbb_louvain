@@ -17,10 +17,12 @@ import sys
 import os
 import itertools
 import time
+
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from eventSelectionControlPlots import *
 from ROOT import *
+from itertools import combinations
 
 from eventSelection import eventCategories, eventCategory, isInCategory
 
@@ -31,6 +33,10 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
+
+jobNumber=1
+
+Njobs=1
 
 ############
 ### Maps ###
@@ -131,13 +137,14 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      if i%100==0 : 
-        print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
-        t0 = time.time()
+      print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
+      t0 = time.time()
+      if i==1000 : 
+        break
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=False,btagAlgo="SSV")
-      for i in range(eventCategories()):
-        if isInCategory(i, categoryData):  rooCategories[i].setIndex(1)
-	else: rooCategories[i].setIndex(0)
+      for c in range(eventCategories()):
+        if isInCategory(c, categoryData):  rooCategories[c].setIndex(1)
+	else: rooCategories[c].setIndex(0)
       escp.processEvent(event)
       i += 1
 
