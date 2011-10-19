@@ -4,27 +4,58 @@ import ROOT
 class BaseControlPlots:
     """A class to create control plots"""
 
-    def __init__(self, dir=None, purpose="generic"):
+    def __init__(self, dir=None, purpose="generic", dataset=None, mode="plots"):
       """Initialize the ControlPlots, creating output file if needed. If no file is given, it means it is delegated."""
-      # create output file if needed. If no file is given, it means it is delegated
-      if dir is None:
-        self.f = ROOT.TFile("controlPlots.root", "RECREATE")
-        self.dir = self.f.mkdir(purpose)
-      else :
-        self.f = None
-        self.dir = dir
-      self.h_vector = { }
+      self._mode = mode
+      self._purpose = purpose
+      # for plots
+      if self._mode=="plots":
+        # create output file if needed. If no file is given, it means it is delegated
+        if dir is None:
+          self._f = ROOT.TFile("controlPlots.root", "RECREATE")
+          self._dir = self._f.mkdir(purpose)
+        else :
+          self._f = None
+          self._dir = dir
+        self._h_vector = { }
+      # for ntuples
+      if self._mode=="dataset":
+        self._obsSet = RooArgSet()
+        if dataset is None:
+          self._rds = RooDataSet("rds_zbb",  "rds_zbb", self._obsSet) # Q: is that ok, or do we have to create the rds once the ArgSet is fully defined?
+	else:
+	  self._rds = dataset
+        self._rrv_vector = { }
     
     def beginJob(self):
       """Declare histograms, and for derived classes instantiate handles. Must be overloaded.""" 
       raise NotImplementedError
       # histograms are added by calling addHisto(*args)
+      # roodataset variables are added by calling addVariable(*args)
+      # in a second step, these two could be merged. Otherwise, difficult to arrange both options in a single beginJob.
+      # also, we would have to duplicate a lot.
+      # one option would be a switch set in the constructor
+
+    #here, the idea would be to have a wrapper called in beginJob, that calls either one or the other (mode set in the constructor). 
+    def add(self, *args):
+      """Add one item to the list of products. Arguments are as for TH1F."""
+      if self._mode=="plots":
+        addHisto(*args)
+      else:
+        addVariable(*[args[i] for i in [0,1,3,4]])
 
     def addHisto(self,*args):
       """Add one histograms to the list of products. Arguments are as for TH1F."""
       # this fills a distionnary name <-> histogram
-      self.dir.cd()
-      self.h_vector[args[0]] = ROOT.TH1F(*args)
+      self._dir.cd()
+      self._h_vector[args[0]] = ROOT.TH1F(*args)
+
+    def addVariable(self,*args):
+      """Add one variable to the list of products. Arguments are as for RooRealVar."""
+      # this fills a distionnary name <-> RooRealVar
+      self._rrv_vector[self._purpose+"_"+args[0]] = RooRealVar(*args)
+      self._obsSet.add(self._rrv_vector[self._purpose+"_"+args[0]])
+      self._rds.addColumn(self._rrv_vector[self._purpose+"_"+args[0]])
     
     def processEvent(self, event, weight = 1.):
       """process event and fill histograms"""
@@ -34,7 +65,7 @@ class BaseControlPlots:
       """Process event data to extract histogrammables. Must be overloaded."""
       raise NotImplementedError
       # this is just an example, we never get there
-      # that method must return a dictionnary name <-> value that matches self.h_vector
+      # that method must return a dictionnary name <-> value that matches self._h_vector
       result = { }
       result["var1"] = 1.
       result["var2"] = 2.3
@@ -42,17 +73,40 @@ class BaseControlPlots:
       return result
     
     def fill(self, data, weight = 1.):
+      """Fills whatever must be filled in"""
+      if self._mode=="plots":
+        fillPlots(data, weight)
+      else:
+        fillRDS(data)
+
+    def fillPlots(self, data, weight = 1.):
       """Fills histograms with the data provided as input."""
       for name,value in data.items():
         if isinstance(value,list):
-          for val in value: self.h_vector[name].Fill(val,weight)
+          for val in value: self._h_vector[name].Fill(val,weight)
         else:
-          self.h_vector[name].Fill(value,weight)
+          self._h_vector[name].Fill(value,weight)
+
+    def fillRDS(self, data):
+      """Fills roodataset with the data provided as input."""
+      for name,value in data.items():
+        if isinstance(value,list):
+	  #for now, we only store scalars, not vectors
+	  pass
+        else:
+	  self._h_vector[self._purpose+"_"+name].setVal(value)
+      self._rds.add(self._obsSet)  
 
     def endJob(self):
       """Save and close."""
-      self.dir.cd()
-      self.dir.Write()
-      if not self.f is None:
-        self.f.Close()
+      if self._mode=="plots":
+        self._dir.cd()
+        self._dir.Write()
+        if not self._f is None:
+          self._f.Close()
+      else:
+        if dataset is None:
+          ws  = RooWorkspace(self._purpose,self._purpose) # need a way to share a workspace (as we do for dirs)
+          getattr(ws,'import')(self._rds) 
+          ws.writeToFile("File_rds_zbb_"+self._purpose+".root") 
 

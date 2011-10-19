@@ -11,9 +11,9 @@ from eventSelection import *
 class EventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, muChannel=True, checkTrigger=False):
+    def __init__(self, dir=None, muChannel=True, checkTrigger=False, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection")
+      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
       self.muChannel = muChannel
       self.checkTrigger = checkTrigger
     
