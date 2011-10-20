@@ -21,6 +21,10 @@ import time
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from eventSelectionControlPlots import *
+from monteCarloSelectionControlPlots import *
+from LumiReWeightingControlPlots import *
+from BtaggingReWeightingControlPlots import *
+from LeptonsReweightingControlPlots import *
 from ROOT import *
 from itertools import combinations
 
@@ -33,10 +37,9 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
-
-jobNumber=1
-
-Njobs=1
+MonteCarloPUFileName="./PUdistMC.root"
+DataPUFileName="./PUdistDATA.root"
+btagPerfData="../testfiles/performance_ssv_witheff.root"
 
 ############
 ### Maps ###
@@ -99,6 +102,10 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=False, dataset=rds_zbb, mode="dataset")
+mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
+lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 
 ### input
 
@@ -111,17 +118,14 @@ events = Events (files)
 ### booking
 
 escp.beginJob(btagging="SSV", zmulabel="Ztighttight", zelelabel="Zelel")
+mscp.beginJob(genlabel="genParticles")
+prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel="goodPV", pulabel="addPileupInfo")
+brcp.beginJob(btagPerfData)
+lrcp.beginJob()
 
 ### categories
 
-rooCategories = { }
-for i in range(eventCategories()):
-  rc = RooCategory("rc_"+str(i),categoryName(i))
-  rc.defineType("not_acc",0)
-  rc.defineType("acc",1)
-  rooCategories[i] = rc
-  rds_zbb.addColumn(rc)
-  escp._obsSet.add(rc) # this is not clean at all -> shows that this has to move somehow to the base class itself.
+escp.defineCategories(categoryNames)
 
 ########################
 ### Run Forest, run! ###
@@ -137,18 +141,23 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
-      t0 = time.time()
-      if i==1000 : 
-        break
+      if i%100==0 :
+        print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
+        t0 = time.time()
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=False,btagAlgo="SSV")
-      for c in range(eventCategories()):
-        if isInCategory(c, categoryData):  rooCategories[c].setIndex(1)
-	else: rooCategories[c].setIndex(0)
+      escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
       escp.processEvent(event)
+      mscp.processEvent(event)
+      prcp.processEvent(event)
+      brcp.processEvent(event)
+      lrcp.processEvent(event)
       i += 1
 
     escp.endJob()
+    mscp.endJob()
+    prcp.endJob()
+    brcp.endJob()
+    lrcp.endJob()
 
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)

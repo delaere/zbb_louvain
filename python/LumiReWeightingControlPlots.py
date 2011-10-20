@@ -11,9 +11,9 @@ from LumiReWeighting import *
 class LumiReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None, PileupSummaryInfo="addPileupInfo"):
+    def __init__(self, dir=None, PileupSummaryInfo="addPileupInfo", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="lumiReweighting")
+      BaseControlPlots.__init__(self, dir=dir, purpose="lumiReweighting", dataset=dataset, mode=mode)
       self.PileupSummaryInfo = PileupSummaryInfo
     
     def beginJob(self, MonteCarloFileName, DataFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel="goodPV", pulabel="addPileupInfo"):

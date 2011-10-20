@@ -11,9 +11,9 @@ from monteCarloSelection import *
 class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
 
-    def __init__(self, dir=None):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection")
+      BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection", dataset=dataset, mode=mode)
 
     def beginJob(self, genlabel="genParticles"):
       # declare histograms
@@ -34,15 +34,15 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       event.getByLabel (self.genlabel,self.genHandle)
       particles = self.genHandle.product()
       self.i += 1
-      if isZbEvent(particles):
+      if isZbEvent(particles,0,False):
         self.bjet += 1
         result["eventType"] = 3
         return result
-      if isZcEvent(particles):
+      if isZcEvent(particles,0,False):
         self.cjet += 1
         result["eventType"] = 2
         return result
-      if isZlEvent(particles):
+      if isZlEvent(particles,0,False):
         self.ljet += 1
         result["eventType"] = 1
         return result

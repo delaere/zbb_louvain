@@ -6,6 +6,7 @@ import os
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
+from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 #from myFuncTimer import print_timing
 
 class EventSelectionControlPlots(BaseControlPlots):
@@ -16,11 +17,14 @@ class EventSelectionControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
       self.muChannel = muChannel
       self.checkTrigger = checkTrigger
+      self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent", btagging="SSV"):
       self.btagging = btagging
       # declare histograms
       self.add("run","Run number",15000,160000,175000)
+      self.add("event","Event number",1000,0,5e9)
+      self.add("ls","Lumi section",2000,0,2000)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("zmassMu","zmassMu",10000,0,1000)
@@ -61,26 +65,38 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
       self.add("SSVHEdisc","SSVHEdisc",200,-10,10)
       self.add("SSVHPdisc","SSVHPdisc",200,-10,10)
+      self.add("SVmass","SVmass",20,0,5)
       self.add("MET","MET",100,0,200)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("jetpt","Jet Pt",100,15,215)
+      self.addHisto("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
       self.add("jeteta","Jet eta",25,0, 2.5)
       self.add("jetetapm","Jet eta",50,-2.5, 2.5)
       self.add("jetphi","Jet phi",80,-4,4)
       self.add("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.add("jet1pt","leading jet Pt",500,15,515)
+      self.addHisto("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
       self.add("jet1eta","leading jet Eta",25,0,2.5)
       self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
       self.add("jet2pt","subleading jet Pt",500,15,515)
+      self.addHisto("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
       self.add("jet2eta","subleading jet Eta",25,0,2.5)
       self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
+      self.addHisto("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
+      self.add("bjet1HEdisc","leading bjet SSVHE disc",200,-10,10)
+      self.add("bjet1HPdisc","leading bjet SSVHP disc",200,-10,10)
+      self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
+      self.addHisto("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
+      self.add("bjet2HEdisc","subleading bjet SSVHE disc",200,-10,10)
+      self.add("bjet2HPdisc","subleading bjet SSVHP disc",200,-10,10)
+      self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
       self.add("nj","jet count",15,0,15)
       self.add("nb","b-jet count",5,0,5)
       self.add("nbP","pure b-jet count",5,0,5)
@@ -134,6 +150,9 @@ class EventSelectionControlPlots(BaseControlPlots):
         if isInCategory(category, categoryData):
           result["category"].append(category)
       result["run"] = event.eventAuxiliary().run()
+      result["event"] = event.eventAuxiliary().id().event()
+      result["ls"] = event.eventAuxiliary().luminosityBlock()
+
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]
@@ -180,6 +199,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       nb  = 0
       nbP = 0
       result["jetpt"] = [ ]
+      result["jetpt_totunc"] = [ ]
       result["jeteta"] = [ ]
       result["jetetapm"] = [ ]
       result["jetphi"] = [ ]
@@ -194,6 +214,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["jetid"] = [ ]
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
+      result["SVmass"] = [ ]
       for jet in jets:
         #jetPt = jetpt(jet) 
         jetPt = jet.pt()
@@ -201,6 +222,7 @@ class EventSelectionControlPlots(BaseControlPlots):
           rawjet = jet.correctedJet("Uncorrected")
           #result["jetpt"].append(jetPt)
           result["jetpt"].append(jet.pt())
+	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
           result["jetphi"].append(jet.phi())
@@ -219,25 +241,39 @@ class EventSelectionControlPlots(BaseControlPlots):
           # B-tagging
           result["SSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+          tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
+          if tISV :
+            if tISV.secondaryVertex(0) :
+              result["SVmass"].append(tISV.secondaryVertex(0).p4().mass())
           nj += 1
           if nj==1: 
             result["jet1pt"] = jetPt #jet.pt()
+	    result["jet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
           elif nj==2:
             result["jet2pt"] = jetPt #jet.pt()
+	    result["jet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
               result["bjet1pt"] = jetPt #jet.pt()
+	      result["bjet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
+	      result["bjet1HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+	      result["bjet1HPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	      result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
             elif nb==2:
               result["bjet2pt"] = jetPt #jet.pt()
+	      result["bjet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
+	      result["bjet2HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+	      result["bjet2HPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	      result["bjet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
           if isBJet(jet,"HP",self.btagging): nbP += 1
       result["nj"] = nj
       result["nb"] = nb

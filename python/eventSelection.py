@@ -14,8 +14,6 @@ def selectedTriggers(triggerInfo):
     else: 
       False
   pathout = map(lambda path:isFired(path),paths)
-  #not sure if the all-in-one solution below is faster...
-  #pathout = map(lambda trigger: if not triggerInfo.path(trigger) is None: triggerInfo.path(trigger).wasAccept() else: False, triggers)
   return pathout
 
 def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
@@ -66,30 +64,6 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=167039 and runNumber<170249 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
       if runNumber>=170249  : outcome ="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6 " in pathnames
   return outcome
-  # this is what we could do with the TriggerWeight product:
-  #outcome = False
-  #if runNumber is None:
-  #  if muChannel:
-  #    for i in range(6): outcome |= triggerInfo[i]
-  #  else:
-  #    for i in range(6,13): outcome |= triggerInfo[i]
-  #else:
-  #  if muChannel:
-  #    if runNumber>=132440 and runNumber<=139980 : outcome = triggerInfo[0]  #HLT_Mu3
-  #    if runNumber>=140058 and runNumber<=140401 : outcome = triggerInfo[1]  #HLT_Mu5
-  #    if runNumber>=141956 and runNumber<=144114 : outcome = triggerInfo[2]  #HLT_Mu7
-  #    if runNumber>=146428 and runNumber<=147116 : outcome = triggerInfo[3]  #HLT_Mu9
-  #    if runNumber>=147146 and runNumber<=148102 : outcome = triggerInfo[4]  #HLT_Mu11
-  #    if runNumber>=148783 and runNumber<=149442 : outcome = triggerInfo[5]  #HLT_Mu15_v1
-  #  else:
-  #    if runNumber>=132440 and runNumber<=137028 : outcome = triggerInfo[6]  #HLT_Photon10_L1R should impose a cut at 15 GeV by hand
-  #    if runNumber>=138564 and runNumber<=140401 : outcome = triggerInfo[7]  #HLT_Photon15_Cleaned_L1R
-  #    if runNumber>=141956 and runNumber<=144114 : outcome = triggerInfo[8]  #HLT_Ele15_SW_CaloEleId_L1R
-  #    if runNumber>=146428 and runNumber<=147116 : outcome = triggerInfo[9]  #HLT_Ele17_SW_CaloEleId_L1R
-  #    if runNumber>=147146 and runNumber<=148102 : outcome = triggerInfo[10] #HLT_Ele17_SW_TightEleId_L1R
-  #    if runNumber>=148783 and runNumber<=149063 : outcome = triggerInfo[11] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1
-  #    if runNumber>=149181 and runNumber<=149442 : outcome = triggerInfo[12] #HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2
-  #return outcome
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""

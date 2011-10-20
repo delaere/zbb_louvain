@@ -7,6 +7,7 @@ from math import sin
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
+from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 #from myFuncTimer import print_timing
 
 ## TODO: Remove later... for data only
@@ -22,9 +23,9 @@ from eventSelection import *
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
 
-    def __init__(self, dir=None):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="muons")
+      BaseControlPlots.__init__(self, dir=dir, purpose="muons", dataset=dataset, mode=mode)
     
     def beginJob(self, muonlabel="matchedMuons", muonType="tight"):
       # declare histograms
@@ -39,6 +40,7 @@ class MuonsControlPlots(BaseControlPlots):
       self.addHisto("muonSHits","Muon Strip hits",30,0,30)
       self.addHisto("muonMatches","Muon matched segments",10,0,10)
       self.addHisto("muonMHits","Muon muon hits",100,0,100)
+      self.addHisto("muondb","muon dB",100,0,0.05)
       self.addHisto("nmu","muon count",5,0,5)
       
       # prepare handles
@@ -65,6 +67,7 @@ class MuonsControlPlots(BaseControlPlots):
       result["muonSHits"]  = [ ]
       result["muonMatches"]= [ ]
       result["muonMHits"]  = [ ]
+      result["muondb"]     = [ ]
       nmu = 0
       for muon in muons:
         # for muons:
@@ -91,6 +94,7 @@ class MuonsControlPlots(BaseControlPlots):
         result["muonEtapm"].append(muon.eta())
         result["muonMatches"].append(muon.numberOfMatches())
         if isGoodMuon(muon,self.muonType) : nmu += 1
+        result["muondb"].append(abs(muon.dB()))
       result["nmu"] = nmu
    
       return result
@@ -99,9 +103,9 @@ class MuonsControlPlots(BaseControlPlots):
 class ElectronsControlPlots(BaseControlPlots):
     """A class to create control plots for electrons"""
 
-    def __init__(self, dir=None):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="electrons")
+      BaseControlPlots.__init__(self, dir=dir, purpose="electrons", dataset=dataset, mode=mode)
     
     def beginJob(self, electronlabel="matchedElectrons", electronType="tight"):
       # declare histograms
@@ -173,23 +177,27 @@ class ElectronsControlPlots(BaseControlPlots):
 class JetmetControlPlots(BaseControlPlots):
     """A class to create control plots for jets and MET"""
 
-    def __init__(self, dir=None):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="jetmet")
+      BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
+      self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self, jetlabel="cleanPatJets", metlabel="patMETsPF", btagging="SSV"):
       self.btagging=btagging
       # declare histograms
       self.addHisto("SSVHEdisc","SSVHEdisc",200,-10,10)
       self.addHisto("SSVHPdisc","SSVHPdisc",200,-10,10)
+      self.addHisto("SVmass","SVmass",20,0,5)
       self.addHisto("TCHEdisc","TCHEdisc",200,-10,10)
       self.addHisto("TCHPdisc","TCHPdisc",200,-10,10)
       self.addHisto("SSVHEdiscJet1","SSVHEdiscJet1",200,-10,10)
       self.addHisto("SSVHPdiscJet1","SSVHPdiscJet1",200,-10,10)
+      self.addHisto("SVmassJet1","SVmassJet1",20,0,5)
       self.addHisto("TCHEdiscJet1","TCHEdiscJet1",200,-10,10)
       self.addHisto("TCHPdiscJet1","TCHPdiscJet1",200,-10,10)
       self.addHisto("SSVHEdiscbJet1","SSVHEdiscbJet1",200,-10,10)
       self.addHisto("SSVHPdiscbJet1","SSVHPdiscbJet1",200,-10,10)
+      self.addHisto("SVmassbjet1","SVmassbjet1",20,0,5)
       self.addHisto("TCHEdiscbJet1","TCHEdiscbJet1",200,-10,10)
       self.addHisto("TCHPdiscbJet1","TCHPdiscbJet1",200,-10,10)
       self.addHisto("SSVHEdiscDisc1","SSVHEdiscDisc1",200,-10,10)
@@ -199,21 +207,26 @@ class JetmetControlPlots(BaseControlPlots):
       self.addHisto("MET","MET",100,0,200)
       self.addHisto("METphi","MET #phi",70,-3.5,3.5)
       self.addHisto("jetpt","Jet Pt",100,15,215)
+      self.addHisto("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
       self.addHisto("jeteta","Jet eta",25,0, 2.5)
       self.addHisto("jetetapm","Jet eta",50,-2.5, 2.5)
       self.addHisto("jetphi","Jet phi",80,-4,4)
       self.addHisto("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.addHisto("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.addHisto("jet1pt","leading jet Pt",500,15,515)
+      self.addHisto("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
       self.addHisto("jet1eta","leading jet Eta",25,0,2.5)
       self.addHisto("jet1etapm","leading jet Eta",50,-2.5,2.5)
       self.addHisto("jet2pt","subleading jet Pt",500,15,515)
+      self.addHisto("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
       self.addHisto("jet2eta","subleading jet Eta",25,0,2.5)
       self.addHisto("jet2etapm","subleading jet Eta",50,-2.5,2.5)
       self.addHisto("bjet1pt","leading bjet Pt",500,15,515)
+      self.addHisto("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.addHisto("bjet1eta","leading bjet Eta",25,0,2.5)
       self.addHisto("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.addHisto("bjet2pt","subleading bjet Pt",500,15,515)
+      self.addHisto("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.addHisto("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.addHisto("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.addHisto("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
@@ -245,9 +258,13 @@ class JetmetControlPlots(BaseControlPlots):
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
+      result["SVmass"] = [ ]
+      result["SSVHEmass"] = [ ]
+      result["SSVHPmass"] = [ ]
       result["TCHEdisc"] = [ ]
       result["TCHPdisc"] = [ ]
       result["jetpt"] = [ ]
+      result["jetpt_totunc"] = [ ]
       result["jeteta"] = [ ]
       result["jetetapm"] = [ ]
       result["jetphi"] = [ ]
@@ -274,6 +291,7 @@ class JetmetControlPlots(BaseControlPlots):
         if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
+	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
           result["jetphi"].append(jet.phi())
@@ -292,6 +310,10 @@ class JetmetControlPlots(BaseControlPlots):
           # B-tagging
           result["SSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+	  tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
+	  if tISV :
+	    if tISV.secondaryVertex(0) :
+	      result["SVmass"].append(tISV.secondaryVertex(0).p4().mass())
           result["TCHEdisc"].append(jet.bDiscriminator("trackCountingHighEffBJetTags"))
           result["TCHPdisc"].append(jet.bDiscriminator("trackCountingHighPurBJetTags"))
 	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
@@ -302,29 +324,39 @@ class JetmetControlPlots(BaseControlPlots):
           if nj==1: 
 	    j1pt=jetPt#jet.pt()
             result["jet1pt"] = jetPt#jet.pt()
+	    result["jet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
             result["SSVHEdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
             result["SSVHPdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	    if tISV :
+	      if tISV.secondaryVertex(0) :
+	        result["SVmassJet1"] = tISV.secondaryVertex(0).p4().mass()
             result["TCHEdiscJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
             result["TCHPdiscJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           elif nj==2:
             result["jet2pt"] = jetPt#jet.pt()
+	    result["jet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
               result["bjet1pt"] = jetPt#jet.pt()
+	      result["bjet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
               result["SSVHEdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["SSVHPdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	      if tISV :
+	        if tISV.secondaryVertex(0) :
+	          result["SVmassbJet1"] = tISV.secondaryVertex(0).p4().mass()
               result["TCHEdiscbJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
               result["TCHPdiscbJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
 	      result["dptj1b1"] = jetPt-j1pt#jet.pt()-j1pt
             elif nb==2:
               result["bjet2pt"] = jetPt#jet.pt()
+	      result["bjet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
           if isBJet(jet,"HP",self.btagging): nbP += 1
@@ -338,7 +370,6 @@ class JetmetControlPlots(BaseControlPlots):
       result["MET"] = met[0].pt()
       result["METphi"] = met[0].phi()
       return result
-    
 
 def runTest():
   output = ROOT.TFile("controlPlots.root", "RECREATE")
