@@ -16,10 +16,11 @@ def selectedTriggers(triggerInfo):
   pathout = map(lambda path:isFired(path),paths)
   return pathout
 
-def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
+def isTriggerOK(triggerInfo, runNumber, muChannel=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
+  #runNumber= event.eventAuxiliary().run()
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
@@ -46,7 +47,7 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=163269 and runNumber<165121 : outcome = "HLT_DoubleMu7_v2" in pathnames
       if runNumber>=165121 and runNumber<167039 : outcome = "HLT_Mu13_Mu8_v2" in pathnames
       if runNumber>=167039 and runNumber<170249 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
-      if runNumber>=170249  : outcome = "HLT_Mu13_Mu8_v6" in pathnames
+      if runNumber>=170249 and runNumber<173236 : outcome = "HLT_Mu13_Mu8_v6" in pathnames
     else:
       if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
       if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
@@ -62,7 +63,7 @@ def isTriggerOK(triggerInfo, muChannel=True, runNumber=None):
       if runNumber>=165121 and runNumber<165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
       if runNumber>=165970 and runNumber<167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
       if runNumber>=167039 and runNumber<170249 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
-      if runNumber>=170249  : outcome ="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6 " in pathnames
+      if runNumber>=170249 and runNumber<173236 : outcome ="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6 " in pathnames
   return outcome
 
 def isLooseMuon(muon):
@@ -421,12 +422,12 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", massWindow=30.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met,runNumber, muChannel=True, btagging="SSV", massWindow=30.):
   """Check analysis requirements for various steps."""
   output = []
   bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
   # output[0]: Trigger
-  if isTriggerOK(triggerInfo, muChannel):
+  if isTriggerOK(triggerInfo, runNumber, muChannel):
     output.append(1)
   else:
     output.append(0)

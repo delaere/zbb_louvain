@@ -70,9 +70,10 @@ zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
+#runHandle = Handle("")
 
 #@print_timing
-def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
+def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   """Compute the event category for histogramming"""
   if not ZjetFilter=="bcl":
     event.getByLabel ("genParticles",genHandle)
@@ -82,10 +83,10 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
   event.getByLabel("cleanPatJets",jetHandle)
   event.getByLabel("patMETsPF",metHandle)
-  #event.getByLabel("ZmuMatchedmuMatched",zmuHandle)
-  #event.getByLabel("ZelMatchedelMatched",zeleHandle)
-  event.getByLabel("Ztighttight",zmuHandle)
-  event.getByLabel("Zelel",zeleHandle)
+  event.getByLabel("ZmuMatchedmuMatched",zmuHandle)
+  event.getByLabel("ZelMatchedelMatched",zeleHandle)
+  #event.getByLabel("Ztighttight",zmuHandle)
+  #event.getByLabel("Zelel",zeleHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
@@ -95,7 +96,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, runNumber, btagAlgo)
 
 def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
@@ -183,11 +184,12 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   i = 0
   t0 = time.time()
   for event in events:
+    runNumber= event.eventAuxiliary().run()
     if i%100==0 : 
       print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
       t0 = time.time()
     for muChannel in [True, False]:
-      categoryData = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo)
+      categoryData = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber)
       if muChannel: 
         if onlyEle:
 	  plots = []

@@ -8,6 +8,7 @@ from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 #from myFuncTimer import print_timing
+event_list = open("files_Mu_stage3_run166512.txt","w")
 
 class EventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -144,7 +145,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       #for trigger,triggered in enumerate(selTriggers):
       #  if triggered : self.h_triggerBit.Fill(trigger,weight)
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel)
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel, runNumber)
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
@@ -339,7 +340,7 @@ def runTest():
     i += 1
   controlPlots.endJob()
 
-def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"):
+def dumpEventList(stage=3, muChannel=True, path='/home/fynu/lceard/store/Prod_AOD_2011A/synchronisation/166512/Mu_2011A_166512_Prompt_v4/'):
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -366,6 +367,7 @@ def dumpEventList(stage=6, muChannel=True, path="/storage/data/cms/store/user/fa
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel)
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, runNumber)
     if isInCategory(stage, categoryData):
-      print "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
+      #print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
+      print >> event_list , event.eventAuxiliary().id().event()
