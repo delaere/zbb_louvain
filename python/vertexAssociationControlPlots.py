@@ -5,6 +5,7 @@ import sys
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from vertexAssociation import *
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 class VertexAssociationControlPlots(BaseControlPlots):
@@ -14,42 +15,42 @@ class VertexAssociationControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="vertexAssociation", dataset=dataset, mode=mode)
     
-    def beginJob(self, jetlabel="cleanPatJets", zlabel="Ztighttight", vertexlabel="goodPV" , sigcut = 2.):
+    def beginJob(self, jetlabel=zbblabel.jetlabel, zlabel=zbblabel.zmumulabel, vertexlabel=zbblabel.vertexlabel , sigcut = 2.):
       self.sigcut = sigcut
       # declare histograms
-      self.addHisto("nvertices","nvertices",30,0,30)
-      self.addHisto("vx","vx",400,-0.2,0.2)
-      self.addHisto("vy","vy",400,-0.2,0.2)
-      self.addHisto("vz","vz",100,-25,25)
-      self.addHisto("vxerr","vxerr",100,0,0.01)
-      self.addHisto("vyerr","vyerr",100,0,0.01)
-      self.addHisto("vzerr","vzerr",100,0,0.02)
-      self.addHisto("lepton_dz","z distance between the two Z leptons",100,0,0.2)
-      self.addHisto("l1v_dz","z distance between lepton and vertex",100,0,1.)
-      self.addHisto("l2v_dz","z distance between lepton and vertex",100,0,1.)
-      self.addHisto("distance","vertex/track distance in z",2000,-10,10)
-      self.addHisto("sig","vertex/track significance in z",2000,-10,10)
-      self.addHisto("ratio1","jet/vertex association ratio v1",100,0,1)
-      self.addHisto("ratio2","jet/vertex association ratio v2",100,0,1)
-      self.addHisto("ratio3","jet/vertex association ratio v3",100,0,1)
-      self.addHisto("ratio1b","jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.addHisto("ratio2b","jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.addHisto("ratio3b","jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.addHisto("j1_ratio1","leading jet/vertex association ratio v1",100,0,1)
-      self.addHisto("j1_ratio2","leading jet/vertex association ratio v2",100,0,1)
-      self.addHisto("j1_ratio3","leading jet/vertex association ratio v3",100,0,1)
-      self.addHisto("j1_ratio1b","leading jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.addHisto("j1_ratio2b","leading jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.addHisto("j1_ratio3b","leading jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.addHisto("goodevent","pass or not Z+jet to vertex association",2,0,2)
+      self.add("nvertices","nvertices",30,0,30)
+      self.add("vx","vx",400,-0.2,0.2)
+      self.add("vy","vy",400,-0.2,0.2)
+      self.add("vz","vz",100,-25,25)
+      self.add("vxerr","vxerr",100,0,0.01)
+      self.add("vyerr","vyerr",100,0,0.01)
+      self.add("vzerr","vzerr",100,0,0.02)
+      self.add("lepton_dz","z distance between the two Z leptons",100,0,0.2)
+      self.add("l1v_dz","z distance between lepton and vertex",100,0,1.)
+      self.add("l2v_dz","z distance between lepton and vertex",100,0,1.)
+      self.add("distance","vertex/track distance in z",2000,-10,10)
+      self.add("sig","vertex/track significance in z",2000,-10,10)
+      self.add("ratio1","jet/vertex association ratio v1",100,0,1)
+      self.add("ratio2","jet/vertex association ratio v2",100,0,1)
+      self.add("ratio3","jet/vertex association ratio v3",100,0,1)
+      self.add("ratio1b","jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.add("ratio2b","jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.add("ratio3b","jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.add("j1_ratio1","leading jet/vertex association ratio v1",100,0,1)
+      self.add("j1_ratio2","leading jet/vertex association ratio v2",100,0,1)
+      self.add("j1_ratio3","leading jet/vertex association ratio v3",100,0,1)
+      self.add("j1_ratio1b","leading jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.add("j1_ratio2b","leading jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.add("j1_ratio3b","leading jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.add("goodevent","pass or not Z+jet to vertex association",2,0,2)
       # some plots with only the jets associated to genjets. Filled only for MC, allows to check PU effect more directly.
       # I do only duplicate some plots relevant for the PU study.
-      self.addHisto("ratio1b_nopu","jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.addHisto("ratio2b_nopu","jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.addHisto("ratio3b_nopu","jet/vertex association ratio v3 using vertexing",100,0,1)
-      self.addHisto("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
-      self.addHisto("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
-      self.addHisto("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.add("ratio1b_nopu","jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.add("ratio2b_nopu","jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.add("ratio3b_nopu","jet/vertex association ratio v3 using vertexing",100,0,1)
+      self.add("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
+      self.add("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
+      self.add("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.zHandle = Handle ("vector<reco::CompositeCandidate>")

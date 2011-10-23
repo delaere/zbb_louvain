@@ -18,14 +18,14 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
     
     def beginJob(self, perfData="../testfiles/performance_ssv_witheff.root"):
       # declare histograms
-      self.addHisto("HE","HE",200,0,2)
-      self.addHisto("HP","HP",200,0,2)
-      self.addHisto("HEexcl","HEexcl",200,0,2)
-      self.addHisto("HPexcl","HPexcl",200,0,2)
-      self.addHisto("HEHE","HEHE",200,0,2)
-      self.addHisto("HEHP","HEHP",200,0,2)
-      self.addHisto("HPHP","HPHP",200,0,2)
-      # reweighting engine
+      self.add("HE","HE",200,0,2)
+      self.add("HP","HP",200,0,2)
+      self.add("HEexcl","HEexcl",200,0,2)
+      self.add("HPexcl","HPexcl",200,0,2)
+      self.add("HEHE","HEHE",200,0,2)
+      self.add("HEHP","HEHP",200,0,2)
+      self.add("HPHP","HPHP",200,0,2)
+      # reweig engine
       self.engine = btaggingWeight(0,999,0,999,perfData)
     
     #@print_timing

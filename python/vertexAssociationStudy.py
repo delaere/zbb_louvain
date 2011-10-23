@@ -42,20 +42,20 @@ def runStudy():
     if i%1000==0 : print "Processing... event ", i
     i += 1
     # check that the event passes Z+jet selection
-    event.getByLabel ("cleanPatJets",jetHandle)
-    event.getByLabel ("patMETsPF",metHandle)
-    event.getByLabel ("Ztighttight",zmuHandle)
-    event.getByLabel ("Zelel",zeleHandle)
+    event.getByLabel (zbblabel.jetlabel,jetHandle)
+    event.getByLabel (zbblabel.metlabel,metHandle)
+    event.getByLabel (zbblabel.zmumulabel,zmuHandle)
+    event.getByLabel (zbblabel.zelelabel,zeleHandle)
     jets = jetHandle.product()
     met = metHandle.product()
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
-    event.getByLabel ("patTriggerEvent",trigInfoHandle)
+    event.getByLabel (zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
     if not isInCategory(4, eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met)): continue
     # sort according to #vertices and call controlPlots.processEvent for each bin
     # for data-driven estimate, this is the best (MC could separate jets from PU using genjet association)
-    event.getByLabel ("goodPV",vertexHandle)
+    event.getByLabel (zbblabel.vertexlabel,vertexHandle)
     vertices = vertexHandle.product()
     nvertices = vertices.size()
     if nvertices>10 : nvertices = 11 #last bin is overflow

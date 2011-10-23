@@ -18,7 +18,7 @@ class LeptonsReWeightingControlPlots(BaseControlPlots):
     
     def beginJob(self):
       # declare histograms
-      self.addHisto("weight","weight",200,0,2)
+      self.add("weight","weight",200,0,2)
       # reweighting engine
       self.engine = LeptonsReWeighting()
 
@@ -39,7 +39,7 @@ def runTest():
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  controlPlots.beginJob(perfData="../testfiles/performance_ssv_witheff.root")
+  controlPlots.beginJob()
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i

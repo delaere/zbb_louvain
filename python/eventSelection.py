@@ -411,13 +411,13 @@ def isInCategory(category, categoryTuple):
     return isInCategory( 16, categoryTuple ) and categoryTuple[7]>0
   # some temporary stuff
   elif category==19:
-    return isInCategory(9, categoryTuple) and categoryTuple[8]>80 and categoryTuple[8]<120
+    return isInCategory(9, categoryTuple) and categoryTuple[8]>80 # and categoryTuple[8]<120
   elif category==20:
-    return isInCategory(9, categoryTuple) and categoryTuple[10]>0.5 and categoryTuple[10]<1.0
+    return isInCategory(9, categoryTuple) and categoryTuple[10]>0.6 and categoryTuple[10]<1.1 and categoryTuple[8]>80 
   elif category==21:
-    return isInCategory(14, categoryTuple) and categoryTuple[8]>80 and categoryTuple[8]<120
+    return isInCategory(14, categoryTuple) and categoryTuple[8]>80 # and categoryTuple[8]<120
   elif category==22:
-    return isInCategory(14, categoryTuple) and categoryTuple[10]>0.5 and categoryTuple[10]<1.0
+    return isInCategory(14, categoryTuple) and categoryTuple[10]>0.6 and categoryTuple[10]<1.1 and categoryTuple[8]>80 
   # other does not exist
   else:
     return False

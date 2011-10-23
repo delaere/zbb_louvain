@@ -75,21 +75,21 @@ genHandle = Handle ("vector<reco::GenParticle>")
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
   if not ZjetFilter=="bcl":
-    event.getByLabel ("genParticles",genHandle)
+    event.getByLabel (zbblabel.genlabel,genHandle)
     genParticles = genHandle.product()
     if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
     if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
     if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
-  event.getByLabel("cleanPatJets",jetHandle)
-  event.getByLabel("patMETsPF",metHandle)
-  event.getByLabel("Ztighttight",zmuHandle)
-  event.getByLabel("Zelel",zeleHandle)
+  event.getByLabel(zbblabel.jetlabel,jetHandle)
+  event.getByLabel(zbblabel.metlabel,metHandle)
+  event.getByLabel(zbblabel.zmumulabel,zmuHandle)
+  event.getByLabel(zbblabel.zelelabel,zeleHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   if checkTrigger:
-    event.getByLabel("patTriggerEvent",trigInfoHandle)
+    event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
@@ -117,9 +117,9 @@ events = Events (files)
 
 ### booking
 
-escp.beginJob(btagging="SSV", zmulabel="Ztighttight", zelelabel="Zelel")
-mscp.beginJob(genlabel="genParticles")
-prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel="goodPV", pulabel="addPileupInfo")
+escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
+mscp.beginJob(genlabel=zbblabel.genlabel)
+prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
 brcp.beginJob(btagPerfData)
 lrcp.beginJob()
 

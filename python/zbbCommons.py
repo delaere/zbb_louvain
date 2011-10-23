@@ -1,0 +1,30 @@
+
+class zbblabel:
+  """labels used in the PAT configuration"""
+  allmuonslabel="allMuons"
+  loosemuonslabel="looseMuons"
+  muonlabel="matchedMuons"
+  allelectronslabel="allElectrons"
+  looseelectronslabel="allElectrons"
+  electronlabel="matchedElectrons"
+  jetlabel="cleanPatJets"
+  zmumulabel="Ztighttight"
+  zelelabel="Zelel"
+  vertexlabel="goodPV"
+  pulabel="addPileupInfo"
+  triggerlabel="patTriggerEvent"
+  metlabel="patMETsPF"
+  zmmbblabel="Zmmbb"
+  zeebblabel="Zeebb"
+  bblabel ="bbbar"
+  genlabel="genParticles"
+  
+class zbbfile:
+  """files containing calibrations and other data"""
+  ssvperfData="../testfiles/performance_ssv_witheff.root"
+  pileupData=""
+  pileupMC=""
+  jecUncertainty="./Jec10V1_Uncertainty_KT4PF.txt"
+  controlPlots="controlPlots.root"
+  rooDataset="File_rds_zbb.root"
+

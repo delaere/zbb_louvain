@@ -7,8 +7,9 @@ from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
-event_list = open("files_Mu_stage3_run166512.txt","w")
+event_list = open("eventlist.txt","w")
 
 class EventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -20,7 +21,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, metlabel="patMETsPF", jetlabel="cleanPatJets", zmulabel="Ztighttight", zelelabel="Zelel", triggerlabel="patTriggerEvent", btagging="SSV"):
+    def beginJob(self, metlabel=zbblabel.metlabel, jetlabel=zbblabel.jetlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, triggerlabel=zbblabel.triggerlabel, btagging="SSV"):
       self.btagging = btagging
       # declare histograms
       self.add("run","Run number",15000,160000,175000)
@@ -70,29 +71,29 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("MET","MET",100,0,200)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("jetpt","Jet Pt",100,15,215)
-      self.addHisto("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
+      self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
       self.add("jeteta","Jet eta",25,0, 2.5)
       self.add("jetetapm","Jet eta",50,-2.5, 2.5)
       self.add("jetphi","Jet phi",80,-4,4)
       self.add("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.add("jet1pt","leading jet Pt",500,15,515)
-      self.addHisto("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
+      self.add("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
       self.add("jet1eta","leading jet Eta",25,0,2.5)
       self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
       self.add("jet2pt","subleading jet Pt",500,15,515)
-      self.addHisto("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
+      self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
       self.add("jet2eta","subleading jet Eta",25,0,2.5)
       self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
-      self.addHisto("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
+      self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.add("bjet1HEdisc","leading bjet SSVHE disc",200,-10,10)
       self.add("bjet1HPdisc","leading bjet SSVHP disc",200,-10,10)
       self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
-      self.addHisto("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
+      self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.add("bjet2HEdisc","subleading bjet SSVHE disc",200,-10,10)
@@ -346,11 +347,11 @@ def dumpEventList(stage=3, muChannel=True, path='/home/fynu/lceard/store/Prod_AO
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  metlabel="patMETsPF"
-  jetlabel="cleanPatJets"
-  zmulabel="Ztighttight"
-  zelelabel="Zelel"
-  triggerlabel="patTriggerEvent"
+  metlabel=zbblabel.metlabel
+  jetlabel=zbblabel.jetlabel
+  zmulabel=zbblabel.zmumulabel
+  zelelabel=zbblabel.zelelabel
+  triggerlabel=zbblabel.triggerlabel
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
@@ -369,5 +370,4 @@ def dumpEventList(stage=3, muChannel=True, path='/home/fynu/lceard/store/Prod_AO
     triggerInfo = trigInfoHandle.product()
     categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, runNumber)
     if isInCategory(stage, categoryData):
-      #print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
-      print >> event_list , event.eventAuxiliary().id().event()
+      print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

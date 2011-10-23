@@ -3,13 +3,14 @@ from DataFormats.FWLite import Events, Handle
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libPhysicsToolsUtilities.so")
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 
 class LumiReWeighting:
    """A class to reweight MC according to number of pileup events."""
 
-   def __init__(self, MonteCarloFileName=None, DataFileName=None, MonteCarloHistName="pileup", DataHistName="pileup", PileupSummaryInfo="addPileupInfo", systematicShift=0):
+   def __init__(self, MonteCarloFileName=None, DataFileName=None, MonteCarloHistName="pileup", DataHistName="pileup", PileupSummaryInfo=zbblabel.pulabel, systematicShift=0):
       # access histograms and initialize the weights
       self.engine = ROOT.edm.LumiReWeighting(MonteCarloFileName,DataFileName,MonteCarloHistName,DataHistName)
       self.PoissonMeanShifter = ROOT.reweight.PoissonMeanShifter(systematicShift)

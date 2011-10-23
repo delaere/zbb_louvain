@@ -4,6 +4,7 @@ import sys
 import os
 from DataFormats.FWLite import Events, Handle
 from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet
+from zbbCommons import zbblabel
 
 def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None):
   """Dump informations about a given event in the LHCO format for MadWeight"""
@@ -38,10 +39,10 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  fwevent.getByLabel ("cleanPatJets",jetHandle)
-  fwevent.getByLabel ("patMETsPF",metHandle)
-  fwevent.getByLabel ("Ztighttight",zmuHandle)
-  fwevent.getByLabel ("Zelel",zeleHandle)
+  fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
+  fwevent.getByLabel (zbblabel.metlabel,metHandle)
+  fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
+  fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
@@ -89,22 +90,17 @@ def dumpAll(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  metlabel="patMETsPF"
-  jetlabel="cleanPatJets"
-  zmulabel="Ztighttight"
-  zelelabel="Zelel"
-  triggerlabel="patTriggerEvent"
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
   for event in events:
-    event.getByLabel (jetlabel,jetHandle)
-    event.getByLabel (metlabel,metHandle)
-    event.getByLabel (zmulabel,zmuHandle)
-    event.getByLabel (zelelabel,zeleHandle)
-    event.getByLabel (triggerlabel,trigInfoHandle)
+    event.getByLabel (zbblabel.jetlabel,jetHandle)
+    event.getByLabel (zbblabel.metlabel,metHandle)
+    event.getByLabel (zbblabel.zmumulabel,zmuHandle)
+    event.getByLabel (zbblabel.zelelabel,zeleHandle)
+    event.getByLabel (zbblabel.triggerlabel,trigInfoHandle)
     jets = jetHandle.product()
     met = metHandle.product()
     zCandidatesMu = zmuHandle.product()

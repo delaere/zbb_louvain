@@ -6,6 +6,7 @@ import sys
 import os
 from DataFormats.FWLite import Events, Handle
 from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet, isGoodElectron, isGoodMuon, eventCategory
+from zbbCommons import zbblabel
 
 def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   """Dump informations about a given event"""
@@ -40,14 +41,14 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
-  fwevent.getByLabel ("matchedElectrons",electronHandle)
-  fwevent.getByLabel ("matchedMuons",muonHandle)
-  fwevent.getByLabel ("cleanPatJets",jetHandle)
-  fwevent.getByLabel ("patMETsPF",metHandle)
-  fwevent.getByLabel ("Ztighttight",zmuHandle)
-  fwevent.getByLabel ("Zelel",zeleHandle)
-  fwevent.getByLabel ("goodPV",vertexHandle)
-  fwevent.getByLabel ("patTriggerEvent",trigInfoHandle)
+  fwevent.getByLabel (zbblabel.electronlabel,electronHandle)
+  fwevent.getByLabel (zbblabel.muonlabel,muonHandle)
+  fwevent.getByLabel (zbblabel.,jetHandle)
+  fwevent.getByLabel (zbblabel.metlabel,metHandle)
+  fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
+  fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
+  fwevent.getByLabel (zbblabel.vertexlabel,vertexHandle)
+  fwevent.getByLabel (zbblabel.triggerlabel,trigInfoHandle)
   triggerInfo = trigInfoHandle.product()
   vertices = vertexHandle.product()
   electrons = electronHandle.product()
@@ -80,9 +81,9 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   dijetHandle = Handle ("vector<reco::CompositeCandidate>")
   zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
   zeebbHandle = Handle ("vector<reco::CompositeCandidate>")
-  fwevent.getByLabel ("bbbar",dijetHandle)
-  fwevent.getByLabel ("Zeebb",zeebbHandle)
-  fwevent.getByLabel ("Zmmbb",zmmbbHandle)
+  fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
+  fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
+  fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
   dijets = dijetHandle.product()
   zeebbs = zeebbHandle.product()
   zmmbbs = zmmbbHandle.product()

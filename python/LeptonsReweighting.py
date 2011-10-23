@@ -1,5 +1,6 @@
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 class PtEtaMap:
@@ -142,11 +143,9 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         #fwevent.getByLabel ("ZmuMatchedmuMatched", self.zmuHandle_)
-         fwevent.getByLabel ("Ztighttight", self.zmuHandle_)
+         fwevent.getByLabel (zbblabel.zmumulabel, self.zmuHandle_)
          zCandidatesMu = self.zmuHandle_.product()
-         #fwevent.getByLabel ("ZelMatchedelMatched", self.zeleHandle_)
-         fwevent.getByLabel ("Zelel", self.zeleHandle_)
+         fwevent.getByLabel (zbblabel.zelelabel, self.zeleHandle_)
          zCandidatesEle = self.zeleHandle_.product()
          bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
          if not bestZcandidate is None:

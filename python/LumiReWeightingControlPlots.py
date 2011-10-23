@@ -6,23 +6,24 @@ import os
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from LumiReWeighting import *
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 class LumiReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None, PileupSummaryInfo="addPileupInfo", dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="lumiReweighting", dataset=dataset, mode=mode)
       self.PileupSummaryInfo = PileupSummaryInfo
     
-    def beginJob(self, MonteCarloFileName, DataFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel="goodPV", pulabel="addPileupInfo"):
+    def beginJob(self, MonteCarloFileName, DataFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel):
       # reweighting engine
       self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName, PileupSummaryInfo=self.PileupSummaryInfo)
       # declare histograms
-      self.addHisto("LumiWeight","LumiWeight",1000,0,10)
-      self.addHisto("pu","pu",50,0,50)
-      self.addHisto("pv","pv",50,0,50)
+      self.add("LumiWeight","LumiWeight",1000,0,10)
+      self.add("pu","pu",50,0,50)
+      self.add("pv","pv",50,0,50)
       # fill the histogram with the configured weights
       self.dir.cd()
       self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)

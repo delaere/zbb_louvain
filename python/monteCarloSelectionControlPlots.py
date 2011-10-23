@@ -6,6 +6,7 @@ import os
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from monteCarloSelection import *
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 class MonteCarloSelectionControlPlots(BaseControlPlots):
@@ -15,9 +16,9 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection", dataset=dataset, mode=mode)
 
-    def beginJob(self, genlabel="genParticles"):
+    def beginJob(self, genlabel=zbblabel.genlabel):
       # declare histograms
-      self.addHisto("eventType","Event Type (0,l,c,b)+Z",4,0,4)
+      self.add("eventType","Event Type (0,l,c,b)+Z",4,0,4)
       # prepare handles
       self.genlabel=genlabel
       self.genHandle = Handle ("vector<reco::GenParticle>")

@@ -6,6 +6,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
 from DataFormats.FWLite import Events, Handle
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 class btaggingWeight:
@@ -41,11 +42,9 @@ class btaggingWeight:
     if event.object().event().eventAuxiliary().isRealData():
       return 1.
     # retrieve the objects (jets and Z candidates)
-    event.getByLabel("cleanPatJets",self.jetHandle)
-    #event.getByLabel("ZmuMatchedmuMatched",self.zmuHandle)
-    #event.getByLabel("ZelMatchedelMatched",self.zeleHandle)
-    event.getByLabel("Ztighttight",self.zmuHandle)
-    event.getByLabel("Zelel",self.zeleHandle)
+    event.getByLabel(zbblabel.jetlabel,self.jetHandle)
+    event.getByLabel(zbblabel.zmumulabel,self.zmuHandle)
+    event.getByLabel(zbblabel.zelelabel,self.zeleHandle)
     jets = self.jetHandle.product()
     zCandidatesMu  = self.zmuHandle.product()
     zCandidatesEle = self.zeleHandle.product()    

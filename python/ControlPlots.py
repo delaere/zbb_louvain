@@ -62,6 +62,7 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from eventSelection import eventCategories, eventCategory, isInCategory
 from monteCarloSelection import isZbEvent, isZcEvent
+from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
 jetHandle = Handle ("vector<pat::Jet>")
@@ -70,29 +71,26 @@ zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
-#runHandle = Handle("")
 
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   """Compute the event category for histogramming"""
   if not ZjetFilter=="bcl":
-    event.getByLabel ("genParticles",genHandle)
+    event.getByLabel (zbblabel.genlabel,genHandle)
     genParticles = genHandle.product()
     if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
     if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
     if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
-  event.getByLabel("cleanPatJets",jetHandle)
-  event.getByLabel("patMETsPF",metHandle)
-  event.getByLabel("ZmuMatchedmuMatched",zmuHandle)
-  event.getByLabel("ZelMatchedelMatched",zeleHandle)
-  #event.getByLabel("Ztighttight",zmuHandle)
-  #event.getByLabel("Zelel",zeleHandle)
+  event.getByLabel(zbblabel.jetlabel,jetHandle)
+  event.getByLabel(zbblabel.metlabel,metHandle)
+  event.getByLabel(zbblabel.zmumulabel,zmuHandle)
+  event.getByLabel(zbblabel.zelelabel,zeleHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   if checkTrigger:
-    event.getByLabel("patTriggerEvent",trigInfoHandle)
+    event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
@@ -154,19 +152,19 @@ def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, chec
   for muChannel in [True, False]:
     if muChannel: 
       plots = levels
+      zlabel= zbblabel.zmumulabel
     else:
       plots = map(lambda x: x+eventCategories(),levels)
+      zlabel= zbblabel.zelelabel
     for level in plots:
-      allmuonsPlots[level].beginJob(muonlabel="allMuons", muonType="none")
-      loosemuonsPlots[level].beginJob(muonlabel="looseMuons", muonType="loose")
-      tightmuonsPlots[level].beginJob(muonlabel="matchedMuons", muonType="tight")
-      allelectronsPlots[level].beginJob(electronlabel="allElectrons", electronType="none")
-      tightelectronsPlots[level].beginJob(electronlabel="matchedElectrons", electronType="tight")
-      jetmetAK5PFPlots[level].beginJob(jetlabel="cleanPatJets",btagging=btagAlgo)
-      #vertexPlots[level].beginJob(zlabel="ZmuMatchedmuMatched")
-      #selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel="ZmuMatchedmuMatched", zelelabel="ZelMatchedelMatched")
-      vertexPlots[level].beginJob(zlabel="Ztighttight")
-      selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel="Ztighttight", zelelabel="Zelel")
+      allmuonsPlots[level].beginJob(muonlabel=zbblabel.allmuonslabel, muonType="none")
+      loosemuonsPlots[level].beginJob(muonlabel=zbblabel.loosemuonslabel, muonType="loose")
+      tightmuonsPlots[level].beginJob(muonlabel=zbblabel.muonlabel, muonType="tight")
+      allelectronsPlots[level].beginJob(electronlabel=zbblabel.allelectronslabel, electronType="none")
+      tightelectronsPlots[level].beginJob(electronlabel=zbblabel.electronlabel, electronType="tight")
+      jetmetAK5PFPlots[level].beginJob(jetlabel=zbblabel.jetlabel,btagging=btagAlgo)
+      vertexPlots[level].beginJob(zlabel=zlabel)
+      selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
       if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
       if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
