@@ -8,7 +8,7 @@ from DataFormats.FWLite import Events, Handle
 from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet, isGoodElectron, isGoodMuon, eventCategory
 from zbbCommons import zbblabel
 
-def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
+def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="/home/fynu/lceard/store/Prod_AOD_2011A/synchronisation/166841/Mu_2011A_166512_Prompt_v4/"):
   """Dump informations about a given event"""
   # in case no fwevent is provided, find it using run,event,(lumi)
   if fwevent is None:
@@ -57,11 +57,14 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
+  #rawjet = jet.correctedJet("Uncorrected")
+
   # category
-  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=True, btagging="SSV", massWindow=30.)
-  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel=False, btagging="SSV", massWindow=30.)
+  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.)
+  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=30.)
   print "Event category info in muon channel:",catMu
   print "Event category info in electron channel:",catEle
+
   # loop on objects
   print len(vertices), "vertices in the event."
   for vertex in vertices:
@@ -71,6 +74,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path=""):
   for electron in electrons:
     PrintElectron(electron)
   for jet in jets:
+    #rawjet = jet.correctedJet("L5Flavor")
     PrintJet(jet)
   PrintMET(met[0])
   for z in zCandidatesMu:
@@ -172,6 +176,7 @@ def PrintElectron(electron) :
 def PrintJet(jet) :
   print "-----------------------------------------------------------------"
   PrintCandidate("jet",jet,False)
+  #PrintCandidate("rawjet",rawjet,False)
   print "  nhf=",(( jet.neutralHadronEnergy() + jet.HFHadronEnergy() ) / jet.energy())
   print "  nef=",(jet.neutralEmEnergyFraction())
   print "  nconstituents=",(jet.numberOfDaughters())
@@ -191,17 +196,19 @@ def PrintJet(jet) :
     sv = taginfo.secondaryVertex(0)
     if not sv is None:
       print "     details about the secondary vertex:"
-      print "     * number of tracks:", sv.tracksSize()
-      print "     * chi2:",sv.chi2()
-      distance = taginfo.flightDistance(0,True)
-      print "     * distance:", distance.value(), "+/-",distance.error()
-      print "     * distance significance:", distance.significance()
-      dir = taginfo.flightDirection(0)
-      print "     * flight direction:",dir.x(),",",dir.y(),",",dir.z()
-      dirv = ROOT.TVector3(dir.x(),dir.y(),dir.z())
-      dirj = ROOT.TVector3(jet.px(),jet.py(),jet.pz())
-      print "     * dR(jet):",dirv.DeltaR(dirj)
-      print "     * mass:",sv.p4().M()
+      print "     * number of tracks:"
+      #, sv.tracksSize()
+      print "     * chi2:"
+      #,sv.chi2()
+      #distance = taginfo.flightDistance(0,True)
+      #print "     * distance:", distance.value(), "+/-",distance.error()
+      #print "     * distance significance:", distance.significance()
+      #dir = taginfo.flightDirection(0)
+      #print "     * flight direction:",dir.x(),",",dir.y(),",",dir.z()
+      #dirv = ROOT.TVector3(dir.x(),dir.y(),dir.z())
+      #dirj = ROOT.TVector3(jet.px(),jet.py(),jet.pz())
+      #print "     * dR(jet):",dirv.DeltaR(dirj)
+      #print "     * mass:",sv.p4().M()
   print "-----------------------------------------------------------------"
 
 def PrintMET(met) :

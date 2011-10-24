@@ -20,11 +20,11 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
-  #runNumber= event.eventAuxiliary().run()
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+
   if runNumber is None:
     if muChannel:
       triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Mu13_Mu8_v6")      
@@ -422,7 +422,7 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met,runNumber, muChannel=True, btagging="SSV", massWindow=30.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.):
   """Check analysis requirements for various steps."""
   output = []
   bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)

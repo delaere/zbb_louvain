@@ -199,7 +199,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("TCHPdiscJet1","TCHPdiscJet1",200,-10,10)
       self.add("SSVHEdiscbJet1","SSVHEdiscbJet1",200,-10,10)
       self.add("SSVHPdiscbJet1","SSVHPdiscbJet1",200,-10,10)
-      self.add("SVmassbjet1","SVmassbjet1",20,0,5)
+      self.add("SVmassbJet1","SVmassbJet1",20,0,5)
       self.add("TCHEdiscbJet1","TCHEdiscbJet1",200,-10,10)
       self.add("TCHPdiscbJet1","TCHPdiscbJet1",200,-10,10)
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,-10,10)

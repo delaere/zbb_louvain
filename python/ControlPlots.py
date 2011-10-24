@@ -94,7 +94,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, runNumber, btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel, btagAlgo)
 
 def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""

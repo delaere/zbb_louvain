@@ -134,6 +134,8 @@ class EventSelectionControlPlots(BaseControlPlots):
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
+      runNumber= event.eventAuxiliary().run()
+      #print "RunNumber" , runNumber
       if self.checkTrigger:
         event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
         triggerInfo = self.trigInfoHandle.product()
@@ -146,7 +148,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       #for trigger,triggered in enumerate(selTriggers):
       #  if triggered : self.h_triggerBit.Fill(trigger,weight)
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, self.muChannel, runNumber)
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, self.muChannel)
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
@@ -250,19 +252,19 @@ class EventSelectionControlPlots(BaseControlPlots):
           nj += 1
           if nj==1: 
             result["jet1pt"] = jetPt #jet.pt()
-	    result["jet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	    result["jet1pt_totunc"]= (self._JECuncertainty.unc_tot_jet(jet))
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
           elif nj==2:
             result["jet2pt"] = jetPt #jet.pt()
-	    result["jet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	    result["jet2pt_totunc"]= (self._JECuncertainty.unc_tot_jet(jet))
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
               result["bjet1pt"] = jetPt #jet.pt()
-	      result["bjet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	      result["bjet1pt_totunc"] = (self._JECuncertainty.unc_tot_jet(jet))
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
 	      result["bjet1HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -270,7 +272,7 @@ class EventSelectionControlPlots(BaseControlPlots):
 	      result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
             elif nb==2:
               result["bjet2pt"] = jetPt #jet.pt()
-	      result["bjet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	      result["bjet2pt_totunc"] = (self._JECuncertainty.unc_tot_jet(jet))
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
 	      result["bjet2HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -368,6 +370,6 @@ def dumpEventList(stage=3, muChannel=True, path='/home/fynu/lceard/store/Prod_AO
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel, runNumber)
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel)
     if isInCategory(stage, categoryData):
       print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
