@@ -123,7 +123,7 @@ def CreateTheShellFile(argv):
 		CreateTheConfigFile(argv);
 		if Jobs_RunHere==0:
 			shell_file.write('cd -\n')
-		shell_file.write('cmsRun ' + os.getcwd() + '/'+Path_Cfg + '\n')
+		shell_file.write('cmsRun ' + os.getcwd() + '/'+Path_Cfg + argv[2] + '\n')
 	else:
 		print #Program to use is not specified... Guess it is bash command		
                 shell_file.write('#Program to use is not specified... Guess it is bash command\n')
