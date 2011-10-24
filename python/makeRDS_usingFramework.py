@@ -113,6 +113,7 @@ dirList=list(itertools.islice(os.listdir(path[channel]), jobNumber, None, Njobs)
 files=[]
 for fname in dirList:
   files.append(path[channel]+"/"+fname)
+print "files = ", files  
 events = Events (files)
 
 ### booking
