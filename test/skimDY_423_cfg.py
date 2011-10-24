@@ -21,6 +21,34 @@
 
 import FWCore.ParameterSet.Config as cms
 
+###
+
+import FWCore.ParameterSet.VarParsing as VarParsing
+
+# setup 'analysis'  options
+options = VarParsing.VarParsing ('analysis')
+
+options.register ('sample',
+                  "TT_MC", # default value
+                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                  VarParsing.VarParsing.varType.string,          # string, int, or float
+                  "Sample to process")
+
+options.register ('slice',
+                  0, # default value
+                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                  VarParsing.VarParsing.varType.int,          # string, int, or float
+                  "Slice of sample")
+
+# setup any defaults you want
+#options.sample = 'XXX'
+#options.slice  = '666'
+
+# get and parse the command line arguments
+options.parseArguments()
+
+### define process
+
 process = cms.Process("PAT2")
 
 ## MessageLogger
@@ -74,9 +102,9 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
 )
 
@@ -137,20 +165,29 @@ process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4'))
 
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
-path     = "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/"
-pathname = "file:/home/fynu/tdupree/store/zbb_13Sep/DY_MC/"
+### options ###
+sample = options.sample
+slice  = options.slice
+print "*** GOING TO LOOK AT ", sample 
+print "*** dataset slice #  ", slice 
+###############
+
+path = {"DY_MC"   : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/" ,
+        "TT_MC"   : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/" ,
+        "Mu_Data" : "/home/fynu/tdupree/store/zbb_13Sep/Mu_Data/" ,
+        "El_Data" : "/home/fynu/tdupree/store/zbb_13Sep/El_Data/" ,
+        }
+
+pathname = "file:"+path[sample]
 
 import os
 
-dirList=os.listdir(path)
+dirList=os.listdir(path[sample])
 files=[]
 for fname in dirList:
     files.append(pathname+fname)
 
 print files
-
-slice = 10
-
 if slice: files = files[len(files)*(slice-1)/10:len(files)*slice/10]
 
 print files
@@ -165,6 +202,7 @@ process.source.fileNames = files #[ files
 
 process.maxEvents.input = -1
 
-process.out.fileName = 'Test_DYMC_'+str(slice)+'.root'
+if slice : process.out.fileName = path[sample]+'/skim/'+sample+'_'+str(slice)+'.root'
+else     : process.out.fileName = path[sample]+'/skim/'+sample+'.root'
 
 process.options.wantSummary = False
