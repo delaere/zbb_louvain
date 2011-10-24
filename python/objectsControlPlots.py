@@ -326,7 +326,7 @@ class JetmetControlPlots(BaseControlPlots):
           if nj==1: 
 	    j1pt=jetPt#jet.pt()
             result["jet1pt"] = jetPt#jet.pt()
-	    result["jet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	    result["jet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
             result["SSVHEdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -338,14 +338,14 @@ class JetmetControlPlots(BaseControlPlots):
             result["TCHPdiscJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           elif nj==2:
             result["jet2pt"] = jetPt#jet.pt()
-	    result["jet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	    result["jet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
               result["bjet1pt"] = jetPt#jet.pt()
-	      result["bjet1pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
               result["SSVHEdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -358,7 +358,7 @@ class JetmetControlPlots(BaseControlPlots):
 	      result["dptj1b1"] = jetPt-j1pt#jet.pt()-j1pt
             elif nb==2:
               result["bjet2pt"] = jetPt#jet.pt()
-	      result["bjet2pt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
           if isBJet(jet,"HP",self.btagging): nbP += 1
