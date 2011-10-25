@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_data_cfg.py,v $')
 )
@@ -95,8 +95,8 @@ process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatElectrons" )
-        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")')
-        #, matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0)||filter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0)||filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")')
+        #, matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")')
+        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0)||filter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0)||filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")')
 )
 
 # trigger object embedders for the same collections
@@ -528,22 +528,24 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 process.source.fileNames = [
     #"file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleMu_AOD_May10ReReco-v1.root"
-    "file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleElectron_AOD_May10ReReco-v1.root"
+    #"file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleElectron_AOD_May10ReReco-v1.root"
     #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
     #"file:/home/fynu/lceard/storage/dilep_events/EE2_RECO.root"
     #"file:/storage/data/cms/users/lceard/test/DoubleMu_Run2010A_AOD_PromptReco-v4.root"
     ]                                     
 
-process.maxEvents.input = 1000
+process.maxEvents.input = -1
 
 #process.out.fileName = '4DiLep.root'
 #process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
-process.out.fileName = 'LocalTestDoubleElectronRun2011A_May10ReReco.root'
+#process.out.fileName = 'LocalTestDoubleElectronRun2011A_May10ReReco.root'
 
 #process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
 
 #process.out.fileName = 'crab_Electron_03Oct2011_v1.root'
 #process.out.fileName = 'crab_Mu_03Oct2011_v1.root'
+
+process.out.fileName = 'PAT_DoubleMu_May10ReReco.root'
 
 process.options.wantSummary = True
