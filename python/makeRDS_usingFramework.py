@@ -27,6 +27,7 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from ROOT import *
 from itertools import combinations
+from baseControlPlots import getArgSet
 
 from eventSelection import eventCategories, eventCategory, isInCategory
 
@@ -123,6 +124,7 @@ mscp.beginJob(genlabel=zbblabel.genlabel)
 prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
 brcp.beginJob(btagPerfData)
 lrcp.beginJob()
+ntuple = getArgSet([escp, mscp, prcp, brcp, lrcp]) #would it be enought to call rds_zbb.get() or even to use obsSet ???
 
 ### categories
 
@@ -152,6 +154,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       prcp.processEvent(event)
       brcp.processEvent(event)
       lrcp.processEvent(event)
+      rds_zbb.add(ntuple)
       i += 1
 
     escp.endJob()

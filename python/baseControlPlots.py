@@ -1,6 +1,13 @@
 #! /usr/bin/env python
 import ROOT 
 
+def getArgSet(controlplots):
+  assert isinstance(controlplots,list)
+  merged = ROOT.RooArgSet()
+  for ctrlplot in controlplots:
+    merged.add(ctrlplot._obsSet)
+  return merged
+
 class BaseControlPlots:
     """A class to create control plots"""
 
@@ -84,8 +91,8 @@ class BaseControlPlots:
       """Set the categories, given a list of booleans. Only works for datasets"""
       if self._mode!="dataset": return
       for c, flag in enumerate(categories):
-        if flag: self._rooCategories[c] = 1
-	else: self._rooCategories[c] = 0
+        if flag: self._rooCategories[c].setIndex(1)
+	else: self._rooCategories[c].setIndex(0)
 
     def fillPlots(self, data, weight = 1.):
       """Fills histograms with the data provided as input."""
@@ -103,7 +110,8 @@ class BaseControlPlots:
 	  pass
         else:
 	  self._rrv_vector[name].setVal(value)
-      self._rds.add(self._obsSet)  
+      if self._ownedRDS:
+        self._rds.add(self._obsSet)  
 
     def fill(self, data, weight = 1.):
       """Fills whatever must be filled in"""
