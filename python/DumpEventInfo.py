@@ -8,7 +8,7 @@ from DataFormats.FWLite import Events, Handle
 from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet, isGoodElectron, isGoodMuon, eventCategory
 from zbbCommons import zbblabel
 
-def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="/home/fynu/lceard/store/Prod_AOD_2011A/synchronisation/166841/Mu_2011A_166512_Prompt_v4/"):
+def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfiles/"):
   """Dump informations about a given event"""
   # in case no fwevent is provided, find it using run,event,(lumi)
   if fwevent is None:

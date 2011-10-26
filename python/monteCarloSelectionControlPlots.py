@@ -56,8 +56,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
 def runTest():
   controlplots = MonteCarloSelectionControlPlots()
-  #path="/storage/data/cms/store/user/favereau/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_387/"
-  path="/home/fynu/tdupree/store/zbb_13Sep/DY_MC/"
+  path="../testfiles/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:

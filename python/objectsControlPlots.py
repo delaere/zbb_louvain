@@ -8,7 +8,7 @@ from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel
+from zbbCommons import zbblabel,zbbfile
 #from myFuncTimer import print_timing
 
 ## TODO: Remove later... for data only
@@ -374,12 +374,12 @@ class JetmetControlPlots(BaseControlPlots):
       return result
 
 def runTest():
-  output = ROOT.TFile("controlPlots.root", "RECREATE")
+  output = ROOT.TFile(zbbfile.controlPlots, "RECREATE")
   jetmetPlots = JetmetControlPlots(output.mkdir("jetmet"))
   electronsPlots = ElectronsControlPlots(output.mkdir("electrons"))
   muonsPlots = MuonsControlPlots(output.mkdir("muons"))
 
-  path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
+  path="../testfiles/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:

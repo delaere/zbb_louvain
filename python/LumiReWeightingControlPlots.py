@@ -6,7 +6,7 @@ import os
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from LumiReWeighting import *
-from zbbCommons import zbblabel
+from zbbCommons import zbblabel,zbbfile
 #from myFuncTimer import print_timing
 
 class LumiReWeightingControlPlots(BaseControlPlots):
@@ -53,13 +53,13 @@ class LumiReWeightingControlPlots(BaseControlPlots):
 
 def runTest():
   controlPlots = LumiReWeightingControlPlots()
-  path="/home/fynu/delaere/scratch/zbbAnalysis/store/September11/ttbar/"
+  path="../testfiles/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  controlPlots.beginJob(MonteCarloFileName="../testfiles/MCpileup.root", DataFileName="../testfiles/Pileup_2011_to_173692_LPLumiScale_68mb.root")
+  controlPlots.beginJob(MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData)
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i

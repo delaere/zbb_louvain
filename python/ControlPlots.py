@@ -1,6 +1,7 @@
 #!/usr/bin/env python 
 
 from optparse import OptionParser
+from zbbCommons import zbbfile
 import sys
 usage="""%prog [options]"""
 description="""A simple script to generate control plots."""
@@ -10,7 +11,7 @@ epilog="""Example:
 parser = OptionParser(usage=usage,add_help_option=True,description=description,epilog=epilog)
 parser.add_option("-i", "--inputPath", dest="path",
                   help="Read input file from DIR.", metavar="DIR")
-parser.add_option("-o", "--output", dest='outputname', default="controlPlots.root",
+parser.add_option("-o", "--output", dest='outputname', default=zbbfile.controlPlots,
                   help="Save output as FILE.", metavar="FILE")
 parser.add_option("--all",action="store_true",dest="all",
                   help="Process all levels.")
@@ -26,9 +27,9 @@ parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
 parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
                   help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
-parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default="PUdist.root",
+parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default=zbbfile.pileupData,
                   help="Read estimated PU distribution for data from file.", metavar="file")
-parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default="PUdistMC.root",
+parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default=zbbfile.pileupMC,
                   help="Read generated PU distribution for MC from file.", metavar="file")
 parser.add_option("--noPUweight",action="store_true",dest="noPUweight",
                   help="Do not reweight according to PU.")
@@ -36,7 +37,7 @@ parser.add_option("--noBweight",action="store_true",dest="noBweight",
                   help="Do not reweight according to btagging.")
 parser.add_option("--noLweight",action="store_true",dest="noLweight",
                   help="Do not reweight according to leptons.")
-parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default="performance_ssv_witheff.root",
+parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default=zbbfile.ssvperfData,
                   help="Read btagging efficiencies and SF from file.", metavar="file")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")
@@ -96,7 +97,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
     triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel, btagAlgo)
 
-def runTest(path, levels, outputname="controlPlots.root", ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
+def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")

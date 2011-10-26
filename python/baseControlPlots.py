@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import ROOT 
+from zbbCommons import zbbfile
 
 def getArgSet(controlplots):
   assert isinstance(controlplots,list)
@@ -19,7 +20,7 @@ class BaseControlPlots:
       if self._mode=="plots":
         # create output file if needed. If no file is given, it means it is delegated
         if dir is None:
-          self._f = ROOT.TFile("controlPlots.root", "RECREATE")
+          self._f = ROOT.TFile(zbbfile.controlPlots, "RECREATE")
           self._dir = self._f.mkdir(purpose)
         else :
           self._f = None

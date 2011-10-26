@@ -6,6 +6,7 @@ import os
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from btaggingWeight import *
+from zbbCommons import zbbfile
 #from myFuncTimer import print_timing
 
 class BtaggingReWeightingControlPlots(BaseControlPlots):
@@ -16,7 +17,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="BtaggingReweighting", dataset=dataset, mode=mode)
       self.muChannel=muChannel
     
-    def beginJob(self, perfData="../testfiles/performance_ssv_witheff.root"):
+    def beginJob(self, perfData=zbbfile.ssvperfData):
       # declare histograms
       self.add("HE","HE",200,0,2)
       self.add("HP","HP",200,0,2)
@@ -56,7 +57,7 @@ def runTest():
   for fname in dirList:
     files.append(path+fname)
   events = Events (files)
-  controlPlots.beginJob(perfData="../testfiles/performance_ssv_witheff.root")
+  controlPlots.beginJob()
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i

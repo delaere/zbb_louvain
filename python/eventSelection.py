@@ -216,6 +216,7 @@ def isGoodJet(jet, Z = None):
   outcome = outcome and jetId(jet,"loose")
   # to study the impact of PU on MC, request the jet to be matched to a genjet
   # outcome = outcome and not (jet.genJet() is None)
+  # TODO: add vertex match (?)
   return outcome
 
 def isGoodMet(met,cut=40):
@@ -267,6 +268,7 @@ def isZcandidate(zCandidate):
   if flavor != 1:
     print "Error: Z is not made of a proper lepton pair (flavor issue)"
     return False
+  #TODO: add vertex match
   # if everything ok, return the result of the lepton check
   return result
 

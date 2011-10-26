@@ -215,7 +215,6 @@ class VertexAssociationControlPlots(BaseControlPlots):
 
 def runTest():
   controlPlots = VertexAssociationControlPlots()
-  #path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/"
   path="../testfiles/ttbar/"
   dirList=os.listdir(path)
   files=[]

@@ -79,7 +79,7 @@ def PrintJet(jet, file, index) :
 def PrintMET(met, file, index) :
   file.write(str(index) + ' 6' + str(met.eta()) + ' ' + str(met.phi()) + ' ' + str(met.pt()) + ' 0 0 0 0 0 0 \n')
 
-def dumpAll(stage=7, muChannel=True, path="/storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/", fileAll="INCL.lhco", file2j="2jets.lhco", file3j="3jets.lhco"):
+def dumpAll(stage=7, muChannel=True, path="../testfiles/", fileAll="INCL.lhco", file2j="2jets.lhco", file3j="3jets.lhco"):
   # prepare output
   out_file_INCL= open(fileAll,"w")
   out_file_2j= open(file2j,"w")

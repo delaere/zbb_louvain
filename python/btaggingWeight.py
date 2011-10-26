@@ -6,13 +6,13 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
 from DataFormats.FWLite import Events, Handle
-from zbbCommons import zbblabel
+from zbbCommons import zbblabel,zbbfile
 #from myFuncTimer import print_timing
 
 class btaggingWeight:
   """compute the event weight based on btagging SF"""
 
-  def __init__(self,jmin1,jmax1,jmin2,jmax2, file="../testfiles/performance_ssv_witheff.root"):
+  def __init__(self,jmin1,jmax1,jmin2,jmax2, file=zbbfile.ssvperfData):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
     self.jetHandle = Handle ("vector<pat::Jet>")
     self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")

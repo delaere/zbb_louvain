@@ -1,6 +1,7 @@
 import os
 import ROOT
 from math import sqrt
+from zbbCommons import zbbfile
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
@@ -8,7 +9,7 @@ ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
 class JetCorrectionUncertaintyProxy:
   """A class to access JEC uncertainties"""
 
-  def __init__(self,file="./Jec10V1_Uncertainty_KT4PF.txt"):
+  def __init__(self,file=zbbfile.jecUncertainty):
     if not os.path.isfile(file):
       print "Error: ",file, ": No such file."
       self._engine = None

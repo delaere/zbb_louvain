@@ -329,7 +329,7 @@ class EventSelectionControlPlots(BaseControlPlots):
 
 def runTest():
   controlPlots = EventSelectionControlPlots(muChannel=True)
-  path="/home/fynu/lceard/store/Prod_AOD_2011A/Round2_ReRecoMay10_204pb/Mu_2011A_May10ReRe_204pb/"
+  path="../testfiles/"
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
@@ -343,7 +343,7 @@ def runTest():
     i += 1
   controlPlots.endJob()
 
-def dumpEventList(stage=3, muChannel=True, path='/home/fynu/lceard/store/Prod_AOD_2011A/synchronisation/166512/Mu_2011A_166512_Prompt_v4/'):
+def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:

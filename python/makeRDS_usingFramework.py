@@ -28,7 +28,7 @@ from LeptonsReweightingControlPlots import *
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-
+from zbbCommons import zbbfile
 from eventSelection import eventCategories, eventCategory, isInCategory
 
 ###################
@@ -38,9 +38,9 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 channel = "Mu_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
-MonteCarloPUFileName="./PUdistMC.root"
-DataPUFileName="./PUdistDATA.root"
-btagPerfData="../testfiles/performance_ssv_witheff.root"
+MonteCarloPUFileName=zbbfile.pileupMC
+DataPUFileName=zbbfile.pileupData
+btagPerfData=zbbfile.ssvperfData
 
 ############
 ### Maps ###
