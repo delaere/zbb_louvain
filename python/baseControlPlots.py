@@ -92,7 +92,9 @@ class BaseControlPlots:
       """Set the categories, given a list of booleans. Only works for datasets"""
       if self._mode!="dataset": return
       for c, flag in enumerate(categories):
-        if flag: self._rooCategories[c].setIndex(1)
+        if flag:
+          self._rooCategories[c].setIndex(1)
+          #print "index 1!!!!!!!!!!!!!!!!!!!!"
 	else: self._rooCategories[c].setIndex(0)
 
     def fillPlots(self, data, weight = 1.):
@@ -130,7 +132,6 @@ class BaseControlPlots:
           self._f.Close()
       else:
         if self._ownedRDS:
-          ws  = ROOT.RooWorkspace(self._purpose,self._purpose) # need a way to share a workspace (as we do for dirs)
+          ws  = RooWorkspace(self._purpose,self._purpose) # need a way to share a workspace (as we do for dirs)
           getattr(ws,'import')(self._rds) 
           ws.writeToFile("File_rds_zbb_"+self._purpose+".root") 
-

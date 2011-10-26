@@ -8,7 +8,7 @@ from baseControlPlots import BaseControlPlots
 from LeptonsReweighting import *
 #from myFuncTimer import print_timing
 
-class LeptonsReWeightingControlPlots(BaseControlPlots):
+class LeptonsReweightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
     def __init__(self, dir=None, muChannel=True, dataset=None, mode="plots"):
@@ -24,7 +24,7 @@ class LeptonsReWeightingControlPlots(BaseControlPlots):
 
     #@print_timing
     def process(self, event):
-      """LeptonsReWeightingControlPlots"""
+      """LeptonsReweightingControlPlots"""
       result = { }
       w = self.engine.weight(fwevent=event, muChannel=self.muChannel)
       result["weight"] = w
@@ -32,7 +32,7 @@ class LeptonsReWeightingControlPlots(BaseControlPlots):
 
 
 def runTest():
-  controlPlots = LeptonsReWeightingControlPlots()
+  controlPlots = LeptonsReweightingControlPlots()
   path="../testfiles/ttbar/"
   dirList=os.listdir(path)
   files=[]
