@@ -12,7 +12,7 @@ from zbbCommons import zbblabel
 class LumiReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, PileupSummaryInfo=zbblabel.pulabel, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="lumiReweighting", dataset=dataset, mode=mode)
       self.PileupSummaryInfo = PileupSummaryInfo
