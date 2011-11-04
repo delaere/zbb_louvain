@@ -5,7 +5,7 @@ def selectedTriggers(triggerInfo):
   if triggerInfo is None:
     return []
 
-  triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6")
+  triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Mu13_Mu8_v6","HLT_Mu13_Mu8_v7","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v7","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v8")
               
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
@@ -24,13 +24,12 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
     return True
   paths = triggerInfo.acceptedPaths()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
-
+  #print "trigger path" , pathnames 
   if runNumber is None:
     if muChannel:
-      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Mu13_Mu8_v6")      
+      triggers = ("HLT_DoubleMu6_v1","HLT_DoubleMu7_v2","HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4","HLT_Mu13_Mu8_v7")      
     else:
-      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6"
-                  )
+      triggers = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5","HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8" )
 
     intersect = list(set(pathnames) & set(triggers))
     outcome = len(intersect)>0
@@ -43,11 +42,25 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
       if runNumber>=147146 and runNumber<=148102 : outcome = "HLT_Mu11" in pathnames
       if runNumber>=148783 and runNumber<=149442 : outcome = "HLT_Mu15_v1" in pathnames
 
-      if runNumber>=160410 and runNumber<163269 : outcome = "HLT_DoubleMu6_v1" in pathnames
-      if runNumber>=163269 and runNumber<165121 : outcome = "HLT_DoubleMu7_v2" in pathnames
-      if runNumber>=165121 and runNumber<167039 : outcome = "HLT_Mu13_Mu8_v2" in pathnames
-      if runNumber>=167039 and runNumber<170249 : outcome = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4") in pathnames
-      if runNumber>=170249 and runNumber<173236 : outcome = "HLT_Mu13_Mu8_v6" in pathnames
+      if runNumber>=160410 and runNumber<163269 :
+        outcome = "HLT_DoubleMu6_v1" in pathnames
+        
+      if runNumber>=163269 and runNumber<165121 :
+        outcome = "HLT_DoubleMu7_v2" in pathnames
+                
+      if runNumber>=165121 and runNumber<167039 :
+        outcome = "HLT_Mu13_Mu8_v2" in pathnames
+                
+      if runNumber>=167039 and runNumber<170249 :
+        outcome = "HLT_Mu13_Mu8_v2" in pathnames
+        if outcome==False:
+          outcome = "HLT_Mu13_Mu8_v3" in pathnames
+          if outcome==False:
+            outcome = "HLT_Mu13_Mu8_v4" in pathnames
+      if runNumber>=170249 :
+        outcome = "HLT_Mu13_Mu8_v6" in pathnames
+        if outcome==False:
+          outcome = "HLT_Mu13_Mu8_v7" in pathnames
     else:
       if runNumber>=132440 and runNumber<=137028 : outcome = "HLT_Photon10_L1R" # should impose a cut at 15 GeV by hand
       if runNumber>=138564 and runNumber<=140401 : outcome = "HLT_Photon15_Cleaned_L1R" in pathnames
@@ -57,13 +70,24 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
       if runNumber>=148783 and runNumber<=149063 : outcome = "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1" in pathnames
       if runNumber>=149181 and runNumber<=149442 : outcome = "HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2" in pathnames
 
-      if runNumber>=160410 and runNumber<161217 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1" in pathnames
-      if runNumber>=161217 and runNumber<163269 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2" in pathnames
-      if runNumber>=163269 and runNumber<165121 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3" in pathnames
-      if runNumber>=165121 and runNumber<165970 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
-      if runNumber>=165970 and runNumber<167039 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
-      if runNumber>=167039 and runNumber<170249 : outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
-      if runNumber>=170249 and runNumber<173236 : outcome ="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6 " in pathnames
+      if runNumber>=160410 and runNumber<161217 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1" in pathnames
+      if runNumber>=161217 and runNumber<163269 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2" in pathnames
+      if runNumber>=163269 and runNumber<165121 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3" in pathnames
+      if runNumber>=165121 and runNumber<165970 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4" in pathnames
+      if runNumber>=165970 and runNumber<167039 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5" in pathnames
+      if runNumber>=167039 and runNumber<170249 :
+        outcome = "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6" in pathnames
+      if runNumber>=170249 :
+        outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6" in pathnames
+        if outcome == False:
+          outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7" in pathnames
+          if outcome == False:
+            outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8" in pathnames
   return outcome
 
 def isLooseMuon(muon):
@@ -431,6 +455,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumb
   # output[0]: Trigger
   if isTriggerOK(triggerInfo, runNumber, muChannel):
     output.append(1)
+    #print "passed"
   else:
     output.append(0)
   # output[1], output[2]: di-lepton and mass cut
