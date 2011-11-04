@@ -140,7 +140,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       if handleBT:
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel))
       if handleLeptonEff:
-        leptonsReWeightingPlots.append(LeptonsReWeightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
+        leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
