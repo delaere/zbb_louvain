@@ -76,26 +76,35 @@ class LeptonsReWeighting:
      self.zeleHandle_ = Handle ("vector<reco::CompositeCandidate>")
      # the efficiency maps
      self._elePidWeight = PtEtaMap([50],[0.8, 1.44, 2.0],
-                                   [[(0.9890,0.005), (0.993601,0.005), (0.974384,0.005), (1.00543,0.005)], 
-                                    [(0.9351,0.005), (1.006160,0.007), (0.937660,0.006), (1.01478,0.009)]])
+                                   [[(1.004,0.005), (1.009,0.005), (1.009,0.005), (1.044,0.006)], 
+                                    [(1.009,0.005), (1.001,0.005), (1.014,0.007), (1.033,0.009)]])
      self._eleIsoWeight = PtEtaMap([50],[1.6],
-                                   [[(1.00509,0.005), (0.993324,0.005)], 
-                                    [(1.04163,0.005), (1.032000,0.006)]])
-     self._eleTrgWeight = PtEtaMap([50],[1.6],
-                                   [[(1.00789,0.005), (1.00789,0.005)], 
-                                    [(1.00897,0.005), (1.00897,0.005)]])
+                                   [[(1.025,0.005), (1.022,0.005)], 
+                                    [(1.011,0.005), (1.051,0.006)]])
+     #self._eleTrgWeight = PtEtaMap([50],[1.6],
+     #                              [[(1.00789,0.005), (1.00789,0.005)], 
+     #                               [(1.00897,0.005), (1.00897,0.005)]])
+     self._ele17TrgWeight_A1 = PtEtaMap([],[0.8, 1.6],
+                                        [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
+     self._ele8TrgWeight_A1  = PtEtaMap([],[0.8, 1.6],
+                                        [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
+     self._ele17TrgWeight_A2 = PtEtaMap([],[0.8, 1.6],
+                                        [[(0.9905,0.0005), (0.9892,0.0006), (0.9892,0.0008)]])
+     self._ele8TrgWeight_A2  = PtEtaMap([],[0.8, 1.6],
+                                        [[(0.9907,0.0005), (0.9893,0.0006), (0.9894,0.0009)]])
+     
      self._muPidWeight  = PtEtaMap([50],[1.2],
-                                   [[(0.992,0.004), (0.995,0.004)], 
-                                    [(0.990,0.004), (0.998,0.005)]])
+                                   [[(0.995,0.004), (0.993,0.004)], 
+                                    [(0.987,0.004), (0.996,0.005)]])
      self._muIsoWeight  = PtEtaMap([50],[1.2],
-                                   [[(1.006,0.004), (1.003,0.004)], 
-                                    [(0.999,0.004), (1.000,0.005)]])
+                                   [[(1.022,0.004), (1.017,0.004)], 
+                                    [(1.001,0.004), (1.002,0.005)]])
      self._mu7TrgWeight = PtEtaMap([],[0.9, 1.5],
-                                   [[(0.970,0.0010), (0.958,0.0010), (0.915,0.0050)]])
+                                   [[(0.971,0.0010), (0.957,0.0010), (0.954,0.0050)]])
      self._mu8TrgWeight = PtEtaMap([],[0.9, 1.5],
-                                   [[(0.978,0.0006), (0.971,0.0010), (0.924,0.0040)]])
-     self._mu13TrgWeight= PtEtaMap([],[0.9, 1.5],
-                                   [[(0.976,0.0007), (0.965,0.0010), (0.901,0.0040)]])
+                                   [[(0.973,0.0010), (0.964,0.0010), (0.952,0.0040)]])
+     self._mu13TrgWeight = PtEtaMap([],[0.9, 1.5],
+                                   [[(0.973,0.0010), (0.962,0.0010), (0.946,0.0040)]])
  
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
@@ -107,8 +116,15 @@ class LeptonsReWeighting:
      lw *= self._eleIsoWeight[(e1.pt(),e1.eta())][0]
      lw *= self._eleIsoWeight[(e2.pt(),e2.eta())][0]
      # trigger
-     lw *= self._eleTrgWeight[(e1.pt(),e1.eta())][0]
-     lw *= self._eleTrgWeight[(e2.pt(),e2.eta())][0]
+     #lw *= self._eleTrgWeight[(e1.pt(),e1.eta())][0]
+     #lw *= self._eleTrgWeight[(e2.pt(),e2.eta())][0]
+     hlt_sf_run2011A1 = self._ele8TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A1 [(e2.pt(),e2.eta())][0]+ \
+                        self._ele17TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A1 [(e2.pt(),e2.eta())][0]- \
+                        self._ele17TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A1[(e2.pt(),e2.eta())][0]
+     hlt_sf_run2011A2 = self._ele8TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2 [(e2.pt(),e2.eta())][0]+ \
+                        self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A2 [(e2.pt(),e2.eta())][0]- \
+                        self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2[(e2.pt(),e2.eta())][0]
+     lw *= (0.50*hlt_sf_run2011A1+0.50*hlt_sf_run2011A2)
      return lw
 
    def weight_mm(self,m1,m2):
@@ -125,7 +141,7 @@ class LeptonsReWeighting:
      hlt_sf_run2011A2 = self._mu8TrgWeight [(m1.pt(),m1.eta())][0]*self._mu13TrgWeight[(m2.pt(),m2.eta())][0] + \
                         self._mu13TrgWeight[(m1.pt(),m1.eta())][0]*self._mu8TrgWeight [(m2.pt(),m2.eta())][0] - \
                         self._mu13TrgWeight[(m1.pt(),m1.eta())][0]*self._mu13TrgWeight[(m2.pt(),m2.eta())][0]
-     lw *= (0.18*hlt_sf_run2011A1+0.82*hlt_sf_run2011A2)
+     lw *= (0.11*hlt_sf_run2011A1+0.89*hlt_sf_run2011A2)
      return lw
 
    #@print_timing
