@@ -24,31 +24,149 @@ import os
 gROOT.SetStyle("Plain")
 gStyle.SetErrorX(0)
 
-WP       = "HP"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
-channel  = "Mu"    #"El","Mu"
-template = "keys"  #"keys", "hist"
+WP       = "HE"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+channel  = "El"    #"El","Mu"
+template = "hist"  #"keys", "hist"
 jec      = 0       #1,3,5
-numbins  = 40      #20,40,80
-PVreduce = 3
+numbins  = 120      #20,40,80
+PVreduce = 0
 
 if template=="keys": numbins=40
 
 ### Getting a file and a tree
 
-file  = TFile("File_rds_zbb_Mu_MC_muSel_forBtag.root")
+file  = TFile("File_rds_zbb_Mu_MC.root")
 ws    = file.Get("ws")
-myRDS = ws.data("rds_zbb");
+myRDS = ws.data("rds_zbb")
 
 print "myRDS.numEntries() = ", myRDS.numEntries()
 
-rrv_msv    = ws.var("rrv_msv")
-rrv_bTagHE = ws.var("rrv_bTagHE")
-rrv_bTagHP = ws.var("rrv_bTagHP")
-rrv_pT     = ws.var("rrv_pT")
-rrv_eta    = ws.var("rrv_eta")
-rrv_nPV    = ws.var("rrv_nPV")
-rrv_pT_unc = ws.var("rrv_pT_unc")
-rc_flav    = ws.cat("rc_flav")
+#RooDataSet::rds_zbb(eventSelectionrun,
+#                    eventSelectionevent,
+#                    eventSelectionls,
+#                    eventSelectiontriggerSelection,
+#                    eventSelectiontriggerBits,
+#                    eventSelectionzmassMu,
+#                    eventSelectionbestzmassMu,
+#                    eventSelectionzmassEle,
+#                    eventSelectionbestzmassEle,
+#                    eventSelectionzptMu,
+#                    eventSelectionbestzptMu,
+#                    eventSelectionzptEle,
+#                    eventSelectionbestzptEle,
+#                    eventSelectionscaldptZbj1,
+#                    eventSelectiondrZbj1,
+#                    eventSelectiondphiZbj1,
+#                    eventSelectionscaldptZbb,
+#                    eventSelectiondphiZbb,
+#                    eventSelectiondrZbb,
+#                    eventSelectiondijetM,
+#                    eventSelectiondijetPt,
+#                    eventSelectiondijetdR,
+#                    eventSelectiondijetSVdR,
+#                    eventSelectiondphidijetMET,
+#                    eventSelectionZbM,
+#                    eventSelectionZbPt,
+#                    eventSelectionZbbM,
+#                    eventSelectionZbbPt,
+#                    eventSelectioncategory,
+#                    eventSelectionmu1pt,
+#                    eventSelectionmu2pt,
+#                    eventSelectionmu1eta,
+#                    eventSelectionmu2eta,
+#                    eventSelectionmu1etapm,
+#                    eventSelectionmu2etapm,
+#                    eventSelectionel1pt,
+#                    eventSelectionel2pt,
+#                    eventSelectionel1eta,
+#                    eventSelectionel2eta,
+#                    eventSelectionel1etapm,
+#                    eventSelectionel2etapm,
+#                    eventSelectionSSVHEdisc,
+#                    eventSelectionSSVHPdisc,
+#                    eventSelectionSVmass,
+#                    eventSelectionMET,
+#                    eventSelectionMETphi,
+#                    eventSelectionjetpt,
+#                    eventSelectionjetpt_totunc,
+#                    eventSelectionjeteta,
+#                    eventSelectionjetetapm,
+#                    eventSelectionjetphi,
+#                    eventSelectionjetoverlapmu,
+#                    eventSelectionjetoverlapele,
+#                    eventSelectionjet1pt,
+#                    eventSelectionjet1pt_totunc,
+#                    eventSelectionjet1eta,
+#                    eventSelectionjet1etapm,
+#                    eventSelectionjet2pt,
+#                    eventSelectionjet2pt_totunc,
+#                    eventSelectionjet2eta,
+#                    eventSelectionjet2etapm,
+#                    eventSelectionbjet1pt,
+#                    eventSelectionbjet1pt_totunc,
+#                    eventSelectionbjet1eta,
+#                    eventSelectionbjet1etapm,
+#                    eventSelectionbjet1HEdisc,
+#                    eventSelectionbjet1HPdisc,
+#                    eventSelectionbjet1SVmass,
+#                    eventSelectionbjet2pt,
+#                    eventSelectionbjet2pt_totunc,
+#                    eventSelectionbjet2eta,
+#                    eventSelectionbjet2etapm,
+#                    eventSelectionbjet2HEdisc,
+#                    eventSelectionbjet2HPdisc,
+#                    eventSelectionbjet2SVmass,
+#                    eventSelectionnj,
+#                    eventSelectionnb,
+#                    eventSelectionnbP,
+#                    eventSelectionnhf,
+#                    eventSelectionnef,
+#                    eventSelectionnpf,
+#                    eventSelectionchf,
+#                    eventSelectionnch,
+#                    eventSelectioncef,
+#                    eventSelectionjetid,
+#                    BtaggingReweightingHE,
+#                    BtaggingReweightingHP,
+#                    BtaggingReweightingHEexcl,
+#                    BtaggingReweightingHPexcl,
+#                    BtaggingReweightingHEHE,
+#                    BtaggingReweightingHEHP,
+#                    BtaggingReweightingHPHP,
+#                    LeptonsReweightingweight,
+#                    rc_eventSelection_0,
+#                    rc_eventSelection_1,
+#                    rc_eventSelection_2,
+#                    rc_eventSelection_3,
+#                    rc_eventSelection_4,
+#                    rc_eventSelection_5,
+#                    rc_eventSelection_6,
+#                    rc_eventSelection_7,
+#                    rc_eventSelection_8,
+#                    rc_eventSelection_9,
+#                    rc_eventSelection_10,
+#                    rc_eventSelection_11,
+#                    rc_eventSelection_12,
+#                    rc_eventSelection_13,
+#                    rc_eventSelection_14,
+#                    rc_eventSelection_15,
+#                    rc_eventSelection_16,
+#                    rc_eventSelection_17,
+#                    rc_eventSelection_18,
+#                    rc_eventSelection_19,
+#                    rc_eventSelection_20,
+#                    rc_eventSelection_21,
+#                    rc_eventSelection_22)
+
+
+rrv_msv    = ws.var("eventSelectionbjet1SVmass")
+#rrv_bTagHE = ws.var("rrv_bTagHE")
+#rrv_bTagHP = ws.var("rrv_bTagHP")
+rrv_pT     = ws.var("eventSelectionjet1pt")
+rrv_eta    = ws.var("eventSelectionjet1eta")
+#rrv_nPV    = ws.var("eventSelectionnpf")
+rrv_pT_unc = ws.var("ctionbjet1pt_totunc")
+rc_flav    = ws.cat("mcSelectioneventType")
 rc_sel     = ws.cat("rc_sel")
 
 rrv_pT.setMin(25)
@@ -63,13 +181,13 @@ rrv_msv.setMin(0)
 rrv_msv.setMax(10)
 rrv_msv.setBins(numbins)
 
-rrv_nPV.setMin(0)
-rrv_nPV.setMax(20)
-rrv_nPV.setBins(20)
+#rrv_nPV.setMin(0)
+#rrv_nPV.setMax(20)
+#rrv_nPV.setBins(20)
 
 f_data = 0
-if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA_elSel_forBTag.root")
-elif channel == "Mu" : f_data = TFile("File_rds_zbb_Mu_DATA_muSel_forBTag.root")
+if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA.root")
+elif channel == "Mu" : f_data = TFile("File_rds_zbb_Mu_DATA.root")
 
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
@@ -87,8 +205,8 @@ if PVreduce == 3:
     myRDS=myRDS.reduce("rrv_nPV>7.5")
 
 if WP=="HE"         :
-    DATA = DATA.reduce("rc_HE==1")
-    myRDS=myRDS.reduce("rc_HE==1")
+    DATA = DATA.reduce("rc_eventSelection_5==1")
+    myRDS=myRDS.reduce("rc_eventSelection_5==1")
 if WP=="HEMET"      :
     DATA = DATA.reduce("rc_HEMET==1")
     myRDS=myRDS.reduce("rc_HEMET==1")
@@ -99,8 +217,8 @@ if WP=="HEMET_excl" :
     DATA = DATA.reduce("rc_HEMET_excl==1")
     myRDS=myRDS.reduce("rc_HEMET_excl==1")
 if WP=="HP"         :
-    DATA = DATA.reduce("rc_HP==1")
-    myRDS=myRDS.reduce("rc_HP==1")
+    DATA = DATA.reduce("rc_eventSelection_6==1")
+    myRDS=myRDS.reduce("rc_eventSelection_6==1")
 if WP=="HPMET"      :
     DATA = DATA.reduce("rc_HPMET==1")
     myRDS=myRDS.reduce("rc_HPMET==1")
@@ -126,9 +244,9 @@ for i in range(0,DATA.numEntries()):
 
 DATA = DATA_withunc
 
-myRDS_l = myRDS.reduce("rc_flav==1")
-myRDS_c = myRDS.reduce("rc_flav==4")
-myRDS_b = myRDS.reduce("rc_flav==5")
+myRDS_l = myRDS.reduce("mcSelectioneventType==1")
+myRDS_c = myRDS.reduce("mcSelectioneventType==2")
+myRDS_b = myRDS.reduce("mcSelectioneventType==3")
 
 print "myRDS_l.numEntries() = ", myRDS_l.numEntries()
 print "myRDS_c.numEntries() = ", myRDS_c.numEntries()
@@ -187,7 +305,7 @@ freem3.Draw()
 
 pTRegion  = RooThresholdCategory("pTRegion", "region of pT", rrv_pT, "pT") 
 etaRegion = RooThresholdCategory("etaRegion","region of eta",rrv_eta,"eta") 
-npvRegion = RooThresholdCategory("npvRegion","region of nPV",rrv_nPV,"nPV") 
+#npvRegion = RooThresholdCategory("npvRegion","region of nPV",rrv_nPV,"nPV") 
 
 # Specify thresholds and state assignments one-by-one.
 # Each statement specifies that all values _below_ the given value
@@ -208,7 +326,7 @@ etaRegion.addThreshold(            3., "1")
 #etaRegion.addThreshold(             1., "2") 
 #etaRegion.addThreshold(rrv_eta.getMax(), "3") 
 
-npvRegion.addThreshold(             15, "1") 
+#npvRegion.addThreshold(             15, "1") 
 
 #npvRegion.addThreshold(             3.5, "1") 
 #npvRegion.addThreshold(             4.5, "2") 
@@ -229,11 +347,11 @@ myRDS_c.addColumn(etaRegion)
 myRDS_l.addColumn(etaRegion) 
 DATA.addColumn(etaRegion) 
 
-myRDS.addColumn(npvRegion) 
-myRDS_b.addColumn(npvRegion) 
-myRDS_c.addColumn(npvRegion) 
-myRDS_l.addColumn(npvRegion) 
-DATA.addColumn(npvRegion) 
+#myRDS.addColumn(npvRegion) 
+#myRDS_b.addColumn(npvRegion) 
+#myRDS_c.addColumn(npvRegion) 
+#myRDS_l.addColumn(npvRegion) 
+#DATA.addColumn(npvRegion) 
 
 
 RDS_per_pT = {}
@@ -269,12 +387,12 @@ rrv_eta.setMin(-2.5)
 rrv_eta.setMax(2.5)
 rrv_eta.setBins(10)
 
-rrv_nPV.setMin(0)
-rrv_nPV.setMax(20)
-rrv_nPV.setBins(20)
+#rrv_nPV.setMin(0)
+#rrv_nPV.setMax(20)
+#rrv_nPV.setBins(20)
 
-RDH_tot          = RooDataHist("myRDH_tot",   "myRDH_tot",   RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDS_sum)
-RHP_tot          = RooHistPdf( "myRHP_tot",   "myRHP_tot",   RooArgSet(rrv_pT,rrv_nPV,rrv_eta), RDH_tot  )
+RDH_tot          = RooDataHist("myRDH_tot",   "myRDH_tot",   RooArgSet(rrv_pT,rrv_eta), RDS_sum)
+RHP_tot          = RooHistPdf( "myRHP_tot",   "myRHP_tot",   RooArgSet(rrv_pT,rrv_eta), RDH_tot  )
 
 Cee=TCanvas("Cee","Cee",600,1000)
 Cee.Divide(2,3)
@@ -304,16 +422,16 @@ RHP_tot.plotOn(FRAME4,RooFit.LineColor(kGreen))
 FRAME4.Draw()
 
 Cee.cd(5)
-FRAME5 = rrv_nPV.frame()
-DATA.plotOn(FRAME5)
-RHP_tot.plotOn(FRAME5,RooFit.LineColor(kGreen))
-FRAME5.Draw()
+#FRAME5 = rrv_nPV.frame()
+#DATA.plotOn(FRAME5)
+#RHP_tot.plotOn(FRAME5,RooFit.LineColor(kGreen))
+#FRAME5.Draw()
 
 Cee.cd(6).SetLogy()
-FRAME6 = rrv_nPV.frame()
-DATA.plotOn(FRAME6)
-RHP_tot.plotOn(FRAME6,RooFit.LineColor(kGreen))
-FRAME6.Draw()
+#FRAME6 = rrv_nPV.frame()
+#DATA.plotOn(FRAME6)
+#RHP_tot.plotOn(FRAME6,RooFit.LineColor(kGreen))
+#FRAME6.Draw()
 
 print "making the three keys pdfs" 
 
@@ -323,9 +441,9 @@ l_sumPdf=0
 
 print "making the three hist pdfs"
 
-myRDS_l = RDS_sum.reduce("rc_flav==1")
-myRDS_c = RDS_sum.reduce("rc_flav==4")
-myRDS_b = RDS_sum.reduce("rc_flav==5")
+myRDS_l = RDS_sum.reduce("mcSelectioneventType==1")
+myRDS_c = RDS_sum.reduce("mcSelectioneventType==2")
+myRDS_b = RDS_sum.reduce("mcSelectioneventType==3")
 
 if template == "keys":
     b_sumPdf = RooKeysPdf("b_sumPdf","b_sumPdf",rrv_msv,myRDS_b)
@@ -374,11 +492,11 @@ C1.Divide(2)
 C1.cd(1)
 freem = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
 freem.SetBarWidth(0.)
-freem.SetMarkerSize(1.3);
+freem.SetMarkerSize(0.7)
 freem.SetLineWidth(1)
 
 DATA.plotOn(freem,
-            RooFit.MarkerSize(1.3),
+            RooFit.MarkerSize(0.3),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
 sumPdf.plotOn(freem,RooFit.LineWidth(1),RooFit.LineColor(kBlack))
@@ -387,7 +505,7 @@ sumPdf.plotOn(freem,RooFit.Components("g_sumPdf"),RooFit.LineWidth(1),RooFit.Lin
 sumPdf.plotOn(freem,RooFit.Components("c_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kGreen),RooFit.LineStyle(kDashed))
 sumPdf.plotOn(freem,RooFit.Components("l_sumPdf"),RooFit.LineWidth(1),RooFit.LineColor(kBlue), RooFit.LineStyle(kDashed))
 DATA.plotOn(freem,
-            RooFit.MarkerSize(1.3),
+            RooFit.MarkerSize(0.3),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
 sumPdf.paramOn(freem,DATA)
@@ -396,11 +514,11 @@ freem.Draw()
 C1.cd(2)
 freem2 = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
 freem2.SetBarWidth(0.)
-freem2.SetMarkerSize(1.3);
-freem2.SetLineWidth(1);
+freem2.SetMarkerSize(0.7)
+freem2.SetLineWidth(1)
                
 DATA.plotOn(freem2,
-            RooFit.MarkerSize(1.3),
+            RooFit.MarkerSize(0.7),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"), RooFit.FillColor(kRed),  RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
@@ -411,11 +529,73 @@ sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("c_sumPdf,b_sumPdf")
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.DrawOption("F"), RooFit.LineColor(kBlack))
 sumPdf2.plotOn(freem2,RooFit.LineWidth(1),RooFit.Components("b_sumPdf"),                   RooFit.FillColor(kRed),  RooFit.LineColor(kBlack))
 DATA.plotOn(freem2,
-            RooFit.MarkerSize(1.3),
+            RooFit.MarkerSize(0.7),
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
 sumPdf2.paramOn(freem2,DATA)
 freem2.Draw()
+
+rrv_msv.SetTitle("Secondary vertex mass")
+rrv_msv.setUnit("GeV/c^{2}")
+  
+
+FRAME = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
+FRAME.SetMinimum(-0.000)
+DATA.plotOn(FRAME,
+            RooFit.MarkerSize(1.3),
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
+#sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+#sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed), RooFit.LineWidth(1))
+DATA.plotOn(FRAME, RooFit.MarkerSize(1.3), RooFit.XErrorSize(0.035), RooFit.DrawOption("pe2"))
+#sum_fb->paramOn(f_frac,myRDS);
+
+#FRAME.SetYTitle("Events / ( 0.333 GeV/c^{2} )");
+
+CANVAS = TCanvas("CANVAS","CANVAS",800,800)
+CANVAS.Divide(1)
+CANVAS.cd(1)
+FRAME.SetBarWidth(0.)
+FRAME.SetMarkerSize(1.3)
+FRAME.SetLineWidth(1)
+   
+FRAME.SetMinimum(-0.000)
+FRAME.Draw("F")
+
+#leg1 = TLegend(0.50, 0.5625, 0.85, 0.95-0.20, "", "NDC")
+#leg1.AddEntry( FRAME.getObject(0), "Data ","PLE")
+#leg1.AddEntry( FRAME.getObject(5), "b-jets"  ,"F")
+#leg1.AddEntry( FRAME.getObject(3), "c-jets"  ,"F")
+
+leg1 = TLegend(0.50, 0.50, 0.85, 0.95-0.20, "", "NDC")
+leg1.AddEntry( FRAME.getObject(0), "Data ", "PLE")
+leg1.AddEntry( FRAME.getObject(5), "b-jets"  ,"F")
+leg1.AddEntry( FRAME.getObject(3), "c-jets"  ,"F")
+leg1.AddEntry( FRAME.getObject(1), "l-jets"  ,"F")
+
+leg1.SetFillColor(0)
+leg1.SetShadowColor(0)
+
+leg1.Draw()
+
+lat=TLatex()
+#lat.SetTextSize(0.9)
+lat.DrawLatex(2.5,0.9*FRAME.GetMaximum(),"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2 fb^{-1}}")
+
+lat2=TLatex()
+#lat2.SetTextSize(0.9)
+lat2.DrawLatex(2.5,0.45*FRAME.GetMaximum(),"High purity b-tagging")
+
+
+                          
+
+
 
 # TLegend* leg1 = new TLegend(0.50, 0.5625, 0.85, 0.95-0.20, "", "NDC");
 # // leg1->AddEntry( f_frac->getObject(0), "data ");
@@ -449,7 +629,10 @@ if PVreduce : pvString+="_"+"PVregion"+str(PVreduce)
 
 if not numbins == 40: template+="_"+str(numbins)+"bins"
 
-C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".pdf")
+C1.SaveAs("~/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_double.pdf")
+
+CANVAS.SaveAs("~/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".pdf")
+
 
 #make RooDataHist
 #make RooHistPdf
@@ -562,7 +745,7 @@ C1.SaveAs("~/public/ZbbLeptonPhoton/bPurPlots/bPurFit_DYtemplate_"+channel+"_"+W
 ##tree = gDirectory.Get("ttree;3")
 #mytsjeen = f.Get("mistag/ttree;3")
 
-filename = "/afs/cern.ch/user/t/tdupree/public/ZbbLeptonPhoton/bPurPlots/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".txt"
+filename = "/home/fynu/tdupree/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".txt"
 
 my_file = open(filename,"w")
 print "filename = ", filename

@@ -35,8 +35,8 @@ cutstring = "rrv_ll_pT>0"
 #cutstring = "rrv_bb_dR<1.5&&rrv_ll_pT>50"
 #cutstring =  0
 
-WP =  "HEHE"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
-channel = "El"
+WP =  "eventSelection_5"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
+channel = "Mu"
 sel= {"Mu":"muSel",
       "El":"elSel",
       "Sum":"sumSel"}

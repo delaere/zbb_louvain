@@ -54,12 +54,12 @@ muChannel = { "Mu_DATA"     : True,
               "Ttbar_El_MC" : False
               }
 
-path = { "Mu_DATA"     : "/home/fynu/tdupree/store/zbb_13Sep/Mu_Data/skim/",
-         "El_DATA"     : "/home/fynu/tdupree/store/zbb_13Sep/El_Data/skim/",
-         "Ttbar_Mu_MC" : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/skim/",
-         "Ttbar_El_MC" : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/skim/",
-         "Mu_MC"       : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/skim/",
-         "El_MC"       : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/skim/"
+path = { "Mu_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/Mu_Data_skim/" ,
+         "El_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/El_Data_skim/" ,
+         "Ttbar_Mu_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
+         "Ttbar_El_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
+         "Mu_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"   ,
+         "El_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"
          }
 
 ###############################
@@ -104,16 +104,19 @@ obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=False, dataset=rds_zbb, mode="dataset")
 #mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
-#prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 
 ### input
 
-dirList=list(itertools.islice(os.listdir(path[channel]), jobNumber, None, Njobs))
-files=[]
-for fname in dirList:
-  files.append(path[channel]+"/"+fname)
+#dirList=list(itertools.islice(os.listdir(path[channel]), jobNumber, None, Njobs))
+#files=[]
+#for fname in dirList:
+#  print "fname = ", fname
+#  files.append(path[channel]+"/"+fname)
+import glob
+files=glob.glob(path[channel]+"*")
 print "files = ", files  
 events = Events (files)
 
@@ -121,12 +124,12 @@ events = Events (files)
 
 escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
 #mscp.beginJob(genlabel=zbblabel.genlabel)
-#prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
+prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
 brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
 ntuple = getArgSet([escp
 #                   , mscp
-#                   , prcp
+                   , prcp
 #                   , brcp
 #                   , lrcp
                     ]) #would it be enought to call rds_zbb.get() or even to use obsSet ???
@@ -159,23 +162,28 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
       escp.processEvent(event)
       #mscp.processEvent(event)
-      #prcp.processEvent(event)
+      prcp.processEvent(event)
       brcp.processEvent(event)
       lrcp.processEvent(event)
       
       ras_escp=escp._obsSet
+      #ras_mscp=mscp._obsSet
       ras_lrcp=lrcp._obsSet
       ras_brcp=brcp._obsSet
+      ras_prcp=prcp._obsSet
 
       ras_escp.add(ras_lrcp)
       ras_escp.add(ras_brcp)
+      #ras_escp.add(ras_mscp)
+      ras_prcp.add(ras_prcp)
+
       #rds_zbb.add(ntuple)
       rds_zbb.add(ras_escp)
       i += 1
 
     escp.endJob()
     #mscp.endJob()
-    #prcp.endJob()
+    prcp.endJob()
     brcp.endJob()
     lrcp.endJob()
 
