@@ -65,50 +65,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el2eta","subleading electron Eta",25,0,2.5)
       self.add("el1etapm","leading electron Eta",50,-2.5,2.5)
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
-      self.add("SSVHEdisc","SSVHEdisc",200,-10,10)
-      self.add("SSVHPdisc","SSVHPdisc",200,-10,10)
-      self.add("SVmass","SVmass",20,0,5)
-      self.add("MET","MET",100,0,200)
-      self.add("METphi","MET #phi",70,-3.5,3.5)
-      self.add("jetpt","Jet Pt",100,15,215)
-      self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
-      self.add("jeteta","Jet eta",25,0, 2.5)
-      self.add("jetetapm","Jet eta",50,-2.5, 2.5)
-      self.add("jetphi","Jet phi",80,-4,4)
-      self.add("jetoverlapmu","jets overlaps with muons",2,0,2)
-      self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
-      self.add("jet1pt","leading jet Pt",500,15,515)
-      self.add("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
-      self.add("jet1eta","leading jet Eta",25,0,2.5)
-      self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
-      self.add("jet2pt","subleading jet Pt",500,15,515)
-      self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
-      self.add("jet2eta","subleading jet Eta",25,0,2.5)
-      self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
-      self.add("bjet1pt","leading bjet Pt",500,15,515)
-      self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
-      self.add("bjet1eta","leading bjet Eta",25,0,2.5)
-      self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
-      self.add("bjet1HEdisc","leading bjet SSVHE disc",200,-10,10)
-      self.add("bjet1HPdisc","leading bjet SSVHP disc",200,-10,10)
-      self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
-      self.add("bjet2pt","subleading bjet Pt",500,15,515)
-      self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
-      self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
-      self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
-      self.add("bjet2HEdisc","subleading bjet SSVHE disc",200,-10,10)
-      self.add("bjet2HPdisc","subleading bjet SSVHP disc",200,-10,10)
-      self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
-      self.add("nj","jet count",15,0,15)
-      self.add("nb","b-jet count",5,0,5)
-      self.add("nbP","pure b-jet count",5,0,5)
-      self.add("nhf","neutral hadron energy fraction",101,0,1.01)
-      self.add("nef","neutral EmEnergy fraction",101,0,1.01)
-      self.add("npf","total multiplicity",50,0,50)
-      self.add("chf","charged hadron energy fraction",101,0,1.01)
-      self.add("nch","charged multiplicity",50,0,50)
-      self.add("cef","charged EmEnergy fraction",101,0,1.01)
-      self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       # prepare handles
       self.jetHandle = Handle ("vector<pat::Jet>")
       self.metHandle = Handle ("vector<pat::MET>")
@@ -198,133 +154,48 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["el2eta"] = abs(ele2.eta())
           result["el1etapm"] = ele1.eta()
           result["el2etapm"] = ele2.eta()
-      ## jet plots
-      nj  = 0
-      nb  = 0
-      nbP = 0
-      result["jetpt"] = [ ]
-      result["jetpt_totunc"] = [ ]
-      result["jeteta"] = [ ]
-      result["jetetapm"] = [ ]
-      result["jetphi"] = [ ]
-      result["jetoverlapmu"] = [ ]
-      result["jetoverlapele"] = [ ]
-      result["nhf"] = [ ]
-      result["nef"] = [ ]
-      result["npf"] = [ ]
-      result["chf"] = [ ]
-      result["nch"] = [ ]
-      result["cef"] = [ ]
-      result["jetid"] = [ ]
-      result["SSVHEdisc"] = [ ]
-      result["SSVHPdisc"] = [ ]
-      result["SVmass"] = [ ]
-      for jet in jets:
-        #jetPt = jetpt(jet) 
-        jetPt = jet.pt()
-        if isGoodJet(jet,bestZcandidate):#hasNoOverlap(jet, bestZcandidate): 
-          rawjet = jet.correctedJet("Uncorrected")
-          #result["jetpt"].append(jetPt)
-          result["jetpt"].append(jet.pt())
-	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
-          result["jeteta"].append(abs(jet.eta()))
-          result["jetetapm"].append(jet.eta())
-          result["jetphi"].append(jet.phi())
-          result["jetoverlapmu"].append(jet.hasOverlaps("muons"))
-          result["jetoverlapele"].append(jet.hasOverlaps("electrons"))
-          result["nhf"].append(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-          result["nef"].append(rawjet.neutralEmEnergyFraction())
-          result["npf"].append(rawjet.numberOfDaughters())
-          result["chf"].append(rawjet.chargedHadronEnergyFraction())
-          result["nch"].append(rawjet.chargedMultiplicity())
-          result["cef"].append(rawjet.chargedEmEnergyFraction())
-          if jetId(jet,"tight"): result["jetid"].append(3)
-          elif jetId(jet,"medium"): result["jetid"].append(2)
-          elif jetId(jet,"loose"): result["jetid"].append(1)
-          else: result["jetid"].append(0)
-          # B-tagging
-          result["SSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-          result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-          tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
-          if tISV :
-            if tISV.secondaryVertex(0) :
-              result["SVmass"].append(tISV.secondaryVertex(0).p4().mass())
-          nj += 1
-          if nj==1: 
-            result["jet1pt"] = jetPt #jet.pt()
-	    result["jet1pt_totunc"]= (self._JECuncertainty.unc_tot_jet(jet))
-            result["jet1eta"] = abs(jet.eta())
-            result["jet1etapm"] = jet.eta()
-          elif nj==2:
-            result["jet2pt"] = jetPt #jet.pt()
-	    result["jet2pt_totunc"]= (self._JECuncertainty.unc_tot_jet(jet))
-            result["jet2eta"] = abs(jet.eta())
-            result["jet2etapm"] = jet.eta()
-          if isBJet(jet,"HE",self.btagging): 
-            nb += 1
-            if nb==1:
-              result["bjet1pt"] = jetPt #jet.pt()
-	      result["bjet1pt_totunc"] = (self._JECuncertainty.unc_tot_jet(jet))
-              result["bjet1eta"] = abs(jet.eta())
-              result["bjet1etapm"] = jet.eta()
-	      result["bjet1HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-	      result["bjet1HPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-	      result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
-            elif nb==2:
-              result["bjet2pt"] = jetPt #jet.pt()
-	      result["bjet2pt_totunc"] = (self._JECuncertainty.unc_tot_jet(jet))
-              result["bjet2eta"] = abs(jet.eta())
-              result["bjet2etapm"] = jet.eta()
-	      result["bjet2HEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-	      result["bjet2HPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-	      result["bjet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
-          if isBJet(jet,"HP",self.btagging): nbP += 1
-      result["nj"] = nj
-      result["nb"] = nb
-      result["nbP"] = nbP
-      result["MET"] = met[0].pt()
-      result["METphi"] = met[0].phi()
+
       ## plots looking for resonnances / kinematics
-      if isInCategory(4, categoryData):
-        # that method returns the best jet pair. When only one is btagged, it is the first one.
-        # when two bjets are present, these are the two.
-        # this means that in cat 4 we have here Zj and Zjj
-        # in cat 5 we have Zb and Zbl
-        # in cat 9 we have Zb and Zbb
-        # later on, variables are refering to b-jets, sometimes they are not.
-        z = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+      # that method returns the best jet pair. When only one is btagged, it is the first one.
+      # when two bjets are present, these are the two.
+      # this means that in cat 4 we have here Zj and Zjj
+      # in cat 5 we have Zb and Zbl
+      # in cat 9 we have Zb and Zbb
+      # later on, variables are refering to b-jets, even if some are light jets
+      if not bestZcandidate is None:
         dijet = findDijetPair(jets, bestZcandidate, self.btagging)
-        if dijet[0] is None: return result # this should never happen
-        b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-        Zb = z+b1
-        result["ZbM"] = Zb.M()
-        result["ZbPt"] = Zb.Pt()
-        result["scaldptZbj1"] = bestZcandidate.pt()-dijet[0].pt()
-        result["dphiZbj1"] = abs(z.DeltaPhi(b1))
-        result["drZbj1"] = z.DeltaR(b1)
-        if dijet[1] is None: return result
-        b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-        if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
-          b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-          b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
-          b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-          b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
-          svdr = b1SV.DeltaR(b2SV)
-        else:
-          svdr = -1
-        bb = b1 + b2
-        Zbb = Zb + b2
-        met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
-        result["dijetM"] = bb.M()
-        result["dijetPt"] = bb.Pt()
-        result["dijetdR"] = b1.DeltaR(b2)
-        result["dijetSVdR"] = svdr
-        result["ZbbM"] = Zbb.M()
-        result["ZbbPt"] = Zbb.Pt()
-        result["scaldptZbb"] = bestZcandidate.pt()-bb.Pt()
-        result["dphiZbb"] = abs(z.DeltaPhi(bb))
-        result["drZbb"] = z.DeltaR(bb)
-        result["dphidijetMET"] = bb.DeltaPhi(met4v)
+        if not dijet[0] is None:
+          z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
+          b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+          Zb = z+b1
+          result["ZbM"] = Zb.M()
+          result["ZbPt"] = Zb.Pt()
+          result["scaldptZbj1"] = bestZcandidate.pt()-dijet[0].pt()
+          result["dphiZbj1"] = abs(z.DeltaPhi(b1))
+          result["drZbj1"] = z.DeltaR(b1)
+        if not dijet[1] is None:
+          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+          if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
+            b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+            b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
+            b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+            b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+            svdr = b1SV.DeltaR(b2SV)
+          else:
+            svdr = -1
+          bb = b1 + b2
+          Zbb = Zb + b2
+          met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
+          result["dijetM"] = bb.M()
+          result["dijetPt"] = bb.Pt()
+          result["dijetdR"] = b1.DeltaR(b2)
+          result["dijetSVdR"] = svdr
+          result["ZbbM"] = Zbb.M()
+          result["ZbbPt"] = Zbb.Pt()
+          result["scaldptZbb"] = bestZcandidate.pt()-bb.Pt()
+          result["dphiZbb"] = abs(z.DeltaPhi(bb))
+          result["drZbb"] = z.DeltaR(bb)
+          result["dphidijetMET"] = bb.DeltaPhi(met4v)
       return result
 
 def runTest():

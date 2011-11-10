@@ -11,7 +11,7 @@ from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel,zbbfile
 #from myFuncTimer import print_timing
 
-## TODO: Remove later... for data only
+############
 #ROOT.gSystem.Load("libFWCoreFWLite.so");
 #ROOT.AutoLibraryLoader.enable()
 #L2L3res = ROOT.FactorizedJetCorrector("L2Relative","../testfiles/JEC/GR_R_42_V20_AK5PF_L2Relative_L2L3Residual.txt")
@@ -184,7 +184,7 @@ class JetmetControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, jetlabel=zbblabel.jetlabel, metlabel=zbblabel.metlabel, btagging="SSV"):
+    def beginJob(self, jetlabel=zbblabel.jetlabel, metlabel=zbblabel.metlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, btagging="SSV"):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,-10,10)
@@ -192,16 +192,6 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("SVmass","SVmass",20,0,5)
       self.add("TCHEdisc","TCHEdisc",200,-10,10)
       self.add("TCHPdisc","TCHPdisc",200,-10,10)
-      self.add("SSVHEdiscJet1","SSVHEdiscJet1",200,-10,10)
-      self.add("SSVHPdiscJet1","SSVHPdiscJet1",200,-10,10)
-      self.add("SVmassJet1","SVmassJet1",20,0,5)
-      self.add("TCHEdiscJet1","TCHEdiscJet1",200,-10,10)
-      self.add("TCHPdiscJet1","TCHPdiscJet1",200,-10,10)
-      self.add("SSVHEdiscbJet1","SSVHEdiscbJet1",200,-10,10)
-      self.add("SSVHPdiscbJet1","SSVHPdiscbJet1",200,-10,10)
-      self.add("SVmassbJet1","SVmassbJet1",20,0,5)
-      self.add("TCHEdiscbJet1","TCHEdiscbJet1",200,-10,10)
-      self.add("TCHPdiscbJet1","TCHPdiscbJet1",200,-10,10)
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,-10,10)
       self.add("SSVHPdiscDisc1","SSVHPdiscDisc1",200,-10,10)
       self.add("TCHEdiscDisc1","TCHEdiscDisc1",200,-10,10)
@@ -221,21 +211,41 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet1Flavor","leading jet Flavor (MC)",21,-10.5,10.5)
       self.add("jet1eta","leading jet Eta",25,0,2.5)
       self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
+      self.add("jet1SSVHEdisc","leading jet SSVHE discriminant",200,-10,10)
+      self.add("jet1SSVHPdisc","leading jet SSVHP discriminant",200,-10,10)
+      self.add("jet1SVmass","leading jet SV mass",20,0,5)
+      self.add("jet1TCHEdisc","leading jet TCHE discriminant",200,-10,10)
+      self.add("jet1TCHPdisc","leading jet TCHP discriminant",200,-10,10)
       self.add("jet2pt","subleading jet Pt",500,15,515)
       self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
       self.add("jet2Flavor","subleading jet Flavor (MC)",21,-10.5,10.5)
       self.add("jet2eta","subleading jet Eta",25,0,2.5)
       self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
+      self.add("jet2SSVHEdisc","subleading jet SSVHE discriminant",200,-10,10)
+      self.add("jet2SSVHPdisc","subleading jet SSVHP discriminant",200,-10,10)
+      self.add("jet2SVmass","subleading jet SV mass",20,0,5)
+      self.add("jet2TCHEdisc","subleading jet TCHE discriminant",200,-10,10)
+      self.add("jet2TCHPdisc","subleading jet TCHP discriminant",200,-10,10)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
       self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.add("bjet1Flavor","leading bjet Flavor (MC)",21,-10.5,10.5)
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
+      self.add("bjet1SSVHEdisc","leading bjet SSVHE discriminant",200,-10,10)
+      self.add("bjet1SSVHPdisc","leading bjet SSVHP discriminant",200,-10,10)
+      self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
+      self.add("bjet1TCHEdisc","leading bjet TCHE discriminant",200,-10,10)
+      self.add("bjet1TCHPdisc","leading bjet TCHP discriminant",200,-10,10)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
       self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.add("bjet2Flavor","subleading bjet Flavor (MC)",21,-10.5,10.5)
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
+      self.add("bjet2SSVHEdisc","subleading bjet SSVHE discriminant",200,-10,10)
+      self.add("bjet2SSVHPdisc","subleading bjet SSVHP discriminant",200,-10,10)
+      self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
+      self.add("bjet2TCHEdisc","subleading bjet TCHE discriminant",200,-10,10)
+      self.add("bjet2TCHPdisc","subleading bjet TCHP discriminant",200,-10,10)
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.add("nj","jet count",15,0,15)
       self.add("nb","b-jet count",5,0,5)
@@ -250,8 +260,12 @@ class JetmetControlPlots(BaseControlPlots):
       # prepare handles
       self.jetHandle = Handle("vector<pat::Jet>")
       self.metHandle = Handle("vector<pat::MET>")
+      self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
+      self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
       self.jetlabel  = jetlabel
       self.metlabel  = metlabel
+      self.zmulabel = zmulabel
+      self.zelelabel = zelelabel
     
     #@print_timing
     def process(self, event):
@@ -260,8 +274,13 @@ class JetmetControlPlots(BaseControlPlots):
       # load event
       event.getByLabel(self.jetlabel,self.jetHandle)
       event.getByLabel(self.metlabel,self.metHandle)
+      event.getByLabel(self.zmulabel,self.zmuHandle)
+      event.getByLabel(self.zelelabel,self.zeleHandle)
       jets = self.jetHandle.product()
       met  = self.metHandle.product()
+      zCandidatesMu = self.zmuHandle.product()
+      zCandidatesEle = self.zeleHandle.product()
+      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
@@ -294,9 +313,9 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscTCHE  = -1
       maxbdiscTCHP  = -1
       for jet in jets:
-        #jetPt = jetpt(jet)
         jetPt = jet.pt()
-        if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
+        if isGoodJet(jet,bestZcandidate):
+        #if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
 	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
@@ -331,47 +350,61 @@ class JetmetControlPlots(BaseControlPlots):
 	  maxbdiscTCHP = max(maxbdiscSSVHP,jet.bDiscriminator("trackCountingHighPurBJetTags"))
           nj += 1
           if nj==1: 
-	    j1pt=jetPt#jet.pt()
-            result["jet1pt"] = jetPt#jet.pt()
+	    j1pt=jetPt
+            result["jet1pt"] = jetPt
 	    result["jet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	    result["jet1Flavor"] = jet.partonFlavour()
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
-            result["SSVHEdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-            result["SSVHPdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+            result["jet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+            result["jet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
 	    if tISV :
 	      if tISV.secondaryVertex(0) :
-	        result["SVmassJet1"] = tISV.secondaryVertex(0).p4().mass()
-            result["TCHEdiscJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
-            result["TCHPdiscJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
+	        result["jet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
+            result["jet1TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
+            result["jet1TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           elif nj==2:
-            result["jet2pt"] = jetPt#jet.pt()
+            result["jet2pt"] = jetPt
 	    result["jet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	    result["jet2Flavor"] = jet.partonFlavour()
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
+            result["jet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+            result["jet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	    if tISV :
+	      if tISV.secondaryVertex(0) :
+	        result["jet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
+            result["jet2TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
+            result["jet2TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
-              result["bjet1pt"] = jetPt#jet.pt()
+              result["bjet1pt"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet1Flavor"] = jet.partonFlavour()
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
-              result["SSVHEdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-              result["SSVHPdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+              result["bjet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+              result["bjet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
 	      if tISV :
 	        if tISV.secondaryVertex(0) :
-	          result["SVmassbJet1"] = tISV.secondaryVertex(0).p4().mass()
-              result["TCHEdiscbJet1"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
-              result["TCHPdiscbJet1"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
-	      result["dptj1b1"] = jetPt-j1pt#jet.pt()-j1pt
+	          result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
+              result["bjet1TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
+              result["bjet1TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
+	      result["dptj1b1"] = jetPt-j1pt
             elif nb==2:
-              result["bjet2pt"] = jetPt#jet.pt()
+              result["bjet2pt"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet2Flavor"] = jet.partonFlavour()
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
+              result["bjet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+              result["bjet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	      if tISV :
+	        if tISV.secondaryVertex(0) :
+	          result["bjet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
+              result["bjet2TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
+              result["bjet2TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
           if isBJet(jet,"HP",self.btagging): nbP += 1
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP
