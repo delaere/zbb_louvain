@@ -92,9 +92,7 @@ class BaseControlPlots:
       """Set the categories, given a list of booleans. Only works for datasets"""
       if self._mode!="dataset": return
       for c, flag in enumerate(categories):
-        if flag:
-          self._rooCategories[c].setIndex(1)
-          #print "index 1!!!!!!!!!!!!!!!!!!!!"
+        if flag: self._rooCategories[c].setIndex(1)
 	else: self._rooCategories[c].setIndex(0)
 
     def fillPlots(self, data, weight = 1.):
@@ -107,6 +105,10 @@ class BaseControlPlots:
 
     def fillRDS(self, data):
       """Fills roodataset with the data provided as input."""
+      for rrv in self._rrv_vector:
+        # data is not guaranteed to contain all variables,
+        # so if we don't do this, these variables will keep the old value
+        self._rrv_vector[rrv].setVal(-1000)
       for name,value in data.items():
         if isinstance(value,list):
 	  #for now, we only store scalars, not vectors
