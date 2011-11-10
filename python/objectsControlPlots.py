@@ -209,7 +209,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("MET","MET",100,0,200)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("jetpt","Jet Pt",100,15,215)
-      self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,100)
+      self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,1)
+      self.add("jetFlavor","Jet Flavor (MC)",21,-10.5,10.5)
       self.add("jeteta","Jet eta",25,0, 2.5)
       self.add("jetetapm","Jet eta",50,-2.5, 2.5)
       self.add("jetphi","Jet phi",80,-4,4)
@@ -217,18 +218,22 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
       self.add("jet1pt","leading jet Pt",500,15,515)
       self.add("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
+      self.add("jet1Flavor","leading jet Flavor (MC)",21,-10.5,10.5)
       self.add("jet1eta","leading jet Eta",25,0,2.5)
       self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
       self.add("jet2pt","subleading jet Pt",500,15,515)
       self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
+      self.add("jet2Flavor","subleading jet Flavor (MC)",21,-10.5,10.5)
       self.add("jet2eta","subleading jet Eta",25,0,2.5)
       self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
       self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
+      self.add("bjet1Flavor","leading bjet Flavor (MC)",21,-10.5,10.5)
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
       self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
+      self.add("bjet2Flavor","subleading bjet Flavor (MC)",21,-10.5,10.5)
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
@@ -267,6 +272,7 @@ class JetmetControlPlots(BaseControlPlots):
       result["TCHPdisc"] = [ ]
       result["jetpt"] = [ ]
       result["jetpt_totunc"] = [ ]
+      result["jetFlavor"] = [ ]
       result["jeteta"] = [ ]
       result["jetetapm"] = [ ]
       result["jetphi"] = [ ]
@@ -294,6 +300,7 @@ class JetmetControlPlots(BaseControlPlots):
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
 	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+	  result["jetFlavor"].append(jet.partonFlavour())
           result["jeteta"].append(abs(jet.eta()))
           result["jetetapm"].append(jet.eta())
           result["jetphi"].append(jet.phi())
@@ -327,6 +334,7 @@ class JetmetControlPlots(BaseControlPlots):
 	    j1pt=jetPt#jet.pt()
             result["jet1pt"] = jetPt#jet.pt()
 	    result["jet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	    result["jet1Flavor"] = jet.partonFlavour()
             result["jet1eta"] = abs(jet.eta())
             result["jet1etapm"] = jet.eta()
             result["SSVHEdiscJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -339,6 +347,7 @@ class JetmetControlPlots(BaseControlPlots):
           elif nj==2:
             result["jet2pt"] = jetPt#jet.pt()
 	    result["jet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	    result["jet2Flavor"] = jet.partonFlavour()
             result["jet2eta"] = abs(jet.eta())
             result["jet2etapm"] = jet.eta()
           if isBJet(jet,"HE",self.btagging): 
@@ -346,6 +355,7 @@ class JetmetControlPlots(BaseControlPlots):
             if nb==1:
               result["bjet1pt"] = jetPt#jet.pt()
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	      result["bjet1Flavor"] = jet.partonFlavour()
               result["bjet1eta"] = abs(jet.eta())
               result["bjet1etapm"] = jet.eta()
               result["SSVHEdiscbJet1"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
@@ -359,6 +369,7 @@ class JetmetControlPlots(BaseControlPlots):
             elif nb==2:
               result["bjet2pt"] = jetPt#jet.pt()
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	      result["bjet2Flavor"] = jet.partonFlavour()
               result["bjet2eta"] = abs(jet.eta())
               result["bjet2etapm"] = jet.eta()
           if isBJet(jet,"HP",self.btagging): nbP += 1
