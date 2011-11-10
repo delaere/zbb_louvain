@@ -25,9 +25,10 @@ class LumiReWeightingControlPlots(BaseControlPlots):
       self.add("pu","pu",50,0,50)
       self.add("pv","pv",50,0,50)
       # fill the histogram with the configured weights
-      self._dir.cd()
-      self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
-      for i in range(50): self.h_weightSetup.SetBinContent(i+1,self.engine.weight(npu=i))
+      if self._mode=="plots":
+        self._dir.cd()
+        self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
+        for i in range(50): self.h_weightSetup.SetBinContent(i+1,self.engine.weight(npu=i))
       # handles
       self.vertexHandle = Handle ("vector<reco::Vertex>")
       self.vertexlabel = (vertexlabel)
