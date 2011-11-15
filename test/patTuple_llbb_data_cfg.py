@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.4 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_data_cfg.py,v $')
 )
@@ -264,18 +264,18 @@ process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' 
 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone( preselection =
-                                                 'electronID("simpleEleId85relIso") == 7 &' 
-                                                 'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
-                                                 'pt > 10. &'
-                                                 'abs(eta) < 2.5 &'
-                                                 #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
-                                                 'abs(dB) < 0.02'
-                                                 )
+                                                  'electronID("simpleEleId85relIso") == 7 &'
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
+                                                  'pt > 10. &'
+                                                  'abs(eta) < 2.5 &'
+                                                  #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
+                                                  'abs(dB) < 0.02'
+                                                  )
 process.tightElectrons.src = "selectedElectronsMatched"
 
 process.matchedElectrons = cleanPatElectrons.clone(preselection =
-                                                   'electronID("simpleEleId85relIso") == 7 &' 
-                                                   'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
+                                                   'electronID("simpleEleId85relIso") == 7 &'
+                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.5 &'
                                                    #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -540,12 +540,18 @@ process.maxEvents.input = -1
 #process.out.fileName = '4DiLep.root'
 #process.out.fileName = 'LocalTestDoubleMuRun2011A_May10ReReco.root'
 #process.out.fileName = 'LocalTestDoubleElectronRun2011A_May10ReReco.root'
-
 #process.out.fileName = 'V4_Prompt_LocalTestDoubleMuRun2011A.root'
 
 #process.out.fileName = 'crab_Electron_03Oct2011_v1.root'
 #process.out.fileName = 'crab_Mu_03Oct2011_v1.root'
 
-process.out.fileName = 'PAT_DoubleMu_May10ReReco.root'
+#process.out.fileName = 'PAT_DoubleMu_May10ReReco.root'
+
+#process.out.fileName = 'PAT_DoubleEle_May10ReReco.root'
+#process.out.fileName = 'PAT_DoubleEle_Prompt_v4.root'
+#process.out.fileName = 'PAT_DoubleEle_05AugReReco.root'
+#process.out.fileName = 'PAT_DoubleEle_Prompt_v6.root'
+#process.out.fileName = 'DoubleMu_Run2011B_PromptReco_v1.root'
+process.out.fileName =  'DoubleEle_Run2011B_PromptReco_v1.root'
 
 process.options.wantSummary = True
