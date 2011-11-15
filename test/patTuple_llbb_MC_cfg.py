@@ -2,9 +2,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.5 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_423_MC_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_MC_cfg.py,v $')
 )
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
@@ -263,7 +263,7 @@ process.allElectrons = process.cleanPatElectrons.clone( preselection = 'pt > 5' 
 # clean electrons for direct analysis
 process.tightElectrons = cleanPatElectrons.clone(preselection =
                                                  'electronID("simpleEleId85relIso") == 7 &'
-                                                 'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &'
+                                                 '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' 
                                                  'pt > 10. &'
                                                  'abs(eta) < 2.5 &'
                                                  #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -273,7 +273,7 @@ process.tightElectrons = cleanPatElectrons.clone(preselection =
 
 process.matchedElectrons = cleanPatElectrons.clone(preselection =
                                                    'electronID("simpleEleId85relIso") == 7 &' 
-                                                   'abs(superCluster.eta)< 1.442 || 1.566 <abs(superCluster.eta)<2.50 &' 
+                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
                                                    'pt > 25. &'
                                                    'abs(eta) < 2.5 &'
                                                    #'abs(superCluster.energy * sin(2 * atan(exp(-1 *abs(superCluster.eta))))) > 20 &'
@@ -541,5 +541,7 @@ process.maxEvents.input = -1
 #process.out.fileName = 'TTJets.root'
 
 #process.out.fileName = '2HDM.root'
+
+process.out.fileName = 'crab_ZbbToLL.root'
 
 process.options.wantSummary = False
