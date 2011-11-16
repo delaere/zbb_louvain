@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.4 $'),
+    version = cms.untracked.string('$Revision: 1.5 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_data_cfg.py,v $')
 )
@@ -90,7 +90,7 @@ defaultTriggerMatch = cms.EDProducer(
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
         #, matchedCuts = cms.string('path("HLT_DoubleMu6_v*")|| path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")')   
-        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*", 1, 0) || filter("hltDiMuonL3PreFiltered6") || path("HLT_DoubleMu7_v*", 1, 0) || filter("hltDiMuonL3PreFiltered7") || path("HLT_Mu13Mu8_v*", 1, 0) || filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")')
+        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*", 1, 0) || filter("hltDiMuonL3PreFiltered6") || path("HLT_DoubleMu7_v*", 1, 0) || filter("hltDiMuonL3PreFiltered7") || path("HLT_Mu13_Mu8_v*", 1, 0) || filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")')
         )
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
