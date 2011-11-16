@@ -16,7 +16,7 @@ def selectedTriggers(triggerInfo):
   pathout = map(lambda path:isFired(path),paths)
   return pathout
 
-def isTriggerOK(triggerInfo, runNumber, muChannel=True):
+def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
@@ -43,6 +43,7 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
       if runNumber>=148783 and runNumber<=149442 : outcome = "HLT_Mu15_v1" in pathnames
 
       if runNumber>=160410 and runNumber<163269 :
+        #print " path = HLT_DoubleMu6_v1" 
         outcome = "HLT_DoubleMu6_v1" in pathnames
         
       if runNumber>=163269 and runNumber<165121 :
@@ -88,7 +89,9 @@ def isTriggerOK(triggerInfo, runNumber, muChannel=True):
           outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7" in pathnames
           if outcome == False:
             outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8" in pathnames
-  return outcome
+
+  print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber)
+  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber))
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
@@ -115,7 +118,7 @@ def isTightMuon(muon):
     mu = muon
   isMatched = mu.triggerObjectMatches().size()>0
   # don't impose matching for tight muons because the trigger -> should now be in the PAT anyway.
-  isMatched = True
+  #isMatched = True
 
   return (isLooseMuon(muon) and isMatched)
 
@@ -154,20 +157,25 @@ def isTightElectron(electron):
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
+  #to correct the PAT error (temporary)
   if electron.pt()<25. : return False
-
+ 
   # impose matching and fiducial cut
   if electron.hasMasterClone():
     el = electron.masterClone()
     ROOT.SetOwnership( el, False ) 
   else:
     el = electron
+    
+  isID85 = el.electronID("simpleEleId85relIso")== 7  
+  isEta = abs(el.eta())< 2.5  
+  isdB = abs(el.dB())< 0.02 
   isMatched = el.triggerObjectMatches().size()>0
-  isMatched = True # for MC and data: now matching is enforced directly in the PAT.
+  #isMatched = True # for MC and data: now matching is enforced directly in the PAT. temporary correction due to PAT error
   superclusterEta = abs(el.superCluster().eta())
   fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
 
-  return (isLooseElectron(electron) and isMatched and fiducialCut)
+  return (isLooseElectron(electron) and isID85 and isEta and isdB and isMatched and fiducialCut)
 
 def isMatchedElectron(electron):
 
@@ -281,7 +289,7 @@ def isZcandidate(zCandidate):
     charge *= daughter.charge()
     if daughter.isMuon():
       flavor *= -1
-      result = result and isGoodMuon(zCandidate.daughter(r),r)
+      result = result and isGoodMuon(zCandidate.daughter(r),r)  
     elif zCandidate.daughter(r).isElectron():
       result = result and isGoodElectron(zCandidate.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
@@ -295,6 +303,65 @@ def isZcandidate(zCandidate):
   #TODO: add vertex match
   # if everything ok, return the result of the lepton check
   return result
+
+def isTriggerMatchZcandidate(zCandidate, runNumber):
+  if not zCandidate is None:
+    daughter1 = zCandidate.daughter(0)
+    daughter2 = zCandidate.daughter(1) #function daughter(0,1) to exchange the two daughters
+
+    Daugh1 = daughter1.masterClone()
+    ROOT.SetOwnership( Daugh1, False )
+    Daugh2 = daughter2.masterClone()
+    ROOT.SetOwnership( Daugh2, False )
+    
+    if Daugh1.isMuon() :
+      print "Muons"
+      if runNumber>=160410 and runNumber<163269 :
+        print "Daugh1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
+        if (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) :
+          return True
+      
+      if runNumber>=163269 and runNumber<165121 :
+        print "Daugh1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
+        if (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0):            return True
+          
+      if runNumber >= 165121 :
+        
+        print "Daugh1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+        print "Daugh1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(Daugh1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+        print "Daugh1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(Daugh1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
+        print "Daugh2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (Daugh2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+        print "Daugh2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+
+        if (Daugh1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8" or "hltDiMuonL3p5PreFiltered8")) and ((Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (Daugh1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13")):
+          return True
+
+    if Daugh1.isElectron() :
+      if runNumber < 167039 :
+        
+        print "Daugh1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size",
+        (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+        print "filter_1 *",(Daugh1.triggerObjectMatchesByFilter("*").size())
+        print "Daugh2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size",
+        (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+        print "filter_2 *",(Daugh2.triggerObjectMatchesByFilter("*").size())
+        
+        if (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0):
+          return True
+
+      if runNumber >= 167039 :
+        
+        print "(Daugh1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
+        (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
+        #print "filter_1 *", (Daugh1.triggerObjectMatchesByFilter("*").size())
+        print "(Daugh2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
+        (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
+        #print "filter_2 *", (Daugh1.triggerObjectMatchesByFilter("*").size())
+
+        if (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0):
+          return True
+          
+  return False
 
 def findBestCandidate(muChannel, *zCandidates):
   """Finds the best Z candidate. Might be none.
@@ -453,7 +520,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumb
   output = []
   bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
   # output[0]: Trigger
-  if isTriggerOK(triggerInfo, runNumber, muChannel):
+  if isTriggerOK(triggerInfo,bestZcandidate, runNumber, muChannel):
     output.append(1)
     #print "passed"
   else:
