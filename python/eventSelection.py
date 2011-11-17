@@ -307,60 +307,61 @@ def isZcandidate(zCandidate):
 def isTriggerMatchZcandidate(zCandidate, runNumber):
   if not zCandidate is None:
     daughter1 = zCandidate.daughter(0)
-    daughter2 = zCandidate.daughter(1) #function daughter(0,1) to exchange the two daughters
-
+    daughter2 = zCandidate.daughter(1)
     Daugh1 = daughter1.masterClone()
     ROOT.SetOwnership( Daugh1, False )
     Daugh2 = daughter2.masterClone()
     ROOT.SetOwnership( Daugh2, False )
+    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber) 
+    case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber)
+    print "isTriggerMatchZcandidate decisions: ", case1,case2
+    return (case1 or case2)
+    #return isTriggerMatchPair(Daugh1,Daugh2,runNumber) or isTriggerMatchPair(Daugh2,Daugh1,runNumber)
+  else:
+    return False
+
+def isTriggerMatchPair(l1,l2,runNumber):
     
-    if Daugh1.isMuon() :
-      print "Muons"
-      if runNumber>=160410 and runNumber<163269 :
-        print "Daugh1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
-        if (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) :
-          return True
-      
-      if runNumber>=163269 and runNumber<165121 :
-        print "Daugh1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
-        if (Daugh1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0):            return True
-          
-      if runNumber >= 165121 :
+  if l1.isMuon() :
+    print "Muons"
+    if runNumber>=160410 and runNumber<163269 :
+      print "l1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
+      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) :
+        return True
+    
+    if runNumber>=163269 and runNumber<165121 :
+      print "l1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
+      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0):
+        return True
         
-        print "Daugh1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (Daugh1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
-        print "Daugh1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(Daugh1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-        print "Daugh1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(Daugh1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
-        print "Daugh2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (Daugh2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
-        print "Daugh2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+    if runNumber >= 165121 :
+      print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+      print "l1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+      print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
+      print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+      print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+      if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l2.triggerObjectMatchByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0 or l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
+        return True
 
-        if (Daugh1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8" or "hltDiMuonL3p5PreFiltered8")) and ((Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (Daugh2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (Daugh1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13")):
-          return True
+  if l1.isElectron() :
+    if runNumber < 167039 :
+      print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+      print "filter_1 *",(l1.triggerObjectMatchesByFilter("*").size())
+      print "l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size", (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+      print "filter_2 *",(l2.triggerObjectMatchesByFilter("*").size())
+      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0):
+        return True
 
-    if Daugh1.isElectron() :
-      if runNumber < 167039 :
+    if runNumber >= 167039 :
+      print "(l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
+      (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
+      #print "filter_1 *", (l1.triggerObjectMatchesByFilter("*").size())
+      print "(l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
+      (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
+      #print "filter_2 *", (l1.triggerObjectMatchesByFilter("*").size())
+      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0):
+        return True
         
-        print "Daugh1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size",
-        (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
-        print "filter_1 *",(Daugh1.triggerObjectMatchesByFilter("*").size())
-        print "Daugh2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size",
-        (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
-        print "filter_2 *",(Daugh2.triggerObjectMatchesByFilter("*").size())
-        
-        if (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0):
-          return True
-
-      if runNumber >= 167039 :
-        
-        print "(Daugh1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
-        (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
-        #print "filter_1 *", (Daugh1.triggerObjectMatchesByFilter("*").size())
-        print "(Daugh2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
-        (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
-        #print "filter_2 *", (Daugh1.triggerObjectMatchesByFilter("*").size())
-
-        if (Daugh1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (Daugh2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0) and (Daugh2.triggerObjectMatchesByFilter("*").size()>0) and (Daugh1.triggerObjectMatchesByFilter("*").size()>0):
-          return True
-          
   return False
 
 def findBestCandidate(muChannel, *zCandidates):
