@@ -90,7 +90,7 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
           if outcome == False:
             outcome = "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8" in pathnames
 
-  print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber)
+  #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber)
   return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber))
 
 def isLooseMuon(muon):
@@ -314,9 +314,9 @@ def isTriggerMatchZcandidate(zCandidate, runNumber):
     ROOT.SetOwnership( Daugh2, False )
     case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber) 
     case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber)
-    print "isTriggerMatchZcandidate decisions: ", case1,case2
+    print "isTriggerMatchZcandidate decisions: ", case1, case2
     return (case1 or case2)
-    #return isTriggerMatchPair(Daugh1,Daugh2,runNumber) or isTriggerMatchPair(Daugh2,Daugh1,runNumber)
+    #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber) or isTriggerMatchPair(Daugh2,Daugh1,runNumber))
   else:
     return False
 
@@ -340,26 +340,36 @@ def isTriggerMatchPair(l1,l2,runNumber):
       print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
       print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
       print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-      if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l2.triggerObjectMatchByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0 or l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
+      if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0 or l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
         return True
-
+      
   if l1.isElectron() :
     if runNumber < 167039 :
-      print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
-      print "filter_1 *",(l1.triggerObjectMatchesByFilter("*").size())
-      print "l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size", (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
-      print "filter_2 *",(l2.triggerObjectMatchesByFilter("*").size())
-      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0):
-        return True
+      return True
+    #if runNumber < 165121:
+      #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 0 1", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,1).size())
+      #print "path *" , (l1.triggerObjectMatchesByPath("*",1,0))
+      #print "filter_1 *",(l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 0 1", (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,1).size())
+      #print "filter_2 *",(l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size())
+      #if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size()>0) :
+        #return True
+    
+    #if runNumber >= 165121 and runNumber < 167039 :
+      #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 1 0", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+      #print "path *" , (l1.triggerObjectMatchesByPath("*",1,0))
+      #print "filter_1 *",(l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 1 0", (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0).size())
+      #print "filter_2 *",(l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size())
+      #if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,1).size()>0):
+        #return True
 
     if runNumber >= 167039 :
-      print "(l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
-      (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
-      #print "filter_1 *", (l1.triggerObjectMatchesByFilter("*").size())
-      print "(l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size          ",
-      (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*").size())
-      #print "filter_2 *", (l1.triggerObjectMatchesByFilter("*").size())
-      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0) and (l2.triggerObjectMatchesByFilter("*").size()>0) and (l1.triggerObjectMatchesByFilter("*").size()>0):
+      #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size())
+      #print "filter_1 *", (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())
+      #print "(l2.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*) size", (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size())
+      #print "filter_2 *", (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())
+      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()>0):
         return True
         
   return False
