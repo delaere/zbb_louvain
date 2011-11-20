@@ -82,11 +82,11 @@ class LeptonsReWeighting:
                                    [[(1.00509,0.005), (0.993324,0.005)], 
                                     [(1.04163,0.005), (1.032000,0.006)]])
      self._elePidWeight_A2 = PtEtaMap([50],[0.8, 1.44, 2.0],
-                                   [[(1.004,0.005), (1.009,0.005), (1.009,0.005), (1.044,0.006)], 
-                                    [(1.009,0.005), (1.001,0.005), (1.014,0.007), (1.033,0.009)]])
+                                   [[(0.9822,0.004), (0.9738,0.004), (0.9432,0.004), (0.9024,0.007)], 
+                                    [(0.9952,0.002), (0.9661,0.028), (0.9512,0.006), (0.8801,0.018)]])
      self._eleIsoWeight_A2 = PtEtaMap([50],[1.6],
-                                   [[(1.025,0.005), (1.022,0.005)], 
-                                    [(1.011,0.005), (1.051,0.006)]])
+                                   [[(0.8253,0.002), (0.7638,0.003)], 
+                                    [(0.9012,0.003), (0.8589,0.008)]])
      self._ele17TrgWeight_A1 = PtEtaMap([],[0.8, 1.6],
                                         [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
      self._ele8TrgWeight_A1  = PtEtaMap([],[0.8, 1.6],
@@ -125,6 +125,8 @@ class LeptonsReWeighting:
                         self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A2 [(e2.pt(),e2.eta())][0]- \
                         self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2[(e2.pt(),e2.eta())][0]
      lw = (0.5*pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)+(0.5*pid_sf_run2011A2*iso_sf_run2011A2*hlt_sf_run2011A2)
+     #lw = (pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)
+     
      return lw
 
    def weight_mm(self,m1,m2):
