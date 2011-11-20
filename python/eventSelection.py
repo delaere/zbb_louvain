@@ -314,7 +314,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber):
     ROOT.SetOwnership( Daugh2, False )
     case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber) 
     case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber)
-    print "isTriggerMatchZcandidate decisions: ", case1, case2
+    #print "isTriggerMatchZcandidate decisions: ", case1, case2
     return (case1 or case2)
     #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber) or isTriggerMatchPair(Daugh2,Daugh1,runNumber))
   else:
@@ -324,23 +324,25 @@ def isTriggerMatchPair(l1,l2,runNumber):
     
   if l1.isMuon() :
     print "Muons"
+    print "run number", runNumber
     if runNumber>=160410 and runNumber<163269 :
-      print "l1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
+      #print "l1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size()>0) :
         return True
     
     if runNumber>=163269 and runNumber<165121 :
-      print "l1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
+      #print "l1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size()>0):
         return True
         
     if runNumber >= 165121 :
-      print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
-      print "l1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-      print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
-      print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
-      print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-      if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",1,0).size()>0) and (l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0 or l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
+      #print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+      #print "l1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+      #print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+      #print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
+
+      if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size()>0) and ((l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
         return True
       
   if l1.isElectron() :
