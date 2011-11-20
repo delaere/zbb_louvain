@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+#from ROOT import EColor
 
 class EColor:
  """ROOT colors taken from RTypes.h"""
@@ -19,7 +20,7 @@ class EColor:
  kPink   = 900 
 
 palette=-7
-
+print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
@@ -27,45 +28,71 @@ process.CombinePlots = cms.PSet(
 
   data = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('May10ReReco_204pb.root')
+    fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/May10ReReco/MU/Mu_ReRecoMay10_ControlPlots_all.root')
    ), 
    cms.PSet(
-     fileName = cms.string('PromptRecoV4_1078pb.root')
-   ) 
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/PromptRecoV4/MU/Mu_PromptV4_ControlPlots_all.root')
+   ), 
+   cms.PSet(
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/Aug05ReReco/MU/Mu_Aug05ReReco_ControlPlots_all.root')
+   ),
+   cms.PSet(
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/PromptRecoV6/MU/Mu_PromptV6_ControlPlots_all.root')
+   ),
+
+   cms.PSet(
+    fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/May10ReReco/ELE/Ele_ReRecoMay10_ControlPlots_all.root')
+   ), 
+   cms.PSet(
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/PromptRecoV4/ELE/Ele_PromptV4_ControlPlots_all.root')
+   ), 
+   cms.PSet(
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/Aug05ReReco/ELE/Ele_Aug05ReReco_ControlPlots_all.root')
+   ),
+   cms.PSet(
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/PromptRecoV6/ELE/Ele_PromptV6_ControlPlots_all.root')
+   )   
   ),
   mc   = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('TTJets_Summer11.root'),
+     fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/TTJets/TTJets_ControlPlots_all.root'),
      #color = cms.uint32(5),
      color = cms.uint32(EColor.kYellow+palette),
-     scale = cms.double(168.*1090./((21./25.)*3701947.)), #NLO MCFM
+     scale = cms.double(168.*2130./(3701947.)), #NLO MCFM
+     #scale = cms.double(168.*1090./((21./25.)*3701947.)), #NLO MCFM
      #scale = cms.double(0.0045916), #NLO MCFM
      role = cms.string('t#bar{t}')
    ),
    cms.PSet(
-     fileName = cms.string('Zb_fromDYJets_Summer11.root'),
+    #fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/TTJets/TTJets_ControlPlots_all.root'),
+    fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/Zb/Zb_fromDYJets_Summer11_ControlPlots_all.root'),
      #color = cms.uint32(2),
      color = cms.uint32(EColor.kRed+palette),
-     scale = cms.double(3048.*1090./30008836.), #NLO MCFM
+     scale = cms.double(3048.*2130./36257961.), #NLO MCFM
+     #scale = cms.double(3048.*1090./30008836.), #NLO MCFM
      #scale = cms.double(0.0355249), #NLO MCFM
      role = cms.string('Z+b')
    ), 
    cms.PSet(
-     fileName = cms.string('Zc_fromDYJets_Summer11.root'),
-     #color = cms.uint32(3),
+    #fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/TTJets/TTJets_ControlPlots_all.root'),
+    fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/Zc/Zc_fromDYJets_Summer11_ControlPlots_all.root'),     
+    #color = cms.uint32(3),
      color = cms.uint32(EColor.kGreen+palette),
-     scale = cms.double(3048.*1090./30008836.), #NLO MCFM
+     scale = cms.double(3048.*2130./36257961.), #NLO MCFM
+     #scale = cms.double(3048.*1090./30008836.), #NLO MCFM
      #scale = cms.double(0.0365163), #NLO MCFM
      role = cms.string('Z+c')
    ), 
    cms.PSet(
-     fileName = cms.string('Zl_fromDYJets_Summer11.root'),
+    #fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/TTJets/TTJets_ControlPlots_all.root'),
+    fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/Control_Plots_2fb/Zl/Zl_fromDYJets_Summer11_ControlPlots_all.root'),
      #color = cms.uint32(4),
      color = cms.uint32(EColor.kBlue+palette),
-     scale = cms.double(3048.*1090./30008836.), #NNLO
+     scale = cms.double(3048.*2130./36257961.), #NLO MCFM
+     #scale = cms.double(3048.*1090./30008836.), #NNLO
      #scale = cms.double(0.0207567), #NNLO
      role = cms.string('Z+l')
-   ),
+   ), 
   ),
   options = cms.PSet (
       nostack = cms.untracked.bool(False)
