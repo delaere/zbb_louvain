@@ -75,26 +75,20 @@ class LeptonsReWeighting:
      self.zmuHandle_  = Handle ("vector<reco::CompositeCandidate>")
      self.zeleHandle_ = Handle ("vector<reco::CompositeCandidate>")
      # the efficiency maps
-     self._elePidWeight_A1 = PtEtaMap([50],[0.8, 1.44, 2.0],
-                                   [[(0.9890,0.005), (0.993601,0.005), (0.974384,0.005), (1.00543,0.005)], 
-                                    [(0.9351,0.005), (1.006160,0.007), (0.937660,0.006), (1.01478,0.009)]])
-     self._eleIsoWeight_A1 = PtEtaMap([50],[1.6],
-                                   [[(1.00509,0.005), (0.993324,0.005)], 
-                                    [(1.04163,0.005), (1.032000,0.006)]])
-     self._elePidWeight_A2 = PtEtaMap([50],[0.8, 1.44, 2.0],
-                                   [[(0.9822,0.004), (0.9738,0.004), (0.9432,0.004), (0.9024,0.007)], 
-                                    [(0.9952,0.002), (0.9661,0.028), (0.9512,0.006), (0.8801,0.018)]])
-     self._eleIsoWeight_A2 = PtEtaMap([50],[1.6],
-                                   [[(0.8253,0.002), (0.7638,0.003)], 
-                                    [(0.9012,0.003), (0.8589,0.008)]])
+     self._elePidWeight_A = PtEtaMap([50],[0.8, 1.44, 2.0],
+                                   [[(1.002,0.006), (1.001,0.007), (1.009,0.008), (1.008,0.010)], 
+                                    [(1.004,0.005), (0.984,0.029), (0.993,0.009), (0.944,0.020)]])
+     self._eleIsoWeight_A = PtEtaMap([50],[1.6],
+                                   [[(1.004,0.006), (1.043,0.007)], 
+                                    [(0.988,0.006), (1.013,0.012)]])
      self._ele17TrgWeight_A1 = PtEtaMap([],[0.8, 1.6],
                                         [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
      self._ele8TrgWeight_A1  = PtEtaMap([],[0.8, 1.6],
                                         [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
      self._ele17TrgWeight_A2 = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.9905,0.0005), (0.9892,0.0006), (0.9892,0.0008)]])
+                                        [[(0.990,0.001), (0.989,0.001), (0.989,0.001)]])
      self._ele8TrgWeight_A2  = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.9907,0.0005), (0.9893,0.0006), (0.9894,0.0009)]])
+                                        [[(0.991,0.001), (0.989,0.001), (0.989,0.001)]])
      
      self._muPidWeight  = PtEtaMap([50],[1.2],
                                    [[(0.995,0.004), (0.993,0.004)], 
@@ -112,11 +106,9 @@ class LeptonsReWeighting:
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
      # particle id
-     pid_sf_run2011A1 = self._elePidWeight_A1[(e1.pt(),e1.eta())][0]*self._elePidWeight_A1[(e2.pt(),e2.eta())][0]
-     pid_sf_run2011A2 = self._elePidWeight_A2[(e1.pt(),e1.eta())][0]*self._elePidWeight_A2[(e2.pt(),e2.eta())][0]
+     pid_sf_run2011A = self._elePidWeight_A[(e1.pt(),e1.eta())][0]*self._elePidWeight_A[(e2.pt(),e2.eta())][0]
      # isolation
-     iso_sf_run2011A1 = self._eleIsoWeight_A1[(e1.pt(),e1.eta())][0]*self._eleIsoWeight_A1[(e2.pt(),e2.eta())][0]
-     iso_sf_run2011A2 = self._eleIsoWeight_A2[(e1.pt(),e1.eta())][0]*self._eleIsoWeight_A2[(e2.pt(),e2.eta())][0]
+     iso_sf_run2011A = self._eleIsoWeight_A[(e1.pt(),e1.eta())][0]*self._eleIsoWeight_A[(e2.pt(),e2.eta())][0]
      # trigger
      hlt_sf_run2011A1 = self._ele8TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A1 [(e2.pt(),e2.eta())][0]+ \
                         self._ele17TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A1 [(e2.pt(),e2.eta())][0]- \
@@ -124,8 +116,8 @@ class LeptonsReWeighting:
      hlt_sf_run2011A2 = self._ele8TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2 [(e2.pt(),e2.eta())][0]+ \
                         self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A2 [(e2.pt(),e2.eta())][0]- \
                         self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2[(e2.pt(),e2.eta())][0]
-     lw = (0.5*pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)+(0.5*pid_sf_run2011A2*iso_sf_run2011A2*hlt_sf_run2011A2)
-     #lw = (pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)
+     #lw = (0.5*pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)+(0.5*pid_sf_run2011A2*iso_sf_run2011A2*hlt_sf_run2011A2)
+     lw = (pid_sf_run2011A*iso_sf_run2011A*0.5*(hlt_sf_run2011A1+hlt_sf_run2011A2))
      
      return lw
 
