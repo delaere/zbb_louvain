@@ -188,7 +188,9 @@ class JetmetControlPlots(BaseControlPlots):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,-10,10)
+      self.add("nVertHE","Number of two-tracks vertices in jets",5,-0.5,4.5)
       self.add("SSVHPdisc","SSVHPdisc",200,-10,10)
+      self.add("nVertHP","Number of three-tracks vertices in jets",5,-0.5,4.5)
       self.add("SVmass","SVmass",20,0,5)
       self.add("TCHEdisc","TCHEdisc",200,-10,10)
       self.add("TCHPdisc","TCHPdisc",200,-10,10)
@@ -212,7 +214,9 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet1eta","leading jet Eta",25,0,2.5)
       self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
       self.add("jet1SSVHEdisc","leading jet SSVHE discriminant",200,-10,10)
+      self.add("jet1nVertHE","Number of two-tracks vertices in leading jet",5,-0.5,4.5)
       self.add("jet1SSVHPdisc","leading jet SSVHP discriminant",200,-10,10)
+      self.add("jet1nVertHP","Number of three-tracks vertices in leading jet",5,-0.5,4.5)
       self.add("jet1SVmass","leading jet SV mass",20,0,5)
       self.add("jet1TCHEdisc","leading jet TCHE discriminant",200,-10,10)
       self.add("jet1TCHPdisc","leading jet TCHP discriminant",200,-10,10)
@@ -222,7 +226,9 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet2eta","subleading jet Eta",25,0,2.5)
       self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
       self.add("jet2SSVHEdisc","subleading jet SSVHE discriminant",200,-10,10)
+      self.add("jet2nVertHE","Number of two-tracks vertices in subleading jet",5,-0.5,4.5)
       self.add("jet2SSVHPdisc","subleading jet SSVHP discriminant",200,-10,10)
+      self.add("jet2nVertHP","Number of two-tracks vertices in subleading jet",5,-0.5,4.5)
       self.add("jet2SVmass","subleading jet SV mass",20,0,5)
       self.add("jet2TCHEdisc","subleading jet TCHE discriminant",200,-10,10)
       self.add("jet2TCHPdisc","subleading jet TCHP discriminant",200,-10,10)
@@ -232,7 +238,9 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.add("bjet1SSVHEdisc","leading bjet SSVHE discriminant",200,-10,10)
+      self.add("bjet1nVertHE","Number of two-tracks vertices in leading bjet",5,-0.5,4.5)
       self.add("bjet1SSVHPdisc","leading bjet SSVHP discriminant",200,-10,10)
+      self.add("bjet1nVertHP","Number of three-tracks vertices in leading bjet",5,-0.5,4.5)
       self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
       self.add("bjet1TCHEdisc","leading bjet TCHE discriminant",200,-10,10)
       self.add("bjet1TCHPdisc","leading bjet TCHP discriminant",200,-10,10)
@@ -242,7 +250,9 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.add("bjet2SSVHEdisc","subleading bjet SSVHE discriminant",200,-10,10)
+      self.add("bjet2nVertHE","Number of two-tracks vertices in subleading bjet",5,-0.5,4.5)
       self.add("bjet2SSVHPdisc","subleading bjet SSVHP discriminant",200,-10,10)
+      self.add("bjet2nVertHP","Number of three-tracks vertices in subleading bjet",5,-0.5,4.5)
       self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
       self.add("bjet2TCHEdisc","subleading bjet TCHE discriminant",200,-10,10)
       self.add("bjet2TCHPdisc","subleading bjet TCHP discriminant",200,-10,10)
@@ -284,6 +294,8 @@ class JetmetControlPlots(BaseControlPlots):
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
+      result["nVertHE"] = [ ]
+      result["nVertHP"] = [ ]
       result["SVmass"] = [ ]
       result["SSVHEmass"] = [ ]
       result["SSVHPmass"] = [ ]
@@ -339,9 +351,15 @@ class JetmetControlPlots(BaseControlPlots):
           result["SSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
 	  tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
+          nHEvert = 0
+          nHPvert = 0
 	  if tISV :
+            nHEvert = tISV.nVertices()
+            nHPvert = sum( tISV.nVertexTracks(v) >=3 for v in range(nHEvert))
 	    if tISV.secondaryVertex(0) :
 	      result["SVmass"].append(tISV.secondaryVertex(0).p4().mass())
+          result["nVertHE"].append(nHEvert)
+          result["nVertHP"].append(nHPvert)
           result["TCHEdisc"].append(jet.bDiscriminator("trackCountingHighEffBJetTags"))
           result["TCHPdisc"].append(jet.bDiscriminator("trackCountingHighPurBJetTags"))
 	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
@@ -358,6 +376,8 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet1etapm"] = jet.eta()
             result["jet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
             result["jet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+            result["jet1nVertHE"] = nHEvert
+            result["jet1nVertHP"] = nHPvert
 	    if tISV :
 	      if tISV.secondaryVertex(0) :
 	        result["jet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
@@ -371,6 +391,8 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2etapm"] = jet.eta()
             result["jet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
             result["jet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+            result["jet2nVertHE"] = nHEvert
+            result["jet2nVertHP"] = nHPvert
 	    if tISV :
 	      if tISV.secondaryVertex(0) :
 	        result["jet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
@@ -386,6 +408,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1etapm"] = jet.eta()
               result["bjet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["bjet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+              result["bjet1nVertHE"] = nHEvert
+              result["bjet1nVertHP"] = nHPvert
 	      if tISV :
 	        if tISV.secondaryVertex(0) :
 	          result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
@@ -405,6 +429,8 @@ class JetmetControlPlots(BaseControlPlots):
 	          result["bjet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
               result["bjet2TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
               result["bjet2TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
+              result["bjet2nVertHE"] = nHEvert
+              result["bjet2nVertHP"] = nHPvert
           if isBJet(jet,"HP",self.btagging): nbP += 1
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP
