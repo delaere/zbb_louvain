@@ -116,9 +116,7 @@ def isTightMuon(muon):
     ROOT.SetOwnership( mu, False ) 
   else:
     mu = muon
-  isMatched = mu.triggerObjectMatches().size()>0
-  # don't impose matching for tight muons because the trigger -> should now be in the PAT anyway.
-  #isMatched = True
+  isMatched = True # no need anymore: this is done in PAT and complemented by the trigger check at step 1.
 
   return (isLooseMuon(muon) and isMatched)
 
@@ -170,8 +168,7 @@ def isTightElectron(electron):
   isID85 = el.electronID("simpleEleId85relIso")== 7  
   isEta = abs(el.eta())< 2.5  
   isdB = abs(el.dB())< 0.02 
-  isMatched = el.triggerObjectMatches().size()>0
-  #isMatched = True # for MC and data: now matching is enforced directly in the PAT. temporary correction due to PAT error
+  isMatched = True # no need anymore: this is done in PAT and complemented by the trigger check at step 1.
   superclusterEta = abs(el.superCluster().eta())
   fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
 
