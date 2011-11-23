@@ -1,5 +1,14 @@
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TH1F.h"
+#include "THStack.h"
+#include "TROOT.h"
 #include "TStyle.h"
 #include "TPad.h"
+#include "TLatex.h"
+#include "TFrame.h"
+#include <string>
+
 void setTDRStyle() {
   // For the canvas:
   gStyle->SetCanvasBorderMode(0);
@@ -150,14 +159,14 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   TH1F* data = NULL;
   TObject* obj = NULL;
   while ((obj = next())) {
-    if(string(obj->GetName())==string(canvas->GetName()) && obj->InheritsFrom("TH1")) {
+    if(std::string(obj->GetName())==std::string(canvas->GetName()) && obj->InheritsFrom("TH1")) {
       data = (TH1F*)obj;
     }
-    if(string(obj->GetName())==string(canvas->GetName()) && obj->InheritsFrom("THStack")) {
+    if(std::string(obj->GetName())==std::string(canvas->GetName()) && obj->InheritsFrom("THStack")) {
       mc = new TIter(((THStack*)obj)->GetHists());
     }
   }
-  TH1F* histo_ratio = data ? data->Clone() : NULL;
+  TH1F* histo_ratio = (TH1F*)(data ? data->Clone() : NULL);
   TH1F* totmc = NULL;
   if(mc) {
     while ((obj = mc->Next())) {
@@ -177,10 +186,24 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   histo_ratio->SetTitle("");
   histo_ratio->Sumw2();
   histo_ratio->Divide(totmc);
+  // set ratio to 1 for empty bins
+  //for(int i=0;i<=histo_ratio->GetNbinsX();++i) {
+  //  if(histo_ratio->GetBinContent(i)==0) {
+  //    histo_ratio->SetBinContent(i,1);
+  //    histo_ratio->SetBinError(i,0);
+  //  }
+  //}
   // create the uncertainty histogram
   TH1F* mc_uncertainty = (TH1F*)totmc->Clone();
   //for(unsigned bin = 0; bin<=mc_uncertainty->GetNbinsx(); ++bin) mc_uncertainty->SetBinContent(mc_uncertainty->GetBinError());
   mc_uncertainty->Divide(totmc);
+  // set uncertainty to 0 for empty bins
+  for(int i=0;i<=mc_uncertainty->GetNbinsX();++i) {
+    if(mc_uncertainty->GetBinContent(i)==0) {
+      mc_uncertainty->SetBinContent(i,1);
+      mc_uncertainty->SetBinError(i,0);
+    }
+  }
   // create a new canvas with two pads
   TCanvas* c = new TCanvas(Form("%s_withRatio",canvas->GetName()),Form("%s with ratio",canvas->GetTitle()),500,640);
   TPad *canvas_1 = new TPad("canvas_1", canvas->GetTitle(),0,0.22,1.0,1.0);

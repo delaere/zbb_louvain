@@ -21,6 +21,7 @@
 #include <TKey.h>
 #include <TStyle.h>
 #include <TLegend.h>
+#include <DrawCanvas.C>
 
 // this is a class to publish the content of ROOT files (histograms) on the web. 
 // It extracts plots from the input files, uses diowGenerator to generate web pages, 
@@ -158,9 +159,11 @@ class wwwPublisher
 {
   public:
     wwwPublisher():menu(NULL) {}
-    ~wwwPublisher() {}
+    virtual ~wwwPublisher() {}
     void traverseDir(TDirectory* datadir, const char* outpath);
     void finishPage(const char* path) { createFrames(path); addMenuFooter(); }
+  protected:
+    virtual TCanvas* format(TCanvas* h) { return h; } 
   private:
     void dumpHisto(TCanvas* h,const char* outpath, diowGenerator* generator = NULL);
     void createMenuHeader(const char* path);
@@ -184,7 +187,7 @@ void wwwPublisher::traverseDir(TDirectory* datadir, const char* outpath)
    generator.setUsername("zbb_louvain");
    generator.setTitle("Control plots");
    generator.createWebpage(outpath,"diow.html");
-   addMenuItem(datadir->GetName(), outpath);
+   addMenuItem(datadir->GetTitle(), outpath);
    char buffer[1024];
 
    TList* keys = datadir->GetListOfKeys();
@@ -220,7 +223,7 @@ void wwwPublisher::dumpHisto(TCanvas* h,const char* outpath, diowGenerator* gene
      legend->SetBorderSize(1);
    }
    sprintf(buffer,"%s/%s.png",outpath,h->GetName());
-   h->SaveAs(buffer);
+   format(h)->SaveAs(buffer);
    //sprintf(buffer,"%s/%s.eps",outpath,h->GetName());
    //h->SaveAs(buffer);
    if(generator) {
@@ -291,6 +294,22 @@ void wwwPublisher::createFrames(const char* path)
    outfile.close();
 }
 
+class wwwPublisherWithRatio: public wwwPublisher
+{
+  public:
+    wwwPublisherWithRatio():wwwPublisher() {}
+    virtual ~wwwPublisherWithRatio() {}
+  protected:
+    virtual TCanvas* format(TCanvas* h); 
+};
+
+TCanvas* wwwPublisherWithRatio::format(TCanvas* h)
+{
+  //DrawCanvas(h);
+  //return DrawCanvasWithRatio(h);
+  return h;
+}
+
 void publish(const char* inputFile, const char* outputPath) {
   // input File
   TFile* input = TFile::Open(inputFile);
@@ -299,7 +318,7 @@ void publish(const char* inputFile, const char* outputPath) {
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
   // do the job
-  wwwPublisher publisher;
+  wwwPublisherWithRatio publisher;
   publisher.traverseDir(input,outputPath);
   publisher.finishPage(outputPath); // here we finish everything.
   // note that we could call traverseDir more than once, with different outputPath.
