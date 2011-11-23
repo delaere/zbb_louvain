@@ -8,12 +8,13 @@ void skimPlots(TFile* f_in, TFile* f_out)
 {
   std::vector<std::pair<std::string, std::string> > plots;
   // list of plots to keep
-  //plots.push_back(std::make_pair(std::string("figure1a"),std::string("/Combined/stage_4/jetmetAK5PF/Nvertjet")));
+  plots.push_back(std::make_pair(std::string("figure1a"),std::string("/Combined/stage_4/selection/bjet1n_vert")));
   plots.push_back(std::make_pair(std::string("figure1b"),std::string("/Combined/stage_4/jetmetAK5PF/SSVHPdisc")));
-  plots.push_back(std::make_pair(std::string("figure2"),std::string("/Combined/stage_6/selection/bestzmass")));
-  plots.push_back(std::make_pair(std::string("figure3a"),std::string("/Combined/stage_6/selection/bestzpt")));
-  plots.push_back(std::make_pair(std::string("figure3b"),std::string("/Combined/stage_6/selection/bjet1pt")));
-  plots.push_back(std::make_pair(std::string("figure3c"),std::string("/Combined/stage_6/selection/dphiZbj1")));
+  plots.push_back(std::make_pair(std::string("figure1b_prime"),std::string("/Combined/stage_4/jetmetAK5PF/SSVHPdiscJet1")));
+  plots.push_back(std::make_pair(std::string("figure2a"),std::string("/Combined/stage_6/selection/bestzmass")));
+  plots.push_back(std::make_pair(std::string("figure2b"),std::string("/Combined/stage_6/selection/bestzpt")));
+  plots.push_back(std::make_pair(std::string("figure3a"),std::string("/Combined/stage_6/selection/bjet1pt")));
+  plots.push_back(std::make_pair(std::string("figure3b"),std::string("/Combined/stage_6/selection/dphiZbj1")));
   std::vector<std::pair<std::string, std::string> >::const_iterator plots_iterator = plots.begin();
   for(;plots_iterator<plots.end();plots_iterator++) {
     f_out->cd();
