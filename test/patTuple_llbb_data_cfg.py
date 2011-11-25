@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.5 $'),
+    version = cms.untracked.string('$Revision: 1.6 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_data_cfg.py,v $')
 )
@@ -27,7 +27,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 
 removeMCMatching(process, ['All'])
 
-# scrapingveto:
+# scrapingveto: not use danymore
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                     applyfilter = cms.untracked.bool(True),
                                     debugOn = cms.untracked.bool(False),
@@ -40,21 +40,22 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
 
 # electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
 
-muontriggers      = cms.vstring("HLT_DoubleMu6_v*",
-                                "HLT_DoubleMu7_v*"
-                                ,"HLT_Mu13_Mu8_V*"
+muontriggers      = cms.vstring("HLT_DoubleMu6_v*"
+                                ,"HLT_DoubleMu7_v*"
+                                ,"HLT_Mu13_Mu8_v*"
                                 )
 
-electrontriggers  = cms.vstring(#"HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*",
-                                 "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
-                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
+electrontriggers  = cms.vstring(#"HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*"
+                                 "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*"
+                                 ,"HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"
+                                 ,"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
 
 alltriggers       = muontriggers + electrontriggers
 
 process.hlt = cms.EDFilter( "TriggerResultsFilter",
                             triggerConditions = alltriggers ,
-                            #triggerConditions = cms.vstring("HLT_*"),         #test
-                            hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+                            #triggerConditions = cms.vstring("HLT_*"),            #test
+                            hltResults = cms.InputTag( "TriggerResults","","HLT"),
                             l1tResults = cms.InputTag( "gtDigis" ),
                             l1tIgnoreMask = cms.bool( False ),
                             l1techIgnorePrescales = cms.bool( False ),
@@ -90,13 +91,14 @@ defaultTriggerMatch = cms.EDProducer(
 process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatMuons" )
         #, matchedCuts = cms.string('path("HLT_DoubleMu6_v*")|| path("HLT_DoubleMu7_v*")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")')   
-        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*", 1, 0) || filter("hltDiMuonL3PreFiltered6") || path("HLT_DoubleMu7_v*", 1, 0) || filter("hltDiMuonL3PreFiltered7") || path("HLT_Mu13_Mu8_v*", 1, 0) || filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")')
+        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*",0,0) || path("HLT_DoubleMu7_v*",0,0) || path("HLT_Mu13_Mu8_v*",0,1)')
         )
+#Names of filters to require offline : || filter("hltDiMuonL3PreFiltered6")  || filter("hltDiMuonL3PreFiltered7")|| filter("hltSingleMu13L3Filtered13") || filter("hltDiMuonL3PreFiltered8")||filter("hltDiMuonL3p5PreFiltered8")
 
 process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
         src         = cms.InputTag( "selectedPatElectrons" )
         #, matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")')
-        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",1,0)||filter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter")|| path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0)||filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")')
+        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0) || path("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1) || path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1)')
 )
 
 # trigger object embedders for the same collections
@@ -204,7 +206,7 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
                                                  #' trackIso < 3 &'                                     # VBTF choice
                                                  'pt > 20 &'
                                                  'abs(eta) < 2.1 &'
-                                                 'triggerObjectMatches.size > 0'                        # Trigger Match DeltaR and DeltapT/pT to be really tight
+                                                 'triggerObjectMatches.size > 0'                        
                                                  )
 
 process.matchedMuons.src = "selectedMuonsMatched"
@@ -466,9 +468,9 @@ process.patDefaultSequence *= process.embb
 
 # Run it
 
-process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZMuMuFilter)
-process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZEEFilter)
-process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.EMUFilter)
+process.p1 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZMuMuFilter)
+process.p2 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.ZEEFilter)
+process.p3 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.EMUFilter)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
 
@@ -527,7 +529,7 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 
 process.source.fileNames = [
-    #"file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleMu_AOD_May10ReReco-v1.root"
+    "file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleMu_AOD_May10ReReco-v1.root"
     #"file:/home/fynu/lceard/storage/test_patTuple_2fb_251011/Run2011A_DoubleElectron_AOD_May10ReReco-v1.root"
     #"file:/storage/data/cms/users/lceard/test/MC_test_ZJetToMuMuPt-50to80_TuneZ2.root"
     #"file:/home/fynu/lceard/storage/dilep_events/dileptons_RECO.root"
@@ -545,13 +547,12 @@ process.maxEvents.input = -1
 #process.out.fileName = 'crab_Electron_03Oct2011_v1.root'
 #process.out.fileName = 'crab_Mu_03Oct2011_v1.root'
 
-#process.out.fileName = 'PAT_DoubleMu_May10ReReco.root'
-
+process.out.fileName = 'PAT_DoubleMu_May10ReReco.root'
 #process.out.fileName = 'PAT_DoubleEle_May10ReReco.root'
 #process.out.fileName = 'PAT_DoubleEle_Prompt_v4.root'
 #process.out.fileName = 'PAT_DoubleEle_05AugReReco.root'
 #process.out.fileName = 'PAT_DoubleEle_Prompt_v6.root'
 #process.out.fileName = 'DoubleMu_Run2011B_PromptReco_v1.root'
-process.out.fileName =  'DoubleEle_Run2011B_PromptReco_v1.root'
+#process.out.fileName =  'DoubleEle_Run2011B_PromptReco_v1.root'
 
 process.options.wantSummary = True
