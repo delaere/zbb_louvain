@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/patTuple_llbb_MC_cfg.py,v $')
 )
@@ -29,87 +29,13 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 
 #removeMCMatching(process, ['All'])
 
-# scrapingveto:
+# scrapingveto: not used anymore
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                     applyfilter = cms.untracked.bool(True),
                                     debugOn = cms.untracked.bool(False),
                                     numtrack = cms.untracked.uint32(10),
                                     thresh = cms.untracked.double(0.2)
                                     )
-
-#---------------------------- Trigger
-#------------------------------------------------------------------------------------------------------------------------------------------------
-
-# electron triggers are taken according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/VbtfZeeBaselineSelection
-
-muontriggers      = cms.vstring("HLT_DoubleMu6_v*",
-                                "HLT_DoubleMu7_v*"
-                                ,"HLT_Mu13_Mu8_V*"
-                                )
-
-electrontriggers  = cms.vstring(#"HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*",
-                                  "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
-                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
-
-
-alltriggers       = muontriggers + electrontriggers
-
-process.hlt = cms.EDFilter( "TriggerResultsFilter",
-                            triggerConditions = alltriggers ,
-                            #triggerConditions = cms.vstring("HLT_*"),         #test
-                            hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
-                            l1tResults = cms.InputTag( "gtDigis" ),
-                            l1tIgnoreMask = cms.bool( False ),
-                            l1techIgnorePrescales = cms.bool( False ),
-                            daqPartitions = cms.uint32( 1 ),
-                            throw = cms.bool( False )
-                          )
-
-# compute weight from prescale
-process.WeightFromTrigger = cms.EDProducer('WeightFromTrigger',
-    HLTLabel = cms.InputTag("TriggerResults::HLT"),
-    UseCombinedPrescales = cms.bool(False),
-    TriggerNames = alltriggers 
-)
-
-# add trigger information (trigTools)
-from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger(process)
-
-# trigger matchers for various collections
-
-# base matcher to define default values
-defaultTriggerMatch = cms.EDProducer(
-  "PATTriggerMatcherDRDPtLessByR"                                               # match by DeltaR only, best match by DeltaR
-, src     = cms.InputTag( "selectedPatMuons" )
-, matched = cms.InputTag( "patTrigger" )                                        # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
-, matchedCuts = cms.string( 'path( "HLT_DoubleMu6_v*" )' )
-, maxDPtRel = cms.double( 0.5 )
-, maxDeltaR = cms.double( 0.3 )
-, resolveAmbiguities    = cms.bool( True )                                      # only one match per trigger object
-, resolveByMatchQuality = cms.bool( True )                                      # take best match found per reco object: by DeltaR here (s. above)
-)
-
-process.selectedMuonsTriggerMatch = defaultTriggerMatch.clone(
-        src         = cms.InputTag( "selectedPatMuons" )
-        , matchedCuts = cms.string('path("HLT_DoubleMu6_v*")')
-)
-
-process.selectedElectronsTriggerMatch = defaultTriggerMatch.clone(
-        src         = cms.InputTag( "selectedPatElectrons" )
-        , matchedCuts = cms.string('path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*")|| path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v*")')
-)
-
-# trigger object embedders for the same collections
-process.selectedMuonsMatched = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-        src     = cms.InputTag(  "selectedPatMuons" ),
-        matches = cms.VInputTag( cms.InputTag('selectedMuonsTriggerMatch') )
-    )
-
-process.selectedElectronsMatched = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
-        src     = cms.InputTag(  "selectedPatElectrons" ),
-        matches = cms.VInputTag( cms.InputTag('selectedElectronsTriggerMatch') )
-    )
 
 #---------------------------- MET
 #------------------------------------------------------------------------------------------------------------------------------------------------
@@ -204,7 +130,7 @@ process.matchedMuons = process.cleanPatMuons.clone(preselection =
                                                  #' trackIso < 3 &'                                    # VBTF choice
                                                  'pt > 20 &'
                                                  'abs(eta) < 2.1 '
-                                                 #'triggerObjectMatches.size > 0'                      # Trigger Match DeltaR and DeltapT/pT to be really tight
+                                                 #'triggerObjectMatches.size > 0'                      #NO trigger for MC
                                                  )
 
 #process.matchedMuons.src = "selectedMuonsMatched"
@@ -465,9 +391,9 @@ process.patDefaultSequence *= process.embb
 
 # Run it
 
-process.p1 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
-process.p2 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
-process.p3 = cms.Path(process.scrapingVeto *process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
+process.p1 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.mutrigger *process.ZMuMuFilter)
+process.p2 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.eltrigger *process.ZEEFilter)
+process.p3 = cms.Path(process.kt6PFJets *process.ak5PFJets *process.patElectronIDs *process.patElectronIsolation *process.patDefaultSequence *process.emutriggerp1 *process.emutriggerp2 * process.EMUFilter)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2', 'p3'))
 
@@ -515,11 +441,11 @@ tokeep_clean += [
                  'keep *_goodPV*_*_*',
                  'keep *_electronGsfTracks*_*_*',
                  
+                 'keep GenEventInfoProduct_generator_*_*',     #for the weight info
                  'keep *_addPileupInfo_*_*']
 
 # B-Tagging: is this needed ?
 tokeep_clean += ['keep *_simpleSecondaryVertex*BJetTags*_*_PAT', 'keep *_trackCounting*BJetTags*_*_PAT']
-
 
 process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 # process.out.outputCommands = cms.untracked.vstring( 'keep *' )
@@ -527,14 +453,14 @@ process.out.outputCommands = cms.untracked.vstring('drop *', *tokeep_clean )
 
 process.source.fileNames = [
     #"file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
-    #"file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
+    "file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
     #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
     ]                                     
 
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 
 #process.out.fileName = 'LocalTest_MC_DYToMuMu.root'
-#process.out.fileName = 'TTjets_LocalTest_MC.root'
+process.out.fileName = 'TTjets_LocalTest_MC.root'
 #process.out.fileName = 'DYjets_LocalTest_MC.root'
 
 #process.out.fileName = 'DYJetsToLL.root'
@@ -542,6 +468,6 @@ process.maxEvents.input = -1
 
 #process.out.fileName = '2HDM.root'
 
-process.out.fileName = 'crab_ZbbToLL.root'
+#process.out.fileName = 'crab_MCatNLO.root'
 
 process.options.wantSummary = False
