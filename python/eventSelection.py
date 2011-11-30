@@ -9,12 +9,11 @@ def selectedTriggers(triggerInfo):
               
   paths = map(lambda trigger: triggerInfo.path(trigger),triggers)
   def isFired(path):
-    if not path is None: 
-      path.wasAccept() # error ReferenceError: attempt to access a null-pointer..... should change name
+    if not not path : 
+      return path.wasAccept()
     else: 
-      False
-  pathout = map(lambda path:isFired(path),paths)
-  return pathout
+      return False
+  return map(lambda path:isFired(path),paths)
 
 def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
   """Checks if the proper trigger is passed"""

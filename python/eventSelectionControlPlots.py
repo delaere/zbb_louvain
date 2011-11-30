@@ -90,6 +90,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
+      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle) 
       runNumber= event.eventAuxiliary().run()
       #print "RunNumber" , runNumber
       if self.checkTrigger:
@@ -98,11 +99,8 @@ class EventSelectionControlPlots(BaseControlPlots):
       else:
         triggerInfo = None
       ## trigger
-      #TODO: debug that plot (empty)
-      #self.h_triggerSelection.Fill(isTriggerOK(triggerInfo, self.muChannel),weight)
-      #selTriggers = selectedTriggers(triggerInfo)
-      #for trigger,triggered in enumerate(selTriggers):
-      #  if triggered : self.h_triggerBit.Fill(trigger,weight)
+      result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, self.muChannel)
+      result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
       categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, self.muChannel)
       result["category"] = [ ]
@@ -124,7 +122,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       for z in zCandidatesEle:
         result["zmassEle"].append(z.mass())
         result["zptEle"].append(z.pt())
-      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle) 
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
