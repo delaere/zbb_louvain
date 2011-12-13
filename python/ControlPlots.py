@@ -39,6 +39,8 @@ parser.add_option("--noLweight",action="store_true",dest="noLweight",
                   help="Do not reweight according to leptons.")
 parser.add_option("-w","--btagWeight", dest="BtagEffDataFileName", default=zbbfile.ssvperfData,
                   help="Read btagging efficiencies and SF from file.", metavar="file")
+parser.add_option("--NLO",action="store_true",dest="NLOWeight",
+                  help="Weight from NLO corrections .")
 parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")
 parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
@@ -72,7 +74,8 @@ zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
-
+genInfoHandle = Handle("GenEventInfoProduct")
+  
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   """Compute the event category for histogramming"""
@@ -97,7 +100,8 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
     triggerInfo = None
   return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel, btagAlgo)
 
-def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
+
+def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
@@ -120,6 +124,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
   lumiReWeightingPlots=[]
   btagReWeightingPlots=[]
   leptonsReWeightingPlots=[]
+  #nloReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -141,6 +146,8 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel))
       if handleLeptonEff:
         leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
+      #if NLOWeight:
+      #  nloReWeightingPlots.append(NloReweightingControlPlots(levelDir.mkdir("nloReWeighting"),muChannel))
 
   # inputs
   dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
@@ -169,6 +176,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
       if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
+      #if NLOWeight: nloReWeightingPlots[level].beginJob()
 
   # the PU reweighting engine
   if handlePU: 
@@ -178,7 +186,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
     BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)
   if handleLeptonEff:
     LeffW = LeptonsReWeighting()
-
+  
   # process events
   i = 0
   t0 = time.time()
@@ -220,6 +228,16 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
         if handlePU: eventWeight *= PileUp.weight(fwevent=event)
         if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event,muChannel=muChannel)
+
+        # for nlo reweighting
+        if NLOWeight :
+          event.getByLabel("generator",genInfoHandle)
+          genInfo = genInfoHandle.product()
+          #weight sign only +/-
+          eventWeight *= (genInfo.weight())/(abs(genInfo.weight()))
+          #weight
+          #eventWeight *= (genInfo.weight())
+
 	if handleBT:
           catName = categoryName(level%eventCategories())
 	  if catName.find("(HEHE") != -1:
@@ -262,6 +280,8 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
           btagReWeightingPlots[level].fill(btagReWeightingPlotsData) #no weight
         if handleLeptonEff:
           leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData) #no weight
+        #if NLOWeight :
+        #  nloReWeightingPlots[level].fill(nloReWeightingPlotsData) #no weight
     i += 1
 
   # save all
@@ -285,6 +305,8 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
        btagReWeightingPlots[level].endJob()
      if handleLeptonEff:
        leptonsReWeightingPlots[level].endJob()
+     #if NLOWeight :
+     #  nloReWeightingPlots[level].endJob()  
   output.Close()
 
 def main(options):
@@ -344,7 +366,7 @@ def main(options):
     parser.print_help()
     return
   # if all ok, run the procedure
-  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight))
+  runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight),NLOWeight=options.NLOWeight)
 
 if __name__ == "__main__":
   main(options)
