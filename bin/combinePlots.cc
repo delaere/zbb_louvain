@@ -236,8 +236,16 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      if(style!=_styleTweaks.end()) h = Rebin(h,style);
      // add
      stack->Add(h);
+     // legend: we do nothing otherwise the entries would have the wrong order (reversed)
+     //leg->AddEntry(h,mcConf->getParameter<std::string>("role").c_str(),"f");
+   }
+   std::vector<edm::ParameterSet>::const_reverse_iterator mcrConf = _mcInputs.rbegin();
+   // another loop on MC, in reverse order, to create the legend.
+   for(std::vector<TDirectory*>::const_reverse_iterator it = mcdirs.rbegin();it<mcdirs.rend();++it, ++mcrConf) {
+     TH1* h;
+     (*it)->GetObject(data->GetName(),h);
      // legend
-     leg->AddEntry(h,mcConf->getParameter<std::string>("role").c_str(),"f");
+     leg->AddEntry(h,mcrConf->getParameter<std::string>("role").c_str(),"f");
    }
    if(drawData) {
      data->Draw("e");         // first draw data... that fixes the scale
