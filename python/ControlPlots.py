@@ -240,31 +240,42 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
 
 	if handleBT:
           catName = categoryName(level%eventCategories())
+          # security against negative weights
+          #BeffW.setMode("*")
+          #if BeffW.weight(event,muChannel)<0: eventWeight=0
+          
 	  if catName.find("(HEHE") != -1:
 	    BeffW.setMode("HEHE")
-	    eventWeight *= BeffW.weight(event,muChannel)
+            if BeffW.weight(event,muChannel)<0: eventWeight=0
+            else : eventWeight *= BeffW.weight(event,muChannel)
 	  elif catName.find("(HEHP") != -1:
 	    BeffW.setMode("HEHP")
-	    eventWeight *= BeffW.weight(event,muChannel)
+	    if BeffW.weight(event,muChannel)<0: eventWeight=0
+            else :eventWeight *= BeffW.weight(event,muChannel)
 	  elif catName.find("(HPHP") != -1:
 	    BeffW.setMode("HPHP")
-	    eventWeight *= BeffW.weight(event,muChannel)
+	    if BeffW.weight(event,muChannel)<0: eventWeight=0
+            else :eventWeight *= BeffW.weight(event,muChannel)
 	  elif catName.find("(HE") != -1:
             if catName.find("exclusive") != -1:
               BeffW.setMode("HEexcl")
-	      eventWeight *= BeffW.weight(event,muChannel)
+	      if BeffW.weight(event,muChannel)<0: eventWeight=0
+              else :eventWeight *= BeffW.weight(event,muChannel)
             else:
               BeffW.setMode("HE")
-	      eventWeight *= BeffW.weight(event,muChannel)
+	      if BeffW.weight(event,muChannel)<0: eventWeight=0
+              else :eventWeight *= BeffW.weight(event,muChannel)
 	  elif catName.find("(HP") != -1:
             if catName.find("exclusive") != -1:
               BeffW.setMode("HPexcl")
-	      eventWeight *= BeffW.weight(event,muChannel)
+	      if BeffW.weight(event,muChannel)<0: eventWeight=0
+              else :eventWeight *= BeffW.weight(event,muChannel)
             else:
               BeffW.setMode("HP")
-	      eventWeight *= BeffW.weight(event,muChannel)
+	      if BeffW.weight(event,muChannel)<0: eventWeight=0
+              else :eventWeight *= BeffW.weight(event,muChannel)
         # security against negative weights 
-        if eventWeight<0: eventWeight=0
+        #if eventWeight<0: eventWeight=0
         # fill the histograms
         jetmetAK5PFPlots[level].fill(jetmetAK5PFPlotsData, eventWeight)
         allmuonsPlots[level].fill(allmuonsPlotsData, eventWeight)
