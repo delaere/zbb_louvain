@@ -126,7 +126,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   canvas->UseCurrentStyle();
   canvas->SetLogx(logx);
   canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS}{#sqrt{s} = 7 TeV, L = 2.1 fb^{-1}}");
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2.1 fb^{-1}}");
   if(SSVHE) {
     x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
     y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
@@ -204,6 +204,8 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
       mc_uncertainty->SetBinError(i,0);
     }
   }
+  // set the color
+  mc_uncertainty->SetFillColor(kYellow);
   // create a new canvas with two pads
   TCanvas* c = new TCanvas(Form("%s_withRatio",canvas->GetName()),Form("%s with ratio",canvas->GetTitle()),500,640);
   TPad *canvas_1 = new TPad("canvas_1", canvas->GetTitle(),0,0.22,1.0,1.0);
