@@ -13,9 +13,9 @@
 #include <TGraphErrors.h>
 
 const char signalName[30] = "Z+b";
-unsigned int nstages = 19;
+unsigned int nstages = 23;
 
-void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRatio=false, bool printSig=false)
+void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRatio=false, bool printSig=false, bool latex=false)
 {
   //get the plots
   TIter next(categoryPlot->GetListOfPrimitives());
@@ -31,17 +31,33 @@ void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRati
     }
   }
   // First print the title row
-  std::cout << setw(detailedLabel?30:10) << "stage" << setw(14) << "data"<< setw(10) << "";
+  if(latex)
+    std::cout << "stage" << " & " << "data" << " & ";
+  else
+    std::cout << setw(detailedLabel?30:10) << "stage" << setw(14) << "data"<< setw(10) << "";
   while ((obj = mc->Next())) {
-    std::cout << setw(10) << obj->GetTitle() << setw(10) << "" ;
+    if(latex)
+      std::cout << obj->GetTitle() << " & " ;
+    else
+      std::cout << setw(10) << obj->GetTitle() << setw(10) << "" ;
   }
-  std::cout << setw(10) << "Total MC" << setw(10) << "";
+  if(latex)
+    std::cout << "Total MC";
+  else
+    std::cout << setw(10) << "Total MC" << setw(10) << "";
   if(printRatio) {
-    std::cout << setw(7) << "Ratio" << setw(12) << "Deviation";
+    if(latex)
+      std::cout << " & " << "Ratio" << " & " << "Deviation";
+    else
+      std::cout << setw(7) << "Ratio" << setw(12) << "Deviation";
   }
   if(printSig) {
-    std::cout << setw(7) << "S/B" << setw(13) << "S/sqrt(B)" << setw(13) << "S/sqrt(S+B)";
+    if(latex)
+      std::cout << " & " << "S/B" << " & " << "S/sqrt(B)" << " & " << "S/sqrt(S+B)";
+    else
+      std::cout << setw(7) << "S/B" << setw(13) << "S/sqrt(B)" << setw(13) << "S/sqrt(S+B)";
   }
+  if(latex) std::cout << " \\\\";
   std::cout << std::endl;
   mc->Reset();
 }
@@ -141,41 +157,73 @@ std::vector<std::pair<float,float> > yieldData(TCanvas* categoryPlot, unsigned s
   return output;
 }
 
-void printYield(const std::vector<std::pair<float,float> >& data, unsigned stage, const char* label="", bool printRatio=false, bool printSig=false)
+void printYield(const std::vector<std::pair<float,float> >& data, unsigned stage, const char* label="", bool printRatio=false, bool printSig=false, bool latex=false)
 {
   bool detailedLabel = (string(label)!="");
   // title column
   if(!detailedLabel) {
-    std::cout << setw(10) << "stage " << stage;
+    if(latex) 
+      std::cout << "stage " << stage << " & " ;
+    else
+      std::cout << setw(10) << "stage " << stage;
   } else {
-    std::cout << setw(30) <<  label;
+    if(latex)
+      std::cout << label << " & ";
+    else
+      std::cout << setw(30) <<  label;
   }
   // data
-  std::cout << setw(10) << setiosflags(ios::right) << data[0].first << "+/-" << resetiosflags(ios::right);
-  std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << data[0].second << resetiosflags(ios::left);
+  if(latex) {
+    std::cout << "$" << setprecision(0) << data[0].first << "\\pm";
+    std::cout << setiosflags(ios::fixed) << setprecision(1) << data[0].second << "$";
+  } else {
+    std::cout << setw(10) << setiosflags(ios::right) << data[0].first << "+/-" << resetiosflags(ios::right);
+    std::cout << setw(7)  << setiosflags(ios::left) << setiosflags(ios::fixed) << setprecision(1) << data[0].second << resetiosflags(ios::left);
+  }
   // mc
   unsigned int i = 1;
   for(; i< data.size()-6 ; ++i) {
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "+/-";
-    std::cout << resetiosflags(ios::right) << setiosflags(ios::left) << setprecision(1) << setw(7) << data[i].second << resetiosflags(ios::left);
+    if(latex) {
+      std::cout << " & $" << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "\\pm";
+      std::cout << setprecision(1) << data[i].second << "$";
+    } else {
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "+/-";
+      std::cout << resetiosflags(ios::right) << setiosflags(ios::left) << setprecision(1) << setw(7) << data[i].second << resetiosflags(ios::left);
+    }
   }
   // Tot MC 
-  std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "+/-";
-  std::cout << resetiosflags(ios::right) << setiosflags(ios::left) << setw(7) << data[i++].second << resetiosflags(ios::left);
+  if(latex) {
+    std::cout << " & $" << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "\\pm";
+    std::cout << data[i++].second << "$";
+  } else {
+    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i].first << "+/-";
+    std::cout << resetiosflags(ios::right) << setiosflags(ios::left) << setw(7) << data[i++].second << resetiosflags(ios::left);
+  }
   // Fixed content: ratio, significance
   if(printRatio) {
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first << resetiosflags(ios::left);
+    if(latex) {
+      std::cout << " & " << setiosflags(ios::fixed) << setprecision(2) << data[i++].first;
+      std::cout << " & " << setiosflags(ios::fixed) << setprecision(2) << data[i++].first;
+    } else {
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(2) << data[i++].first;
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(2) << data[i++].first << resetiosflags(ios::left);
+    }
   }
   if(printSig) {
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
-    std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+    if(latex) {
+      std::cout << " & " << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+      std::cout << " & " << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+      std::cout << " & " << setiosflags(ios::fixed) << setprecision(1) << data[i++].first << " \\\\";
+    } else {
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+      std::cout << setw(10) << setiosflags(ios::right) << setiosflags(ios::fixed) << setprecision(1) << data[i++].first;
+    }
   }
   std::cout << std::endl;
 }
 
-void yield(TFile* file, bool verbose = false, bool graphOutput = false)
+void yield(TFile* file, bool verbose = false, bool graphOutput = false, bool latex = false)
 {
   TList* keys = file->GetListOfKeys();
   TIter next(keys);
@@ -197,13 +245,13 @@ void yield(TFile* file, bool verbose = false, bool graphOutput = false)
         if(categoryPlot) {
 	  if(categoryPlot->InheritsFrom("TCanvas")) {
 	    if(doheader) { 
-	      printHeader(categoryPlot, verbose, verbose, verbose);
+	      printHeader(categoryPlot, verbose, verbose, verbose, latex);
 	      graphs = initGraphs(categoryPlot);
 	    }
 	    doheader = false;
 	    stages.push_back(stage);
 	    data.push_back(yieldData(categoryPlot, stage));
-	    printYield(data.back(), stage, verbose ? ((TDirectory*)(dir->Get(Form("stage_%d",stage))))->GetTitle(): "", verbose, verbose);
+	    printYield(data.back(), stage, verbose ? ((TDirectory*)(dir->Get(Form("stage_%d",stage))))->GetTitle(): "", verbose, verbose, latex);
 	  } else {
 	    std::cout << "Error: input file doesn't look like a combined file with canvas" << std::endl;
 	  }
@@ -235,10 +283,10 @@ void yield(TFile* file, bool verbose = false, bool graphOutput = false)
   if(output) output->Close();
 }
 
-void yield(const char* filename,bool verbose = false, bool graphOutput = false)
+void yield(const char* filename,bool verbose = false, bool graphOutput = false, bool latex = false)
 {
   TFile* file = TFile::Open(filename);
-  yield(file,verbose,graphOutput);
+  yield(file,verbose,graphOutput,latex);
   file->Close();
 }
 
