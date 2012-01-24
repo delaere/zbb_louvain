@@ -123,7 +123,7 @@ process.CombinePlots = cms.PSet(
       rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
-      labelx = cms.untracked.string("M_{l^{+}l^{-}} (GeV)"),
+      labelx = cms.untracked.string("M_{Z} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
       rangex = cms.untracked.vdouble(60.,120.)
     ),
