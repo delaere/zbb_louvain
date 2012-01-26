@@ -225,7 +225,7 @@ def isGoodJet(jet, Z = None):
   # TODO: add vertex match (?)
   return outcome
 
-def isGoodMet(met,cut=40):
+def isGoodMet(met,cut=50):
   """Apply the MET cut"""
   return met.pt()<cut
 
@@ -493,7 +493,7 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
   """Check analysis requirements for various steps."""
   output = []
   bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
