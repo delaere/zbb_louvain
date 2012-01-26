@@ -8,32 +8,32 @@ class ourTriggers: pass
 ourtriggers = ourTriggers()
 # muon triggers per runrange
 ourtriggers.murunMap = intervalmap.intervalmap()
-ourtriggers.murunMap[132440:139980] = ("HLT_Mu3",)
-ourtriggers.murunMap[140058:140401] = ("HLT_Mu5",)
-ourtriggers.murunMap[141956:144114] = ("HLT_Mu7",)
-ourtriggers.murunMap[146428:147116] = ("HLT_Mu9",)
-ourtriggers.murunMap[147146:148102] = ("HLT_Mu11",)
-ourtriggers.murunMap[148783:149442] = ("HLT_Mu15_v1",)
-ourtriggers.murunMap[160410:163268] = ("HLT_DoubleMu6_v1",)
-ourtriggers.murunMap[163269:165120] = ("HLT_DoubleMu7_v2",)
-ourtriggers.murunMap[165121:167038] = ("HLT_Mu13_Mu8_v2",)
-ourtriggers.murunMap[167039:170248] = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4")
+ourtriggers.murunMap[132440:139981] = ("HLT_Mu3",)
+ourtriggers.murunMap[140058:140402] = ("HLT_Mu5",)
+ourtriggers.murunMap[141956:144115] = ("HLT_Mu7",)
+ourtriggers.murunMap[146428:147117] = ("HLT_Mu9",)
+ourtriggers.murunMap[147146:148103] = ("HLT_Mu11",)
+ourtriggers.murunMap[148783:149443] = ("HLT_Mu15_v1",)
+ourtriggers.murunMap[160410:163269] = ("HLT_DoubleMu6_v1",)
+ourtriggers.murunMap[163269:165121] = ("HLT_DoubleMu7_v2",)
+ourtriggers.murunMap[165121:167039] = ("HLT_Mu13_Mu8_v2",)
+ourtriggers.murunMap[167039:170249] = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4")
 ourtriggers.murunMap[170249:]       = ("HLT_Mu13_Mu8_v6","HLT_Mu13_Mu8_v7")
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
-ourtriggers.elrunMap[132440:137028] = ("HLT_Photon10_L1R",)
-ourtriggers.elrunMap[138564:140401] = ("HLT_Photon15_Cleaned_L1R",)
-ourtriggers.elrunMap[141956:144114] = ("HLT_Ele15_SW_CaloEleId_L1R",)
-ourtriggers.elrunMap[146428:147116] = ("HLT_Ele17_SW_CaloEleId_L1R",)
-ourtriggers.elrunMap[147146:148102] = ("HLT_Ele17_SW_TightEleId_L1R",)
-ourtriggers.elrunMap[148783:149063] = ("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1",)
-ourtriggers.elrunMap[149181:149442] = ("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2",)
-ourtriggers.elrunMap[160410:161216] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1",)
-ourtriggers.elrunMap[161217:163268] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2",)
-ourtriggers.elrunMap[163269:165120] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3",)
-ourtriggers.elrunMap[165121:165969] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4",)
-ourtriggers.elrunMap[165970:167038] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5",)
-ourtriggers.elrunMap[167039:170248] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6",)
+ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
+ourtriggers.elrunMap[138564:140402] = ("HLT_Photon15_Cleaned_L1R",)
+ourtriggers.elrunMap[141956:144115] = ("HLT_Ele15_SW_CaloEleId_L1R",)
+ourtriggers.elrunMap[146428:147117] = ("HLT_Ele17_SW_CaloEleId_L1R",)
+ourtriggers.elrunMap[147146:148103] = ("HLT_Ele17_SW_TightEleId_L1R",)
+ourtriggers.elrunMap[148783:149064] = ("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1",)
+ourtriggers.elrunMap[149181:149443] = ("HLT_Ele22_SW_TighterCaloIdIsol_L1R_v2",)
+ourtriggers.elrunMap[160410:161217] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1",)
+ourtriggers.elrunMap[161217:163269] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2",)
+ourtriggers.elrunMap[163269:165121] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3",)
+ourtriggers.elrunMap[165121:165970] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4",)
+ourtriggers.elrunMap[165970:167039] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5",)
+ourtriggers.elrunMap[167039:170249] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6",)
 ourtriggers.elrunMap[170249:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8")
 # merged lists of triggers
 ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
@@ -67,9 +67,17 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
       intersect = set(pathnames) & set(ourtriggers.eltriggers)
   else:
     if muChannel:
-      intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
+      if ourtriggers.murunMap[runNumber] is None:
+        print "unexpected runNumber : " , runNumber
+        intersect = set()
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
     else:
-      intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
+      if ourtriggers.murunMap[runNumber] is None:
+        print "unexpected runNumber : " , runNumber
+        intersect = set()
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
   outcome = len(intersect)>0
 
   #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber)
