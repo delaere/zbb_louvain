@@ -7,7 +7,9 @@
 #include "TPad.h"
 #include "TLatex.h"
 #include "TFrame.h"
+#include "TF1.h"
 #include <string>
+#include <iostream>
 
 void setTDRStyle() {
   // For the canvas:
@@ -241,5 +243,41 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   histo_ratio->Draw("E1X0 same");
   // return the new canvas
   return c;
+}
+
+void addErrorBand(TF1* errorFunction=NULL) {
+  // finds the stack
+  TIter next(gPad->GetListOfPrimitives());
+  THStack* stack = NULL;
+  while(TObject *obj = next()) {
+    if(obj->InheritsFrom("THStack")) {
+      stack = (THStack*)obj;
+      break;
+    }
+  }
+  if(stack==NULL) {
+   std::cerr << "ERROR: MC histogram not found" << std::endl;
+   return;
+  }
+  // get the total histogram, clone it
+  TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
+  // add the syst uncertainty in quadrature to the stat uncertainty
+  if(errorFunction) {
+    for(int i=1; i<=systematics->GetNbinsX(); ++i) {
+      // errorFunction is the relative uncertainty at the center of the bin
+      double err = errorFunction->Eval(systematics->GetBinCenter(i))*systematics->GetBinContent(i);
+      // we add it in quadrature to the stat uncertainty
+      double err2 = err*err + systematics->GetBinError(i)*systematics->GetBinError(i);
+      err = sqrt(err2);
+      // set it
+      systematics->SetBinError(i,err);
+    }
+  }
+  // draw the uncertainty on top of everything.
+  // Note: we have to change the ErrorX, which impacts the data as well.
+  systematics->SetFillColor(1);
+  systematics->SetFillStyle(3001);
+  gStyle->SetErrorX(0.4);
+  systematics->Draw("E2,same");
 }
 
