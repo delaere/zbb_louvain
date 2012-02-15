@@ -62,8 +62,9 @@ class btaggingWeight:
       # check btagging
       if isBJet(jet,"HP","SSV"): ntagsHP += 1
       if isBJet(jet,"HE","SSV"): ntagsHE += 1
+      
       # add to the jetset class
-      self.myJetSet.addJet(flavor,jet.et(),jet.eta())
+      self.myJetSet.addJet(zbblabel.SF_running_mode,zbblabel.SF_uncert, flavor,jet.et(),jet.eta()) ## r.c. 2012
     return self.getWeight(self.myJetSet,ntagsHE,ntagsHP)
 
   def getWeight(self,jetset, ntags1, ntags2):

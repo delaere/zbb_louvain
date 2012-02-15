@@ -1,4 +1,6 @@
 #include <vector>
+#include "TString.h"
+#include <string>
 
 class btagPerfFWLiteInterface;
 
@@ -23,7 +25,7 @@ class JetSet {
   public:
     JetSet(const char* infile);
     ~JetSet();
-    void addJet(int flavor, double et, double eta);
+    void addJet(std::string themode,std::string uncert, int flavor, double et, double eta);
     void addJet(const JetInfo& jet);
     const std::vector<JetInfo>& getJets() const { return jets_; }
     void reset() { jets_.clear(); }

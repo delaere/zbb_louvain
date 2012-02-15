@@ -1,4 +1,6 @@
 #include "TFile.h"
+#include "TString.h"
+#include <string>
 #include "DataFormats/FWLite/interface/EventSetup.h"
 #include "DataFormats/FWLite/interface/ESHandle.h"
 #include "RecoBTag/PerformanceDB/interface/BtagPerformance.h"
@@ -9,7 +11,7 @@ class btagPerfFWLiteInterface {
   public:
     btagPerfFWLiteInterface(const char* inputfile);
     ~btagPerfFWLiteInterface();
-    double getbEffScaleFactor(int flavor, int algo, double pt, double eta) const;
+    double getbEffScaleFactor(std::string mode, std::string meanminmax ,int flavor, int algo, double pt, double eta) const;
     double getbEfficiency(int flavor, int algo, double pt, double eta) const;
   private:
     TFile* esdata_;

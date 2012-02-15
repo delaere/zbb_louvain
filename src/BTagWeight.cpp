@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <string>
 #include <utility>
 #include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
 #include "UserCode/zbb_louvain/interface/BTagWeight.h"
@@ -15,11 +16,11 @@ JetSet::~JetSet() { }
 // add a jet to the set. 
 // Efficiencies and scale factors are automatically extracted from the db,
 // and the jet is added to the set only if meaningful data can be obtained.
-void JetSet::addJet(int flavor, double et, double eta) { 
+void JetSet::addJet(std::string themode, std::string uncert, int flavor, double et, double eta) { 
   addJet(JetInfo(interface_->getbEfficiency(flavor,1,et,eta),
-                 interface_->getbEffScaleFactor(flavor,1,et,eta),
+                 interface_->getbEffScaleFactor(themode,uncert,flavor,1,et,eta),
                  interface_->getbEfficiency(flavor,2,et,eta),
-                 interface_->getbEffScaleFactor(flavor,2,et,eta),
+                 interface_->getbEffScaleFactor(themode,uncert,flavor,2,et,eta),
                  flavor)
         );
 }
@@ -40,7 +41,7 @@ bool BTagWeight::filter(int t) const {
 
 // compute the weight for jets of one kind (algo1 = HE, algo2 = HP)
 float BTagWeight::weight(vector<JetInfo> jets, int algo, int ntags) const {
-  if(!filter(ntags)) return 0;
+  if(!filter(ntags)) return 0; //shouldn't be 1 ? No, we are safe, with the event selection.
   int njets=jets.size();
   int comb= 1 << njets;
   float pMC=0;
@@ -59,7 +60,7 @@ float BTagWeight::weight(vector<JetInfo> jets, int algo, int ntags) const {
             data*=jets[j].eff_SSVHEM*jets[j].sf_SSVHEM;
           } else {
             mc*=(1.-jets[j].eff_SSVHEM);
-            data*=(1.-jets[j].eff_SSVHEM*jets[j].sf_SSVHEM);
+	    data*=(1.-jets[j].eff_SSVHEM*jets[j].sf_SSVHEM);
           }
 	}
  	case 2: {
@@ -91,7 +92,7 @@ bool BTagWeight::filter(int t1, int t2) const {
 // compute the weight for jets of two kinds, one including the othe (e.g. SSV HE and HP)
 float BTagWeight::weight2(vector<JetInfo> jets, int ntags1, int ntags2) const {
   // check that the event passes the selection
-  if(!filter(ntags1,ntags2)) return 0;
+  if(!filter(ntags1,ntags2)) return 0; //shouldn't be 1 ? No, we are safe, with the event selection.
   int njets=jets.size();
   int comb = pow(3,njets);
   float pMC=0;
