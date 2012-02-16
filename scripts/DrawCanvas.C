@@ -249,7 +249,8 @@ void addErrorBand(TF1* errorFunction=NULL) {
   // finds the stack
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
-  while(TObject *obj = next()) {
+  TObject* obj = NULL;
+  while(obj = next()) {
     if(obj->InheritsFrom("THStack")) {
       stack = (THStack*)obj;
       break;
