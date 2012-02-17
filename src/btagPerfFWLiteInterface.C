@@ -15,6 +15,22 @@
 btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   //std::cout << "btagPerfFWLiteInterface: Initializing..." << std::endl;
   esdata_ = TFile::Open(inputfile);
+
+  /// TF1 defined ------------------------------------------------------------------------------------------------
+  tmpSFl_1 = new TF1("SFlight","((0.86318+(0.000801639*x))+(-1.64119e-06*(x*x)))+(2.59121e-10*(x*(x*x)))", 20.,670.);
+  tmpSFl_2 = new TF1("SFlightMin","((0.790364+(0.000463086*x))+(-4.35934e-07*(x*x)))+(-9.08296e-10*(x*(x*x)))", 20.,670.);
+  tmpSFl_3 = new TF1("SFlightMax","((0.935969+(0.0011402*x))+(-2.84645e-06*(x*x)))+(1.42654e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_4 = new TF1("SFlight","((0.958973+(-0.000269555*x))+(1.381e-06*(x*x)))+(-1.87744e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_5 = new TF1("SFlightMin","((0.865771+(-0.000279908*x))+(1.34144e-06*(x*x)))+(-1.75588e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_6 = new TF1("SFlightMax","((1.0522+(-0.000259296*x))+(1.42056e-06*(x*x)))+(-1.999e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_7 = new TF1("SFlight","((0.923033+(-0.000898227*x))+(4.74565e-06*(x*x)))+(-6.11053e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_8 = new TF1("SFlightMin","((0.828021+(-0.000731926*x))+(4.19613e-06*(x*x)))+(-5.81379e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_9 = new TF1("SFlightMax","((1.01812+(-0.00106483*x))+(5.29518e-06*(x*x)))+(-6.40728e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_10 = new TF1("SFlight","((0.97409+(0.000646241*x))+(-2.86294e-06*(x*x)))+(2.79484e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_11 = new TF1("SFlightMin","((0.807222+(0.00103676*x))+(-3.6243e-06*(x*x)))+(3.17368e-09*(x*(x*x)))", 20.,670.);
+  tmpSFl_12 = new TF1("SFlightMax","((1.14091+(0.00025586*x))+(-2.10157e-06*(x*x)))+(2.41599e-09*(x*(x*x)))", 20.,670.);
+  //-----------------------------------------------------------------------------------------------------------------
+
   es_ = esdata_ ? new fwlite::EventSetup(esdata_) : NULL;
   if ( es_ && es_->exists("BTagPerformanceRecord") ) {
     //std::cout << "btagPerfFWLiteInterface: Got the performance tree" << std::endl;
@@ -74,6 +90,7 @@ btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
   if(perfMISTAGSSVHEM_) delete perfMISTAGSSVHEM_;
   if(perfBTAGSSVHEM_) delete perfBTAGSSVHEM_;
   delete es_;
+  //  delete tmpSFl; 
   esdata_->Close();
 }
 
@@ -91,7 +108,7 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
       
       // protection against large pt (where we have no measurement).  
       if(pt>670) pt=670;
-      
+ 
       for(int ind = 0; ind < 15 ; ind++){
 	if(pt>ptmin[ind] && pt<ptmax[ind]){
 	  index=ind;
@@ -349,45 +366,44 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
       default: {
 	// udsg-jets + untags (assumes these are light jets)
 	// FIXME....
-	TF1 *tmpSFl = NULL;
 	if(pt>670) pt=670;
+	double weight=1.0;
 	if( algo == 1 && fabs(eta)>0.0 &&  fabs(eta)<= 0.8)
 	  {
 	    //   Tagger: SSVHEM within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
-	    if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((0.86318+(0.000801639*x))+(-1.64119e-06*(x*x)))+(2.59121e-10*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "min" ) tmpSFl = new TF1("SFlightMin","((0.790364+(0.000463086*x))+(-4.35934e-07*(x*x)))+(-9.08296e-10*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "max" ) tmpSFl = new TF1("SFlightMax","((0.935969+(0.0011402*x))+(-2.84645e-06*(x*x)))+(1.42654e-09*(x*(x*x)))", 20.,670.);
+	    if( meanminmax == "mean" ) weight= tmpSFl_1->Eval(pt);
+	    if( meanminmax == "min" )  weight= tmpSFl_2->Eval(pt);
+	    if( meanminmax == "max" )  weight= tmpSFl_3->Eval(pt);
 	  }
-	if( algo ==1 &&  fabs(eta)> 0.8 &&  fabs(eta)<=1.6)
+	else if( algo ==1 &&  fabs(eta)> 0.8 &&  fabs(eta)<=1.6)
 	  {
 	    //   Tagger: SSVHEM within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
-	    if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((0.958973+(-0.000269555*x))+(1.381e-06*(x*x)))+(-1.87744e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "min" ) tmpSFl = new TF1("SFlightMin","((0.865771+(-0.000279908*x))+(1.34144e-06*(x*x)))+(-1.75588e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "max" ) tmpSFl = new TF1("SFlightMax","((1.0522+(-0.000259296*x))+(1.42056e-06*(x*x)))+(-1.999e-09*(x*(x*x)))", 20.,670.);
+	    if( meanminmax == "mean") weight=tmpSFl_4->Eval(pt);
+	    if( meanminmax == "min" ) weight= tmpSFl_5->Eval(pt);
+	    if( meanminmax == "max" ) weight= tmpSFl_6->Eval(pt);
 	  }
-	if( algo==1 &&  fabs(eta)>1.6  &&  fabs(eta)<=2.4)
+	else if( algo==1 &&  fabs(eta)>1.6  &&  fabs(eta)<=2.4)
 	  {
 	    //   Tagger: SSVHEM within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
-	    if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((0.923033+(-0.000898227*x))+(4.74565e-06*(x*x)))+(-6.11053e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "min" ) tmpSFl = new TF1("SFlightMin","((0.828021+(-0.000731926*x))+(4.19613e-06*(x*x)))+(-5.81379e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "max" ) tmpSFl = new TF1("SFlightMax","((1.01812+(-0.00106483*x))+(5.29518e-06*(x*x)))+(-6.40728e-09*(x*(x*x)))", 20.,670.);
+	    if( meanminmax == "mean" ) weight= tmpSFl_7->Eval(pt);
+	    if( meanminmax == "min" )  weight= tmpSFl_8->Eval(pt);
+	    if( meanminmax == "max" )  weight= tmpSFl_9->Eval(pt);
 	  }
 	
-	if( algo== 2 &&  fabs(eta)> 0.0 &&  fabs(eta)<=2.4)
+	else if( algo== 2 &&  fabs(eta)> 0.0 &&  fabs(eta)<=2.4)
 	  {
 	    //   Tagger: SSVHPT within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
-	    if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((0.97409+(0.000646241*x))+(-2.86294e-06*(x*x)))+(2.79484e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "min" ) tmpSFl = new TF1("SFlightMin","((0.807222+(0.00103676*x))+(-3.6243e-06*(x*x)))+(3.17368e-09*(x*(x*x)))", 20.,670.);
-	    if( meanminmax == "max" ) tmpSFl = new TF1("SFlightMax","((1.14091+(0.00025586*x))+(-2.10157e-06*(x*x)))+(2.41599e-09*(x*(x*x)))", 20.,670.);
+	    if( meanminmax == "mean" ) weight= tmpSFl_10->Eval(pt);
+	    if( meanminmax == "min" )  weight= tmpSFl_11->Eval(pt);
+	    if( meanminmax == "max" )  weight= tmpSFl_12->Eval(pt);
 	  }
-	
-	if( tmpSFl == NULL ){
-	  std::cout << "NULL pointer returned... Function seems not to exist" << std::endl;
-	  return 1.0;
-	}
 	else{
-	  return tmpSFl->Eval(pt);
-	}  
+	  std::cout << "NULL pointer returned... Function seems not to exist" << std::endl;
+	  return weight;
+	}
+	//std::cout << "the weight is  " << weight << std::endl;
+	return weight;
+
       }
       }
     }

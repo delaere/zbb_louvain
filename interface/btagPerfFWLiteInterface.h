@@ -1,5 +1,6 @@
 #include "TFile.h"
 #include "TString.h"
+#include "TF1.h"
 #include <string>
 #include "DataFormats/FWLite/interface/EventSetup.h"
 #include "DataFormats/FWLite/interface/ESHandle.h"
@@ -30,5 +31,6 @@ class btagPerfFWLiteInterface {
     BtagPerformance* perfMISTAGSSVHPT_;
     TH1F *h_eff_ssvhem_b_brl_, *h_eff_ssvhem_b_fwd_, *h_eff_ssvhem_c_brl_, *h_eff_ssvhem_c_fwd_;
     TH1F *h_eff_ssvhpt_b_brl_, *h_eff_ssvhpt_b_fwd_, *h_eff_ssvhpt_c_brl_, *h_eff_ssvhpt_c_fwd_;
+    TF1 *tmpSFl_1, *tmpSFl_2, *tmpSFl_3, *tmpSFl_4, *tmpSFl_5, *tmpSFl_6, *tmpSFl_7, *tmpSFl_8, *tmpSFl_9, *tmpSFl_10, *tmpSFl_11, *tmpSFl_12;
 };
 
