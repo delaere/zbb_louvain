@@ -106,14 +106,14 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	if(algo==1){
 	  //FIXME:temporary solution
 	  if(index==0) {
-	    SFb = 0.896462*((1.+(0.00957275*35))/(1.+(0.00837582*35)));
+	    SFb = 0.896462*((1.+(0.00957275*30))/(1.+(0.00837582*30)));
 	  }
 	  else{
 	    SFb = 0.896462*((1.+(0.00957275*pt))/(1.+(0.00837582*pt)));   
 	  }
 	  
 	  float SFb_error[] = {
-	    /// 12% uncertainties assigned according POG reccom. on the first bin
+	    ///  uncertainties assigned according POG reccom. on the first bin
 	    0.120000, 
 	    0.0316234, 
 	    0.0310149, 
@@ -135,11 +135,25 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	    return SFb;
 	  }
 	  else if(meanminmax=="min"){
-	    return SFb-(SFb*SFb_error[index]);
-	    
+	    if(index==0){
+	      //std::cout << "index "<< index << " SF uncertainty " << SFb_error[index] << std::endl;
+	      //patch for the first bin [uncertainty is ABSOLUTE]	   
+	      return SFb-(SFb_error[index]);
+	    }
+	    else
+	      {
+		return SFb-(SFb*SFb_error[index]);
+	      }	    
 	  }
 	  else if(meanminmax=="max"){
-	    return SFb+(SFb*SFb_error[index]);
+	    if(index==0){
+	      return SFb+(SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb+(SFb*SFb_error[index]);
+	      }
 	  }
 	  else{
 	    std::cerr << "WARNING: unrecognize specification: no weight assigned, please check!" << std::endl;
@@ -151,7 +165,7 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	  //   Tagger: SSVHPT within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
 	  //FIXME:temporary solution
 	  if(index==0){
-	    SFb = 0.422556*((1.+(0.437396*35))/(1.+(0.193806*35)));
+	    SFb = 0.422556*((1.+(0.437396*30))/(1.+(0.193806*30)));
 	  }
 	  else {
 	    SFb = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
@@ -179,10 +193,24 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	    return SFb;
 	  }
 	  else if(meanminmax=="min"){
-	    return SFb-(SFb*SFb_error[index]);
+	    if(index==0){
+	      return SFb-(SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb-(SFb*SFb_error[index]);
+	      }
 	  }
 	  else if(meanminmax=="max"){
-	    return SFb+(SFb*SFb_error[index]);
+	    if(index==0){
+	      return SFb+(SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb+(SFb*SFb_error[index]);
+	      }
 	  }
 	  else{
 	    std::cerr << "WARNING: unrecognize specification: no weight assigned, please check!" << std::endl;
@@ -201,7 +229,7 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	if(algo==1){
 	  //FIXME:temporary solution
 	  if(index==0){
-	    SFb = 0.896462*((1.+(0.00957275*35))/(1.+(0.00837582*35)));
+	    SFb = 0.896462*((1.+(0.00957275*30))/(1.+(0.00837582*30)));
 	  }
 	  else {
 	    SFb = 0.896462*((1.+(0.00957275*pt))/(1.+(0.00837582*pt)));
@@ -229,10 +257,24 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	    return SFb;
 	  }
 	  else if(meanminmax=="min"){
-	    return SFb-(SFb*2*SFb_error[index]);
+	    if(index==0){
+	      return SFb-(2*SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb-(SFb*2*SFb_error[index]);
+	      }
 	  }
 	  else if(meanminmax=="max"){
-	    return SFb+(SFb*2*SFb_error[index]);
+	    if(index==0){
+	      return SFb+(2*SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb+(SFb*2*SFb_error[index]);
+	      }
 	  }
 	  else{
 	    std::cerr << "WARNING: unrecognized specification : no weight assigned, please check!" << std::endl;
@@ -244,7 +286,7 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	  //   Tagger: SSVHPT within 30 < pt < 670 GeV, abs(eta) < 2.4, x = pt
 	  //FIXME:temporary solution
 	  if(index==0){
-	    SFb = 0.422556*((1.+(0.437396*35))/(1.+(0.193806*35)));
+	    SFb = 0.422556*((1.+(0.437396*30))/(1.+(0.193806*30)));
 	  }
 	  else {
 	    SFb = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
@@ -273,10 +315,25 @@ double btagPerfFWLiteInterface::getbEffScaleFactor(std::string mode, std::string
 	    return SFb;
 	  }
 	  else if(meanminmax=="min"){
-	    return SFb-(SFb*2*SFb_error[index]);
+	    if(index==0){
+	      return SFb-(SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb-(SFb*2*SFb_error[index]);
+	      }
 	  }
 	  else if(meanminmax=="max"){
-	    return SFb+(SFb*2*SFb_error[index]);
+	    if(index==0){
+	      return SFb+(SFb_error[index]);
+	      //patch for the first bin [uncertainty is ABSOLUTE]
+	    }
+	    else
+	      {
+		return SFb+(SFb*2*SFb_error[index]);
+	    
+	      }
 	  }
 	  else{
 	    std::cerr << "WARNING: unrecognize specification: no weight assigned, please check!" << std::endl;
