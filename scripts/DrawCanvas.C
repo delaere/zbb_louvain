@@ -8,6 +8,7 @@
 #include "TLatex.h"
 #include "TFrame.h"
 #include "TF1.h"
+#include "TGraphAsymmErrors.h"
 #include <string>
 #include <iostream>
 
@@ -280,5 +281,55 @@ void addErrorBand(TF1* errorFunction=NULL) {
   systematics->SetFillStyle(3001);
   gStyle->SetErrorX(0.4);
   systematics->Draw("E2,same");
+}
+
+void addErrorBandFromTH1(TH1* minusHisto=NULL, TH1* plusHisto=NULL ) {
+  // finds the stack
+  // DO SOMETHING....
+  TIter next(gPad->GetListOfPrimitives());
+  THStack* stack = NULL;
+  TObject* obj = NULL;
+  while(obj = next()) {
+    if(obj->InheritsFrom("THStack")) {
+      stack = (THStack*)obj;
+      break;
+    }
+  }
+  if(stack==NULL) {
+   std::cerr << "ERROR: MC histogram not found" << std::endl;
+   return;
+  }
+  // get the total histogram, clone it
+  TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
+  // add the syst uncertainty in quadrature to the stat uncertainty
+  TGraphAsymmErrors* TG_systematics = NULL;
+  TG_systematics = new TGraphAsymmErrors(systematics);
+
+  if(minusHisto && plusHisto &&  TG_systematics) {
+    for(int i=1; i<=systematics->GetNbinsX(); ++i) {
+      
+      // extracting the errors ---------------------------------------
+      double plusError  = plusHisto->GetBinContent(i)- systematics->GetBinContent(i);
+      double minusError = minusHisto->GetBinContent(i)- systematics->GetBinContent(i); 
+     
+      // combining with statistical ---------------------------------------      
+      double plusErrorTot = sqrt(plusError*plusError + systematics->GetBinError(i)*systematics->GetBinError(i));
+      double minusErrorTot = sqrt(minusError*minusError + systematics->GetBinError(i)*systematics->GetBinError(i));
+            
+      //setting the errors ------------------------------------------------
+      TG_systematics ->SetPointEYhigh(i,plusErrorTot);
+      TG_systematics ->SetPointEYlow(i,minusErrorTot);
+
+    }
+  }
+  // draw the uncertainty on top of everything.
+  // Note: we have to change the ErrorX, which impacts the data as well.
+  TG_systematics->SetFillColor(1);
+  //  TG_systematics->SetMarkerColor(1);
+  TG_systematics->SetFillStyle(3001); // was 3001
+  gStyle->SetErrorX(0.4);
+  //gStyle->SetEndErrorSize(3);
+  TG_systematics->Draw("E2,same");
+
 }
 
