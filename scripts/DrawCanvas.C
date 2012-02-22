@@ -306,12 +306,13 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
   TG_systematics = new TGraphAsymmErrors(systematics);
 
   if(minusHistoJES && plusHistoJES &&  TG_systematics) {
-    for(int i=0; i<=systematics->GetNbinsX(); ++i) {
+    for(int i=1; i<=systematics->GetNbinsX(); ++i) {
       
       // extracting the errors ---------------------------------------
       
       double minusErrorJES = minusHistoJES->GetBinContent(i)- systematics->GetBinContent(i); 
       double plusErrorJES  = plusHistoJES->GetBinContent(i)- systematics->GetBinContent(i);
+      //std::cout<< "bin content "<<i<< " is "<< systematics->GetBinContent(i) << std::endl;
 
       // combining with statistical ---------------------------------------      
 
@@ -329,12 +330,12 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
 
       //setting the errors and the mean value --------------------------------
       // Errors along x-axis, just for aesthetics  ----------------------------
-      TG_systematics ->SetPointEXhigh(i,(systematics->GetBinWidth(i)/2)*0.75);   
-      TG_systematics ->SetPointEXlow(i,(systematics->GetBinWidth(i)/2)*0.75);  
+      TG_systematics ->SetPointEXhigh(i-1,(systematics->GetBinWidth(i)/2)*0.75);   
+      TG_systematics ->SetPointEXlow(i-1,(systematics->GetBinWidth(i)/2)*0.75);  
       
       // Errors along y-axis ----------------------------------------
-      TG_systematics ->SetPointEYhigh(i,plusErrorTot);
-      TG_systematics ->SetPointEYlow(i,minusErrorTot);
+      TG_systematics ->SetPointEYhigh(i-1,plusErrorTot);
+      TG_systematics ->SetPointEYlow(i-1,minusErrorTot);
     }
   }
   // draw the uncertainty on top of everything.
