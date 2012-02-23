@@ -312,19 +312,19 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
       
       double minusErrorJES = minusHistoJES->GetBinContent(i)- systematics->GetBinContent(i); 
       double plusErrorJES  = plusHistoJES->GetBinContent(i)- systematics->GetBinContent(i);
-      //std::cout<< "bin content "<<i<< " is "<< systematics->GetBinContent(i) << std::endl;
+      std::cout<< "bin content "<<i<< " is "<< systematics->GetBinError(i) << std::endl;
 
       // combining with statistical ---------------------------------------      
 
-      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES + systematics->GetBinError(i)*systematics->GetBinError(i));
-      double plusErrorTot = sqrt(plusErrorJES*plusErrorJES + systematics->GetBinError(i)*systematics->GetBinError(i));
+      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
+      double plusErrorTot = sqrt(plusErrorJES*plusErrorJES ); //+ systematics->GetBinError(i)*systematics->GetBinError(i));
         
       if(minusHistoBtag && plusHistoBtag){	
 	double minusErrorBtag = minusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i); 
 	double plusErrorBtag  = plusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i);
        
-	minusErrorTot = sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag + systematics->GetBinError(i)*systematics->GetBinError(i));
-	plusErrorTot = sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag + systematics->GetBinError(i)*systematics->GetBinError(i));
+	minusErrorTot = sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag );//+ systematics->GetBinError(i)*systematics->GetBinError(i));
+	plusErrorTot = sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag );// + systematics->GetBinError(i)*systematics->GetBinError(i));
 	
       }
 
@@ -346,3 +346,49 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
   TG_systematics->Draw("E2,same");
 }
 
+
+void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NULL) {
+  // finds the stack
+  TIter next(gPad->GetListOfPrimitives());
+  THStack* stack = NULL;
+  TObject* obj = NULL;
+  while(obj = next()) {
+    if(obj->InheritsFrom("THStack")) {
+      stack = (THStack*)obj;
+      break;
+    }
+  }
+  if(stack==NULL) {
+   std::cerr << "ERROR: MC histogram not found" << std::endl;
+   return;
+  }
+  // get the total histogram, clone it
+  TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
+  TGraphAsymmErrors* TG_systematics = NULL;
+  TG_systematics = new TGraphAsymmErrors(systematics);
+
+
+  // add the syst uncertainty in quadrature to the stat uncertainty
+  if(errorFunctionMinus && errorFunctionPlus &&  TG_systematics) {
+    for(int i=1; i<=systematics->GetNbinsX(); ++i) {
+      // errorFunction is the relative uncertainty at the center of the bin
+      double errPlus  = errorFunctionPlus->Eval(systematics->GetBinCenter(i))*systematics->GetBinContent(i);
+      double errMinus = errorFunctionMinus->Eval(systematics->GetBinCenter(i))*systematics->GetBinContent(i);      
+      // we add it in quadrature to the stat uncertainty
+      // set it
+      TG_systematics ->SetPointEXhigh(i-1,(systematics->GetBinWidth(i)/2)*0.75);   
+      TG_systematics ->SetPointEXlow(i-1,(systematics->GetBinWidth(i)/2)*0.75);  
+    
+      // Errors along y-axis ----------------------------------------
+      TG_systematics ->SetPointEYhigh(i-1,errPlus);
+      TG_systematics ->SetPointEYlow(i-1,errMinus);
+ 
+    }
+  }
+  // draw the uncertainty on top of everything.
+  // Note: we have to change the ErrorX, which impacts the data as well.
+  TG_systematics->SetFillColor(1);
+  TG_systematics->SetFillStyle(3001); 
+  gStyle->SetErrorX(0.4); 
+  TG_systematics->Draw("E2,same");
+}
