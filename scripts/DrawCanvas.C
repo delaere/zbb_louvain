@@ -2,12 +2,14 @@
 #include "TLegend.h"
 #include "TH1F.h"
 #include "THStack.h"
+#include "TObject.h"
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TPad.h"
 #include "TLatex.h"
 #include "TFrame.h"
 #include "TF1.h"
+#include "TFile.h"
 #include "TGraphAsymmErrors.h"
 #include <string>
 #include <iostream>
@@ -129,7 +131,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   canvas->UseCurrentStyle();
   canvas->SetLogx(logx);
   canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2.1 fb^{-1}}");
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2.2 fb^{-1}}");
   if(SSVHE) {
     x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
     y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
@@ -247,6 +249,12 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
 }
 
 void addErrorBand(TF1* errorFunction=NULL) {
+  //TFile *file1  = new TFile("bjet2unc.root"); 
+  //errorFunction =(TF1*)file1->Get("bjet2uncfit");
+  //TFile *file1  = new TFile("bjet1unc.root"); 
+  //errorFunction =(TF1*)file1->Get("bjet1uncfit");
+  // = 0.0526117 -0.000932991*x + 7.02479e-06*pow(x,2)
+
   // finds the stack
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
@@ -275,12 +283,25 @@ void addErrorBand(TF1* errorFunction=NULL) {
       systematics->SetBinError(i,err);
     }
   }
+  
   // draw the uncertainty on top of everything.
   // Note: we have to change the ErrorX, which impacts the data as well.
   systematics->SetFillColor(1);
   systematics->SetFillStyle(3001);
   gStyle->SetErrorX(0.4);
   systematics->Draw("E2,same");
+
+  // add a legend
+  TLegend* legend = new TLegend(0.1,0.7,0.48,0.9);
+  if(legend) {
+    legend->AddEntry(systematics,"JES","f");
+    legend->SetFillColor(kWhite);
+    legend->SetBorderSize(0);
+    legend->Draw();
+    
+  }
+
+
 }
 
 // Extension for JES + Btag efficiency uncertainty
@@ -316,8 +337,8 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
 
       // combining with statistical ---------------------------------------      
 
-      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
-      double plusErrorTot = sqrt(plusErrorJES*plusErrorJES ); //+ systematics->GetBinError(i)*systematics->GetBinError(i));
+      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES); //+ //systematics->GetBinError(i)*systematics->GetBinError(i));
+      double plusErrorTot = sqrt(plusErrorJES*plusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
         
       if(minusHistoBtag && plusHistoBtag){	
 	double minusErrorBtag = minusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i); 
@@ -325,7 +346,6 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
        
 	minusErrorTot = sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag );//+ systematics->GetBinError(i)*systematics->GetBinError(i));
 	plusErrorTot = sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag );// + systematics->GetBinError(i)*systematics->GetBinError(i));
-	
       }
 
       //setting the errors and the mean value --------------------------------
@@ -344,10 +364,40 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
   TG_systematics->SetFillStyle(3001); 
   gStyle->SetErrorX(0.4); 
   TG_systematics->Draw("E2,same");
+  
+  TLegend* legend = new TLegend(0.1,0.7,0.48,0.9);
+  if(legend) {
+    //legend->AddEntry(TG_systematics," JES Uncertainty","f");
+    legend->AddEntry(TG_systematics," B Uncertainty","f");
+    //legend->AddEntry(TG_systematics," JES + B-Tag Uncertainties","f");
+    legend->SetFillColor(kWhite);
+    legend->SetBorderSize(0);
+    legend->Draw();    
+  }
+
 }
 
 
 void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NULL) {
+  //define functions
+  //TFile *file1  = new TFile("JES_pTlead.root"); 
+  //TFile *file1  = new TFile("JES_pTsublead.root"); 
+  //TFile *file1  = new TFile("JES_pTbb.root"); 
+  
+  //TFile *file1  = new TFile("pTZJES.root"); 
+  
+  TFile *file1  = new TFile("pTZBtag.root");
+  
+  //TFile *file1  = new TFile("pTbbJESBtag.root"); 
+  //TFile *file1  = new TFile("pTZJESBtag.root"); 
+  //TFile *file1  = new TFile("pTbbJESBtagSq.root"); 
+  //TFile *file1  = new TFile("pTbbJESBtagSq.root"); 
+
+  
+  errorFunctionMinus =(TF1*)file1->Get("funcminus");
+  errorFunctionPlus =(TF1*)file1->Get("funcplus");
+
+
   // finds the stack
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
@@ -391,4 +441,17 @@ void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NU
   TG_systematics->SetFillStyle(3001); 
   gStyle->SetErrorX(0.4); 
   TG_systematics->Draw("E2,same");
+
+  TLegend* legend = new TLegend(0.1,0.7,0.48,0.9);
+  if(legend) {
+    //legend->AddEntry(TG_systematics," JES Uncertainty","f");
+    legend->AddEntry(TG_systematics," B Uncertainty","f");
+    //legend->AddEntry(TG_systematics," JES + B-Tag Uncertainties","f");
+    legend->SetFillColor(kWhite);
+    legend->SetBorderSize(0);
+    legend->Draw();    
+  }
+
+
+
 }
