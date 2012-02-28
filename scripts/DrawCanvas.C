@@ -244,6 +244,7 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   histo_ratio->SetMarkerStyle(20);
   histo_ratio->SetMarkerSize(0.7);
   histo_ratio->Draw("E1X0 same");
+  mc_uncertainty->Draw("AXIG same");
   // return the new canvas
   return c;
 }
