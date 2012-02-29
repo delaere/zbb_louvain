@@ -156,7 +156,7 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   // now it is up to you to arrange things and save
 }
 
-TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
+TCanvas* DrawCanvasWithRatio(TCanvas* canvas, bool emptyBinsNoUnc = true)
 {
   // get data and total MC from the canvas
   TIter next(canvas->GetListOfPrimitives());
@@ -202,11 +202,11 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas)
   TH1F* mc_uncertainty = (TH1F*)totmc->Clone();
   //for(unsigned bin = 0; bin<=mc_uncertainty->GetNbinsx(); ++bin) mc_uncertainty->SetBinContent(mc_uncertainty->GetBinError());
   mc_uncertainty->Divide(totmc);
-  // set uncertainty to 1 for empty bins
+  // set uncertainty to 0 or 1 for empty bins
   for(int i=0;i<=mc_uncertainty->GetNbinsX();++i) {
     if(mc_uncertainty->GetBinContent(i)==0) {
       mc_uncertainty->SetBinContent(i,1);
-      mc_uncertainty->SetBinError(i,1);
+      mc_uncertainty->SetBinError(i,emptyBinsNoUnc? 0. : 1.);
     }
   }
   // set the color
