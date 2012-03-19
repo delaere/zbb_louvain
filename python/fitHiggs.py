@@ -31,12 +31,14 @@ gROOT.SetStyle("Plain")
 ### GET DATA AND MC ###
 #######################
 
-cutstring = "rrv_ll_pT>0"
+#cutstring = "rrv_ll_pT>0"
 #cutstring = "rrv_bb_dR<1.5&&rrv_ll_pT>50"
-#cutstring =  0
+cutstring =  "jetmetMET<50&eventSelectionbestzmassEle>76&eventSelectionbestzmassEle<106"
 
-WP =  "eventSelection_5"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
+WP =  "eventSelection_9"        #"HP","HPMET","HP_excl","HE","HEMET","HE_excl"
 channel = "Mu"
+
+
 sel= {"Mu":"muSel",
       "El":"elSel",
       "Sum":"sumSel"}
@@ -53,10 +55,13 @@ TtbarMC_el = "Ttbar_El_MC"
 Data_el    = "El_DATA"
 DYMC_el    = "El_MC"
 
+if channel =="El": cutstring ="jetmetMET<50&eventSelectionbestzmassEle>76&eventSelectionbestzmassEle<106"
+if channel =="Mu": cutstring ="jetmetMET<50&eventSelectionbestzmassMu>76&eventSelectionbestzmassMu<106"
 if channel=="Sum":
     Data    = Data_el
     DYMC    = DYMC_el
     TtbarMC = TtbarMC_el
+    cutstring ="jetmetMET<50"
 
 file = {  Data      : TFile("File_rds_zbb_"+Data+".root"),
           DYMC       : TFile("File_rds_zbb_"+DYMC+".root"),
@@ -108,7 +113,7 @@ else :
 
 myRDS[DYMC]    = myRDS[DYMC].reduce("rc_"+WP+"==1")
 myRDS[TtbarMC] = myRDS[TtbarMC].reduce("rc_"+WP+"==1")
-DATA=myRDS[Data].reduce("rc_"+WP+"==1")
+DATA           = myRDS[Data].reduce("rc_"+WP+"==1")
 
 if cutstring:
     myRDS[DYMC]    = myRDS[DYMC].reduce(cutstring)
@@ -117,24 +122,27 @@ if cutstring:
 
 print "DATA("+WP+").numEntries() = ", DATA.numEntries()
 
-rrv_SV_M    = ws[Data].var("rrv_SV_M")
-rrv_bb_M    = ws[Data].var("rrv_bb_M")
+rrv_SV_M    = ws[Data].var("jetmetbjet1SVmass")
+
+rrv_bb_M    = ws[Data].var("eventSelectiondijetM")
+rrv_bb_M.setMin(0)
 rrv_bb_M.setMax(750)
 rrv_bb_M.setBins(25)
 rrv_bb_M.SetTitle("m(bb) (GeV/c^{2})")
 
-rrv_ll_pT    = ws[Data].var("rrv_ll_pT")
+rrv_ll_pT    = ws[Data].var("eventSelectionbestzptMu")
+rrv_ll_pT.setMin(0)
 rrv_ll_pT.setMax(400)
 rrv_ll_pT.setBins(20)
 rrv_ll_pT.SetTitle("p_{T}(l^{+}l^{-})")
 
-rrv_zbb_M   = ws[Data].var("rrv_zmmbb_M")
-if channel=="El" : rrv_zbb_M   = ws[Data].var("rrv_zeebb_M")
+rrv_zbb_M   = ws[Data].var("eventSelectionZbbM")
+rrv_zbb_M.setMin(0)
 rrv_zbb_M.setMax(750)
 rrv_zbb_M.setBins(15)
 rrv_zbb_M.SetTitle("M(l^{+}l^{-}bb)")
 
-rrv_bb_dR   = ws[Data].var("rrv_bb_dR")
+rrv_bb_dR   = ws[Data].var("eventSelectiondijetdR")
 rrv_bb_dR.setMin(0)
 rrv_bb_dR.setMax(6)
 rrv_bb_dR.setBins(12)
@@ -154,11 +162,11 @@ print "############################"
 ### MAKE SIGNAL PDF (analytic or template) ###
 ##############################################
 
-mean_bb  = RooRealVar("mean_bb", "mean_bb", 300,100,500)
-sigma_bb = RooRealVar("sigma_bb","sigma_bb", 30, 10,100)
+mean_bb  = RooRealVar("mean_bb", "mean_bb", 250)
+sigma_bb = RooRealVar("sigma_bb","sigma_bb", 30)
 Sig_bb = RooGaussian("Sig_bb","Sig_bb",rrv_bb_M,mean_bb,sigma_bb)
 
-S = RooRealVar("S","S",0.01,0,30)
+S = RooRealVar("S","S",0.10,-30,30)
 
 sig_pdf = RooExtendPdf("sig_pdf",
                        "sig_pdf",
@@ -197,10 +205,18 @@ Canvas.Divide(2,2)
 dir =0
 
 for var in varList:
+    print "var = ", var
     C_fit[var]=TCanvas("C_fit"+var.GetName(),"C_fit"+var.GetName(),800,400)
     C_fit[var].Divide(2)
     frame[var] = var.frame()#0,600,12)#rrv_bb_M.getMax())
-
+    frame_test = var.frame()#0,600,12)#rrv_bb_M.getMax())
+   
+    print "var = ", var
+    print "var.GetName() = ", var.GetName()
+    print "var.getMax() = ", var.getMax()
+    print "frame[var] = ", frame[var]
+    print "frame-test = ", frame_test
+  
     rdh_zbb_MC_bb_M[DYMC]    = RooDataHist("rdh_zbb_MC_bb_M"+DYMC,
                                            "rdh_zbb_MC_SV_M"+DYMC,
                                            RooArgSet(var),
@@ -238,8 +254,13 @@ for var in varList:
     
     SM_MC = B[DYMC].getVal() + B[TtbarMC].getVal()
 
-    norm = 1.#SM_MC/DATA.numEntries()#1.
+    norm = SM_MC/DATA.numEntries()#1.
+
+    B[DYMC].setVal(B[DYMC].getVal()/norm)
+    B[TtbarMC].setVal(B[TtbarMC].getVal()/norm)
     
+    B_SM = RooRealVar("B_SM","B_SM",SM_MC/norm)#,0.9*SM_MC,1.1*SM_MC)
+
     ext_pdf={}
     ext_pdf[DYMC] = RooExtendPdf("ext_pdf"+DYMC,
                                  "ext_pdf"+DYMC,
@@ -266,6 +287,7 @@ for var in varList:
     print "#S  = ", S.getVal()
     print "#DY = ", B[DYMC].getVal()
     print "#TT = ", B[TtbarMC].getVal()
+    print "frame = ", frame[var]
     
     DATA.plotOn(frame[var],
                 RooFit.MarkerSize(1.3),
@@ -359,7 +381,7 @@ for var in varList:
     Canvas.cd(dir)
     frame2[var].Draw()
 
-Canvas.SaveAs(channel+"_"+WP+"_"+cutstring+".pdf")
+Canvas.SaveAs(channel+"_"+str(WP)+"_"+cutstring+".pdf")
 
 Canvas2 = TCanvas("C2","C2",1200,400)
 Canvas2.Divide(3)
@@ -400,20 +422,18 @@ for var1 in varList :
         myRDS[TtbarMC].fillHistogram(th2_ttmc[corrVar], RooArgList(var1,var2))
         
         CorrCanvas[corrVar].cd(1)
-        th2_data[corrVar].Draw("col2z")
+        #th2_data[corrVar].Draw("col2z")
         CorrCanvas[corrVar].cd(2)
-        th2_dymc[corrVar].Draw("col2z")
+        #th2_dymc[corrVar].Draw("col2z")
         CorrCanvas[corrVar].cd(3)
-        th2_ttmc[corrVar].Draw("col2z")
+        #th2_ttmc[corrVar].Draw("col2z")
         CorrCanvas[corrVar].cd(4)
-        th2_data[corrVar].Draw("contz")
+        #th2_data[corrVar].Draw("contz")
         CorrCanvas[corrVar].cd(5)
-        th2_dymc[corrVar].Draw("contz")
+        #th2_dymc[corrVar].Draw("contz")
         CorrCanvas[corrVar].cd(6)
-        th2_ttmc[corrVar].Draw("contz")
+        #th2_ttmc[corrVar].Draw("contz")
 
-
-bla
 
 
 
@@ -426,7 +446,7 @@ bla
 # can also do 2D 
 # 1D (number of signal events) should be sufficient
 
-plc_S = RooStats.ProfileLikelihoodCalculator(DATA,Sum_bb,RooArgSet(S_8))
+plc_S = RooStats.ProfileLikelihoodCalculator(DATA,Sum_bb,RooArgSet(S))
 plot_S = RooStats.LikelihoodIntervalPlot(plc_S.GetInterval())
 
 print "plotting likelihood of S alone"
@@ -456,16 +476,16 @@ myHybridResult={}
 toys_significance={}
 sig_bb = {}
 
-mList = (200,250,300,350,400)
+mList = (300,350,400)
 
 for m in mList :
     sig_bb[m] = RooGaussian("sig_bb_"+str(m),"sig_bb_"+str(m),rrv_bb_M,RooFit.RooConst(m),RooFit.RooConst(25))
-    sum_bb[m] = RooAddPdf("sum_bb_"+str(m),"sum_bb_"+str(m),RooArgList(sig_bb[m],bkg_bb),RooArgList(S_8,B_8))
+    sum_bb[m] = RooAddPdf("sum_bb_"+str(m),"sum_bb_"+str(m),RooArgList(sig_bb[m],Sum_bb),RooArgList(S,RooFit.RooConst(DATA.numEntries())))
     ### generate a data sample
     data[m] = sum_bb[m].generate(RooArgSet(rrv_bb_M),RooFit.Extended())
     ### run HybridCalculator on those inputs
     ### use interface from HypoTest calculator by default
-    myHybridCalc[m] = RooStats.HybridCalculatorOriginal(data[m], sum_bb[m], bkg_bb ,RooArgSet())
+    myHybridCalc[m] = RooStats.HybridCalculatorOriginal(data[m], sum_bb[m], Sum_bb ,RooArgSet())
     #&nuisance_parameters, &bkg_yield_prior);
     ## here I use the default test statistics: 2*lnQ (optional)
     myHybridCalc[m].SetTestStatistic(1);
@@ -497,6 +517,17 @@ for m in mList :
     mean_sb_toys_test_stat[m] = myHybridPlot[m].GetSBmean()
     myHybridResult[m].SetDataTestStatistics(mean_sb_toys_test_stat[m])
     toys_significance[m] = myHybridResult[m].Significance()
+
+    print "==> m(Higgs) = ", m ," <==="
+    print " - -2lnQ = " , min2lnQ_data[m] 
+    print " - CL_sb = " , clsb_data[m]
+    print " - CL_b  = " , clb_data[m]
+    print " - CL_s  = " , cls_data[m]
+    print " - CL_s 'error' = " , cls_error[m]
+    print " - significance of data  = " , data_significance[m]
+    print " - mean significance of toys  = " , toys_significance[m]
+
+    bla
 
 print "***Completed HybridCalculatorOriginal example"
 print "*** varying Higgs mass hypothesis and estimating confidence level ***"

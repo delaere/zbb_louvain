@@ -1,4 +1,3 @@
-
 #######################################################
 #
 # Loop over entries
@@ -24,150 +23,39 @@ import os
 gROOT.SetStyle("Plain")
 gStyle.SetErrorX(0)
 
-WP       = "HE"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+WP       = "HEHE"  #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
 channel  = "El"    #"El","Mu"
-template = "hist"  #"keys", "hist"
+template = "keys"  #"keys", "hist"
 jec      = 0       #1,3,5
-numbins  = 120      #20,40,80
+numbins  = 160     #20,40,80
 PVreduce = 0
+if WP=="HP" : numbins=numbins/2
+if WP=="HEHE" : numbins=numbins/4
+
+jet2 = False
 
 if template=="keys": numbins=40
 
 ### Getting a file and a tree
 
-file  = TFile("File_rds_zbb_Mu_MC.root")
+if   channel == "El" : file  = TFile("File_rds_zbb_El_MC.root")
+elif channel == "Mu" : file  = TFile("File_rds_zbb_Mu_MC.root")
+
 ws    = file.Get("ws")
 myRDS = ws.data("rds_zbb")
 
 print "myRDS.numEntries() = ", myRDS.numEntries()
 
-#RooDataSet::rds_zbb(eventSelectionrun,
-#                    eventSelectionevent,
-#                    eventSelectionls,
-#                    eventSelectiontriggerSelection,
-#                    eventSelectiontriggerBits,
-#                    eventSelectionzmassMu,
-#                    eventSelectionbestzmassMu,
-#                    eventSelectionzmassEle,
-#                    eventSelectionbestzmassEle,
-#                    eventSelectionzptMu,
-#                    eventSelectionbestzptMu,
-#                    eventSelectionzptEle,
-#                    eventSelectionbestzptEle,
-#                    eventSelectionscaldptZbj1,
-#                    eventSelectiondrZbj1,
-#                    eventSelectiondphiZbj1,
-#                    eventSelectionscaldptZbb,
-#                    eventSelectiondphiZbb,
-#                    eventSelectiondrZbb,
-#                    eventSelectiondijetM,
-#                    eventSelectiondijetPt,
-#                    eventSelectiondijetdR,
-#                    eventSelectiondijetSVdR,
-#                    eventSelectiondphidijetMET,
-#                    eventSelectionZbM,
-#                    eventSelectionZbPt,
-#                    eventSelectionZbbM,
-#                    eventSelectionZbbPt,
-#                    eventSelectioncategory,
-#                    eventSelectionmu1pt,
-#                    eventSelectionmu2pt,
-#                    eventSelectionmu1eta,
-#                    eventSelectionmu2eta,
-#                    eventSelectionmu1etapm,
-#                    eventSelectionmu2etapm,
-#                    eventSelectionel1pt,
-#                    eventSelectionel2pt,
-#                    eventSelectionel1eta,
-#                    eventSelectionel2eta,
-#                    eventSelectionel1etapm,
-#                    eventSelectionel2etapm,
-#                    eventSelectionSSVHEdisc,
-#                    eventSelectionSSVHPdisc,
-#                    eventSelectionSVmass,
-#                    eventSelectionMET,
-#                    eventSelectionMETphi,
-#                    eventSelectionjetpt,
-#                    eventSelectionjetpt_totunc,
-#                    eventSelectionjeteta,
-#                    eventSelectionjetetapm,
-#                    eventSelectionjetphi,
-#                    eventSelectionjetoverlapmu,
-#                    eventSelectionjetoverlapele,
-#                    eventSelectionjet1pt,
-#                    eventSelectionjet1pt_totunc,
-#                    eventSelectionjet1eta,
-#                    eventSelectionjet1etapm,
-#                    eventSelectionjet2pt,
-#                    eventSelectionjet2pt_totunc,
-#                    eventSelectionjet2eta,
-#                    eventSelectionjet2etapm,
-#                    eventSelectionbjet1pt,
-#                    eventSelectionbjet1pt_totunc,
-#                    eventSelectionbjet1eta,
-#                    eventSelectionbjet1etapm,
-#                    eventSelectionbjet1HEdisc,
-#                    eventSelectionbjet1HPdisc,
-#                    eventSelectionbjet1SVmass,
-#                    eventSelectionbjet2pt,
-#                    eventSelectionbjet2pt_totunc,
-#                    eventSelectionbjet2eta,
-#                    eventSelectionbjet2etapm,
-#                    eventSelectionbjet2HEdisc,
-#                    eventSelectionbjet2HPdisc,
-#                    eventSelectionbjet2SVmass,
-#                    eventSelectionnj,
-#                    eventSelectionnb,
-#                    eventSelectionnbP,
-#                    eventSelectionnhf,
-#                    eventSelectionnef,
-#                    eventSelectionnpf,
-#                    eventSelectionchf,
-#                    eventSelectionnch,
-#                    eventSelectioncef,
-#                    eventSelectionjetid,
-#                    BtaggingReweightingHE,
-#                    BtaggingReweightingHP,
-#                    BtaggingReweightingHEexcl,
-#                    BtaggingReweightingHPexcl,
-#                    BtaggingReweightingHEHE,
-#                    BtaggingReweightingHEHP,
-#                    BtaggingReweightingHPHP,
-#                    LeptonsReweightingweight,
-#                    rc_eventSelection_0,
-#                    rc_eventSelection_1,
-#                    rc_eventSelection_2,
-#                    rc_eventSelection_3,
-#                    rc_eventSelection_4,
-#                    rc_eventSelection_5,
-#                    rc_eventSelection_6,
-#                    rc_eventSelection_7,
-#                    rc_eventSelection_8,
-#                    rc_eventSelection_9,
-#                    rc_eventSelection_10,
-#                    rc_eventSelection_11,
-#                    rc_eventSelection_12,
-#                    rc_eventSelection_13,
-#                    rc_eventSelection_14,
-#                    rc_eventSelection_15,
-#                    rc_eventSelection_16,
-#                    rc_eventSelection_17,
-#                    rc_eventSelection_18,
-#                    rc_eventSelection_19,
-#                    rc_eventSelection_20,
-#                    rc_eventSelection_21,
-#                    rc_eventSelection_22)
 
-
-rrv_msv    = ws.var("eventSelectionbjet1SVmass")
+if jet2 : rrv_msv    = ws.var("jetmetbjet2SVmass")
+else    : rrv_msv    = ws.var("jetmetbjet1SVmass")
 #rrv_bTagHE = ws.var("rrv_bTagHE")
 #rrv_bTagHP = ws.var("rrv_bTagHP")
-rrv_pT     = ws.var("eventSelectionjet1pt")
-rrv_eta    = ws.var("eventSelectionjet1eta")
+rrv_pT     = ws.var("jetmetjet1pt")
+rrv_eta    = ws.var("jetmetjet1eta")
 #rrv_nPV    = ws.var("eventSelectionnpf")
-rrv_pT_unc = ws.var("ctionbjet1pt_totunc")
+rrv_pT_unc = ws.var("jetmetjet1pt_totunc")
 rc_flav    = ws.cat("mcSelectioneventType")
-rc_sel     = ws.cat("rc_sel")
 
 rrv_pT.setMin(25)
 rrv_pT.setMax(150)
@@ -193,16 +81,16 @@ ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
 
 if PVreduce == 1:
-    DATA = DATA.reduce("rrv_nPV<4.5")
-    myRDS=myRDS.reduce("rrv_nPV<4.5")
+    DATA = DATA.reduce("vertexAssociationnvertices<4.5")
+    myRDS=myRDS.reduce("vertexAssociationnvertices<4.5")
 if PVreduce == 2:
-    DATA = DATA.reduce("rrv_nPV>4.5")
-    DATA = DATA.reduce("rrv_nPV<7.5")
-    myRDS=myRDS.reduce("rrv_nPV>4.5")
-    myRDS=myRDS.reduce("rrv_nPV<7.5")
+    DATA = DATA.reduce("vertexAssociationnvertices>4.5")
+    DATA = DATA.reduce("vertexAssociationnvertices<7.5")
+    myRDS=myRDS.reduce("vertexAssociationnvertices>4.5")
+    myRDS=myRDS.reduce("vertexAssociationnvertices<7.5")
 if PVreduce == 3:
-    DATA = DATA.reduce("rrv_nPV>7.5")
-    myRDS=myRDS.reduce("rrv_nPV>7.5")
+    DATA = DATA.reduce("vertexAssociationnvertices>7.5")
+    myRDS=myRDS.reduce("vertexAssociationnvertices>7.5")
 
 if WP=="HE"         :
     DATA = DATA.reduce("rc_eventSelection_5==1")
@@ -228,7 +116,21 @@ if WP=="HP_excl"    :
 if WP=="HPMET_excl" :
     DATA = DATA.reduce("rc_HPMET_excl==1")
     myRDS=myRDS.reduce("rc_HPMET_excl==1")
-
+if WP == "HEHE":
+    DATA = DATA.reduce("rc_eventSelection_9==1")
+    myRDS = myRDS.reduce("rc_eventSelection_9==1")
+    if channel == "Mu":
+        DATA  = DATA.reduce("jetmetMET<50")
+        DATA  = DATA.reduce("jetmetMET<50&eventSelectionbestzmassMu>76&eventSelectionbestzmassMu<106")
+        #myRDS = myRDS.reduce("jetmetMET<50&eventSelectionbestzmassMu<106")
+    elif channel == "El":
+        DATA  = DATA.reduce("jetmetMET<50")
+        DATA  = DATA.reduce("jetmetMET<50&eventSelectionbestzmassEle>76&eventSelectionbestzmassEle<106")
+        #myRDS = myRDS.reduce("jetmetMET<50&eventSelectionbestzmassEle>76")#&eventSelectionbestzmassEle<106")
+elif WP == "HPHP":
+    DATA = DATA.reduce("rc_eventSelection_11==1")
+    myRDS = myRDS.reduce("rc_eventSelection_11==1")
+                                
 print "DATA.numEntries() = ", DATA.numEntries()
 
 
@@ -464,15 +366,21 @@ Nl = RooRealVar("N_{l}","N_{l}",DATA.numEntries()*0.10,0,DATA.numEntries())
 f_Sum_b = RooRealVar("f_{b}","f_{b}", 0.70, 0.00, 1.  )
 f_Sum_c = RooRealVar("f_{c}","f_{c}", 0.20, 0.00, 1.  )
 
+#sumPdf = RooAddPdf("sumPdf","sumPdf",
+#                   RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
+#                   RooArgList(Nb,      Nc       ,Nl        ) )
+#sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
+#                    RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
+#                    RooArgList(f_Sum_b,  f_Sum_c            ) )
 sumPdf = RooAddPdf("sumPdf","sumPdf",
-                   RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
-                   RooArgList(Nb,      Nc       ,Nl        ) )
+                   RooArgList(b_sumPdf, c_sumPdf),
+                   RooArgList(Nb,      Nc               ) )
 sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
-                    RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
-                    RooArgList(f_Sum_b,  f_Sum_c            ) )
+                    RooArgList(b_sumPdf, c_sumPdf),
+                    RooArgList(f_Sum_b,             ) )
 
 rrv_msv.setRange("r",0,5)
-rrv_msv.SetTitle("m(SV) (GeV/c^{2})")
+rrv_msv.SetTitle("m(SV) (GeV)")
 
 print " fit DATA with JES"
 
@@ -535,91 +443,89 @@ DATA.plotOn(freem2,
 sumPdf2.paramOn(freem2,DATA)
 freem2.Draw()
 
-rrv_msv.SetTitle("Secondary vertex mass")
-rrv_msv.setUnit("GeV/c^{2}")
-  
 
-FRAME = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()/2.,rrv_msv.getBins()/2)
-FRAME.SetMinimum(-0.000)
+
+rrv_msv.SetTitle("Secondary vertex mass")
+rrv_msv.setUnit("GeV")
+
+from drawStyle import *
+
+setStyle()
+
+#######################################################
+
+CANVAS = TCanvas("CANVAS","CANVAS",600,600)
+
+borderX = CANVAS.GetWindowWidth()-CANVAS.GetWw()
+borderY = CANVAS.GetWindowHeight()-CANVAS.GetWh()
+CANVAS.SetCanvasSize(500,500)
+CANVAS.SetWindowSize(500+borderX,500+borderY)
+
+CANVAS.Modified()
+CANVAS.Update()
+#float x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.03;
+#float y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.1;
+
+CANVAS.UseCurrentStyle()
+
+#######################################################
+  
+FRAME = rrv_msv.frame(rrv_msv.getMin(),rrv_msv.getMax()*5./10.,rrv_msv.getBins()*5/10)
+#FRAME.SetBarWidth(0.)
+#FRAME.SetMarkerSize(1.0);#0.7
+#FRAME.SetLineWidth(1)
+
+##gStyle.SetOptTitle(kFALSE)
+#FRAME.SetTitle("")
+
+#CANVAS.SetTickx()
+#CANVAS.SetTicky()
+
+#FRAME.GetXaxis().SetLabelFont(42)
+#FRAME.GetYaxis().SetLabelFont(42)
+#FRAME.GetXaxis().SetTitleFont(42)
+#FRAME.GetYaxis().SetTitleFont(42)
+
 DATA.plotOn(FRAME,
-            RooFit.MarkerSize(1.3),
+            RooFit.MarkerSize(1.0),#0.7
             RooFit.XErrorSize(0.035),
             RooFit.DrawOption("pe2"))
 #sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineWidth(1))
 #sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen), RooFit.DrawOption("F"), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed), RooFit.DrawOption("F"), RooFit.LineWidth(1))
-sumPdf2.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed), RooFit.LineWidth(1))
-DATA.plotOn(FRAME, RooFit.MarkerSize(1.3), RooFit.XErrorSize(0.035), RooFit.DrawOption("pe2"))
-#sum_fb->paramOn(f_frac,myRDS);
+#sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+#sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen-7), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed-7), RooFit.LineWidth(1))
+DATA.plotOn(FRAME,
+            RooFit.MarkerSize(1.0),#0.7
+            RooFit.XErrorSize(0.035),
+            RooFit.DrawOption("pe2"))
 
-#FRAME.SetYTitle("Events / ( 0.333 GeV/c^{2} )");
-
-CANVAS = TCanvas("CANVAS","CANVAS",800,800)
-CANVAS.Divide(1)
-CANVAS.cd(1)
-FRAME.SetBarWidth(0.)
-FRAME.SetMarkerSize(1.3)
-FRAME.SetLineWidth(1)
    
-FRAME.SetMinimum(-0.000)
-FRAME.Draw("F")
+FRAME.Draw()
 
-#leg1 = TLegend(0.50, 0.5625, 0.85, 0.95-0.20, "", "NDC")
-#leg1.AddEntry( FRAME.getObject(0), "Data ","PLE")
-#leg1.AddEntry( FRAME.getObject(5), "b-jets"  ,"F")
-#leg1.AddEntry( FRAME.getObject(3), "c-jets"  ,"F")
-
-leg1 = TLegend(0.50, 0.50, 0.85, 0.95-0.20, "", "NDC")
+leg1 = TLegend(0.72, 0.55, 0.92, 0.95-0.15, "", "NDC")
 leg1.AddEntry( FRAME.getObject(0), "Data ", "PLE")
-leg1.AddEntry( FRAME.getObject(5), "b-jets"  ,"F")
-leg1.AddEntry( FRAME.getObject(3), "c-jets"  ,"F")
-leg1.AddEntry( FRAME.getObject(1), "l-jets"  ,"F")
+#leg1.AddEntry( FRAME.getObject(1), "l-jets"  ,"F")
+leg1.AddEntry( FRAME.getObject(1), "c-jets"  ,"F")
+leg1.AddEntry( FRAME.getObject(3), "b-jets"  ,"F")
 
+leg1.SetTextSize(0.04)
 leg1.SetFillColor(0)
 leg1.SetShadowColor(0)
+leg1.SetBorderSize(0)
 
 leg1.Draw()
 
 lat=TLatex()
-#lat.SetTextSize(0.9)
-lat.DrawLatex(2.5,0.9*FRAME.GetMaximum(),"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2 fb^{-1}}")
+lat.SetTextSize(0.04)
+#lat.DrawLatex(2.4,0.88*FRAME.GetMaximum(),"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2.1 fb^{-1}}")
+if channel=="Mu" : lat.DrawLatex(2.9,0.88*FRAME.GetMaximum(),"Dimuon sample")
+if channel=="El" : lat.DrawLatex(2.5,0.88*FRAME.GetMaximum(),"Dielectron sample")
 
-lat2=TLatex()
-#lat2.SetTextSize(0.9)
-lat2.DrawLatex(2.5,0.45*FRAME.GetMaximum(),"High purity b-tagging")
-
-
-                          
-
-
-
-# TLegend* leg1 = new TLegend(0.50, 0.5625, 0.85, 0.95-0.20, "", "NDC");
-# // leg1->AddEntry( f_frac->getObject(0), "data ");
-# leg1->AddEntry( f_frac->getObject(0), "Data ","PLE");
-# leg1->AddEntry( f_frac->getObject(5), "b-jets"  ,"F");
-# leg1->AddEntry( f_frac->getObject(3), "c-jets"  ,"F");
-
-# leg1->SetFillColor(0);
-# leg1->SetShadowColor(0);
-
-# leg1->Draw();
-
-# TLatex lat;
-# lat.DrawLatex(2.,14.,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 36 pb^{-1}}");
-
-# TLatex lat;
-# lat.DrawLatex(2.5,6,"High purity b-tagging");
-            
-
-#C1.cd(3)
-#freem3 = rrv_pT.frame(0,250)
-#DATA.plotOn(freem3,RooLinkedList())
-#sumPdf2.plotOn(freem3,RooFit.LineColor(kBlack))
-#freem3.Draw()
+CANVAS.Draw()
 
 jecString=""
 if jec : jecString+="_"+str(jec)+"sigmaJEC"
@@ -629,9 +535,19 @@ if PVreduce : pvString+="_"+"PVregion"+str(PVreduce)
 
 if not numbins == 40: template+="_"+str(numbins)+"bins"
 
-C1.SaveAs("~/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_double.pdf")
+if jet2 : C1.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_double_jet2.pdf")
+else    : C1.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_double.pdf")
 
-CANVAS.SaveAs("~/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".pdf")
+if jet2 : CANVAS.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_jet2.pdf")
+else    : CANVAS.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".pdf")
+
+lat2=TLatex()
+lat2.SetTextSize(0.04)
+#if WP=="HE" : lat2.DrawLatex(2.4,0.45*FRAME.GetMaximum(),"High eff. b-tagging")
+#if WP=="HP" : lat2.DrawLatex(2.4,0.45*FRAME.GetMaximum(),"High purity b-tagging")
+
+if jet2 : CANVAS.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_withTagLabel_jet2.pdf")
+else    : CANVAS.SaveAs("~/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_withTagLabel.pdf")
 
 
 #make RooDataHist
@@ -745,7 +661,8 @@ CANVAS.SaveAs("~/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"
 ##tree = gDirectory.Get("ttree;3")
 #mytsjeen = f.Get("mistag/ttree;3")
 
-filename = "/home/fynu/tdupree/public/ZbbPaper/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".txt"
+filename = "/home/fynu/tdupree/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+".txt"
+if jet2 :filename = "/home/fynu/tdupree/public/Z2b/bPurity/bPurFit_DYtemplate_"+channel+"_"+WP+"_"+template+pvString+jecString+"_jet2.txt"
 
 my_file = open(filename,"w")
 print "filename = ", filename

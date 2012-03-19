@@ -25,6 +25,9 @@ from monteCarloSelectionControlPlots import *
 from LumiReWeightingControlPlots import *
 from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
+from objectsControlPlots import *
+from vertexAssociationControlPlots import *
+
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
@@ -35,7 +38,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "Mu_DATA" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "Mu_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
 MonteCarloPUFileName=zbbfile.pileupMC
@@ -51,7 +54,11 @@ muChannel = { "Mu_DATA"     : True,
               "Mu_MC"       : True,
               "El_MC"       : False,
               "Ttbar_Mu_MC" : True,
-              "Ttbar_El_MC" : False
+              "Ttbar_El_MC" : False,
+              "ZZ_Mu_MC"    : True,
+              "ZZ_El_MC"    : False,
+              "ZHbb_Mu_MC"  : True,
+              "ZHbb_El_MC"  : False
               }
 
 path = { "Mu_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/Mu_Data_skim/" ,
@@ -59,7 +66,11 @@ path = { "Mu_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/Mu_Data_s
          "Ttbar_Mu_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
          "Ttbar_El_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
          "Mu_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"   ,
-         "El_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"
+         "El_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"   ,
+         "ZZ_Mu_MC"    : "/storage/data/cms/users/tdupree/zbb/20111103/ZZ_MC_skim/"   ,
+         "ZZ_El_MC"    : "/storage/data/cms/users/tdupree/zbb/20111103/ZZ_MC_skim/"   ,
+         "ZHbb_Mu_MC"  : "/storage/data/cms/users/tdupree/zbb/20111103/ZHbb_125_MC_skim/", 
+         "ZHbb_El_MC"  : "/storage/data/cms/users/tdupree/zbb/20111103/ZHbb_125_MC_skim/" 
          }
 
 ###############################
@@ -103,10 +114,14 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=False, dataset=rds_zbb, mode="dataset")
-#mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
-prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
+jmcp     = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+if channel[-2:] == "MC":
+  mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+  prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+
 
 ### input
 
@@ -123,13 +138,17 @@ events = Events (files)
 ### booking
 
 escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
-#mscp.beginJob(genlabel=zbblabel.genlabel)
-prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
 brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
+jmcp.beginJob()             
+vacp.beginJob()             
+if channel[-2:] == "MC":
+  mscp.beginJob(genlabel=zbblabel.genlabel)
+  prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
+
 ntuple = getArgSet([escp
 #                   , mscp
-                   , prcp
+#                   , prcp
 #                   , brcp
 #                   , lrcp
                     ]) #would it be enought to call rds_zbb.get() or even to use obsSet ???
@@ -160,32 +179,45 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
         t0 = time.time()
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=False,btagAlgo="SSV")
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
+
       escp.processEvent(event)
-      #mscp.processEvent(event)
-      prcp.processEvent(event)
       brcp.processEvent(event)
       lrcp.processEvent(event)
+      jmcp.processEvent(event)
+      vacp.processEvent(event)
+      if channel[-2:] == "MC":
+        mscp.processEvent(event)
+        prcp.processEvent(event)
       
       ras_escp=escp._obsSet
-      #ras_mscp=mscp._obsSet
       ras_lrcp=lrcp._obsSet
       ras_brcp=brcp._obsSet
-      ras_prcp=prcp._obsSet
+      ras_jmcp=jmcp._obsSet
+      ras_vacp=vacp._obsSet
+      if channel[-2:] == "MC":
+        ras_mscp=mscp._obsSet
+        ras_prcp=prcp._obsSet
 
       ras_escp.add(ras_lrcp)
       ras_escp.add(ras_brcp)
-      #ras_escp.add(ras_mscp)
-      ras_prcp.add(ras_prcp)
+      ras_escp.add(ras_jmcp)
+      ras_escp.add(ras_vacp)
+      if channel[-2:] == "MC":
+        ras_escp.add(ras_mscp)
+        ras_escp.add(ras_prcp)
 
       #rds_zbb.add(ntuple)
       rds_zbb.add(ras_escp)
       i += 1
 
     escp.endJob()
-    #mscp.endJob()
-    prcp.endJob()
     brcp.endJob()
     lrcp.endJob()
+    jmcp.endJob()
+    vacp.endJob()
+    if channel[-2:] == "MC":
+      mscp.endJob()
+      prcp.endJob()
 
 
     ws = RooWorkspace("ws","workspace")

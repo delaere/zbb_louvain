@@ -170,7 +170,22 @@ def isMatchedElectron(electron):
   #print "clone:",electron.masterClone().isNonnull()
   #if electron.hasOverlaps("muons"): return False
 
-  return (isTightElectron(electron) and True)
+  if electron.hasMasterClone():
+    el = electron.masterClone()
+    ROOT.SetOwnership( el, False )
+  else:
+    el = electron
+
+  elIdCut = ( el.electronID("simpleEleId85relIso") == 7 )
+
+  superclusterEta = abs(el.superCluster().eta())
+  fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
+
+  elPtCut = el.pt() > 25. 
+  elEtaCut = abs(el.eta()) < 2.5 
+  elDbCut = abs(el.dB()) < 0.02 
+
+  return (isTightElectron(electron) and elPtCut and elEtaCut and elDbCut and elIdCut and fiducialCut)
 
 def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
