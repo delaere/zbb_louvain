@@ -18,7 +18,7 @@ WP       = "11"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
 channel  = "El"    #"El","Mu"
 extraCut = "jetmetbjet1pt>25.&jetmetbjet2pt>25."
 
-kutString = ""+extraCut
+totalCutString = ""+extraCut
 
 #####################################################
 ### settings (this should move somewhere central) ### 
@@ -111,10 +111,10 @@ for sample in totsampleList:
 
     if channel =="Mu" :
         myRDS_red[sample]=myRDS_red[sample].reduce(muMassCut)
-        kutString=kutString+"&"+muMassCut
+        totalCutString+="&"+muMassCut
     if channel =="El" :
         myRDS_red[sample]=myRDS_red[sample].reduce(elMassCut)
-        kutString=kutString+"&"+muMassCut
+        totalCutString+="&"+muMassCut
 
     myRDS_red[sample].addColumn(w)
 
@@ -157,18 +157,10 @@ print "===> the pure # of ", sample, " MC    ............... ", str(sum_MC)[:4]
 print "===> the pure # of ", sample, " DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
 
+###########
+### FIN ###
+###########
 
-#num_TT_MC = RooRealVar("num_TT_MC","num_TT_MC",
-#                       RDS_TT_red_w.sumEntries()*(lumi_of_DATA/lumi_of_TT))
-#num_DY_MC = RooRealVar("num_DY_MC","num_DY_MC",
-#                        RDS_DY_red_w.sumEntries()*(lumi_of_DATA/lumi_of_DY))
-#total_MC = num_TT_MC.getVal()+num_DY_MC.getVal()
-#
-#print "the total (DY+TT) MC events = " , total_MC
-#print "the lumi of DATA = 2.1 fb-1???"  , lumi_of_DATA
-#print "the number of entries of DATA = ", DATA_red.numEntries()#
-#
-#norm = total_MC/DATA_red.numEntries()
 
 
 
