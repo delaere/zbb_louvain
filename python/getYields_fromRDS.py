@@ -1,59 +1,160 @@
+#####################################################
+###                                               ###
+### getYields_fromRDS.py                          ###
+###                                               ###
+### Small script to estimate the number of events ###
+### for different data and MC samples             ###
+### for a certain working point and selection     ###
+###                                               ###
+#####################################################
+
 from ROOT import *
 
-file_el  = TFile("File_rds_zbb_ZZ_El_MC.root")
-file_mu  = TFile("File_rds_zbb_ZZ_El_MC.root")
+#####################################################
+### sample/wp/selection of interest
+#####################################################
 
-ws_el    = file_el.Get("ws")
-ws_mu    = file_mu.Get("ws")
+WP       = "11"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+channel  = "El"    #"El","Mu"
+extraCut = "jetmetbjet1pt>25.&jetmetbjet2pt>25."
 
-myRDS_el = ws_el.data("rds_zbb")
-myRDS_mu = ws_mu.data("rds_zbb")
+kutString = ""+extraCut
 
-print "myRDS_el.numEntries() = ", myRDS_el.numEntries()
-print "myRDS_mu.numEntries() = ", myRDS_mu.numEntries()
+#####################################################
+### settings (this should move somewhere central) ### 
+#####################################################
 
-myRDS_el.append(myRDS_mu)
-myRDS=myRDS_el
-ws=ws_el
+MCsampleList  = ["TT","DY","ZZ","ZHbb"]
+totsampleList = ["DATA","TT","DY","ZZ","ZHbb"]
 
-rrv_w_HE   = ws.var("BtaggingReweightingHE")
-rrv_w_HP   = ws.var("BtaggingReweightingHP")
-rrv_w_HEHE = ws.var("BtaggingReweightingHEHE")
-rrv_w_HEHP = ws.var("BtaggingReweightingHEHP")
-rrv_w_HPHP = ws.var("BtaggingReweightingHPHP")
+lumi = { "DATA" : 2.1                     ,
+         "TT"   : (3701947./157.5)/1000.  ,
+         "DY"   : (36257961./3048.)/1000. ,
+         "ZZ"   : 4000000./6000.          ,
+         "ZHbb" : 12000.                  }
+
+MCweight = {}
+
+for sample in MCsampleList:
+    print "the lumi of ", sample, " = ", lumi[sample]
+    MCweight[sample] = lumi["DATA"]/lumi[sample]
+    print "the weight of ", sample," = ", MCweight[sample]
+
+#############
+### files ###
+#############
+
+myRDS_el    = {}
+myRDS_mu    = {}
+myRDS       = {}
+myRDS_red   = {} 
+myRDS_red_w = {} 
+
+
+filename_el = {"DATA" : "File_rds_zbb_El_DATA.root",
+               "TT"  : "File_rds_zbb_Ttbar_El_MC.root",
+               "DY"  : "File_rds_zbb_El_MC.root",
+               "ZZ"  : "File_rds_zbb_ZZ_El_MC.root",
+               "ZHbb": "File_rds_zbb_ZHbb_El_MC.root"
+               }
+
+filename_mu = {"DATA" : "File_rds_zbb_Mu_DATA.root",
+               "TT"  : "File_rds_zbb_Ttbar_Mu_MC.root",
+               "DY"  : "File_rds_zbb_Mu_MC.root",
+               "ZZ"  : "File_rds_zbb_ZZ_Mu_MC.root",
+               "ZHbb": "File_rds_zbb_ZHbb_Mu_MC.root"
+               }
+
+for sample in totsampleList :
+
+    file_el  = TFile(filename_el[sample])
+    file_mu  = TFile(filename_mu[sample])
+
+    ws_el    = file_el.Get("ws")
+    ws_mu    = file_mu.Get("ws")
+
+    myRDS_el[sample] = ws_el.data("rds_zbb")
+    myRDS_mu[sample] = ws_mu.data("rds_zbb")
+
+    print "myRDS_el.numEntries() for ", sample , " = ", myRDS_el[sample].numEntries()
+    print "myRDS_mu.numEntries() for ", sample , " = ", myRDS_mu[sample].numEntries()
+
+    ws=ws_el
+
+###############
+### weights ###
+###############
+
+rrv_w_b = {"5"  : ws.var("BtaggingReweightingHE")  ,
+           "7"  : ws.var("BtaggingReweightingHP")  ,
+           "9"  : ws.var("BtaggingReweightingHEHE"), 
+           "11" : ws.var("BtaggingReweightingHPHP")
+           }
 
 rrv_w_lep  = ws.var("LeptonsReweightingweight")
 rrv_w_lumi = ws.var("lumiReweightingLumiWeight")
 
 
-w = { "HEHE" : RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_HEHE,rrv_w_lep,rrv_w_lumi)),
-      "HPHP" : RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_HPHP,rrv_w_lep,rrv_w_lumi)) }
+w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 
+#################################  
+### working point & selection ###
+#################################
 
+muMassCut = "(eventSelectionbestzmassMu>76&eventSelectionbestzmassMu<106)"
+elMassCut = "(eventSelectionbestzmassEle>76&eventSelectionbestzmassEle<106)"
 
-lumi_of_DATA = 2.1
+for sample in totsampleList:
+    myRDS_red[sample] = myRDS_el[sample].reduce("rc_eventSelection_"+WP+"==1")
 
-MC_xsec = 6000.
-MC_nevents = 4000000.
-lumi_of_ZZ   = MC_nevents/MC_xsec
+    if extraCut : myRDS_red[sample] = myRDS_red[sample].reduce(extraCut)
 
-MC_weight = lumi_of_DATA/lumi_of_ZZ
+    if channel =="Mu" :
+        myRDS_red[sample]=myRDS_red[sample].reduce(muMassCut)
+        kutString=kutString+"&"+muMassCut
+    if channel =="El" :
+        myRDS_red[sample]=myRDS_red[sample].reduce(elMassCut)
+        kutString=kutString+"&"+muMassCut
 
-print "lumi_of_ZZ = ", lumi_of_ZZ
-print "MC_weight = ", MC_weight
+    myRDS_red[sample].addColumn(w)
 
-myRDS_red = myRDS.reduce("rc_eventSelection_9==1")
+    myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
 
-myRDS_red.addColumn(w["HEHE"])
+#################
+### printouts ###
+#################
 
-myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get(),"","w")
+print "***"
+print "*** DATA/MC COMPARISONS"
+print "***"
+print "channel ......... ", channel
+print "working point ... ", WP
+print "extra cut ....... ", extraCut
+print "***"
 
-print "the pure number of entries of ZZ MC = ", myRDS_red_w.numEntries()
-print "the effective number of ZZ MC for this data-lumi = ", myRDS_red_w.numEntries()*(lumi_of_DATA/lumi_of_ZZ)
+sum_MC=0
+for sample in MCsampleList:
+    print "the pure # of ", sample, " MC  ............... ", str(myRDS_red_w[sample].numEntries())[:4]
+    sum_MC+=myRDS_red_w[sample].numEntries()
+print "===> the pure # of ", sample, " MC    ............... ", str(sum_MC)[:4]
+print "===> the pure # of ", sample, " DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
+print "***"
+sum_MC=0
+for sample in MCsampleList:
+    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample]))[:4]
+    sum_MC+=myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample])
+print "===> the pure # of ", sample, " MC    ............... ", str(sum_MC)[:4]
+print "===> the pure # of ", sample, " DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
-print "the effective weighted number of ZZ MC for this data lumi = ", myRDS_red_w.sumEntries()*(lumi_of_DATA/lumi_of_ZZ)
+print "***"
 
+sum_MC=0
+for sample in MCsampleList:
+    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample]))[:4]
+    sum_MC+=myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample])
+print "===> the pure # of ", sample, " MC    ............... ", str(sum_MC)[:4]
+print "===> the pure # of ", sample, " DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
 
 
