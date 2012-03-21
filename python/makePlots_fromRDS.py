@@ -645,7 +645,7 @@ for name in namePlotList:
     rhp_ZHbb = RooHistPdf("rhp_ZHbb","rhp_ZHbb",
                         RooArgSet(var[name]),
                         rdh_ZHbb)
-    sum = RooAddPdf("sum","sum",RooArgList(rhp_TT,rhp_DY,rhp_ZZ,rhp_ZHbb),RooArgList(num_TT_MC,num_DY_MC,num_ZZ_MC,num_ZHbb_MC))    
+    sum = RooAddPdf("sum","sum",RooArgList(rhp_TT,rhp_DY,rhp_ZZ,rhp_ZHbb),RooArgList(num_TT_MC,num_DY_MC,num_ZZ_MC,num_ZHbb_MC)    )
 
 
     var_frame[name] = var[name].frame()
