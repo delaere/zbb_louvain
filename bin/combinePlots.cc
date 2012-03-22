@@ -15,14 +15,24 @@
 #include <TKey.h>
 #include <TStyle.h>
 #include <TLegend.h>
+#include <TLatex.h>
+#include <TFrame.h>
 
 class plotCombiner {
 
    public:
      plotCombiner(edm::ParameterSet& options) {
        _nostack = options.getUntrackedParameter("nostack",false);
+       _lumi = options.getUntrackedParameter("luminosity",1.);
+       _autoLumiScaling = options.getUntrackedParameter("autoLumiScaling",false);
+       _lat = new TLatex(0.2,0.87,options.getUntrackedParameter("label",std::string("")).c_str());
+       _leg = new TLegend(0.6,0.7,0.9,0.9);
+       _legendCompleted = false;
      }
-     ~plotCombiner() {}
+     ~plotCombiner() { 
+       delete _lat;
+       delete _leg;
+     }
      void run(TDirectory* output) {
        CombineDir(_filesData, _filesMC, output);
      }
@@ -45,6 +55,11 @@ class plotCombiner {
          _styleTweaks[tweak->getParameter<std::string>("name")] = *tweak;
        }
      }
+     void resetLegend() {
+       delete _leg;
+       _leg = new TLegend(0.6,0.7,0.9,0.9);
+       _legendCompleted = false;
+     }
    private:
      void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      void CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
@@ -54,7 +69,10 @@ class plotCombiner {
      std::vector<TDirectory*> _filesData;
      std::vector<TDirectory*> _filesMC;
      std::map<std::string, edm::ParameterSet> _styleTweaks;
-     bool _nostack;
+     bool _nostack, _autoLumiScaling, _legendCompleted;
+     double _lumi;
+     TLegend* _leg;
+     TLatex* _lat;
 };
 
 void setTDRStyle() {
@@ -181,6 +199,7 @@ int main(int argc, char *argv[]){
   // set the tdr Style
   setTDRStyle();
   gROOT->SetBatch();  
+  gROOT->SetStyle("tdrStyle");
   // do the job
   plotCombiner combiner(options);
   combiner.setDatacfg(dataInputs);
@@ -190,6 +209,7 @@ int main(int argc, char *argv[]){
   // save and quit
   _output->Write();
   _output->Close();
+  std::cout << "Done." << std::endl;
   return 0;
 }
 
@@ -203,12 +223,13 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      drawData = false;
    }
    // create everything, using also first data histo
+   gROOT->SetStyle("tdrStyle");
    TH1* data;
    (*datadirs.begin())->GetObject(name,data);
    data = (TH1*) data->Clone();
-   TCanvas* c = new TCanvas(data->GetName(),data->GetTitle());
+   TCanvas* c = new TCanvas(data->GetName(),data->GetTitle(),500,500);
    THStack* stack = new THStack(data->GetName(),"MC stack");
-   TLegend* leg = new TLegend(0.6,0.7,0.9,0.9);
+   THStack* nostack = new THStack(data->GetName(),"MC stack - not stacked");
    // DATA
    std::map<std::string, edm::ParameterSet>::iterator style = _styleTweaks.find(data->GetName());
    for(std::vector<TDirectory*>::const_iterator it = datadirs.begin()+1;it<datadirs.end();++it) {
@@ -218,7 +239,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    }
    if(style!=_styleTweaks.end()) data = Rebin(data,style);
    data->SetTitle("data");
-   leg->AddEntry(data,"Data","LEP");
+   if(!_legendCompleted) _leg->AddEntry(data,"Data","LEP");
    // now to the MC
    std::vector<edm::ParameterSet>::const_iterator mcConf = _mcInputs.begin();
    for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it, ++mcConf) {
@@ -226,41 +247,78 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      (*it)->GetObject(data->GetName(),h);
      // title
      h->SetTitle(mcConf->getParameter<std::string>("role").c_str());
-     // color
-     h->SetFillColor(mcConf->getParameter<unsigned int>("color"));
-     //h->SetLineColor(mcConf->getParameter<unsigned int>("color"));
+     // color and style
+     if(mcConf->getUntrackedParameter<bool>("stacked",true) && !_nostack)
+       // for stacked histograms, just set the fill color
+       h->SetFillColor(mcConf->getParameter<unsigned int>("color"));
+     else {
+       // non-stacked histograms are drawn as a thicker line
+       h->SetLineColor(mcConf->getParameter<unsigned int>("color"));
+       h->SetFillStyle(0);
+       h->SetLineWidth(3);
+     }
      // scale
      h->Sumw2();
      h->Scale(mcConf->getParameter<double>("scale"));
      // rebin
      if(style!=_styleTweaks.end()) h = Rebin(h,style);
      // add
-     stack->Add(h);
-     // legend: we do nothing otherwise the entries would have the wrong order (reversed)
-     //leg->AddEntry(h,mcConf->getParameter<std::string>("role").c_str(),"f");
+     if(mcConf->getUntrackedParameter<bool>("stacked",true) && !_nostack) 
+       stack->Add(h);
+     else
+       nostack->Add(h);
    }
    std::vector<edm::ParameterSet>::const_reverse_iterator mcrConf = _mcInputs.rbegin();
    // another loop on MC, in reverse order, to create the legend.
-   for(std::vector<TDirectory*>::const_reverse_iterator it = mcdirs.rbegin();it<mcdirs.rend();++it, ++mcrConf) {
-     TH1* h;
-     (*it)->GetObject(data->GetName(),h);
-     // legend
-     leg->AddEntry(h,mcrConf->getParameter<std::string>("role").c_str(),"f");
+   if(!_legendCompleted) {
+     for(std::vector<TDirectory*>::const_reverse_iterator it = mcdirs.rbegin();it<mcdirs.rend();++it, ++mcrConf) {
+       TH1* h;
+       (*it)->GetObject(data->GetName(),h);
+       // legend
+       if(mcrConf->getUntrackedParameter<bool>("stacked",true) && !_nostack)
+         _leg->AddEntry(h,mcrConf->getParameter<std::string>("role").c_str(),"f");
+       else
+         _leg->AddEntry(h,mcrConf->getParameter<std::string>("role").c_str(),"l");
+     }
+     _legendCompleted = true;
    }
    if(drawData) {
      data->Draw("e");         // first draw data... that fixes the scale
-     if(_nostack)
-       stack->Draw("nostack, hist, same");     // then the stack on top
-     else
-       stack->Draw("hist, same");   // then the stack on top
+     stack->Draw("hist, same");   // then the stack on top
+     nostack->Draw("nostack, hist, same");     // then the unstacked histograms on top
      data->Draw("e, same");   // and again data to see all points
    } else {
-     if(_nostack)
-       stack->Draw("nostack");// draw the mc alone
-     else
-       stack->Draw();         // draw the mc alone
+     stack->Draw();         // draw the mc alone
+     nostack->Draw("nostack, same");// draw the mc alone
    }
-   leg->Draw();               // draw the legend
+   // add the label from options
+   float fontsize = 0.04;
+   _lat->SetNDC();
+   _lat->SetTextSize(fontsize);
+   float datamax = data->GetBinCenter(data->GetMaximumBin());
+   float xmin = data->GetXaxis()->GetXmin();
+   float xmax = data->GetXaxis()->GetXmax();
+   float x1 = xmin + (xmax-xmin)*0.03; // left
+   float x2 = xmax - (xmax-xmin)*(0.03 + _lat->GetXsize()); // right
+   bool justifyRight = true; // default
+   if (datamax>x1+_lat->GetXsize() && datamax<x2) { // both are ok
+     justifyRight = (x2-datamax) > (datamax-x1-_lat->GetXsize());
+   } else if (datamax>x1+_lat->GetXsize()) { // left works
+     justifyRight = false;
+   } else if (datamax<x2) { // right works
+     justifyRight = true;
+   }
+   _lat->SetX(justifyRight?0.925-_lat->GetXsize():0.2);
+   _lat->Draw();
+   // put the legend accordingly
+   _leg->SetFillColor(kWhite);
+   _leg->SetBorderSize(0);
+   _leg->SetX1NDC(justifyRight?0.925-_lat->GetXsize():0.2);
+   _leg->SetX2NDC(_leg->GetX1NDC()+0.3);
+   _leg->SetY1NDC(0.65 - fontsize);
+   _leg->SetY2NDC(0.85 - fontsize);
+   _leg->Draw();               // draw the legend
+   c->UseCurrentStyle();
    if(style!=_styleTweaks.end()) {
      // we might add in the config file a set of entries to set labels, axis, etc.
      // everything is done using untracked parameters, so it is easy and quick to add things.
@@ -272,7 +330,14 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      if(xrange.size()==2) data->GetXaxis()->SetRangeUser(xrange[0],xrange[1]);
    }
    output->WriteObject(c,c->GetName());
+   // cleanup
    delete c;
+   // this is needed, in principle, but slows things down a lot.
+   /*
+   delete data;
+   delete stack;
+   delete nostack;
+   */
 }
 
 TH1* plotCombiner::Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterator& style)

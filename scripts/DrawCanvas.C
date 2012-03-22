@@ -104,7 +104,7 @@ void setTDRStyle() {
   gROOT->UseCurrentStyle();
 }
 
-void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char* addLabel=NULL)
+void DrawCanvas(TCanvas* canvas, const char* addLabel=NULL)
 {
   setTDRStyle();
   // retrieve the frame
@@ -116,42 +116,25 @@ void DrawCanvas(TCanvas* canvas, bool SSVHE=false, bool SSVHP=false, const char*
   float borderY = canvas->GetWindowHeight()-canvas->GetWh();
   canvas->SetCanvasSize(500,500);
   canvas->SetWindowSize(500+borderX,500+borderY);
-  // add the label
-  TLatex lat;
-  lat.SetTextSize(0.04);
-  frame = (TFrame*) canvas->FindObject("TFrame");
-  bool logx = canvas->GetLogx();
-  bool logy = canvas->GetLogy();
-  canvas->SetLogx(false);
-  canvas->SetLogy(false);
-  canvas->Modified();
-  canvas->Update();
-  float x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.03;
-  float y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.1;
-  canvas->UseCurrentStyle();
-  canvas->SetLogx(logx);
-  canvas->SetLogy(logy);
-  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 2.2 fb^{-1}}");
-  if(SSVHE) {
-    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
-    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
-    lat.DrawLatex(x,y,"High Efficiency b-tagging");
-  } else if(SSVHP) {
-    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
-    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
-    lat.DrawLatex(x,y,"High Purity b-tagging");
-  }
-  if(addLabel) {
-    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
-    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
-    lat.DrawLatex(x,y,addLabel);
-  }
-  // polish the legend
+  // move the legend to the place it should be
   TLegend* legend = ((TLegend*)canvas->FindObject("TPave"));
-  if(legend) {
-    legend->SetFillColor(kWhite);
-    legend->SetBorderSize(0);
+  TIter next(canvas->GetListOfPrimitives());
+  TLatex* label = NULL;
+  TObject* obj = NULL;
+  while(obj = next()) {
+    if(obj->InheritsFrom("TLatex")) {
+      label = (THStack*)obj;
+      break;
+    }
   }
+  if(label != NULL) {
+    legend->SetX1NDC(label->GetX());
+    legend->SetX2NDC(label->GetX()+0.3);
+    legend->SetY1NDC(0.65 - 0.04);
+    legend->SetY2NDC(0.85 - 0.04);
+    legend->Draw();
+  }
+  // redraw the axis on top of everything
   canvas->RedrawAxis();
   // now it is up to you to arrange things and save
 }
@@ -191,16 +174,8 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas, bool emptyBinsNoUnc = true)
   histo_ratio->SetTitle("");
   histo_ratio->Sumw2();
   histo_ratio->Divide(totmc);
-  // set ratio to 1 for empty bins
-  //for(int i=0;i<=histo_ratio->GetNbinsX();++i) {
-  //  if(histo_ratio->GetBinContent(i)==0) {
-  //    histo_ratio->SetBinContent(i,1);
-  //    histo_ratio->SetBinError(i,0);
-  //  }
-  //}
   // create the uncertainty histogram
   TH1F* mc_uncertainty = (TH1F*)totmc->Clone();
-  //for(unsigned bin = 0; bin<=mc_uncertainty->GetNbinsx(); ++bin) mc_uncertainty->SetBinContent(mc_uncertainty->GetBinError());
   mc_uncertainty->Divide(totmc);
   // set uncertainty to 0 or 1 for empty bins
   for(int i=0;i<=mc_uncertainty->GetNbinsX();++i) {
@@ -250,12 +225,6 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas, bool emptyBinsNoUnc = true)
 }
 
 void addErrorBand(TF1* errorFunction=NULL) {
-  //TFile *file1  = new TFile("bjet2unc.root"); 
-  //errorFunction =(TF1*)file1->Get("bjet2uncfit");
-  //TFile *file1  = new TFile("bjet1unc.root"); 
-  //errorFunction =(TF1*)file1->Get("bjet1uncfit");
-  // = 0.0526117 -0.000932991*x + 7.02479e-06*pow(x,2)
-
   // finds the stack
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
@@ -452,7 +421,5 @@ void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NU
     legend->SetBorderSize(0);
     legend->Draw();    
   }
-
-
 
 }
