@@ -121,7 +121,7 @@ for sample in totsampleList:
     if sample != "DATA": myRDS_red[sample].addColumn(w)
     #myRDS_red[sample].addColumn(w)
 
-    myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","")#"w")
+    myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
 
 #################
 ### printouts ###
@@ -343,5 +343,5 @@ for name in namePlotList:
     CANVAS[name].cd(2)
     th1_copy["DATA"+name].Draw()                                      
     for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
-    bla
+    
     
