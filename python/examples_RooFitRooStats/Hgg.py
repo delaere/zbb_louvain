@@ -1,8 +1,11 @@
 #######################################################
 ###                                                 ###
-### roofit101.py                                    ###  
+### Hgg.py                                          ###  
 ###                                                 ###
-### Basic RooFit example to construct a PDF         ###
+### RooFit/RooStats example of a toy H->gg search   ###
+### - construction of exp+gauss pdf                 ###
+### - fit                                           ###
+### - profile likelihood for search                 ###
 ###                                                 ###
 ### To be run as                                    ###
 ### >python -i Hgg.py                               ###
@@ -120,3 +123,6 @@ print "plotting likelihood of S alone"
 C_profLik=TCanvas("C_profLik","C_profLik",400,350)
 plot_S.Draw()
 
+###########
+### FIN ###
+###########

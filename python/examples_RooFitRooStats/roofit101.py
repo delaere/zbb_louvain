@@ -3,6 +3,7 @@
 ### roofit101.py                                    ###  
 ###                                                 ###
 ### Basic RooFit example to construct a PDF         ###
+### - sum of two gaussians                          ###
 ###                                                 ###
 ### To be run as                                    ###
 ### >python -i roofit101.py                         ###
@@ -68,3 +69,7 @@ sum.plotOn(f3,RooFit.LineColor(kGreen))
 sum.plotOn(f3,RooFit.Components("g"), RooFit.LineColor(kBlue),RooFit.LineStyle(kDashed))
 sum.plotOn(f3,RooFit.Components("g2"),RooFit.LineColor(kRed),  RooFit.LineStyle(kDotted))
 f3.Draw()
+
+###########
+### FIN ###
+###########

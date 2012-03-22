@@ -9,11 +9,11 @@
 ###                                                  ### 
 ### Ex.1: fit for fraction of signal events          ### 
 ### Ex.2: fit for number of sig&bkg events           ###  
+### Ex.3: estimate profile likelohood                ### 
 ###                                                  ### 
-### Possible extensions                              ###  
+### Possibilities                                    ###  
 ### - change signal model (voigt, template)          ###
 ### - change background model (template: histo/keys) ###
-### - estimate CLs (RooStats)                        ###
 ###                                                  ###
 ### Questions/comments: tristan.dupree@uclouvain.be  ###
 ###                                                  ###
@@ -169,6 +169,20 @@ sum_f.plotOn(f2)
 sum_f.plotOn(f2,RooFit.Components("bkg_fit"),RooFit.LineStyle(kDashed),RooFit.LineColor(kRed))
 sum_f.plotOn(f2,RooFit.Components("sig_fit"),RooFit.LineStyle(kDashed),RooFit.LineColor(kGreen))
 f2.Draw()
+
+#################
+### prof.lik. ###
+#################
+
+plc_S = RooStats.ProfileLikelihoodCalculator(data,sum_f,RooArgSet(f_sig))
+plot_S = RooStats.LikelihoodIntervalPlot(plc_S.GetInterval())
+
+plot_S.SetMaximum(100)
+
+print "plotting likelihood of fraction of signal events alone"
+
+C_profLik=TCanvas("C_profLik","C_profLik",400,350)
+plot_S.Draw()
 
 ###########
 ### msg ###
