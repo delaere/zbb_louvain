@@ -260,6 +260,8 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      // scale
      h->Sumw2();
      h->Scale(mcConf->getParameter<double>("scale"));
+     if(_autoLumiScaling)
+       h->Scale(_lumi);
      // rebin
      if(style!=_styleTweaks.end()) h = Rebin(h,style);
      // add
