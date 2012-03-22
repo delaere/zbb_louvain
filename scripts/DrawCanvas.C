@@ -104,7 +104,7 @@ void setTDRStyle() {
   gROOT->UseCurrentStyle();
 }
 
-void DrawCanvas(TCanvas* canvas, const char* addLabel=NULL)
+void DrawCanvas(TCanvas* canvas)
 {
   setTDRStyle();
   // retrieve the frame
