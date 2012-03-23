@@ -121,7 +121,8 @@ for sample in totsampleList:
     if sample != "DATA": myRDS_red[sample].addColumn(w)
     #myRDS_red[sample].addColumn(w)
 
-    myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
+    if sample != "DATA": myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
+    else               : myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get())
 
 #################
 ### printouts ###
@@ -171,18 +172,18 @@ print "===> the effective, weighted # of DATA  ............... ", myRDS_red_w["D
 namePlotList = [
 #    "eventSelectionbestzmassMu"  ,  ##
 #    "eventSelectionbestzmassEle" ,
-    "eventSelectionbestzptMu"    ,
-    "eventSelectionbestzptEle"   ,
+#    "eventSelectionbestzptMu"    ,
+#    "eventSelectionbestzptEle"   ,
 #    "jetmetbjet1pt"              ,   
 #    "jetmetbjet2pt"              ,   
 #    "jetmetMET"                  ,
-    "eventSelectiondphiZbb"      ,
-    "eventSelectiondphiZbj1"     , 
-    "eventSelectiondijetPt"      ,#
-    "eventSelectiondijetM"       ,
+#    "eventSelectiondphiZbb"      ,
+#    "eventSelectiondphiZbj1"     , 
+#    "eventSelectiondijetPt"      ,#
+#    "eventSelectiondijetM"       ,
     "eventSelectiondijetdR"      ,
 #    "eventSelectiondijetSVdR"    ,
-    "eventSelectionZbbM"         
+#    "eventSelectionZbbM"         
     ]
 
 ################
@@ -279,10 +280,11 @@ th1_copy = {}
 
 componentString={}
 
+
 for name in namePlotList:
     sampleList = RooArgList()
     for sample in totsampleList:
-        th1[sample+name] = TH1D("th1_"+sample+name,"th1_"+sample+name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+        th1[sample+name] = TH1D("th1_"+name,"th1_"+name,var[name].getBins(),var[name].getMin(),var[name].getMax())
         myRDS_red_w[sample].fillHistogram(th1[sample+name], RooArgList(var[name]))
         th1_copy[sample+name] = TH1D(th1[sample+name])
     for sample in MCsampleList:
@@ -341,7 +343,15 @@ for name in namePlotList:
     CANVAS[name].cd(1)                                 
     var_frame[name].Draw()
     CANVAS[name].cd(2)
-    th1_copy["DATA"+name].Draw()                                      
-    for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
+    th1["DATA"+name].Draw()                                      
+    for sample in ("DY","TT","ZZ"): th1[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
+    #th1_copy["DATA"+name].Draw()                                      
+    #for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
     
     
+file={}
+for sample in totsampleList:
+    file[sample]=TFile("TH1s"+sample+".root","RECREATE")
+    #for name in namePlotList: th1[sample+name].Write("th1_"+name)
+    for name in namePlotList: th1[sample+name].Write()
+    file[sample].Close()
