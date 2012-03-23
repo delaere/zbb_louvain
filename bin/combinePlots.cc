@@ -225,6 +225,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    // create everything, using also first data histo
    gROOT->SetStyle("tdrStyle");
    TH1* data;
+   (*datadirs.begin())->cd();
    (*datadirs.begin())->GetObject(name,data);
    data = (TH1*) data->Clone();
    TCanvas* c = new TCanvas(data->GetName(),data->GetTitle(),500,500);
