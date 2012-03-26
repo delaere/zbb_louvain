@@ -24,7 +24,7 @@ class zbblabel:
 class zbbfile:
   """files containing calibrations and other data"""
   ssvperfData="../data/performance_ssv_witheff.root"
-  pileupData="../data/Pileup_2011_to_173692_CD111018_data.root"
+  pileupData="../data/Pileup_2011_to_173692_CD111018.root"
   pileupMC="../data/Summer11_PU_S4_spikesmear.root"
   jecUncertainty="../data/Jec10V1_Uncertainty_KT4PF.txt"
   controlPlots="controlPlots.root"

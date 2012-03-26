@@ -38,7 +38,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "Mu_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "Ttbar_Mu_MC" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
 MonteCarloPUFileName=zbbfile.pileupMC
@@ -117,7 +117,7 @@ escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], che
 brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 jmcp     = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
-#vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 if channel[-2:] == "MC":
   mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
   prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
@@ -140,7 +140,7 @@ escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.z
 brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
 jmcp.beginJob()             
-#vacp.beginJob()             
+vacp.beginJob()             
 if channel[-2:] == "MC":
   mscp.beginJob(genlabel=zbblabel.genlabel)
   prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
@@ -183,7 +183,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       brcp.processEvent(event)
       lrcp.processEvent(event)
       jmcp.processEvent(event)
-      #vacp.processEvent(event)
+      vacp.processEvent(event)
       if channel[-2:] == "MC":
         mscp.processEvent(event)
         prcp.processEvent(event)
@@ -192,7 +192,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       ras_lrcp=lrcp._obsSet
       ras_brcp=brcp._obsSet
       ras_jmcp=jmcp._obsSet
-      #ras_vacp=vacp._obsSet
+      ras_vacp=vacp._obsSet
       if channel[-2:] == "MC":
         ras_mscp=mscp._obsSet
         ras_prcp=prcp._obsSet
@@ -200,7 +200,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       ras_escp.add(ras_lrcp)
       ras_escp.add(ras_brcp)
       ras_escp.add(ras_jmcp)
-      #ras_escp.add(ras_vacp)
+      ras_escp.add(ras_vacp)
       if channel[-2:] == "MC":
         ras_escp.add(ras_mscp)
         ras_escp.add(ras_prcp)
@@ -213,7 +213,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     brcp.endJob()
     lrcp.endJob()
     jmcp.endJob()
-    #vacp.endJob()
+    vacp.endJob()
     if channel[-2:] == "MC":
       mscp.endJob()
       prcp.endJob()
