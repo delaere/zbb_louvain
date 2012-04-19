@@ -200,6 +200,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("TCHPdiscDisc1","TCHPdiscDisc1",200,-10,10)
       self.add("MET","MET",100,0,200)
       self.add("METphi","MET #phi",70,-3.5,3.5)
+      self.add("METsignificance","MET significance",100,0,10)
       self.add("jetpt","Jet Pt",100,15,215)
       self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,1)
       self.add("jetFlavor","Jet Flavor (MC)",21,-10.5,10.5)
@@ -441,6 +442,9 @@ class JetmetControlPlots(BaseControlPlots):
       result["nbP"] = nbP
       result["MET"] = met[0].pt()
       result["METphi"] = met[0].phi()
+      result["METsignificance"] = 0.
+      if met[0].getSignificanceMatrix()(0,0)<1e10 && met[0].getSignificanceMatrix()(1,1)<1e10 : 
+        result["METsignificance"] = met[0].significance()
       return result
 
 def runTest():
