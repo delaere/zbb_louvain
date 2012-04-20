@@ -443,7 +443,7 @@ class JetmetControlPlots(BaseControlPlots):
       result["MET"] = met[0].pt()
       result["METphi"] = met[0].phi()
       result["METsignificance"] = 0.
-      if met[0].getSignificanceMatrix()(0,0)<1e10 && met[0].getSignificanceMatrix()(1,1)<1e10 : 
+      if met[0].getSignificanceMatrix()(0,0)<1e10 and met[0].getSignificanceMatrix()(1,1)<1e10: 
         result["METsignificance"] = met[0].significance()
       return result
 
