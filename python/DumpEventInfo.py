@@ -43,7 +43,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   trigInfoHandle = Handle ("pat::TriggerEvent")
   fwevent.getByLabel (zbblabel.electronlabel,electronHandle)
   fwevent.getByLabel (zbblabel.muonlabel,muonHandle)
-  fwevent.getByLabel (zbblabel.,jetHandle)
+  fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
   fwevent.getByLabel (zbblabel.metlabel,metHandle)
   fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
   fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
