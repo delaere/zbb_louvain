@@ -130,11 +130,11 @@ if isMC:
     print "isMC=True"
 else:
     if is8Nov: 
-        process.GlobalTag.globaltag = 'FT_R_44_V9::All' # 44X -- Nov8
+        process.GlobalTag.globaltag = 'GR_R_44_V15::All' ##'FT_R_44_V9::All' # 44X -- Nov8
         print "is8Nov=True"
         print "isMC=False"
     else:
-        process.GlobalTag.globaltag = 'FT_R_44_V11::All' # 44X -- Nov19
+        process.GlobalTag.globaltag = 'GR_R_44_V15::All' ##'FT_R_44_V11::All' # 44X -- Nov19
         print "is8Nov=False"
         print "isMC=False"
 
@@ -144,14 +144,14 @@ else:
 
 readFiles = cms.untracked.vstring()
 readFiles.extend([
-    #"file:/tmp/castello/Run2011A_DoubleElectron_AOD_08Nov2011-v1_0000_001ED292-B51B-E111-A231-001BFCDBD130.root" ### test file for electrons
-    "file:/tmp/castello/Run2011A_DoubleMu_AOD_08Nov2011-v1_0000_00011B62-381B-E111-8425-002618943810.root" ## test file for muons
+    "file:/tmp/castello/Run2011A_DoubleElectron_AOD_08Nov2011-v1_0000_001ED292-B51B-E111-A231-001BFCDBD130.root" ### test file for electrons
+    #"file:/tmp/castello/Run2011A_DoubleMu_AOD_08Nov2011-v1_0000_00011B62-381B-E111-8425-002618943810.root" ## test file for muons
     #"file:/tmp/castello/Fall11_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph_PU_S6-START44_V5-v1_FE772459-D80A-E111-ABBE-E0CB4E1A1186.root" ## test file for MC Drell-Yan
     ])
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(100),  )
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -301,7 +301,7 @@ process.userDataSelectedElectrons = cms.EDProducer(
 
 ########################################################################################
 
-process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 10 && abs(eta) < 2.5' ) 
+process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs(eta) < 2.5' ) 
 process.allElectrons.src = "patElectronsWithTrigger"
 
 process.tightElectrons = process.selectedPatElectrons.clone( cut = 
@@ -310,7 +310,7 @@ process.tightElectrons = process.selectedPatElectrons.clone( cut =
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &'
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
                                                   'abs(dB) < 0.02 &'
-                                                  'pt>10 &'
+                                                  'pt>20 &'
                                                   'abs(eta) < 2.5'
                                                   )
 process.tightElectrons.src = "patElectronsWithTrigger"
@@ -320,7 +320,7 @@ process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
                                                    'userFloat("PFIsoPUCorrected") < 0.15 &'
                                                    '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
                                                    'abs(dB) < 0.02 & '
-                                                   'pt>10 &'
+                                                   'pt>20 &'
                                                    'abs(eta) < 2.5 &'
                                                    'triggerObjectMatches.size > 0'                           
                                                    )
@@ -332,7 +332,7 @@ process.matchedElectrons.src = "patElectronsWithTrigger"
 
 process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('allElectrons@+ allElectrons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('zelallelall'),
                                   roles = cms.vstring('all1', 'all2')
                                   )
@@ -340,14 +340,14 @@ process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
 
 process.zelTightelTight = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("tightElectrons@+ tightElectrons@-"),
-                               cut = cms.string("mass > 12.0"),
+                               cut = cms.string("mass > 50.0"),
                                name = cms.string('zeltighteltight'), 
                                roles = cms.vstring('tight1', 'tight2')
                               )
 
 process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("matchedElectrons@+ matchedElectrons@-"),
-                               cut = cms.string("mass > 12.0"),
+                               cut = cms.string("mass > 50.0"),
                                name = cms.string('zelmatchedelmatched'), 
                                roles = cms.vstring('matched1', 'matched2')
                               )
@@ -409,7 +409,7 @@ process.userDataSelectedMuons = cms.EDProducer(
 
 process.allMuons = selectedPatMuons.clone(
     src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-    cut = cms.string("pt>10  & abs(eta) < 2.4")    
+    cut = cms.string("pt>20  & abs(eta) < 2.4")    
     )
 
 process.tightMuons = selectedPatMuons.clone(
@@ -422,7 +422,7 @@ process.tightMuons = selectedPatMuons.clone(
                     'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
                     'numberOfMatchedStations>1 &'                                 
                     'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'
-                    'pt>10 &'
+                    'pt>20 &'
                     'abs(eta) < 2.4')
    )
 
@@ -436,7 +436,7 @@ process.matchedMuons = selectedPatMuons.clone(
                      'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
                      'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
                      'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
-                     'pt>10 &'
+                     'pt>20 &'
                      'abs(eta) < 2.4 &'
                      #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
                      #' trackIso < 3 &'                                      # VBTF choice
@@ -479,21 +479,21 @@ process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info pr
 
 process.zmuAllmuAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('allMuons@+ allMuons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('Zmuallmuall'),
                                   roles = cms.vstring('all1', 'all2')
                                   )
 
 process.zmuTightmuTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('tightMuons@+ tightMuons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('Zmutightmutight'),
                                   roles = cms.vstring('tight1', 'tight2')
                                   )
 
 process.zmuMatchedmuMatched = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('matchedMuons@+ matchedMuons@-'),
-                                  cut   = cms.string('mass >12.0'),
+                                  cut   = cms.string('mass >50.0'),
                                   name  = cms.string('Zmumatchedmumatched'),
                                   roles = cms.vstring('matched1', 'matched2')
                                   )
@@ -527,7 +527,7 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #process.ak5PFJets.doAreaFastjet = True
 
 
-inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) # ,'L5Flavor','L7Parton' OUTDATED: do not use them!
+inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #  ,'L5Flavor','L7Parton'OUTDATED: do not use them!
 if isMC:
     inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
 
@@ -542,12 +542,22 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     jetIdLabel   = "ak5"
                     )
 
-process.selectedPatJets.cut      = 'pt > 10. & abs(eta) < 2.4 '
+process.selectedPatJets.cut      = 'pt > 20. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
-#process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' ) ## FIXME:change the TAGGER!
+process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
 
-process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
+process.filterbjets = process.countPatJets.clone(src= "bjets", minNumber = 2)
+    
+process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("bjets bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('bbar'),
+                               roles = cms.vstring('b1', 'b2'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zeej = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("zelMatchedelMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zeej'),
@@ -555,13 +565,49 @@ process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
                                checkCharge = cms.bool(False)
                               )
 
-process.Zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
+process.zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("zmuMatchedmuMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zmmj'),
                                roles = cms.vstring('Z', 'j'),
                                checkCharge = cms.bool(False)
                               )
+
+
+process.zeeb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zelMatchedelMatched bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zeeb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zmmb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zmuMatchedmuMatched bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zmmbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zelMatchedelMatched bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zmuMatchedmuMatched bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
+
+
+
 
 #################################################
 ###### MET ######################################
@@ -614,8 +660,11 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_allConversions_*_*',  ## maybe useless?
 
                                    ##################################################                                   
-                                   
+                                
                                    'keep *_*atJets*_*_*',
+                                   #### keep candidates based on b jets
+                                   'keep *_bjets*_*_*',
+                                   ####################################
                                    'keep *_*5PFJets*_*_*',
                                    'keep *_z*_*_*',
                                    'keep *_*Muons*_*_*',
@@ -689,6 +738,10 @@ process.PFmuon = cms.Path(
     (process.preMuonSequence * process.preElectronSequence)*
     process.patDefaultSequence*
 
+    #### b-jets candidates #####
+    process.bjets*
+    ##process.filterbjets*
+    
     process.userDataSelectedMuons*
     process.userDataSelectedElectrons*
 
@@ -705,9 +758,9 @@ process.PFmuon = cms.Path(
     process.allMuons*
     process.tightMuons*
     process.matchedMuons*
+       
     
     #### Z candidates ##########
-
     (process.zelAllelAll+
      process.zelTightelTight+
      process.zelMatchedelMatched+   
@@ -715,11 +768,18 @@ process.PFmuon = cms.Path(
      process.zmuTightmuTight+
      process.zmuMatchedmuMatched)*
 
+
     process.offlinePrimaryVertexFromZ*
 
     #### Z+jets candidates ##########
-    (process.Zmmj+
-    process.Zeej)*
+    (process.zmmj+
+     process.zeej+
+     process.zmmb+
+     process.zeeb)*
+     #process.filterbjets*
+     #(process.bbbar+
+     # process.zmmbb+
+     # process.zeebb))*
     process.ZMMFilter
      
     )
@@ -754,6 +814,10 @@ process.PFelectron = cms.Path(
     # process.patTrigger*
     process.patDefaultSequence*
 
+    #### b-jets candidates #####
+    process.bjets*
+    #process.bbbar+
+    
     process.userDataSelectedMuons*
     process.userDataSelectedElectrons*
 
@@ -783,8 +847,14 @@ process.PFelectron = cms.Path(
     process.offlinePrimaryVertexFromZ*
 
     #### Z+jets candidates ##########
-    (process.Zmmj+
-    process.Zeej)*
+    (process.zmmj+
+     process.zeej+
+     process.zmmb+
+     process.zeeb)*
+     #process.filterbjets*
+     #(process.bbbar+
+     # process.zmmbb+
+     # process.zeebb))*
     process.ZEEFilter
     )
     
