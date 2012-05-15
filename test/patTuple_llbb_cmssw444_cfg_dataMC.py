@@ -91,6 +91,9 @@ process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
 
+##-------------------- Import the MET correction modules -----------------
+process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+
 ##-------------------- Import the Jet RECO modules -----------------------
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 process.load("RecoJets.Configuration.GenJetParticles_cff")
@@ -144,9 +147,10 @@ else:
 
 readFiles = cms.untracked.vstring()
 readFiles.extend([
-    "file:/tmp/castello/Run2011A_DoubleElectron_AOD_08Nov2011-v1_0000_001ED292-B51B-E111-A231-001BFCDBD130.root" ### test file for electrons
+    #"file:/tmp/castello/Run2011A_DoubleElectron_AOD_08Nov2011-v1_0000_001ED292-B51B-E111-A231-001BFCDBD130.root" ### test file for electrons
     #"file:/tmp/castello/Run2011A_DoubleMu_AOD_08Nov2011-v1_0000_00011B62-381B-E111-8425-002618943810.root" ## test file for muons
     #"file:/tmp/castello/Fall11_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph_PU_S6-START44_V5-v1_FE772459-D80A-E111-ABBE-E0CB4E1A1186.root" ## test file for MC Drell-Yan
+    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/7A64B1BE-CE36-E111-BE8E-003048FFD7D4.root"
     ])
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
@@ -613,7 +617,15 @@ process.zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
 ###### MET ######################################
 #################################################
 
-#add MET (for PF objects)
+process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
+process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
+process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
+process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
+
+if not isMC:
+  process.patPFJetMETtype1p2Corr.jetCorrLabel = 'L2L3Residual'
+  process.patPFMet.addGenMET = cms.bool(False)
+
 from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
 
@@ -635,7 +647,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##      OUTPUT      ##
 ######################
 
-process.out.fileName = cms.untracked.string('PATskim-Zjets.root')
+process.out.fileName = cms.untracked.string('PATskim-test.root')
 
 process.out.outputCommands =  cms.untracked.vstring(
     'drop *',
@@ -670,6 +682,8 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_*Muons*_*_*',
                                    'keep *_*Electrons*_*_*',
                                    'keep *_patMETs*_*_*',
+                                   'keep *_patType1CorrectedPFMet*_*_*',
+                                   'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
                                    
                                    ## b-tagger ###################################
                                    
@@ -781,7 +795,10 @@ process.PFmuon = cms.Path(
      # process.zmmbb+
      # process.zeebb))*
     process.ZMMFilter
-     
+    * process.patPFMet
+    * process.selectedPatJetsForMETtype1p2Corr
+    * process.patPFJetMETtype1p2Corr
+    * process.patType1CorrectedPFMet
     )
 
 process.PFelectron = cms.Path(
@@ -856,8 +873,11 @@ process.PFelectron = cms.Path(
      # process.zmmbb+
      # process.zeebb))*
     process.ZEEFilter
+    * process.patPFMet
+    * process.selectedPatJetsForMETtype1p2Corr
+    * process.patPFJetMETtype1p2Corr
+    * process.patType1CorrectedPFMet
     )
-    
 
 #####################
 ###  OUTPATH    #####
