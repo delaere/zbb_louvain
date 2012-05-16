@@ -546,6 +546,13 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     jetIdLabel   = "ak5"
                     )
 
+process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
+   src = cms.InputTag("patJets"),
+   primaryVertices = cms.InputTag("goodPV"),
+)
+process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.patJetsWithBeta))
+process.selectedPatJets.src      = cms.InputTag("patJetsWithBeta")
+
 process.selectedPatJets.cut      = 'pt > 20. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 

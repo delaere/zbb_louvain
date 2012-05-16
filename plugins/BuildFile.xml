@@ -1,9 +1,11 @@
+<use   name="DataFormats/VertexReco" />
 <use   name="root"/>
 <use   name="FWCore/Framework"/>
 <use   name="FWCore/ServiceRegistry"/>
 <use   name="SimDataFormats/PileupSummaryInfo"/>
 <use   name="CommonTools/Utils"/>
 <use   name="CommonTools/UtilAlgos"/>
+<use   name="DataFormats/PatCandidates" />
 
 <library   file="*.cc" name="UserCodezbb_louvainPlugins">
   <flags   EDM_PLUGIN="1"/>
