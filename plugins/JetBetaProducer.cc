@@ -15,7 +15,7 @@
 //
 // Original Author:  Christophe Delaere
 //         Created:  Wed May 16 21:12:25 CEST 2012
-// $Id$
+// $Id: JetBetaProducer.cc,v 1.1 2012/05/16 22:33:05 delaer Exp $
 //
 //
 
@@ -28,6 +28,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include "FWCore/Framework/interface/Event.h"
 
@@ -84,6 +85,9 @@ JetBetaProducer::beta(pat::Jet const& jet, Handle<VertexCollection> const& verti
 {
   // definition of beta: ratio of charged pT from first vertex over the sum of all the charged pT in jet. 
 
+  LogDebug("JetBetaProducer") << "Computing beta for jet with Pt " << jet.pt()
+                              << " in an event with " << vertices->size() << " vertices."; 
+
   // by definition, 0 if there is no primary vertex.
   if(vertices->size()<1) return 0.;
   // loop over the tracks making the PV, and store the keys
@@ -91,6 +95,7 @@ JetBetaProducer::beta(pat::Jet const& jet, Handle<VertexCollection> const& verti
   const reco::Vertex pv = vertices.product()->operator[](0);
   for( reco::Vertex::trackRef_iterator tk = pv.tracks_begin(); tk < pv.tracks_end(); ++tk) {
     trackrefs.push_back(tk->key());
+    LogDebug("JetBetaProducer") << "Key from PV: " << trackrefs.back();
   }
   // now loop over the jet charged constituents, and count pt
   float ptsum = 0.;
@@ -99,8 +104,12 @@ JetBetaProducer::beta(pat::Jet const& jet, Handle<VertexCollection> const& verti
   for(std::vector< reco::PFCandidatePtr >::const_iterator jetconst = constituents.begin(); jetconst < constituents.end(); ++jetconst) {
     if((*jetconst)->trackRef().isNull()) continue;
     list<int>::iterator found = find(trackrefs.begin(), trackrefs.end(), (*jetconst)->trackRef().key());
-    if(found!=trackrefs.end()) ptsum += (*jetconst)->pt();
+    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=trackrefs.end());
+    if(found!=trackrefs.end()) {
+      ptsum += (*jetconst)->pt();
+    }
     ptsumall += (*jetconst)->pt();
+    LogDebug("JetBetaProducer") << "ptsum= " << ptsum << " ptsumall= " << ptsumall << " ratio= " << ptsum/ptsumall;
   }
   if(ptsumall<0.001) // non-null: 0.001 is much lower than any pt cut at reco level.
     return -1.;
@@ -114,6 +123,9 @@ JetBetaProducer::betaStar(pat::Jet const& jet, Handle<VertexCollection> const& v
 {
   // defined as the ratio of charged pT coming from good PU vertices over the sum of all charged pT in jet. 
 
+  LogDebug("JetBetaProducer") << "Computing beta* for jet with Pt " << jet.pt()
+                              << " in an event with " << vertices->size() << " vertices."; 
+
   // by definition, 0 if there is no PU vertex.
   if(vertices->size()<2) return 0.;
   // loop over the tracks making the PU vertices, and store the keys
@@ -121,6 +133,7 @@ JetBetaProducer::betaStar(pat::Jet const& jet, Handle<VertexCollection> const& v
   for(VertexCollection::const_iterator PUvertex = vertices->begin()+1; PUvertex<vertices->end(); ++PUvertex) {
     for( reco::Vertex::trackRef_iterator tk = PUvertex->tracks_begin(); tk < PUvertex->tracks_end(); ++tk) {
       trackrefs.push_back(tk->key());
+      LogDebug("JetBetaProducer") << "Key from PU: " << trackrefs.back();
     }
   }
   // now loop over the jet charged constituents, and count pt
@@ -130,8 +143,10 @@ JetBetaProducer::betaStar(pat::Jet const& jet, Handle<VertexCollection> const& v
   for(std::vector< reco::PFCandidatePtr >::const_iterator jetconst = constituents.begin(); jetconst < constituents.end(); ++jetconst) {
     if((*jetconst)->trackRef().isNull()) continue;
     list<int>::iterator found = find(trackrefs.begin(), trackrefs.end(), (*jetconst)->trackRef().key());
+    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=trackrefs.end());
     if(found!=trackrefs.end()) ptsum += (*jetconst)->pt();
     ptsumall += (*jetconst)->pt();
+    LogDebug("JetBetaProducer") << "ptsum= " << ptsum << " ptsumall= " << ptsumall << " ratio= " << ptsum/ptsumall;
   }
   if(ptsumall<0.001) // non-null: 0.001 is much lower than any pt cut at reco level.
     return -1.;
@@ -160,6 +175,7 @@ JetBetaProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
          << "Input pat::Jet is not of PF-type !!\n";
     j.addUserFloat("beta",beta(j,primaryVertices));
     j.addUserFloat("betaStar",betaStar(j,primaryVertices));
+    LogDebug("JetBetaProducerSummary") << "jet Pt = " << j.pt() << " beta= " << j.userFloat("beta") << " beta*= " << j.userFloat("betaStar");
   }
   iEvent.put(jetColl);
  
