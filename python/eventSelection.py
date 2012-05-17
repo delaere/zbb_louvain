@@ -427,14 +427,6 @@ categoryNames = [
   "Z+bb (HEHE+MET)", 
   "Z+bb (HEHP+MET)", 
   "Z+bb (HPHP+MET)", 
-  "Z+1b (HE exclusive)", 
-  "Z+1b (HP exclusive)",
-  "Z+1b (HE exclusive + MET)",
-  "Z+1b (HP exclusive + MET)",
-  "Z+bb (HEHE) + Zpt cut",
-  "Z+bb (HEHE) + dR(SV) cut",
-  "Z+bb (HPHP+MET) + Zpt cut",
-  "Z+bb (HPHP+MET) + dR(SV) cut",
 ]
 
 def eventCategories(): return len(categoryNames)
@@ -491,27 +483,6 @@ def isInCategory(category, categoryTuple):
   # categoty 14: Z+bb (HPHP+MET)
   elif category==14:
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
-  # categoty 15: Z+1b (HE exclusive)
-  elif category==15:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]==1 and categoryTuple[5]==categoryTuple[6]
-  # categoty 16: Z+1b (HP exclusive)
-  elif category==16:
-    return isInCategory( 4, categoryTuple) and categoryTuple[5]==1 and categoryTuple[4]==categoryTuple[6]  
-  # categoty 17: Z+1b (HE exclusive + MET)
-  elif category==17:
-    return isInCategory( 15, categoryTuple ) and categoryTuple[7]>0
-  # categoty 18: Z+1b (HP exclusive + MET)
-  elif category==18:
-    return isInCategory( 16, categoryTuple ) and categoryTuple[7]>0
-  # some temporary stuff
-  elif category==19:
-    return isInCategory(9, categoryTuple) and categoryTuple[8]>80 # and categoryTuple[8]<120
-  elif category==20:
-    return isInCategory(9, categoryTuple) and categoryTuple[10]>0.6 and categoryTuple[10]<1.1 and categoryTuple[8]>80 
-  elif category==21:
-    return isInCategory(14, categoryTuple) and categoryTuple[8]>80 # and categoryTuple[8]<120
-  elif category==22:
-    return isInCategory(14, categoryTuple) and categoryTuple[10]>0.6 and categoryTuple[10]<1.1 and categoryTuple[8]>80 
   # other does not exist
   else:
     return False
