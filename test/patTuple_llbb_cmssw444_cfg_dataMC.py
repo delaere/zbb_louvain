@@ -155,6 +155,10 @@ readFiles.extend([
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(100),  )
+# to debug beta ##############
+#process.MessageLogger.debugModules = cms.untracked.vstring('patJetsWithBeta')
+#process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
+##############################
 process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
