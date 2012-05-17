@@ -114,7 +114,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
 
   # prepare the plots
   allmuonsPlots=[]
-  loosemuonsPlots=[]
   tightmuonsPlots=[]
   allelectronsPlots=[]
   tightelectronsPlots=[]
@@ -133,7 +132,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
     for level in range(eventCategories()):
       levelDir = channelDir.mkdir("stage_"+str(level),categoryName(level))
       allmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("allmuons")))
-      loosemuonsPlots.append(MuonsControlPlots(levelDir.mkdir("loosemuons")))
       tightmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("tightmuons")))
       allelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("allelectrons")))
       tightelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("tightelectrons")))
@@ -166,7 +164,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       zlabel= zbblabel.zelelabel
     for level in plots:
       allmuonsPlots[level].beginJob(muonlabel=zbblabel.allmuonslabel, muonType="none")
-      loosemuonsPlots[level].beginJob(muonlabel=zbblabel.loosemuonslabel, muonType="loose")
       tightmuonsPlots[level].beginJob(muonlabel=zbblabel.muonlabel, muonType="tight")
       allelectronsPlots[level].beginJob(electronlabel=zbblabel.allelectronslabel, electronType="none")
       tightelectronsPlots[level].beginJob(electronlabel=zbblabel.electronlabel, electronType="tight")
@@ -211,7 +208,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       if len(plots)>0: 
         jetmetAK5PFPlotsData = jetmetAK5PFPlots[plots[0]].process(event)
         allmuonsPlotsData = allmuonsPlots[plots[0]].process(event)
-        loosemuonsPlotsData = loosemuonsPlots[plots[0]].process(event)
         tightmuonsPlotsData = tightmuonsPlots[plots[0]].process(event)
         allelectronsPlotsData = allelectronsPlots[plots[0]].process(event)
         tightelectronsPlotsData = tightelectronsPlots[plots[0]].process(event)
@@ -279,7 +275,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         # fill the histograms
         jetmetAK5PFPlots[level].fill(jetmetAK5PFPlotsData, eventWeight)
         allmuonsPlots[level].fill(allmuonsPlotsData, eventWeight)
-        loosemuonsPlots[level].fill(loosemuonsPlotsData, eventWeight)
         tightmuonsPlots[level].fill(tightmuonsPlotsData, eventWeight)
         allelectronsPlots[level].fill(allelectronsPlotsData, eventWeight)
         tightelectronsPlots[level].fill(tightelectronsPlotsData, eventWeight)
@@ -304,7 +299,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
     for level in plots:
      jetmetAK5PFPlots[level].endJob()
      allmuonsPlots[level].endJob()
-     loosemuonsPlots[level].endJob()
      tightmuonsPlots[level].endJob()
      allelectronsPlots[level].endJob()
      tightelectronsPlots[level].endJob()

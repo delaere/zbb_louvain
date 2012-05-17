@@ -121,7 +121,7 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
-  if string.find(role,"loose")!=-1   : return isLooseMuon(muon)
+  if string.find(role,"all")!=-1   : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
   if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
@@ -189,7 +189,7 @@ def isMatchedElectron(electron):
 
 def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
-  if string.find(role,"loose")!=-1   : return isLooseElectron(electron)
+  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
