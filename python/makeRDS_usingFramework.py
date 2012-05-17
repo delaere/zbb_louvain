@@ -83,6 +83,7 @@ zmuHandle = Handle ("vector<reco::CompositeCandidate>")
 zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
+vertexHandle = Handle ("vector<reco::Vertex>")
 
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
@@ -96,16 +97,18 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   event.getByLabel(zbblabel.metlabel,metHandle)
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
+  event.getByLabel(zbblabel.vertexlabel,vertexHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
+  vertices = vertexHandle.product()
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, muChannel,btagAlgo)
 
 ############################################
 ### Define RooRealVars and RooCategories ###

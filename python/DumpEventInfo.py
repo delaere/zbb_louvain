@@ -60,8 +60,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #rawjet = jet.correctedJet("Uncorrected")
 
   # category
-  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.)
-  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=30.)
+  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.)
+  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=30.)
   print "Event category info in muon channel:",catMu
   print "Event category info in electron channel:",catEle
 

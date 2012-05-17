@@ -75,6 +75,7 @@ zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 genInfoHandle = Handle("GenEventInfoProduct")
+vertexHandle = Handle("vector<reco::Vertex>")
   
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
@@ -89,16 +90,18 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   event.getByLabel(zbblabel.metlabel,metHandle)
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
+  event.getByLabel(zbblabel.vertexlabel,vertexHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
+  vertices = vertexHandle.product()
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel, btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo)
 
 
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):

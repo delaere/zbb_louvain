@@ -21,7 +21,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, metlabel=zbblabel.metlabel, jetlabel=zbblabel.jetlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, triggerlabel=zbblabel.triggerlabel, btagging="SSV"):
+    def beginJob(self, metlabel=zbblabel.metlabel, jetlabel=zbblabel.jetlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, triggerlabel=zbblabel.triggerlabel, btagging="SSV", vertexlabel=zbblabel.vertexlabel):
       self.btagging = btagging
       # declare histograms
       self.add("run","Run number",15000,160000,175000)
@@ -71,11 +71,13 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
       self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
       self.trigInfoHandle = Handle ("pat::TriggerEvent")
+      self.vertexHandle = Handle ("vector<reco::Vertex>")
       self.jetlabel = jetlabel
       self.metlabel = metlabel
       self.zmulabel = zmulabel
       self.zelelabel = zelelabel
       self.trigInfolabel = triggerlabel
+      self.vertexlabel = vertexlabel
     
     #@print_timing
     def process(self, event):
@@ -86,10 +88,12 @@ class EventSelectionControlPlots(BaseControlPlots):
       event.getByLabel(self.metlabel,self.metHandle)
       event.getByLabel(self.zmulabel,self.zmuHandle)
       event.getByLabel(self.zelelabel,self.zeleHandle)
+      event.getByLabel(self.vertexlabel,self.vertexHandle)
       jets = self.jetHandle.product()
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
+      vertices = self.vertexHandle.product()
       bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle) 
       runNumber= event.eventAuxiliary().run()
       #print "RunNumber" , runNumber
@@ -102,7 +106,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, self.muChannel)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, self.muChannel)
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel)
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
@@ -222,10 +226,12 @@ def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
   zmulabel=zbblabel.zmumulabel
   zelelabel=zbblabel.zelelabel
   triggerlabel=zbblabel.triggerlabel
+  vertexlabel = zbblabel.vertexlabel
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+  vertexHandle = Handle ("vector<reco::Vertex>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
   for event in events:
     event.getByLabel (jetlabel,jetHandle)
@@ -233,11 +239,13 @@ def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
     event.getByLabel (zmulabel,zmuHandle)
     event.getByLabel (zelelabel,zeleHandle)
     event.getByLabel (triggerlabel,trigInfoHandle)
+    event.getByLabel (vertexlabel,vertexHandle)
     jets = jetHandle.product()
     met = metHandle.product()
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
+    vertices = vertexHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel)
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel)
     if isInCategory(stage, categoryData):
       print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

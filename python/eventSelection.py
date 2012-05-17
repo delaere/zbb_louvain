@@ -1,6 +1,7 @@
 import ROOT
 import string
 import intervalmap
+from vertexAssociation import zVertex
 
 # here we declare our triggers
 class ourTriggers: pass
@@ -235,8 +236,8 @@ def isGoodJet(jet, Z = None):
   outcome = outcome and jet.pt()>25
   # overlap checking
   # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
-#  if jet.hasOverlaps("muons"): return False
-#  if jet.hasOverlaps("electrons"): return False
+  #  if jet.hasOverlaps("muons"): return False
+  #  if jet.hasOverlaps("electrons"): return False
   if not Z is None :
     outcome = outcome
     if not hasNoOverlap(jet,Z) :
@@ -245,7 +246,9 @@ def isGoodJet(jet, Z = None):
   outcome = outcome and jetId(jet,"loose")
   # to study the impact of PU on MC, request the jet to be matched to a genjet
   # outcome = outcome and not (jet.genJet() is None)
-  # TODO: add vertex match (?)
+  # vertex match - disabled... further studies pending.
+  #outcome = outcome and jet.userFloat("betaStar") < 0.2 # option 1: use beta*
+  #outcome = outcome and jet.userFloat("beta") > 0.15 # option 2: use beta
   return outcome
 
 def isGoodMet(met,cut=50):
@@ -275,7 +278,7 @@ def isBJet(jet,workingPoint,algo="SSV"):
     return False
 
 
-def isZcandidate(zCandidate):
+def isZcandidate(zCandidate, vertex = None):
   """Checks that this is a suitable candidate from lepton quality"""
   result = True
   flavor = 1
@@ -297,7 +300,9 @@ def isZcandidate(zCandidate):
   if flavor != 1:
     print "Error: Z is not made of a proper lepton pair (flavor issue)"
     return False
-  #TODO: add vertex match
+  # vertex match
+  if not vertex is None:
+    result = result and zVertex(zCandidate,0.05,vertex)
   # if everything ok, return the result of the lepton check
   return result
 
@@ -364,7 +369,7 @@ def isTriggerMatchPair(l1,l2,runNumber):
         
   return False
 
-def findBestCandidate(muChannel, *zCandidates):
+def findBestCandidate(muChannel, vertex, *zCandidates):
   """Finds the best Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates.
      muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
@@ -373,14 +378,14 @@ def findBestCandidate(muChannel, *zCandidates):
   if muChannel is None:
     for col in zCandidates:
       for z in col:
-        if not isZcandidate(z): continue
+        if not isZcandidate(z,vertex): continue
         if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
           bestM = z.mass()
           bestZ = z
   else:
     for col in zCandidates:
       for z in col:
-        if not isZcandidate(z): continue
+        if not isZcandidate(z,vertex): continue
 	if (muChannel==True and z.daughter(0).isElectron() ) or (muChannel==False and z.daughter(0).isMuon()) : continue
         if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
           bestM = z.mass()
@@ -487,10 +492,14 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
   """Check analysis requirements for various steps."""
   output = []
-  bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+  if vertices.size()>0 :
+    vertex = vertices[0]
+  else:
+    vertex = None
+  bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
   # output[0]: Trigger
   if isTriggerOK(triggerInfo,bestZcandidate, runNumber, muChannel):
     output.append(1)

@@ -39,14 +39,17 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+  vertexHandle = Handle ("vector<reco::Vertex>")
   fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
   fwevent.getByLabel (zbblabel.metlabel,metHandle)
   fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
   fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
+  fwevent.getByLabel (zbblabel.vertexlable,vertexHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
+  vertices = vertexHandle.product()
   # find the best z candidate
   bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
   # print its constituents
