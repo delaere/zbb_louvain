@@ -108,7 +108,7 @@ void DrawCanvas(TCanvas* canvas)
 {
   setTDRStyle();
   // retrieve the frame
-  TFrame* frame = (TFrame*) canvas->FindObject("TFrame");
+  // TFrame* frame = (TFrame*) canvas->FindObject("TFrame");
   // draw the canvas
   canvas->Draw();
   // fix the size
@@ -121,9 +121,9 @@ void DrawCanvas(TCanvas* canvas)
   TIter next(canvas->GetListOfPrimitives());
   TLatex* label = NULL;
   TObject* obj = NULL;
-  while(obj = next()) {
+  while((obj = next())) {
     if(obj->InheritsFrom("TLatex")) {
-      label = (THStack*)obj;
+      label = (TLatex*)obj;
       break;
     }
   }
@@ -229,7 +229,7 @@ void addErrorBand(TF1* errorFunction=NULL) {
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
   TObject* obj = NULL;
-  while(obj = next()) {
+  while((obj = next())) {
     if(obj->InheritsFrom("THStack")) {
       stack = (THStack*)obj;
       break;
@@ -280,7 +280,7 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
   TObject* obj = NULL;
-  while(obj = next()) {
+  while((obj = next())) {
     if(obj->InheritsFrom("THStack")) {
       stack = (THStack*)obj;
       break;
@@ -372,7 +372,7 @@ void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NU
   TIter next(gPad->GetListOfPrimitives());
   THStack* stack = NULL;
   TObject* obj = NULL;
-  while(obj = next()) {
+  while((obj = next())) {
     if(obj->InheritsFrom("THStack")) {
       stack = (THStack*)obj;
       break;
