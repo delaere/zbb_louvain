@@ -209,6 +209,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jetphi","Jet phi",80,-4,4)
       self.add("jetoverlapmu","jets overlaps with muons",2,0,2)
       self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
+      self.add("jetbeta","Jet beta function",20,-1,1)
+      self.add("jetbetaStar","Jet beta* function",20,-1,1)
       self.add("jet1pt","leading jet Pt",500,15,515)
       self.add("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
       self.add("jet1Flavor","leading jet Flavor (MC)",21,-10.5,10.5)
@@ -221,6 +223,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet1SVmass","leading jet SV mass",20,0,5)
       self.add("jet1TCHEdisc","leading jet TCHE discriminant",200,-10,10)
       self.add("jet1TCHPdisc","leading jet TCHP discriminant",200,-10,10)
+      self.add("jet1beta","leading jet beta function",20,-1,1)
+      self.add("jet1betaStar","leading jet beta* function",20,-1,1)
       self.add("jet2pt","subleading jet Pt",500,15,515)
       self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
       self.add("jet2Flavor","subleading jet Flavor (MC)",21,-10.5,10.5)
@@ -233,6 +237,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet2SVmass","subleading jet SV mass",20,0,5)
       self.add("jet2TCHEdisc","subleading jet TCHE discriminant",200,-10,10)
       self.add("jet2TCHPdisc","subleading jet TCHP discriminant",200,-10,10)
+      self.add("jet2beta","subleading jet beta function",20,-1,1)
+      self.add("jet2betaStar","subleading jet beta* function",20,-1,1)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
       self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.add("bjet1Flavor","leading bjet Flavor (MC)",21,-10.5,10.5)
@@ -245,6 +251,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
       self.add("bjet1TCHEdisc","leading bjet TCHE discriminant",200,-10,10)
       self.add("bjet1TCHPdisc","leading bjet TCHP discriminant",200,-10,10)
+      self.add("bjet1beta","leading bjet beta function",20,-1,1)
+      self.add("bjet1betaStar","leading bjet beta* function",20,-1,1)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
       self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.add("bjet2Flavor","subleading bjet Flavor (MC)",21,-10.5,10.5)
@@ -257,6 +265,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
       self.add("bjet2TCHEdisc","subleading bjet TCHE discriminant",200,-10,10)
       self.add("bjet2TCHPdisc","subleading bjet TCHP discriminant",200,-10,10)
+      self.add("bjet2beta","subleading bjet beta function",20,-1,1)
+      self.add("bjet2betaStar","subleading bjet beta* function",20,-1,1)
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.add("nj","jet count",15,0,15)
       self.add("nb","b-jet count",5,0,5)
@@ -310,6 +320,8 @@ class JetmetControlPlots(BaseControlPlots):
       result["jetphi"] = [ ]
       result["jetoverlapmu"] = [ ]
       result["jetoverlapele"] = [ ]
+      result["jetbeta"] = [ ]
+      result["jetbetaStar"] = [ ]
       result["nhf"] = [ ]
       result["nef"] = [ ]
       result["npf"] = [ ]
@@ -338,6 +350,8 @@ class JetmetControlPlots(BaseControlPlots):
           result["jetphi"].append(jet.phi())
           result["jetoverlapmu"].append(jet.hasOverlaps("muons"))
           result["jetoverlapele"].append(jet.hasOverlaps("electrons"))
+          result["jetbeta"].append(jet.userFloat("beta"))
+          result["jetbetaStar"].append(jet.userFloat("betaStar"))
           result["nhf"].append(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
           result["nef"].append(rawjet.neutralEmEnergyFraction())
           result["npf"].append(rawjet.numberOfDaughters())
@@ -384,6 +398,8 @@ class JetmetControlPlots(BaseControlPlots):
 	        result["jet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
             result["jet1TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
             result["jet1TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
+            result["jet1beta"] = jet.userFloat("beta")
+            result["jet1betaStar"] = jet.userFloat("betaStar")
           elif nj==2:
             result["jet2pt"] = jetPt
 	    result["jet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -399,6 +415,8 @@ class JetmetControlPlots(BaseControlPlots):
 	        result["jet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
             result["jet2TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
             result["jet2TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
+            result["jet2beta"] = jet.userFloat("beta")
+            result["jet2betaStar"] = jet.userFloat("betaStar")
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if nb==1:
@@ -417,6 +435,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1TCHEdisc"] = jet.bDiscriminator("trackCountingHighEffBJetTags")
               result["bjet1TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
 	      result["dptj1b1"] = jetPt-j1pt
+              result["bjet1beta"] = jet.userFloat("beta")
+              result["bjet1betaStar"] = jet.userFloat("betaStar")
             elif nb==2:
               result["bjet2pt"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -432,6 +452,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet2TCHPdisc"] = jet.bDiscriminator("trackCountingHighPurBJetTags")
               result["bjet2nVertHE"] = nHEvert
               result["bjet2nVertHP"] = nHPvert
+              result["bjet2beta"] = jet.userFloat("beta")
+              result["bjet2betaStar"] = jet.userFloat("betaStar")
           if isBJet(jet,"HP",self.btagging): nbP += 1
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP
