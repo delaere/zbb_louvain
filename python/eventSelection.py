@@ -17,9 +17,16 @@ ourtriggers.murunMap[147146:148103] = ("HLT_Mu11",)
 ourtriggers.murunMap[148783:149443] = ("HLT_Mu15_v1",)
 ourtriggers.murunMap[160410:163269] = ("HLT_DoubleMu6_v1",)
 ourtriggers.murunMap[163269:165121] = ("HLT_DoubleMu7_v2",)
-ourtriggers.murunMap[165121:167039] = ("HLT_Mu13_Mu8_v2",)
-ourtriggers.murunMap[167039:170249] = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3","HLT_Mu13_Mu8_v4")
-ourtriggers.murunMap[170249:]       = ("HLT_Mu13_Mu8_v6","HLT_Mu13_Mu8_v7")
+ourtriggers.murunMap[165121:167044] = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3",)
+ourtriggers.murunMap[167078:170249] = ("HLT_Mu13_Mu8_v4")
+ourtriggers.murunMap[170249:173199] = ("HLT_Mu13_Mu8_v6")
+ourtriggers.murunMap[173236:175875] = ("HLT_Mu13_Mu8_v7")
+#### not covered : 175975 !!!!
+ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10","HLT_Mu17_tkMu8_v3")
+ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11","HLT_Mu17_tkMu8_v4")
+
+ourtriggers.murunMap[180253:]       = ("HLT_Mu17_Mu8_v16","HLT_Mu17_tkMu8_v9")
+
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
 ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
@@ -35,7 +42,16 @@ ourtriggers.elrunMap[163269:165121] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL
 ourtriggers.elrunMap[165121:165970] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4",)
 ourtriggers.elrunMap[165970:167039] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5",)
 ourtriggers.elrunMap[167039:170249] = ("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6",)
-ourtriggers.elrunMap[170249:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7","HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8")
+ourtriggers.elrunMap[170249:170759] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",)
+ourtriggers.elrunMap[170826:173198] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",)
+ourtriggers.elrunMap[173236:175875] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",)
+ourtriggers.elrunMap[178420:179889] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)
+ourtriggers.elrunMap[179959:180252] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v10",)
+
+ourtriggers.elrunMap[190456:190738] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15",)
+ourtriggers.elrunMap[190762:190892] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16",)
+ourtriggers.elrunMap[191512:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17",)
+
 # merged lists of triggers
 ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
@@ -74,7 +90,7 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
       else:  
         intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
     else:
-      if ourtriggers.murunMap[runNumber] is None:
+      if ourtriggers.elrunMap[runNumber] is None:
         print "unexpected runNumber : " , runNumber
         intersect = set()
       else:  
@@ -107,9 +123,18 @@ def isTightMuon(muon):
     ROOT.SetOwnership( mu, False ) 
   else:
     mu = muon
+
+  chargedHadronIso = mu.pfIsolationR04().sumChargedHadronPt
+  chargedHadronIsoPU = mu.pfIsolationR04().sumPUPt  
+  neutralHadronIso  = mu.pfIsolationR04().sumNeutralHadronEt
+  photonIso  = mu.pfIsolationR04().sumPhotonEt
+
+  RelativeIsolationDBetaCorr=(chargedHadronIso + max(photonIso+neutralHadronIso-0.5*chargedHadronIsoPU ,0.))/(max(0.5,mu.pt()))   
+  #print "RelativeIsolationDBetaCorr : " , RelativeIsolationDBetaCorr
+  Iso = RelativeIsolationDBetaCorr < 0.15
   #isMatched = True # no need anymore: this is done in PAT and complemented by the trigger check at step 1.
 
-  return (isLooseMuon(muon))
+  return (isLooseMuon(muon) and Iso)
 
 def isMatchedMuon(muon):
   """Perform additional checks that define a matched muon"""
@@ -171,22 +196,7 @@ def isMatchedElectron(electron):
   #print "clone:",electron.masterClone().isNonnull()
   #if electron.hasOverlaps("muons"): return False
 
-  if electron.hasMasterClone():
-    el = electron.masterClone()
-    ROOT.SetOwnership( el, False )
-  else:
-    el = electron
-
-  elIdCut = ( el.electronID("simpleEleId85relIso") == 7 )
-
-  superclusterEta = abs(el.superCluster().eta())
-  fiducialCut = superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 )
-
-  elPtCut = el.pt() > 25. 
-  elEtaCut = abs(el.eta()) < 2.5 
-  elDbCut = abs(el.dB()) < 0.02 
-
-  return (isTightElectron(electron) and elPtCut and elEtaCut and elDbCut and elIdCut and fiducialCut)
+  return (isTightElectron(electron) and True)
 
 def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
@@ -254,6 +264,11 @@ def isGoodJet(jet, Z = None):
 def isGoodMet(met,cut=50):
   """Apply the MET cut"""
   return met.pt()<cut
+
+def isGoodMet_Sig(met,cut=50):
+  """Apply the MET cut"""
+  if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
+    return met.significance()<cut
 
 def isBJet(jet,workingPoint,algo="SSV"):
   """Perform b-tagging"""
@@ -337,17 +352,35 @@ def isTriggerMatchPair(l1,l2,runNumber):
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",0,0).size()>0):
         return True
         
-    if runNumber >= 165121 :
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+    if runNumber >= 165121 and runNumber< 178420:
+      #print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size())
       #print "l1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
       #print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
-      #print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,0).size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size())
       #print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-
       if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and ((l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
         return True
+
+    if runNumber >= 178420 and runNumber< 180253:
+      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size())
+      #print "l1.triggerObjectMatchesByFilter(hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size())
+      #print "l1.triggerObjectMatchesByFilter(hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17) size",(l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size())
+      #print "l2.triggerObjectMatchesByFilter(hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size())
+      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_tkMu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size())
+      #print "l1.triggerObjectMatchesByFilter(hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17) size",(l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size())
+      #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,0).size())
+      #print "l1 hltDiMuonL3p5PreFiltered8 size = ",  l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0)       or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3Mu17FromDiMuonFiltered17").size()> 0 ):
+        return True
+
+    if runNumber >= 180253 :  
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0)     or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size()>0 ) :
+        return True
+      
       
   if l1.isElectron() :
+    print "Electrons :"
     #print "run number : ", runNumber
     if runNumber < 165121:
       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 0 0", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size())
@@ -432,6 +465,15 @@ categoryNames = [
   "Z+bb (HEHE+MET)", 
   "Z+bb (HEHP+MET)", 
   "Z+bb (HPHP+MET)", 
+  "Z+1b (HE exclusive)", 
+  "Z+1b (HP exclusive)",
+  "Z+1b (HE exclusive + MET)",
+  "Z+1b (HP exclusive + MET)",
+  "Z+b (HE+MET_significance)", 
+  "Z+b (HP+MET_significance)",
+  "Z+bb (HEHE+MET_significance)", 
+  "Z+bb (HEHP+MET_significance)", 
+  "Z+bb (HPHP+MET_significance)",
 ]
 
 def eventCategories(): return len(categoryNames)
@@ -488,6 +530,24 @@ def isInCategory(category, categoryTuple):
   # categoty 14: Z+bb (HPHP+MET)
   elif category==14:
     return isInCategory(11, categoryTuple) and categoryTuple[7]>0
+
+  # category 15:  Z+b (HE+MET_significance)
+  elif category==15:
+    return isInCategory( 5, categoryTuple) and categoryTuple[8]>0
+  # category 16:  Z+b (HP+MET_significance)
+  elif category==16:
+    return isInCategory( 6, categoryTuple) and categoryTuple[8]>0
+  # categoty 17: Z+bb (HEHE+MET_significance)
+  elif category==17:
+    return isInCategory( 9, categoryTuple) and categoryTuple[8]>0
+  # categoty 18: Z+bb (HEHP+MET_significance)
+  elif category==18:
+    return isInCategory(10, categoryTuple) and categoryTuple[8]>0
+  # categoty 19: Z+bb (HPHP+MET_significance)
+  elif category==19:
+    return isInCategory(11, categoryTuple) and categoryTuple[8]>0
+
+
   # other does not exist
   else:
     return False
@@ -513,6 +573,8 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
   else: 
     output.append(1)
     if abs(bestZcandidate.mass()-91)< massWindow: #76-106 GeV
+    #if abs(bestZcandidate.mass()-90)< massWindow: #to comply with the others
+#    if abs(bestZcandidate.mass()-91.1876)<massWindow:
       output.append(1)
     else:
       output.append(0)
@@ -538,14 +600,20 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
     output.append(1)
   else: 
     output.append(0)
+  # output[8] : MET Significance
+  if isGoodMet_Sig(met[0]):
+    output.append(1)
+  else: 
+    output.append(0)
+    
   # additional quantities. For now, put the floats... might become cuts later on.
-  # output[8] : Z Pt
+  # output[9] : Z Pt
   if bestZcandidate is None:
     output.append(-1)
   else:
     output.append(bestZcandidate.pt())
-  # output[9] : delta R (bb)
-  # output[10] : delta R (bb) via SV
+  # output[10] : delta R (bb)
+  # output[11] : delta R (bb) via SV
   dijet = findDijetPair(jets, bestZcandidate, btagging)
   if dijet[0] is None or dijet[1] is None: 
     output.append(-1)
