@@ -269,6 +269,8 @@ def isGoodMet_Sig(met,cut=50):
   """Apply the MET cut"""
   if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
     return met.significance()<cut
+  else :
+    return False
 
 def isBJet(jet,workingPoint,algo="SSV"):
   """Perform b-tagging"""
@@ -465,10 +467,6 @@ categoryNames = [
   "Z+bb (HEHE+MET)", 
   "Z+bb (HEHP+MET)", 
   "Z+bb (HPHP+MET)", 
-  "Z+1b (HE exclusive)", 
-  "Z+1b (HP exclusive)",
-  "Z+1b (HE exclusive + MET)",
-  "Z+1b (HP exclusive + MET)",
   "Z+b (HE+MET_significance)", 
   "Z+b (HP+MET_significance)",
   "Z+bb (HEHE+MET_significance)", 
