@@ -15,7 +15,7 @@
 //
 // Original Author:  Christophe Delaere
 //         Created:  Wed May 16 21:12:25 CEST 2012
-// $Id: JetBetaProducer.cc,v 1.1 2012/05/16 22:33:05 delaer Exp $
+// $Id: JetBetaProducer.cc,v 1.2 2012/05/17 14:03:55 delaer Exp $
 //
 //
 
@@ -58,11 +58,14 @@ class JetBetaProducer : public edm::EDProducer {
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() {}
       
-      float beta(pat::Jet const&, edm::Handle<reco::VertexCollection> const&) const;
-      float betaStar(pat::Jet const&, edm::Handle<reco::VertexCollection> const&) const;
+      void  buildTrackRefs(edm::Handle<reco::VertexCollection> const&);
+      float beta(pat::Jet const&) const;
+      float betaStar(pat::Jet const&) const;
 
       // ----------member data ---------------------------
       edm::InputTag src_, primaryVertices_;
+      std::list<int> _trackrefs_PV;
+      std::list<int> _trackrefs_PU;
 };
 
 JetBetaProducer::JetBetaProducer(const edm::ParameterSet& iConfig):
@@ -80,32 +83,50 @@ using namespace std;
 using namespace reco;
 
 // ------------ method called to produce the beta  ------------
+void
+JetBetaProducer::buildTrackRefs(edm::Handle<reco::VertexCollection> const& vertices) 
+{
+  LogDebug("JetBetaProducer") << "Processing an event with " << vertices->size() << " vertices."; 
+  // loop over the tracks making the PV, and store the keys
+  _trackrefs_PV.clear();
+  if(vertices->size()>0) {
+    const reco::Vertex pv = vertices.product()->operator[](0);
+    for( reco::Vertex::trackRef_iterator tk = pv.tracks_begin(); tk < pv.tracks_end(); ++tk) {
+      _trackrefs_PV.push_back(tk->key());
+      LogDebug("JetBetaProducer") << "Key from PV: " << _trackrefs_PV.back();
+    }
+  }
+  // loop over the tracks making the PU vertices, and store the keys
+  _trackrefs_PU.clear();
+  if(vertices->size()>1) {
+    for(VertexCollection::const_iterator PUvertex = vertices->begin()+1; PUvertex<vertices->end(); ++PUvertex) {
+      for( reco::Vertex::trackRef_iterator tk = PUvertex->tracks_begin(); tk < PUvertex->tracks_end(); ++tk) {
+        _trackrefs_PU.push_back(tk->key());
+        LogDebug("JetBetaProducer") << "Key from PU: " << _trackrefs_PU.back();
+      }
+    }
+  }
+}
+
+// ------------ method called to produce the beta  ------------
 float
-JetBetaProducer::beta(pat::Jet const& jet, Handle<VertexCollection> const& vertices) const
+JetBetaProducer::beta(pat::Jet const& jet) const
 {
   // definition of beta: ratio of charged pT from first vertex over the sum of all the charged pT in jet. 
 
-  LogDebug("JetBetaProducer") << "Computing beta for jet with Pt " << jet.pt()
-                              << " in an event with " << vertices->size() << " vertices."; 
+  LogDebug("JetBetaProducer") << "Computing beta for jet with Pt " << jet.pt();
 
   // by definition, 0 if there is no primary vertex.
-  if(vertices->size()<1) return 0.;
-  // loop over the tracks making the PV, and store the keys
-  list<int> trackrefs;
-  const reco::Vertex pv = vertices.product()->operator[](0);
-  for( reco::Vertex::trackRef_iterator tk = pv.tracks_begin(); tk < pv.tracks_end(); ++tk) {
-    trackrefs.push_back(tk->key());
-    LogDebug("JetBetaProducer") << "Key from PV: " << trackrefs.back();
-  }
+  if(_trackrefs_PV.empty()) return 0.;
   // now loop over the jet charged constituents, and count pt
   float ptsum = 0.;
   float ptsumall = 0.;
   const std::vector< reco::PFCandidatePtr > constituents = jet.getPFConstituents();
   for(std::vector< reco::PFCandidatePtr >::const_iterator jetconst = constituents.begin(); jetconst < constituents.end(); ++jetconst) {
     if((*jetconst)->trackRef().isNull()) continue;
-    list<int>::iterator found = find(trackrefs.begin(), trackrefs.end(), (*jetconst)->trackRef().key());
-    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=trackrefs.end());
-    if(found!=trackrefs.end()) {
+    list<int>::const_iterator found = find(_trackrefs_PV.begin(), _trackrefs_PV.end(), (*jetconst)->trackRef().key());
+    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=_trackrefs_PV.end());
+    if(found!=_trackrefs_PV.end()) {
       ptsum += (*jetconst)->pt();
     }
     ptsumall += (*jetconst)->pt();
@@ -114,44 +135,33 @@ JetBetaProducer::beta(pat::Jet const& jet, Handle<VertexCollection> const& verti
   if(ptsumall<0.001) // non-null: 0.001 is much lower than any pt cut at reco level.
     return -1.;
   return ptsum/ptsumall;
-  
 }
 
 // ------------ method called to produce the beta*  -----------
 float
-JetBetaProducer::betaStar(pat::Jet const& jet, Handle<VertexCollection> const& vertices) const
+JetBetaProducer::betaStar(pat::Jet const& jet) const
 {
   // defined as the ratio of charged pT coming from good PU vertices over the sum of all charged pT in jet. 
 
-  LogDebug("JetBetaProducer") << "Computing beta* for jet with Pt " << jet.pt()
-                              << " in an event with " << vertices->size() << " vertices."; 
+  LogDebug("JetBetaProducer") << "Computing beta* for jet with Pt " << jet.pt();
 
   // by definition, 0 if there is no PU vertex.
-  if(vertices->size()<2) return 0.;
-  // loop over the tracks making the PU vertices, and store the keys
-  list<int> trackrefs;
-  for(VertexCollection::const_iterator PUvertex = vertices->begin()+1; PUvertex<vertices->end(); ++PUvertex) {
-    for( reco::Vertex::trackRef_iterator tk = PUvertex->tracks_begin(); tk < PUvertex->tracks_end(); ++tk) {
-      trackrefs.push_back(tk->key());
-      LogDebug("JetBetaProducer") << "Key from PU: " << trackrefs.back();
-    }
-  }
+  if(_trackrefs_PU.empty()) return 0.;
   // now loop over the jet charged constituents, and count pt
   float ptsum = 0.;
   float ptsumall = 0.;
   const std::vector< reco::PFCandidatePtr > constituents = jet.getPFConstituents();
   for(std::vector< reco::PFCandidatePtr >::const_iterator jetconst = constituents.begin(); jetconst < constituents.end(); ++jetconst) {
     if((*jetconst)->trackRef().isNull()) continue;
-    list<int>::iterator found = find(trackrefs.begin(), trackrefs.end(), (*jetconst)->trackRef().key());
-    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=trackrefs.end());
-    if(found!=trackrefs.end()) ptsum += (*jetconst)->pt();
+    list<int>::const_iterator found = find(_trackrefs_PU.begin(), _trackrefs_PU.end(), (*jetconst)->trackRef().key());
+    LogDebug("JetBetaProducer") << "found charged component in jet with key " << (*jetconst)->trackRef().key() << ". Found = " << (found!=_trackrefs_PU.end());
+    if(found!=_trackrefs_PU.end()) ptsum += (*jetconst)->pt();
     ptsumall += (*jetconst)->pt();
     LogDebug("JetBetaProducer") << "ptsum= " << ptsum << " ptsumall= " << ptsumall << " ratio= " << ptsum/ptsumall;
   }
   if(ptsumall<0.001) // non-null: 0.001 is much lower than any pt cut at reco level.
     return -1.;
   return ptsum/ptsumall;
-
 }
 
 // ------------ method called to produce the data  ------------
@@ -161,22 +171,28 @@ JetBetaProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   using namespace edm;
 
-  Handle<vector<pat::Jet>  > jets;
-  iEvent.getByLabel(src_,jets);
+  Handle<vector<pat::Jet>  > jets; // Jet collection
+  iEvent.getByLabel(src_,jets); // load it
 
   Handle<VertexCollection> primaryVertices;  // Collection of primary Vertices
-  iEvent.getByLabel(primaryVertices_, primaryVertices);
+  iEvent.getByLabel(primaryVertices_, primaryVertices); // load them
+  buildTrackRefs(primaryVertices);  // build the list of track refs
 
+  // the output
   auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet> (*jets) );
+  // loop over jets, and add beta and beta*
   for (unsigned int i = 0; i< jetColl->size();++i){
     pat::Jet & j = (*jetColl)[i];
+    // check that these are PFJets
     if ( !j.isPFJet() )
       throw cms::Exception("InvalidInput") 
          << "Input pat::Jet is not of PF-type !!\n";
-    j.addUserFloat("beta",beta(j,primaryVertices));
-    j.addUserFloat("betaStar",betaStar(j,primaryVertices));
+    // add payload to the jets
+    j.addUserFloat("beta",beta(j));
+    j.addUserFloat("betaStar",betaStar(j));
     LogDebug("JetBetaProducerSummary") << "jet Pt = " << j.pt() << " beta= " << j.userFloat("beta") << " beta*= " << j.userFloat("betaStar");
   }
+  // add to the event
   iEvent.put(jetColl);
  
 }
