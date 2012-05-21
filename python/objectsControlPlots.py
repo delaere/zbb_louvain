@@ -31,7 +31,7 @@ class MuonsControlPlots(BaseControlPlots):
     def beginJob(self, muonlabel=zbblabel.muonlabel, muonType="tight"):
       # declare histograms
       self.add("muonType","Muon type", 4,0,4)
-      self.add("muonhits","Muon hits",50,0,50)
+      self.add("muonTckLayers","Muon Tck Layers",50,0,50)
       self.add("muonIso","Muon isolatio",20,0,0.2)
       self.add("muonPt","Muon Pt",500,0,500)
       self.add("muonEta","Muon Eta",25,0,2.5)
@@ -57,28 +57,37 @@ class MuonsControlPlots(BaseControlPlots):
       event.getByLabel (self.muonlabel,self.muonHandle)
       muons = self.muonHandle.product()
       # process event and fill histograms
-      result["muonType"]   = [ ]
-      result["muonhits"]   = [ ]
-      result["muonIso"]    = [ ]
-      result["muonPt"]     = [ ]
-      result["muonEta"]    = [ ]
-      result["muonEtapm"]  = [ ]
-      result["muonChi2"]   = [ ]
-      result["muonPHits"]  = [ ]
-      result["muonSHits"]  = [ ]
-      result["muonMatches"]= [ ]
-      result["muonMHits"]  = [ ]
-      result["muondb"]     = [ ]
+      result["muonType"]        = [ ]
+      result["muonTckLayers"]   = [ ]
+      result["muonIso"]         = [ ]
+      result["muonPt"]          = [ ]
+      result["muonEta"]         = [ ]
+      result["muonEtapm"]       = [ ]
+      result["muonChi2"]        = [ ]
+      result["muonPHits"]       = [ ]
+      result["muonSHits"]       = [ ]
+      result["muonMatches"]     = [ ]
+      result["muonMHits"]       = [ ]
+      result["muondb"]          = [ ]
       nmu = 0
       for muon in muons:
         # for muons:
+        chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt
+        chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt  
+        neutralHadronIso  = muon.pfIsolationR04().sumNeutralHadronEt
+        photonIso  = muon.pfIsolationR04().sumPhotonEt
+        
+        RelativeIsolationDBetaCorr=(chargedHadronIso + max(photonIso+neutralHadronIso-0.5*chargedHadronIsoPU ,0.))/(max(0.5,muon.pt()))
+        
         result["muonType"].append(muon.isGlobalMuon()+2*muon.isTrackerMuon())
         if muon.isTrackerMuon():
-          result["muonhits"].append(muon.innerTrack().numberOfValidHits())
+          ###result["muonhits"].append(muon.innerTrack().numberOfValidHits())
+          result["muonTckLayers"].append(muon.innerTrack().hitPattern().trackerLayersWithMeasurement())
           result["muonPHits"].append(muon.innerTrack().hitPattern().numberOfValidPixelHits())
           result["muonSHits"].append(muon.innerTrack().hitPattern().numberOfValidStripHits())
         else:
-          result["muonhits"].append(0)
+          ##result["muonhits"].append(0)
+          result["muonTckLayers"].append(0)
           result["muonPHits"].append(0)
           result["muonSHits"].append(0)
         if muon.isGlobalMuon():
@@ -89,7 +98,7 @@ class MuonsControlPlots(BaseControlPlots):
           result["muonChi2"].append(muon.normChi2())
         else:
           result["muonChi2"].append(0)
-        result["muonIso"].append((muon.trackIso()+muon.caloIso())/muon.pt())
+        result["muonIso"].append(RelativeIsolationDBetaCorr)
         result["muonPt"].append(muon.pt())
         result["muonEta"].append(abs(muon.eta()))
         result["muonEtapm"].append(muon.eta())
