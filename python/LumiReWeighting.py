@@ -55,7 +55,8 @@ class LumiReWeighting:
      # find the "BX0" and the number of PU interactions in there
      for pvi in pileup:
        if pvi.getBunchCrossing()==0:
-         return pvi.getPU_NumInteractions()
+         ##return pvi.getPU_NumInteractions()   ##Pile Up for 2.2/fb
+         return pvi.getTrueNumInteractions()
      return None
 
    def shiftWeight( self, npu):
