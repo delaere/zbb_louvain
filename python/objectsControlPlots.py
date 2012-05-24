@@ -32,7 +32,7 @@ class MuonsControlPlots(BaseControlPlots):
       # declare histograms
       self.add("muonType","Muon type", 4,0,4)
       self.add("muonTckLayers","Muon Tck Layers",50,0,50)
-      self.add("muonIso","Muon isolatio",20,0,0.2)
+      self.add("muonIso","Muon isolation",20,0,0.2)
       self.add("muonPt","Muon Pt",500,0,500)
       self.add("muonEta","Muon Eta",25,0,2.5)
       self.add("muonEtapm","Muon Eta",50,-2.5,2.5)
@@ -126,10 +126,12 @@ class ElectronsControlPlots(BaseControlPlots):
       self.add("eleetapm","electron eta",60,-3,3)
       self.add("eledb","electron dB",100,0,0.05)
       self.add("eleoverlapmu","electrons overlaps with muon",2,0,2)
-      self.add("eleHcalIso","Electron HCAL relative isolation dr03",100,0,0.2)
-      self.add("eleEcalIso","Electron ECAL relative isolation dr03",100,0,0.2)
-      self.add("eleTkIso","Electron Tk relative isolation dr03",100,0,0.2)
-      self.add("eleHoE","Electron H over E",100,0,0.1)
+      self.add("elechargedIso","Electron charged Hadron isolation ",100,0,0.2)
+      self.add("elephotonIso","Electron photon isolation",100,0,0.2)
+      self.add("eleneutralIso","Electron neutral Hadron isolation ",100,0,0.2)
+      self.add("elepfIsoPUc","Electron pfIsoPUCorrected",100,0,0.2)
+      self.add("rho","Rho Variable",100,0,100)
+      #self.add("eleHoE","Electron H over E",100,0,0.1)
       self.add("eledphi","Electron dphi at calo",100,0,0.1)
       self.add("eledeta","Electron deta at calo",100,0,0.01)
       self.add("eleinin","Electron sigma ieta ieta",100,0,0.1)
@@ -138,14 +140,18 @@ class ElectronsControlPlots(BaseControlPlots):
       self.electronHandle = Handle ("vector<pat::Electron>")
       self.electronlabel  = electronlabel
       self.electronType   = electronType
-    
+      self.rhoHandle = Handle ("double")
+
     #@print_timing
     def process(self, event):
       """ElectronsControlPlots"""
       result = { }
       # load event
-      event.getByLabel (self.electronlabel,self.electronHandle)
+      event.getByLabel(self.electronlabel,self.electronHandle)
       electrons = self.electronHandle.product()
+      event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
+      rho = self.rhoHandle.product()
+      
       # lepton selection
       result["eleid"] = [ ]
       result["elemisshits"] = [ ]
@@ -154,23 +160,57 @@ class ElectronsControlPlots(BaseControlPlots):
       result["eleetapm"] = [ ]
       result["eledb"] = [ ]
       result["eleoverlapmu"] = [ ]
-      result["eleHcalIso"] = [ ]
-      result["eleEcalIso"] = [ ]
-      result["eleTkIso"] = [ ]
-      result["eleHoE"] = [ ]
+      result["elechargedIso"] = [ ]
+      result["elephotonIso"] = [ ]
+      result["eleneutralIso"] = [ ]
+      result["elepfIsoPUc"] = [ ]
+      result["rho"] = [ ]
+      #result["eleHoE"] = [ ]
       result["eledphi"] = [ ]
       result["eledeta"] = [ ]
       result["eleinin"] = [ ]
       nel = 0
       for electron in electrons:
         # for electrons
+        charged =  electron.pfIsolationVariables().chargedHadronIso
+        photon = electron.pfIsolationVariables().photonIso
+        neutral = electron.pfIsolationVariables().neutralHadronIso    
+  ##Effective area for 2011 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/Main/HVVElectronId2012 ) 
+        if(abs(electron.eta())<=1.0):
+            A_eff_PH=0.081
+            A_eff_NH=0.024
+        elif(abs(electron.eta())>1.0 and abs(electron.eta())<=1.479) :
+            A_eff_PH=0.084
+            A_eff_NH=0.037
+        elif(abs(electron.eta())>1.479 and abs(electron.eta())<=2.0) :
+            A_eff_PH=0.048
+            A_eff_NH=0.037
+        elif(abs(electron.eta())>2.0 and abs(electron.eta())<=2.2) :
+            A_eff_PH=0.089
+            A_eff_NH=0.023
+        elif(abs(electron.eta())>2.2 and abs(electron.eta())<=2.3) :
+            A_eff_PH=0.092
+            A_eff_NH=0.023
+        elif(abs(electron.eta())>2.3 and abs(electron.eta())<=2.4):
+            A_eff_PH=0.097
+            A_eff_NH=0.021   
+        else :
+            A_eff_PH=0.11
+            A_eff_NH=0.021  
+        PFIsoPUCorrected =(charged+max((photon-(rho[0]*A_eff_PH)),0.) + max((neutral-(rho[0]*A_eff_NH)),0.))/max(0.5,electron.pt())
+      
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
         result["eleid"].append(electron.electronID("simpleEleId85relIso"))
         result["elemisshits"].append(electron.gsfTrack().numberOfLostHits())
-        result["eleHcalIso"].append(electron.dr03HcalTowerSumEt()/scEt)
-        result["eleEcalIso"].append(electron.dr03EcalRecHitSumEt()/scEt)
-        result["eleTkIso"].append(electron.dr03TkSumPt()/scEt)
-        result["eleHoE"].append(electron.hadronicOverEm())
+        result["elechargedIso"].append(charged)
+        result["elephotonIso"].append(photon)
+        result["eleneutralIso"].append(neutral)
+        result["elepfIsoPUc"].append(PFIsoPUCorrected)
+        result["rho"].append(rho[0])
+        #result["eleHcalIso"].append(electron.dr03HcalTowerSumEt()/scEt)
+        #result["eleEcalIso"].append(electron.dr03EcalRecHitSumEt()/scEt)
+        #result["eleTkIso"].append(electron.dr03TkSumPt()/scEt)
+        #result["eleHoE"].append(electron.hadronicOverEm())
         result["eledphi"].append(electron.deltaPhiEleClusterTrackAtCalo())
         result["eledeta"].append(electron.deltaEtaEleClusterTrackAtCalo())
         result["eleinin"].append(electron.scSigmaIEtaIEta())
@@ -179,7 +219,7 @@ class ElectronsControlPlots(BaseControlPlots):
         result["eleetapm"].append(electron.eta())
         result["eledb"].append(abs(electron.dB()))
         result["eleoverlapmu"].append(electron.hasOverlaps("muons"))
-        if isGoodElectron(electron,self.electronType) : nel += 1
+        if isGoodElectron(electron,self.electronType,rho) : nel += 1
       result["nel"] = nel
       return result
     
