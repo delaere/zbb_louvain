@@ -54,6 +54,7 @@ import os
 import itertools
 import time
 from DataFormats.FWLite import Events, Handle
+from FWCore.ParameterSet.Types import InputTag
 from LumiReWeighting import LumiReWeighting
 from LeptonsReweighting import LeptonsReWeighting
 from btaggingWeight import btaggingWeight
@@ -76,7 +77,11 @@ trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 genInfoHandle = Handle("GenEventInfoProduct")
 vertexHandle = Handle("vector<reco::Vertex>")
-  
+rhoHandle = Handle("double")
+#chargedIsoHandle = Handle("edm::ValueMap<double>")
+#gammaIsoHandle = Handle("edm::ValueMap<double>")
+#neutralIsoHandle = Handle("edm::ValueMap<double>")
+
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   """Compute the event category for histogramming"""
@@ -91,17 +96,29 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
   event.getByLabel(zbblabel.vertexlabel,vertexHandle)
+  event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
+  #event.getByLabel("ak5PFJets","rho",rhoHandle)
+
+  #event.getByLabel("elPFIsoValueCharged03PFIso",chargedIsoHandle)
+  #event.getByLabel("elPFIsoValueGamma03PFIso",gammaIsoHandle)
+  #event.getByLabel("elPFIsoValueNeutral03PFIso",neutralIsoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   vertices = vertexHandle.product()
+  rho = rhoHandle.product()
+  #print "rhoHandle.product()" , rhoHandle.product()
+  #charged_iso = chargedIsoHandle.product()
+  #gamma_iso = gammaIsoHandle.product()
+  #neutral_iso = neutralIsoHandle.product()
+  
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel, btagAlgo)
 
 
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
