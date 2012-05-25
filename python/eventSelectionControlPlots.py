@@ -27,6 +27,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("run","Run number",15000,160000,175000)
       self.add("event","Event number",1000,0,5e9)
       self.add("ls","Lumi section",2000,0,2000)
+      #self.add("lumi","Lumi versus run",2000,0,2000,)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("zmassMu","zmassMu",10000,0,1000)
@@ -39,15 +40,15 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("bestzptEle","bestzptEle",500,0,500)
       self.add("scaldptZbj1","scaldptZbj1",1000,-500,500)
       self.add("drZbj1","distance between Z and leading jet",100,0,5)
-      self.add("dphiZbj1","dphiZbj1",40,0,4)
+      self.add("dphiZbj1","dphiZbj1",40,0,3.15)
       self.add("scaldptZbb","scaldptZbb",1000,-500,500)
-      self.add("dphiZbb","dphiZbb",40,0,4)
-      self.add("drZbb","dphiZbb",100,0,5)
+      self.add("dphiZbb","dphiZbb",40,0,3.15)
+      self.add("drZbb","drZbb",100,0,5)
       self.add("dijetM","b bbar invariant mass",1000,0,1000)
       self.add("dijetPt","b bbar Pt",500,0,500)
       self.add("dijetdR","#Delta R (b bbar)",100,0,5)
       self.add("dijetSVdR","#Delta R (b bbar SV)",100,0,5)
-      self.add("dphidijetMET","#Delta #phi (b bbar MET)",40,0,4)
+      self.add("dphidijetMET","#Delta #phi (b bbar MET)",40,0,3.15)
       self.add("ZbM","Zb invariant mass",1000,0,1000)
       self.add("ZbPt","Zb Pt",500,0,500)
       self.add("ZbbM","Zbb invariant mass",1000,0,1000)
@@ -99,8 +100,13 @@ class EventSelectionControlPlots(BaseControlPlots):
       vertices = self.vertexHandle.product()
       rho = self.rhoHandle.product()
       
-      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle) 
+      if vertices.size()>0 :
+          vertex = vertices[0]
+      else:
+          vertex = None
+      bestZcandidate = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle) 
       runNumber= event.eventAuxiliary().run()
+      #lumi= event.eventAuxiliary().lumi()
       #print "RunNumber" , runNumber
       if self.checkTrigger:
         event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
@@ -111,7 +117,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, self.muChannel)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle,rho, vertices, jets, met, runNumber, self.muChannel)
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, self.muChannel)
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
