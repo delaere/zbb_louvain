@@ -126,6 +126,7 @@ def isTightMuon(muon):
     mu = muon
 
 ### temporary patch for muon selection
+    #print "muon = ", mu
   chargedHadronIso = mu.pfIsolationR04().sumChargedHadronPt
   chargedHadronIsoPU = mu.pfIsolationR04().sumPUPt  
   neutralHadronIso  = mu.pfIsolationR04().sumNeutralHadronEt
@@ -134,17 +135,22 @@ def isTightMuon(muon):
   #print "RelativeIsolationDBetaCorr : " , RelativeIsolationDBetaCorr
 
   Iso = RelativeIsolationDBetaCorr < 0.15
-  Id = mu.innerTrack().hitPattern().trackerLayersWithMeasurement()>8 
   dB = abs(mu.dB()) < 0.2
-  chi2 = mu.normChi2() < 10
-  track = (mu.innerTrack().hitPattern().numberOfValidPixelHits() > 0 and mu.globalTrack().hitPattern().numberOfValidMuonHits() > 0 )
+  if mu.innerTrack().isNonnull() and mu.globalTrack().isNonnull():
+    track = (mu.innerTrack().hitPattern().numberOfValidPixelHits() > 0 and mu.globalTrack().hitPattern().numberOfValidMuonHits() > 0 )
+    Id = mu.innerTrack().hitPattern().trackerLayersWithMeasurement()>8 
+    chi2 =  mu.normChi2() < 10
+  else :
+    track = False
+    Id = False
+    chi2 = False
   station  = mu.numberOfMatchedStations>1
   pT = mu.pt() > 20
   Eta = abs(mu.eta())< 2.4
   Global = mu.isGlobalMuon()
   Tracker = mu.isTrackerMuon()
   
-  return (isLooseMuon(muon) and Iso and Id and dB and chi2 and track and station and pT and Eta and Global and Tracker)
+  return (isLooseMuon(muon) and Iso and Id and dB and track and chi2 and station and pT and Eta and Global and Tracker) ###and chi2 and track !!!
 
 def isMatchedMuon(muon):
   """Perform additional checks that define a matched muon"""
@@ -157,7 +163,9 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
-  if string.find(role,"all")!=-1   : return isLooseMuon(muon)
+### Atttention!! very Temporary  Due to the lepton selection problem in the PAT and the use of zallall + offline selection as a solution
+  if string.find(role,"all")!=-1   : return isMatchedMuon(muon)
+  ###if string.find(role,"all")!=-1   : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
   if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
@@ -245,11 +253,13 @@ def isMatchedElectron(electron,rho):
 
 def isGoodElectron(electron,role,rho):
   """Perform additional checks that define a good electron"""
-  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
+### Atttention!! very Temporary  Due to the lepton selection problem in the PAT and the use of zallall + offline selection as a solution
+  if string.find(role,"all")!=-1   : return isMatchedElectron(electron,rho)
+  #if string.find(role,"all")!=-1   : return isLooseElectron(electron)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron,rho)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron,rho)
   if string.find(role,"none")!=-1    : return True
-  print "Warning: Unknown muon role:",role
+  print "Warning: Unknown electron role:",role
   return True
 
 def hasNoOverlap(jet, Z):
@@ -310,7 +320,7 @@ def isGoodMet(met,cut=50):
   """Apply the MET cut"""
   return met.pt()<cut
 
-def isGoodMet_Sig(met,cut=50):
+def isGoodMet_Sig(met,cut=5):
   """Apply the MET cut"""
   if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
     return met.significance()<cut
