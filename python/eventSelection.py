@@ -135,7 +135,7 @@ def isTightMuon(muon):
   #print "RelativeIsolationDBetaCorr : " , RelativeIsolationDBetaCorr
 
   Iso = RelativeIsolationDBetaCorr < 0.15
-  dB = abs(mu.dB()) < 0.2
+  dB = abs(mu.dB()) < 0.02
   if mu.innerTrack().isNonnull() and mu.globalTrack().isNonnull():
     track = (mu.innerTrack().hitPattern().numberOfValidPixelHits() > 0 and mu.globalTrack().hitPattern().numberOfValidMuonHits() > 0 )
     Id = mu.innerTrack().hitPattern().trackerLayersWithMeasurement()>8 
@@ -228,7 +228,7 @@ def isTightElectron(electron,rho):
 
   Id = el.electronID("simpleEleId85relIso") == 5                                                   
   Iso = PFIsoPUCorrected < 0.15
-  dB = abs(el.dB()) < 0.2
+  dB = abs(el.dB()) < 0.02
   Fiducial = ((abs(el.superCluster().eta())< 1.442)or((1.566<(abs(el.superCluster().eta())))and((abs(el.superCluster().eta()))<2.50)))
   Eta = abs(el.eta()) < 2.5
   pT = el.pt()>20
