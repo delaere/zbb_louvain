@@ -425,7 +425,7 @@ process.tightMuons = selectedPatMuons.clone(
    cut = cms.string('isGlobalMuon & isTrackerMuon &'
                     'innerTrack.hitPattern.trackerLayersWithMeasurement>8 &'  ## new requirement in 44X due to changes in tracking
                     'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation
-                    'abs(dB) < 0.2 &' 
+                    'abs(dB) < 0.02 &' 
                     'normChi2 < 10 &'
                     'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
                     'numberOfMatchedStations>1 &'                                 
@@ -439,7 +439,7 @@ process.matchedMuons = selectedPatMuons.clone(
     cut = cms.string('isGlobalMuon & isTrackerMuon &'
                      'innerTrack.hitPattern.trackerLayersWithMeasurement>8 &'  ## new requirement in 44X due to changes in tracking
                      'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation   
-                     'abs(dB) < 0.2 &' 
+                     'abs(dB) < 0.02 &' 
                      'normChi2 < 10 &'
                      'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
                      'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
