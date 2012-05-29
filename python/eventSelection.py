@@ -134,7 +134,7 @@ def isTightMuon(muon):
   RelativeIsolationDBetaCorr=(chargedHadronIso + max(photonIso+neutralHadronIso-0.5*chargedHadronIsoPU ,0.))/(max(0.5,mu.pt()))   
   #print "RelativeIsolationDBetaCorr : " , RelativeIsolationDBetaCorr
 
-  Iso = RelativeIsolationDBetaCorr < 0.15
+  Iso = RelativeIsolationDBetaCorr < 0.2
   dB = abs(mu.dB()) < 0.02
   if mu.innerTrack().isNonnull() and mu.globalTrack().isNonnull():
     track = (mu.innerTrack().hitPattern().numberOfValidPixelHits() > 0 and mu.globalTrack().hitPattern().numberOfValidMuonHits() > 0 )
@@ -190,8 +190,7 @@ def isTightElectron(electron,rho):
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
   #to correct the PAT error (temporary)
-  if electron.pt()<25. : return False
- 
+  
   if electron.hasMasterClone():
     el = electron.masterClone()
     ROOT.SetOwnership( el, False ) 
@@ -226,11 +225,11 @@ def isTightElectron(electron,rho):
     A_eff_NH=0.021  
   PFIsoPUCorrected =(charged+max((photon-(rho[0]*A_eff_PH)),0.) + max((neutral-(rho[0]*A_eff_NH)),0.))/max(0.5,el.pt())
 
-  Id = el.electronID("simpleEleId85relIso") == 5                                                   
+  Id = ((el.electronID("simpleEleId85relIso") == 7) or (el.electronID("simpleEleId85relIso") == 5))                                                   
   Iso = PFIsoPUCorrected < 0.15
   dB = abs(el.dB()) < 0.02
   Fiducial = ((abs(el.superCluster().eta())< 1.442)or((1.566<(abs(el.superCluster().eta())))and((abs(el.superCluster().eta()))<2.50)))
-  Eta = abs(el.eta()) < 2.5
+  Eta = abs(el.eta()) < 2.4
   pT = el.pt()>20
   
    ##everything should be in the pat now
