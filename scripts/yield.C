@@ -22,12 +22,14 @@ void printHeader(TCanvas* categoryPlot, bool detailedLabel=false, bool printRati
   TIter* mc = NULL;
   TH1F* data = NULL;
   TObject* obj = NULL;
+  bool isMCfound = false;
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
       data = (TH1F*)obj;
     }
-    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
+    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack") && !isMCfound) {
       mc = new TIter(((THStack*)obj)->GetHists());
+      isMCfound = true;
     }
   }
   // First print the title row
@@ -69,12 +71,14 @@ std::vector<TGraphErrors*> initGraphs(TCanvas* categoryPlot)
   TIter* mc = NULL;
   TH1F* data = NULL;
   TObject* obj = NULL;
+  bool isMCfound = false;
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
       data = (TH1F*)obj;
     }
-    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
+    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack") && !isMCfound) {
       mc = new TIter(((THStack*)obj)->GetHists());
+      isMCfound = true;
     }
   }
   // Initialize the TGraphs
@@ -120,12 +124,14 @@ std::vector<std::pair<float,float> > yieldData(TCanvas* categoryPlot, unsigned s
   TIter* mc = NULL;
   TH1F* data = NULL;
   TObject* obj = NULL;
+  bool isMCfound = false; 
   while ((obj = next())) {
     if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("TH1")) {
       data = (TH1F*)obj;
     }
-    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack")) {
+    if(strncmp(obj->GetName(),"category",9)==0 && obj->InheritsFrom("THStack") && !isMCfound) {
       mc = new TIter(((THStack*)obj)->GetHists());
+      isMCfound = true;
     }
   }
   // now select the proper stage and retrieve data. all info is in bin stage+1
