@@ -61,16 +61,16 @@ muChannel = { "Mu_DATA"     : True,
               "ZHbb_El_MC"  : False
               }
 
-path = { "Mu_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/Mu_Data_skim/" ,
-         "El_DATA"     : "/storage/data/cms/users/tdupree/zbb/20111103/El_Data_skim/" ,
-         "Ttbar_Mu_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
-         "Ttbar_El_MC" : "/storage/data/cms/users/tdupree/zbb/20111103/TT_MC_skim/"   ,
-         "Mu_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"   ,
-         "El_MC"       : "/storage/data/cms/users/tdupree/zbb/20111103/DY_MC_skim/"   ,
-         "ZZ_Mu_MC"    : "/storage/data/cms/users/tdupree/zbb/20111103/ZZ_MC_skim/"   ,
-         "ZZ_El_MC"    : "/storage/data/cms/users/tdupree/zbb/20111103/ZZ_MC_skim/"   ,
-         "ZHbb_Mu_MC"  : "/storage/data/cms/users/tdupree/zbb/20111103/ZHbb_125_MC_skim/", 
-         "ZHbb_El_MC"  : "/storage/data/cms/users/tdupree/zbb/20111103/ZHbb_125_MC_skim/" 
+path = { "Mu_DATA"     : "/storage/data/cms/store/user/acaudron/skim/Mu_Data/" ,
+         "El_DATA"     : "/storage/data/cms/store/user/acaudron/skim/El_Data/" ,
+         "Ttbar_Mu_MC" : "/storage/data/cms/store/user/acaudron/skim/TT_MC/"   ,
+         "Ttbar_El_MC" : "/storage/data/cms/store/user/acaudron/skim/TT_MC/"   ,
+         "Mu_MC"       : "/storage/data/cms/store/user/acaudron/skim/DY_MC/"   ,
+         "El_MC"       : "/storage/data/cms/store/user/acaudron/skim/DY_MC/"   ,
+         "ZZ_Mu_MC"    : "/storage/data/cms/store/user/acaudron/skim/ZZ_MC/"   ,
+         "ZZ_El_MC"    : "/storage/data/cms/store/user/acaudron/skim/ZZ_MC/"   ,
+         "ZHbb_Mu_MC"  : "/storage/data/cms/store/user/acaudron/skim/ZH_MC/"   , 
+         "ZHbb_El_MC"  : "/storage/data/cms/store/user/acaudron/skim/ZH_MC/"   ,
          }
 
 ###############################
@@ -84,6 +84,8 @@ zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 vertexHandle = Handle ("vector<reco::Vertex>")
+rhoHandle = Handle ("double")
+
 
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   """Compute the event category for histogramming"""
@@ -98,17 +100,20 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
   event.getByLabel(zbblabel.vertexlabel,vertexHandle)
+  event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
+  
   jets = jetHandle.product()
   met = metHandle.product()
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   vertices = vertexHandle.product()
+  rho = rhoHandle.product()
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, muChannel,btagAlgo)
 
 ############################################
 ### Define RooRealVars and RooCategories ###
@@ -119,7 +124,7 @@ rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=False, dataset=rds_zbb, mode="dataset")
 brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
-jmcp     = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 if channel[-2:] == "MC":
   mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
@@ -176,7 +181,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      if i%1==100 :
+      if i%2000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=False,btagAlgo="SSV")
