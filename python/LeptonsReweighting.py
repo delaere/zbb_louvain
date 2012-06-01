@@ -157,7 +157,7 @@ class LeptonsReWeighting:
          zCandidatesMu = self.zmuHandle_.product()
          fwevent.getByLabel (zbblabel.zelelabel, self.zeleHandle_)
          zCandidatesEle = self.zeleHandle_.product()
-         bestZcandidate = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+         bestZcandidate = findBestCandidate(muChannel, rho, vertex, zCandidatesMu, zCandidatesEle)
          if not bestZcandidate is None:
            if muChannel :
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
