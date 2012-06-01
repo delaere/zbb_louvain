@@ -74,6 +74,8 @@ class LeptonsReWeighting:
      # handle to event objects
      self.zmuHandle_  = Handle ("vector<reco::CompositeCandidate>")
      self.zeleHandle_ = Handle ("vector<reco::CompositeCandidate>")
+     self.vertexHandle_ = Handle ("vector<reco::Vertex>")
+     self.rhoHandle_ = Handle ("double")
      # the efficiency maps
      self._elePidWeight_A = PtEtaMap([50],[0.8, 1.44, 2.0],
                                    [[(1.002,0.006), (1.001,0.007), (1.009,0.008), (1.008,0.010)], 
@@ -157,7 +159,7 @@ class LeptonsReWeighting:
          zCandidatesMu = self.zmuHandle_.product()
          fwevent.getByLabel (zbblabel.zelelabel, self.zeleHandle_)
          zCandidatesEle = self.zeleHandle_.product()
-         fwevent.getByLabel(self.vertexlabel,self.vertexHandle_)
+         fwevent.getByLabel(zbblabel.vertexlabel,self.vertexHandle_)
          vertices = self.vertexHandle_.product()
          if vertices.size()>0 :
             vertex = vertices[0]
