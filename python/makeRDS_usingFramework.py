@@ -38,7 +38,7 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "Ttbar_Mu_MC" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+channel = "El_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
 MonteCarloPUFileName=zbbfile.pileupMC
@@ -101,6 +101,8 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
   event.getByLabel(zbblabel.vertexlabel,vertexHandle)
   event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
+
+  runNumber= event.eventAuxiliary().run()
   
   jets = jetHandle.product()
   met = metHandle.product()
@@ -113,15 +115,29 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, muChannel,btagAlgo)
+  #print triggerInfo   
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel,btagAlgo)
 
 ############################################
 ### Define RooRealVars and RooCategories ###
 ############################################
 
+checkTrigger = {
+              "Mu_DATA"     : True,
+              "El_DATA"     : True,
+              "Mu_MC"       : False,
+              "El_MC"       : False,
+              "Ttbar_Mu_MC" : False,
+              "Ttbar_El_MC" : False,
+              "ZZ_Mu_MC"    : False,
+              "ZZ_El_MC"    : False,
+              "ZHbb_Mu_MC"  : False,
+              "ZHbb_El_MC"  : False
+              }
+
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
-escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=False, dataset=rds_zbb, mode="dataset")
+escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
 brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
@@ -181,10 +197,10 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      if i%2000==1 :
+      if i%5000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
-      categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=False,btagAlgo="SSV")
+      categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo="SSV")
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
       escp.processEvent(event)
