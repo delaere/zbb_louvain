@@ -25,8 +25,8 @@ class zbblabel:
 class zbbfile:
   """files containing calibrations and other data"""
   ssvperfData="reweighting_files/performance_ssv_witheff.root"
-  pileupData="reweighting_files/Pileup_2011_to_173692_CD111018_data.root"
-  pileupMC="reweighting_files/Summer11_PU_S4_spikesmear.root"
+  pileupData="reweighting_files_V2/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
+  pileupMC="reweighting_files_V2/pileupDistMC.root"
   jecUncertainty="reweighting_files/Jec11_V2_Uncertainty_AK5PF.txt"
 
   controlPlots="controlPlots.root"
