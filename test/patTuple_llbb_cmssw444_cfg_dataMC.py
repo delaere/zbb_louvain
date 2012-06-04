@@ -93,6 +93,7 @@ process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
 
 ##-------------------- Import the MET correction modules -----------------
 process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
 ##-------------------- Import the Jet RECO modules -----------------------
 process.load('RecoJets.Configuration.RecoPFJets_cff')
@@ -621,9 +622,6 @@ process.zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
                                checkCharge = cms.bool(False)
                               )
 
-
-
-
 #################################################
 ###### MET ######################################
 #################################################
@@ -633,12 +631,61 @@ process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
 process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
 process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
 
+# this is to add the various corrections to the MET that we use.
+process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
+   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+)
+
+process.patType01CorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     cms.InputTag('patPFMETtype0Corr'),               #type0
+   )
+)
+
+process.patType1SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     cms.InputTag('pfMEtSysShiftCorr')                #sysShift
+   )
+)
+
+process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     cms.InputTag('patPFMETtype0Corr'),               #type0
+     cms.InputTag('pfMEtSysShiftCorr')                #sysShift
+   )
+)
+
+# for data, add residual correctionand disable GetMET
 if not isMC:
   process.patPFJetMETtype1p2Corr.jetCorrLabel = 'L2L3Residual'
   process.patPFMet.addGenMET = cms.bool(False)
 
+# select the proper SysShift correction
+if isMC:
+  process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_mc
+else:
+  process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_data
+
+# standard (raw) MET
 from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
+
+# MET sequence
+process.producePatPFMETobjectWithCorrections = cms.Sequence(
+    process.patPFMet
+    * process.type0PFMEtCorrection
+    * process.patPFMETtype0Corr
+    * process.pfMEtSysShiftCorrSequence
+    * process.selectedPatJetsForMETtype1p2Corr
+    * process.patPFJetMETtype1p2Corr
+    * process.patType1CorrectedPFMet
+    * process.patType01CorrectedPFMet
+    * process.patType1SCorrectedPFMet
+    * process.patType01SCorrectedPFMet
+)
 
 ######################
 ##      FILTER      ##
@@ -694,6 +741,9 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_*Electrons*_*_*',
                                    'keep *_patMETs*_*_*',
                                    'keep *_patType1CorrectedPFMet*_*_*',
+                                   'keep *_patType01CorrectedPFMet*_*_*',
+                                   'keep *_patType1SCorrectedPFMet*_*_*',
+                                   'keep *_patType01SCorrectedPFMet*_*_*',
                                    'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
                                    
                                    ## b-tagger ###################################
@@ -806,10 +856,12 @@ process.PFmuon = cms.Path(
      # process.zmmbb+
      # process.zeebb))*
     process.ZMMFilter
-    * process.patPFMet
-    * process.selectedPatJetsForMETtype1p2Corr
-    * process.patPFJetMETtype1p2Corr
-    * process.patType1CorrectedPFMet
+    * process.producePatPFMETobjectWithCorrections
+    #* process.patPFMet
+    #* process.selectedPatJetsForMETtype1p2Corr
+    #* process.pfMEtSysShiftCorrSequence
+    #* process.patPFJetMETtype1p2Corr
+    #* process.patType1CorrectedPFMet
     )
 
 process.PFelectron = cms.Path(
@@ -884,10 +936,12 @@ process.PFelectron = cms.Path(
      # process.zmmbb+
      # process.zeebb))*
     process.ZEEFilter
-    * process.patPFMet
-    * process.selectedPatJetsForMETtype1p2Corr
-    * process.patPFJetMETtype1p2Corr
-    * process.patType1CorrectedPFMet
+    * process.producePatPFMETobjectWithCorrections
+    #* process.patPFMet
+    #* process.selectedPatJetsForMETtype1p2Corr
+    #* process.pfMEtSysShiftCorrSequence
+    #* process.patPFJetMETtype1p2Corr
+    #* process.patType1CorrectedPFMet
     )
 
 #####################
