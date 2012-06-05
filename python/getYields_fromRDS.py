@@ -28,10 +28,11 @@ MCsampleList   = ["TT","DY","ZZ","ZHbb"]
 SMMCsampleList = ["TT","DY","ZZ"]
 totsampleList  = ["DATA","TT","DY","ZZ","ZHbb"]
 
-lumi = { "DATA" : 2.1                     ,
+
+lumi = { "DATA" : 5.051                   ,
          "TT"   : (3701947./157.5)/1000.  ,
-         "DY"   : (36257961./3048.)/1000. ,
-         "ZZ"   : 4000000./6000.          ,
+         "DY"   : (35907791./3048.)/1000. ,
+         "ZZ"   : 4191045./6206.          ,
          "ZHbb" : 12000.                  }
 
 MCweight = {}
@@ -87,9 +88,21 @@ for sample in totsampleList :
 ###############
 
 rrv_w_b = {"5"  : ws.var("BtaggingReweightingHE")  ,
-           "7"  : ws.var("BtaggingReweightingHP")  ,
+           "6"  : ws.var("BtaggingReweightingHP")  ,
+           "7"  : ws.var("BtaggingReweightingHE")  ,
+           "8"  : ws.var("BtaggingReweightingHP")  ,
            "9"  : ws.var("BtaggingReweightingHEHE"), 
-           "11" : ws.var("BtaggingReweightingHPHP")
+           "10" : ws.var("BtaggingReweightingHEHP"),
+           "11" : ws.var("BtaggingReweightingHPHP"),
+           "12" : ws.var("BtaggingReweightingHEHE"),
+           "13" : ws.var("BtaggingReweightingHEHP"),
+           "14" : ws.var("BtaggingReweightingHPHP"),
+           "15" : ws.var("BtaggingReweightingHE")  ,
+           "16" : ws.var("BtaggingReweightingHP")  ,
+           "17" : ws.var("BtaggingReweightingHEHE"), 
+           "18" : ws.var("BtaggingReweightingHEHP"),
+           "19" : ws.var("BtaggingReweightingHPHP"),
+           
            }
 
 rrv_w_lep  = ws.var("LeptonsReweightingweight")
@@ -116,7 +129,7 @@ for sample in totsampleList:
         totalCutString+="&"+muMassCut
     if channel =="El" :
         myRDS_red[sample]=myRDS_red[sample].reduce(elMassCut)
-        totalCutString+="&"+muMassCut
+        totalCutString+="&"+elMassCut
 
     if sample != "DATA": myRDS_red[sample].addColumn(w)
     #myRDS_red[sample].addColumn(w)
@@ -138,26 +151,26 @@ print "***"
 
 sum_MC=0
 for sample in MCsampleList:
-    print "the pure # of ", sample, " MC  ............... ", str(myRDS_red_w[sample].numEntries())[:4]
+    print "the pure # of ", sample, " MC  ............... ", str(myRDS_red_w[sample].numEntries())[:6]
     sum_MC+=myRDS_red_w[sample].numEntries()
-print "===> the pure # of MC ............... ", str(sum_MC)[:4]
+print "===> the pure # of MC ............... ", str(sum_MC)[:6]
 print "===> the pure # of DATA ............... ", myRDS_red_w["DATA"].numEntries()
 
 print "***"
 sum_MC=0
 for sample in MCsampleList:
-    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample]))[:4]
+    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample]))[:6]
     sum_MC+=myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample])
-print "===> the effective # of MC    ............... ", str(sum_MC)[:4]
+print "===> the effective # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
 print "***"
 
 sum_MC=0
 for sample in MCsampleList:
-    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample]))[:4]
+    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample]))[:6]
     sum_MC+=myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample])
-print "===> the effective, weighted # of MC    ............... ", str(sum_MC)[:4]
+print "===> the effective, weighted # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective, weighted # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
 
@@ -183,38 +196,100 @@ namePlotList = [
 #    "eventSelectiondijetM"       ,
     "eventSelectiondijetdR"      ,
 #    "eventSelectiondijetSVdR"    ,
-#    "eventSelectionZbbM"         
+#    "eventSelectionZbbM"         ,
+    #"eventSelectiondrmumu"       ,
+    #"eventSelectiondrelel"       ,
+    "eventSelectionZbM"
     ]
+
+################
+### minimums ###
+################
+min = {
+    "eventSelectionbestzmassMu" :   60 ,  
+    "eventSelectionbestzmassEle":   60 ,  
+    "eventSelectionbestzptMu"   :    0 ,
+    "eventSelectionbestzptEle"  :    0 ,
+    "eventSelectiondijetPt"     :    0 ,
+    "eventSelectiondrZbj1"      :    0 ,
+    "jetmetbjet1pt"             :    5 ,
+    "jetmetbjet2pt"             :    5 ,   
+    "jetmetMET"                 :  200 , 
+    "eventSelectiondphiZbj1"    :    0 ,
+    "eventSelectiondphiZbb"     :    0 ,
+    "eventSelectiondrZbb"       :    0 ,
+    "eventSelectionscaldptZbj1" : -250 ,
+    "eventSelectiondijetM"      :    0 ,
+    "eventSelectiondijetdR"     :    0 ,
+    "eventSelectiondijetSVdR"   :    0 ,
+    "eventSelectionZbbM"        :    0 ,
+    "eventSelectionZbM"         :    0 ,
+    "eventSelectionZbbPt"       :    0 ,
+    "jetmetjet1SSVHEdisc"       :    0 ,
+    "jetmetjet1SSVHPdisc"       :    0 ,
+    "jetmetjet1SVmass"          :    0 ,
+    "eventSelectiondrmumu"      :    0 ,
+    "eventSelectiondrelel"      :    0 
+    }
 
 ################
 ### maximums ###
 ################
-
 max = {
-    "eventSelectionbestzmassMu" :  200 ,  
-    "eventSelectionbestzmassEle":  200 ,  
-    "eventSelectionbestzptMu"   :  300 ,
-    "eventSelectionbestzptEle"  :  300 ,
-    "eventSelectiondijetPt"     :  300 ,
-    "eventSelectiondrZbj1"      :    6 ,
-    "jetmetbjet1pt"             :  250 ,
-    "jetmetbjet2pt"             :  250 ,   
+    "eventSelectionbestzmassMu" :  120 ,  
+    "eventSelectionbestzmassEle":  120 ,  
+    "eventSelectionbestzptMu"   :  360 ,
+    "eventSelectionbestzptEle"  :  360 ,
+    "eventSelectiondijetPt"     :  360 ,
+    "eventSelectiondrZbj1"      :    5 ,
+    "jetmetbjet1pt"             :  265 ,
+    "jetmetbjet2pt"             :  265 ,   
     "jetmetMET"                 :  200 , 
-    "eventSelectiondphiZbj1"    :    6 ,
-    "eventSelectiondphiZbb"     :    6 ,
-    "eventSelectiondrZbb"       :    6 ,
-    "eventSelectionscaldptZbj1" :  150 ,
+    "eventSelectiondphiZbj1"    :  3.2 ,
+    "eventSelectiondphiZbb"     :  3.2 ,
+    "eventSelectiondrZbb"       :    5 ,
+    "eventSelectionscaldptZbj1" :  250 ,
     "eventSelectiondijetM"      :  600 ,
     "eventSelectiondijetdR"     :    5 ,
     "eventSelectiondijetSVdR"   :    5 ,
     "eventSelectionZbbM"        : 1000 ,
-    "eventSelectionZbbPt"       :  300 ,
-    "jetmetjet1SSVHEdisc"       :    6 ,
-    "jetmetjet1SSVHPdisc"       :    6 ,
-    "jetmetjet1SVmass"          :    6 ,
-    "jetmetjet1TCHEdisc"        :   15 ,
-    "jetmetjet1TCHPdisc"        :   15 ,
-    "jetmetMET"                 :  250 
+    "eventSelectionZbM"         :  800 ,
+    "eventSelectionZbbPt"       :  500 ,
+    "jetmetjet1SSVHEdisc"       :    8 ,
+    "jetmetjet1SSVHPdisc"       :    8 ,
+    "jetmetjet1SVmass"          :    5 ,
+    "eventSelectiondrmumu"      :    5 ,
+    "eventSelectiondrelel"      :    5 
+    }
+
+################
+### binning  ###
+################
+binning = {
+    "eventSelectionbestzmassMu" :   30 , #2GeV 
+    "eventSelectionbestzmassEle":   30 ,  
+    "eventSelectionbestzptMu"   :   18 , #20GeV
+    "eventSelectionbestzptEle"  :   18 ,
+    "eventSelectiondijetPt"     :   18 ,
+    "eventSelectiondrZbj1"      :   10 , #0.5
+    "jetmetbjet1pt"             :   26 , #10GeV
+    "jetmetbjet2pt"             :   26 ,   
+    "jetmetMET"                 :   20 , #10GeV 
+    "eventSelectiondphiZbj1"    :   16 , #0.2
+    "eventSelectiondphiZbb"     :   16 ,
+    "eventSelectiondrZbb"       :   10 , #0.5
+    "eventSelectionscaldptZbj1" :   50 , #10GeV
+    "eventSelectiondijetM"      :   12 , #50GeV
+    "eventSelectiondijetdR"     :   10 , #0.5
+    "eventSelectiondijetSVdR"   :   10 ,
+    "eventSelectionZbbM"        :   20 , #50GeV
+    "eventSelectionZbM"         :   16 ,
+    "eventSelectionZbbPt"       :   50 , #10GeV
+    "jetmetjet1SSVHEdisc"       :   16 , #0.5
+    "jetmetjet1SSVHPdisc"       :   16 ,
+    "jetmetjet1SVmass"          :   20 , #0.25GeV
+    "eventSelectiondrmumu"      :   10 , #0.5
+    "eventSelectiondrelel"      :   10 
     }
     
 
@@ -222,9 +297,9 @@ var = {}
 for name in namePlotList:
     print "name = ", name
     var[name] = ws.var(name)
-    var[name].setMin(0)
+    var[name].setMin(min[name])
     var[name].setMax(max[name])
-    var[name].setBins(15)
+    var[name].setBins(binning[name])
 
 
 ###############
@@ -255,7 +330,7 @@ for sample in MCsampleList:
     lumiratio[sample]=lumi["DATA"]/lumi[sample]
     print "lumi ratio for ", sample, " = ", lumiratio[sample]
 
-norm["ZHbb"] = 10*norm["ZHbb"]
+#norm["ZHbb"] = 10*norm["ZHbb"]
 
 #############
 ### plots ###
@@ -284,7 +359,7 @@ componentString={}
 for name in namePlotList:
     sampleList = RooArgList()
     for sample in totsampleList:
-        th1[sample+name] = TH1D("th1_"+name,"th1_"+name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+        th1[sample+name] = TH1D(name,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
         myRDS_red_w[sample].fillHistogram(th1[sample+name], RooArgList(var[name]))
         th1_copy[sample+name] = TH1D(th1[sample+name])
     for sample in MCsampleList:
