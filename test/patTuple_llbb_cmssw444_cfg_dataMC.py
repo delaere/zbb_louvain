@@ -34,15 +34,8 @@ options.parseArguments()
 isMC = bool(options.boolMC)
 is8Nov = bool(options.bool8Nov)
 
-#print "isMC", isMC
-#print "is8Nov", is8Nov
-
-#isMC=False
-#is8Nov=False
-
 ### Torino's counters ###############
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.TotalEventCounter = cms.EDProducer("EventCountProducer")
 process.TotalEventCounter = cms.EDProducer("EventCountProducer")
 process.AfterPVFilterCounter = cms.EDProducer("EventCountProducer")
 process.AfterNSFilterCounter = cms.EDProducer("EventCountProducer")
@@ -108,6 +101,10 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
+##-------------------- Working point and electron ID for 2011 ------------
+process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
+process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
+
 ##-------------------- Turn-on the FastJet density calculation ----------------------------------------------------
 process.kt6PFJets.doRhoFastjet = True
 ##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
@@ -117,15 +114,9 @@ process.ak5PFJets.doAreaFastjet = True
 process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6 ,doRhoFastjet = True)
 process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
-######### REMOVAL OF MC MATCHING
-
-#if not isMC:
+##-------------------- Removal of MC matching ----------------------------
 removeMCMatching(process, ['All']) ## needed also on MC? very strange...
     
-process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
-                                         makeTriggerResults=cms.untracked.bool(True),
-                                     )
-
 ##########################
 #### GLOBAL TAG  #########
 ##########################
@@ -157,10 +148,13 @@ readFiles.extend([
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(100),  )
-# to debug beta ##############
+# Example of how to debug a specific module
 #process.MessageLogger.debugModules = cms.untracked.vstring('patJetsWithBeta')
 #process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
-##############################
+process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
+                                      makeTriggerResults=cms.untracked.bool(True),
+                                    )
+
 process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
@@ -176,7 +170,7 @@ process.goodPV= offlinePrimaryVertices.clone()
 process.goodPV.cut=cms.string('ndof > 4&'
                               'abs(z) <24&'
                               '!isFake &'
-                              ' position.Rho <2 '
+                              'position.Rho <2'
                               )
 
 ##########################
@@ -211,31 +205,8 @@ process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.muIsoSequence = setupPFMuonIso(process, 'muons')
-
-#process.patElectrons.useParticleFlow=True
-#process.load("CommonTools.ParticleFlow.Isolation.pfElectronIsolationFromDeposits_cff")
-#process.isoValElectronWithNeutral.deposits[0].deltaR = 0.3  
-#process.isoValElectronWithCharged.deposits[0].deltaR = 0.3  
-#process.isoValElectronWithPhotons.deposits[0].deltaR = 0.3  
-
 process.pfIsolatedElectrons.isolationCut = 0.5 ### VERY loose, true isolation done later, exploiting deposits...
-
-### VETOs for 0.3 cone: is there an existing backporting in 44X? #######################
-#process.load("RecoParticleFlow.PFProducer.electronPFIsolationValues_cff")
-#process.elPFIsoValueCharged03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.015)')
-#process.elPFIsoValueChargedAll03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.015)')
-#process.elPFIsoValuePU03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.015)')
-#process.elPFIsoValueGamma03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.08)')
-
-### old stuff #########################################################################
-#process.pfIsolatedElectrons.isolationValueMapsCharged  = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03"))
-#process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03"),cms.InputTag("elPFIsoValueGamma03"))
-##process.pfIsolatedElectrons.doDeltaBetaCorrection      = cms.bool(False)
-#process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag("elPFIsoValuePU03")
-
 process.pfAllElectrons.src = "particleFlow" # default = pfNoMuons
-# process.pfAllElectrons.src = "pfNoPileUp"
-# pfIsolated electrons are input for PATelectron producer (when usePF==True)
 
 #################################
 ### ELECTRON trigger matching ###
@@ -260,45 +231,28 @@ process.patElectronsWithTrigger = cms.EDProducer("PATTriggerMatchElectronEmbedde
 
 switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' )
 
-#from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedElectrons_cfi import pfSelectedElectrons
-#process.selectedPatElectronsTriggerMatch.src = cms.InputTag( 'selectedPatElectrons' )
-#process.selectedPatElectronsTriggerMatch.matches = cms.VInputTag('eleTriggerMatchHLT')
-
-
 ################################
 #### ELECTRON IDENTIFICATION ###
 ################################
 
-## Working point and electron ID for 2011 ---> values updated w.r.t. 2010
-process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
-process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
-
-#########################################################################
-
 process.patElectrons.addElectronID = cms.bool(True)
 process.patElectrons.electronIDSources = cms.PSet(
-   
     simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
     simpleEleId85relIso= cms.InputTag("simpleEleId85relIso"),
     simpleEleId80relIso= cms.InputTag("simpleEleId80relIso")
     )
-
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 
-
-## Electrons with UserData for isolation ###############################
+### Electrons with UserData for isolation
 process.userDataSelectedElectrons = cms.EDProducer(
    "Higgs2l2bElectronUserData",
    src = cms.InputTag("patElectrons"),
    rho = cms.InputTag("kt6PFJetsForIsolation:rho"),
-   #Electrons = cms.InputTag("gsfElectrons"),
    PFCandidateMap = cms.InputTag('particleFlow:electrons'),
-
    # NOT yet backported in 44X and 42X
    #IsoValElectronNoPF = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03NoPFIdPFIso'),
    #                                   cms.InputTag('elPFIsoValueGamma03NoPFIdPFIso'),
    #                                   cms.InputTag('elPFIsoValueNeutral03NoPFIdPFIso')),
-
    IsoValElectronNoPF = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFIso'),
                                       cms.InputTag('elPFIsoValueGamma03PFIso'),
                                       cms.InputTag('elPFIsoValueNeutral03PFIso')),
@@ -307,8 +261,7 @@ process.userDataSelectedElectrons = cms.EDProducer(
                                   cms.InputTag('elPFIsoDepositNeutralPFIso')),
 )
 
-########################################################################################
-
+### Our electron collections: all, tight, matched
 process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs(eta) < 2.5' ) 
 process.allElectrons.src = "patElectronsWithTrigger"
 
@@ -345,7 +298,6 @@ process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                   roles = cms.vstring('all1', 'all2')
                                   )
 
-
 process.zelTightelTight = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("tightElectrons@+ tightElectrons@-"),
                                cut = cms.string("mass > 50.0"),
@@ -365,9 +317,10 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 ###########################
 
 #Use PF for PAT muons. Then one can run the patDefaultSequence after the pfNoPU stuff.
-#The patDefaultSequence takes the pfIsolatedMuons as default input collection. To change the input collection one can use:
-#process.patMuons.pfMuonSource = cms.InputTag("pfMuons")  
-#Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded and it can also be used to build the Z candidate. 
+#The patDefaultSequence takes the pfIsolatedMuons as default input collection. 
+#To change the input collection one can use: process.patMuons.pfMuonSource = cms.InputTag("pfMuons")  
+#Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded 
+#and it can also be used to build the Z candidate. 
 
 process.patMuons.useParticleFlow=True
 
@@ -411,8 +364,7 @@ process.userDataSelectedMuons = cms.EDProducer(
    rho = cms.InputTag("kt6PFJetsForIsolation:rho")
 )
 
-###################################################
-
+### Our muon collections: all, tight, matched
 process.allMuons = selectedPatMuons.clone(
     src = cms.InputTag('selectedPatMuonsTriggerMatch'),
     cut = cms.string("pt>20  & abs(eta) < 2.4")    
@@ -504,7 +456,6 @@ process.zmuMatchedmuMatched = cms.EDProducer('CandViewShallowCloneCombiner',
                                   roles = cms.vstring('matched1', 'matched2')
                                   )
 
-
 ##################################
 ### Torino's Z vertex producer ###
 ##################################
@@ -515,7 +466,6 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
       ZmmSrc      = cms.untracked.InputTag("zmuAllmuAll"),        
       ZeeSrc      = cms.untracked.InputTag("zelAllelAll")         
       )
-
 
 #################################################
 #### JETS #######################################
@@ -705,55 +655,14 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 
 process.out.fileName = cms.untracked.string('PATskim-test.root')
 
-process.out.outputCommands =  cms.untracked.vstring(
-    'drop *',
-    )
+process.out.outputCommands = cms.untracked.vstring( 'drop *' )
+                                   ### vertex, incl. Torino's Z vertex producer and mergeable counter ----------------------
 process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_goodPV*_*_*',
-                                   'keep *_offlinePrimaryVertexFromZ_*_*', ## Torino's Z vertex producer
-                                   'keep edmMergeableCounter_*_*_*', ## Torino's mergeable counter
+                                   'keep *_offlinePrimaryVertexFromZ_*_*',
+                                   'keep edmMergeableCounter_*_*_*',
                                    'keep *_offlineBeamSpot*_*_*',
-                                   'keep *_pat*METs*_*_*',
-                                   'keep *_patTriggerEvent_*_*',
-                                   'keep patTriggerPaths_patTrigger_*_*',
-                                   'keep *_*Tracks_*_*',
-
-                                   ## rho corrections saved #########################
-                                   
-                                   'keep *_kt6PFJetsForIsolation_*_*',
-
-                                   ### isolation deposits/ conversion information for building isolation/ID ######
-                                   
-                                   'keep *_elPFIso*_*_*',
-                                   'keep *_allConversions_*_*',  ## maybe useless?
-
-                                   ##################################################                                   
-                                
-                                   'keep *_*atJets*_*_*',
-                                   'keep *_puJetId_*_*',
-                                   'keep *_puJetMva_*_*',
-
-                                   #### keep candidates based on b jets
-                                   'keep *_bjets*_*_*',
-                                   ####################################
-                                   'keep *_*5PFJets*_*_*',
-                                   'keep *_z*_*_*',
-                                   'keep *_*Muons*_*_*',
-                                   'keep *_*Electrons*_*_*',
-                                   'keep *_patMETs*_*_*',
-                                   'keep *_patType1CorrectedPFMet*_*_*',
-                                   'keep *_patType01CorrectedPFMet*_*_*',
-                                   'keep *_patType1SCorrectedPFMet*_*_*',
-                                   'keep *_patType01SCorrectedPFMet*_*_*',
-                                   'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
-                                   
-                                   ## b-tagger ###################################
-                                   
-                                   'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
-                                   'keep *_combinedSecondaryVertex*BJetTags*_*_PAT',
-
-                                   ### for Torino's studies on SV ############################
-
+                                   ### for Torino's studies on SV ----------------------------------------------------------
                                    'keep recoJetedmRefToBaseProdrecoTracksrecoTrackrecoTracksTorecoTrackedmrefhelperFindUsingAdvanceedmRefVectorsAssociationVector_*_*_*',
                                    'keep recoBaseTagInfosOwned_selectedPatJets_tagInfos_PAT',
                                    'keep recoBaseTagInfosOwned_patJets_tagInfos_PAT',
@@ -761,196 +670,138 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAOD__PAT',
                                    'keep recoBaseTagInfosOwned_selectedPatJetsAK5PFOffset_tagInfos_PAT',
                                    'keep recoBaseTagInfosOwned_patJetsAK5PFOffset_tagInfos_PAT',
-
-
-                                   # MC ######################################################
+                                   ### Trigger -----------------------------------------------------------------------------
+                                   'keep *_patTriggerEvent_*_*',
+                                   'keep patTriggerPaths_patTrigger_*_*',
+                                   ### Tracks ------------------------------------------------------------------------------
+                                   'keep *_*Tracks_*_*',
+                                   ### muons -------------------------------------------------------------------------------
+                                   'keep *_*Muons*_*_*',
+                                   ### electrons, incl. isolation deposits/ conversions for isolation/ID -------------------
+                                   'keep *_*Electrons*_*_*',
+                                   'keep *_elPFIso*_*_*',
+                                   'keep *_allConversions_*_*',  ## maybe useless?
+                                   ### Z candidates ------------------------------------------------------------------------
+                                   'keep *_z*_*_*',
+                                   ### Jets and b-jets ---------------------------------------------------------------------
+                                   'keep *_*atJets*_*_*',
+                                   'keep *_*5PFJets*_*_*',
+                                   'keep *_puJetId_*_*',
+                                   'keep *_puJetMva_*_*',
+                                   'keep *_bjets*_*_*',
+                                   'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
+                                   'keep *_combinedSecondaryVertex*BJetTags*_*_PAT',
+                                   ### rho corrections saved ---------------------------------------------------------------
+                                   'keep *_kt6PFJetsForIsolation_*_*',
+                                   ### MET ---------------------------------------------------------------------------------
+                                   'keep *_pat*METs*_*_*',
+                                   'keep *_patMETs*_*_*',
+                                   'keep *_patType1CorrectedPFMet*_*_*',
+                                   'keep *_patType01CorrectedPFMet*_*_*',
+                                   'keep *_patType1SCorrectedPFMet*_*_*',
+                                   'keep *_patType01SCorrectedPFMet*_*_*',
+                                   'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
+                                   # MC ------------------------------------------------------------------------------------
                                    'keep GenEventInfoProduct_generator_*_*',
                                    'keep *_genMetTrue_*_*',
                                    'keep recoGenJets_ak5GenJets_*_*',
                                    'keep *_addPileupInfo_*_*',
                                    'keep LHEEventProduct_*_*_*',
                                    'keep *_genParticles_*_*'
-                                   
-                                   #'keep *_*_*_PAT',
-                                   #'keep *_trackCounting*BJetTags*_*_PAT'
-                                   
                                    ])
-
 process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('PFmuon','PFelectron'))
-
 
 ######################
 ##    SEQUENCES     ##
 ######################
 
 process.PFmuon = cms.Path(
-    process.goodPV*
     process.TotalEventCounter*
+    process.goodPV*                                            ## Primary vertex
     process.simpleEleIdSequence*
-
-    ##to create the collection pfNoPileUp
     process.pfNoPileUpSequence*
-    ## to create the isoVariables with pfNoPileUp
     process.pfParticleSelectionSequence*
-    process.eleIsoSequence* ### check if they are alrady in the PAT default sequence
+    process.eleIsoSequence*
     process.muIsoSequence*
-
-    #process.pfElectronIsolationFromDepositsSequence+
-    
     process.pfAllNeutralHadrons*
     process.pfAllChargedHadrons*
     process.pfAllPhotons*
-
- 
     process.pfMuonSequence* 
     process.pfElectronSequence*
-
-    (process.kt4PFJets+
-     process.kt6PFJets+
-     process.ak5PFJets)*
-    process.kt6PFJetsForIsolation*
-
-    #process.patTrigger*
+    (process.kt4PFJets+process.kt6PFJets+process.ak5PFJets)*   ## reco jets
+    process.kt6PFJetsForIsolation*                             ##
     (process.preMuonSequence * process.preElectronSequence)*
     process.patDefaultSequence*
-    #process.puJetIdSqeuence*
-
-    #### b-jets candidates #####
-    process.bjets*
-    ##process.filterbjets*
-    
-    process.userDataSelectedMuons*
-    process.userDataSelectedElectrons*
-
-    ###### electron candidates #####
+    process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
+    process.bjets*                                             ## our b jets
+    process.userDataSelectedMuons*                             ## Muons + isolation variables
+    process.userDataSelectedElectrons*                         ## Electrons + isolation variables
     process.eleTriggerMatchHLT *
     process.patElectronsWithTrigger *
-    process.allElectrons*
-    process.tightElectrons*
-    process.matchedElectrons*
-    
-    ###### muon candidates #####
+    process.allElectrons*                                      ## our final electron collections
+    process.tightElectrons*                                    ##
+    process.matchedElectrons*                                  ##
     process.muonTriggerMatchHLTMuons*
     process.selectedPatMuonsTriggerMatch*
-    process.allMuons*
-    process.tightMuons*
-    process.matchedMuons*
-       
-    
-    #### Z candidates ##########
-    (process.zelAllelAll+
-     process.zelTightelTight+
-     process.zelMatchedelMatched+   
-     process.zmuAllmuAll+
-     process.zmuTightmuTight+
-     process.zmuMatchedmuMatched)*
-
-
-    process.offlinePrimaryVertexFromZ*
-
-    #### Z+jets candidates ##########
-    (process.zmmj+
-     process.zeej+
-     process.zmmb+
-     process.zeeb)*
-     #process.filterbjets*
-     #(process.bbbar+
-     # process.zmmbb+
-     # process.zeebb))*
-    process.ZMMFilter
-    * process.producePatPFMETobjectWithCorrections
-    #* process.patPFMet
-    #* process.selectedPatJetsForMETtype1p2Corr
-    #* process.pfMEtSysShiftCorrSequence
-    #* process.patPFJetMETtype1p2Corr
-    #* process.patType1CorrectedPFMet
+    process.allMuons*                                          ## our final muon collections
+    process.tightMuons*                                        ##
+    process.matchedMuons*                                      ##
+    (process.zelAllelAll+                                      ## the Z candidates
+     process.zelTightelTight+                                  ##
+     process.zelMatchedelMatched+                              ##
+     process.zmuAllmuAll+                                      ##
+     process.zmuTightmuTight+                                  ##
+     process.zmuMatchedmuMatched)*                             ##
+    process.offlinePrimaryVertexFromZ*                         ## Offline PV from Z for Torino's analysis
+    (process.zmmj+process.zeej+process.zmmb+process.zeeb)*     ## the Z+j and Z+b candidates
+    process.ZMMFilter                                          ## Final filter on the presence of Z->mm
     )
 
 process.PFelectron = cms.Path(
-    process.goodPV*
     process.TotalEventCounter*
+    process.goodPV*                                            ## Primary vertex
     process.simpleEleIdSequence*
-
-    ##to create the collection pfNoPileUp
     process.pfNoPileUpSequence*
-    ## to create the isoVariables with pfNoPileUp
     process.pfParticleSelectionSequence*
-    process.eleIsoSequence* ### check if they are alrady in the PAT default sequence
+    process.eleIsoSequence*
     process.muIsoSequence*
-
-    #process.pfElectronIsolationFromDepositsSequence+
-    
     process.pfAllNeutralHadrons*
     process.pfAllChargedHadrons*
     process.pfAllPhotons*
- 
     process.pfMuonSequence* 
     process.pfElectronSequence*
-
-    (process.kt4PFJets+
-     process.kt6PFJets+
-     process.ak5PFJets)*
-    process.kt6PFJetsForIsolation*
-
+    (process.kt4PFJets+process.kt6PFJets+process.ak5PFJets)*   ## reco jets
+    process.kt6PFJetsForIsolation*                             ##
     (process.preMuonSequence * process.preElectronSequence)*
-    # process.patTrigger*
     process.patDefaultSequence*
-    #process.puJetIdSqeuence*
-
-    #### b-jets candidates #####
-    process.bjets*
-    #process.bbbar+
-    
-    process.userDataSelectedMuons*
-    process.userDataSelectedElectrons*
-
-    ###### electron candidates #####
+    process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
+    process.bjets*                                             ## our b jets
+    process.userDataSelectedMuons*                             ## Muons + isolation variables
+    process.userDataSelectedElectrons*                         ## Electrons + isolation variables
     process.eleTriggerMatchHLT *
     process.patElectronsWithTrigger *
-    process.allElectrons*
-    process.tightElectrons*
-    process.matchedElectrons*
-    
-    ###### muon candidates #####
+    process.allElectrons*                                      ## our final electron collections
+    process.tightElectrons*                                    ##
+    process.matchedElectrons*                                  ##
     process.muonTriggerMatchHLTMuons*
     process.selectedPatMuonsTriggerMatch*
-    process.allMuons*
-    process.tightMuons*
-    process.matchedMuons*
-    
-    #### Z candidates ##########
-
-    (process.zelAllelAll+
-     process.zelTightelTight+
-     process.zelMatchedelMatched+   
-     process.zmuAllmuAll+
-     process.zmuTightmuTight+
-     process.zmuMatchedmuMatched)*
-
-    process.offlinePrimaryVertexFromZ*
-
-    #### Z+jets candidates ##########
-    (process.zmmj+
-     process.zeej+
-     process.zmmb+
-     process.zeeb)*
-     #process.filterbjets*
-     #(process.bbbar+
-     # process.zmmbb+
-     # process.zeebb))*
-    process.ZEEFilter
-    * process.producePatPFMETobjectWithCorrections
-    #* process.patPFMet
-    #* process.selectedPatJetsForMETtype1p2Corr
-    #* process.pfMEtSysShiftCorrSequence
-    #* process.patPFJetMETtype1p2Corr
-    #* process.patType1CorrectedPFMet
+    process.allMuons*                                          ## our final muon collections
+    process.tightMuons*                                        ##
+    process.matchedMuons*                                      ##
+    (process.zelAllelAll+                                      ## the Z candidates
+     process.zelTightelTight+                                  ##
+     process.zelMatchedelMatched+                              ##
+     process.zmuAllmuAll+                                      ##
+     process.zmuTightmuTight+                                  ##
+     process.zmuMatchedmuMatched)*                             ##
+    process.offlinePrimaryVertexFromZ*                         ## Offline PV from Z for Torino's analysis
+    (process.zmmj+process.zeej+process.zmmb+process.zeeb)*     ## the Z+j and Z+b candidates
+    process.ZEEFilter                                          ## Final filter on the presence of Z->mm
     )
 
 #####################
 ###  OUTPATH    #####
 #####################
 
-process.outpath = cms.EndPath(
-    process.out
-    )
+process.outpath = cms.EndPath(process.out)
+
