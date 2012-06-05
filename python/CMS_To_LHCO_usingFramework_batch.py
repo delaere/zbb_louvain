@@ -13,10 +13,7 @@ from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
 
-
-
 print sys.argv 
-
 
 def Delta(par1,par2):
   delta_phi=abs(par2.phi()-par1.phi())
@@ -58,22 +55,30 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   metHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  fwevent.getByLabel ("cleanPatJets",jetHandle)
-  fwevent.getByLabel ("patMETsPF",metHandle)
-  fwevent.getByLabel ("ZmuMatchedmuMatched",zmuHandle)
-  fwevent.getByLabel ("ZelMatchedelMatched",zeleHandle)
+  PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
+  RhoHandle = Handle("double")
+  fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
+  fwevent.getByLabel (zbblabel.metlabel,metHandle)
+  fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
+  fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
+  fwevent.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
+  fwevent.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
+  vertices = PrimaryVertexHandle.product()
+  if vertices.size()>0 :
+    vertex = vertices[0]
+  else:
+    vertex = None
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   #find the best z candidate
-  bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
+  bestZcandidate = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle)
   # loop over jets and print
 
   bjetp=[]
   for jet in jets:
-    #if isGoodJet(jet,bestZcandidate) and isBJet(jet, "HE", "SSV"):
-    if isGoodJet(jet,bestZcandidate): #and isBJet(jet, "HE", "SSV"):
+    if isGoodJet(jet,bestZcandidate) and isBJet(jet, "HE", "SSV"):
       bjetp+=[jet]
 
   dijet = findDijetPair(bjetp, bestZcandidate)
@@ -243,19 +248,17 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
       print "We will run over file ", fname
   events = Events (files)
 
-  metlabel="patMETsPF"
-  jetlabel="cleanPatJets"
+  metlabel=zbblabel.metlabel # To be check to load MeT type 1 + phi correction
+  jetlabel=zbblabel.jetlabel
   jetalllabel="patJets"
-  zmulabel="ZmuMatchedmuMatched"
-  zelelabel="ZelMatchedelMatched"
-  genpartlabel="genParticles"
-  labelElectron = "matchedElectrons"
-  labelMuon = "matchedMuons"
-  vertexLabel ="goodPV"
+  zmulabel=zbblabel.zmumulabel
+  zelelabel=zbblabel.zelelabel
+  genpartlabel=zbblabel.genlabel
+  labelElectron = zbblabel.electronlabel
+  labelMuon = zbblabel.muonlabel
+  vertexLabel =zbblabel.vertexlabel
 
-  initLabel= "gluonsInit"
-  initqLabel= "quarkInit"
-  
+  RhoHandle = Handle("double")
   jetHandle = Handle ("vector<pat::Jet>")
   jetallHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
@@ -269,17 +272,8 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
   genpartHandle =  Handle("std::vector<reco::GenParticle>")
   PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
 
-#  initHandle = Handle ("edm::OwnVector<reco::Candidate,edm::ClonePolicy<reco::Candidate> >")
-#  initqHandle = Handle ("edm::OwnVector<reco::Candidate,edm::ClonePolicy<reco::Candidate> >")
-
-  
   PULabel = "addPileupInfo"
   PUHandle= Handle("std::vector<PileupSummaryInfo>")
-
-  qq_event=0
-  gg_event=0
-  gg_gen_event=0
-  qq_gen_event=0
 
 # Event loop
   for event in events:
@@ -292,14 +286,10 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
     event.getByLabel (metlabel,metHandle)
     event.getByLabel (zmulabel,zmuHandle)
     event.getByLabel (zelelabel,zeleHandle)
-    #event.getByLabel ("ZmuMatchedmuMatched",zmuHandle)
-    #event.getByLabel ("ZelMatchedelMatched",zeleHandle)
     event.getByLabel (labelElectron,electronHandle)
     event.getByLabel (labelMuon,muonHandle)
     event.getByLabel (vertexLabel, PrimaryVertexHandle)
-#    event.getByLabel (initLabel , initHandle)
-#    event.getByLabel (initqLabel , initqHandle)
-                
+    event.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
     run = event.eventAuxiliary().run()
 
     runNumber[0] = event.eventAuxiliary().run()
@@ -313,10 +303,14 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
     vertices = PrimaryVertexHandle.product()
     muons = muonHandle.product()
     electrons = electronHandle.product()
-
-    #I still don't know how to access the primary vertex
-    nbr_PV[0] = -1
-	
+    rho = RhoHandle.product()
+    
+    if vertices.size()>0 :
+      vertex = vertices[0]
+    else:
+      vertex = None
+      
+    nbr_PV[0] = vertices.size()
     #gen level info
     Pile_up[0] = 0
     numberOfInteractions = 0
@@ -345,33 +339,20 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
       event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
       triggerInfo = trigInfoHandle.product()
 
-
-    gluon=[]
-    quark=[]
-
-
     #We require the event selection given by the variable "stage"
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
-    #categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run ,muChannel, massWindow=60.)#!!!!!!!!!!!!!!!!!!!!!!!temporary mass window    
-    #categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run ,muChannel, massWindow=30.)    
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run ,muChannel)    
+# Start procedure selection
+    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
     #if isInCategory(stage, eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run ,muChannel)) :
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
-    
-      
-    
+        
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
-      bestZ = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
-
-
-
-
+      bestZ = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle)
 
       bjetp=[]
       for jet in jets:
-        #if isGoodJet(jet,bestZ) and isBJet(jet, "HE", "SSV"):
-        if isGoodJet(jet,bestZ):# and isBJet(jet, "HE", "SSV"):
+        if isGoodJet(jet,bestZ) and isBJet(jet, "HE", "SSV"):
           bjetp+=[jet]
       if len(bjetp)>1:
         dijet = findDijetPair(bjetp, bestZ)  
@@ -404,11 +385,6 @@ def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarcia
         Pt_l1[0]=l1.pt()
         Pt_l2[0]=l2.pt()
 	
-
-
-
-	  
-
 
         #info about MET
         Met[0] = met[0].pt()
