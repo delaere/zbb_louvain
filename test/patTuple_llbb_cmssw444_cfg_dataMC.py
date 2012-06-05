@@ -193,44 +193,6 @@ else:
     process.preMuonSequence = cms.Sequence(process.patTrigger) 
     process.preElectronSequence = cms.Sequence(process.patTrigger) 
 
-###########################
-#### ELECTRON ISOLATION ###
-###########################
-
-### from PF2PAT sequence...
-process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
-process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
-
-### create the particle-based isolation values for gsfElectrons and muons
-from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
-process.muIsoSequence = setupPFMuonIso(process, 'muons')
-process.pfIsolatedElectrons.isolationCut = 0.5 ### VERY loose, true isolation done later, exploiting deposits...
-process.pfAllElectrons.src = "particleFlow" # default = pfNoMuons
-
-#################################
-### ELECTRON trigger matching ###
-#################################
-
-pathTriggerEle ='(path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0) && filter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter")) || (path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter"))'
-
-process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
-                                             src     = cms.InputTag( "selectedPatElectrons" ),
-                                             matched = cms.InputTag( "patTrigger"),
-                                             matchedCuts = cms.string(pathTriggerEle),
-                                             maxDPtRel = cms.double( 0.5 ),
-                                             maxDeltaR = cms.double( 0.3 ),
-                                             resolveAmbiguities    = cms.bool( True ),
-                                             resolveByMatchQuality = cms.bool( True )
-                                             )
-
-process.patElectronsWithTrigger = cms.EDProducer("PATTriggerMatchElectronEmbedder",
-                                                 src     = cms.InputTag("selectedPatElectrons"),
-                                                 matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'))
-                                                 )
-
-switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' )
-
 ################################
 #### ELECTRON IDENTIFICATION ###
 ################################
@@ -243,10 +205,24 @@ process.patElectrons.electronIDSources = cms.PSet(
     )
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 
+###########################
+#### ELECTRON ISOLATION ###
+###########################
+
+### from PF2PAT sequence...
+process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
+process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
+
+### create the particle-based isolation values for gsfElectrons and muons
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
+process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.pfIsolatedElectrons.isolationCut = 0.5 ### VERY loose, true isolation done later, exploiting deposits...
+process.pfAllElectrons.src = "particleFlow" # default = pfNoMuons
+
 ### Electrons with UserData for isolation
-process.userDataSelectedElectrons = cms.EDProducer(
-   "Higgs2l2bElectronUserData",
-   src = cms.InputTag("patElectrons"),
+process.selectedElectronsWithIsolationData = cms.EDProducer(
+   "ElectronIsolationEmbedder",
+   src = cms.InputTag("selectedPatElectrons"),
    rho = cms.InputTag("kt6PFJetsForIsolation:rho"),
    PFCandidateMap = cms.InputTag('particleFlow:electrons'),
    # NOT yet backported in 44X and 42X
@@ -260,6 +236,29 @@ process.userDataSelectedElectrons = cms.EDProducer(
                                   cms.InputTag('elPFIsoDepositGammaPFIso'),
                                   cms.InputTag('elPFIsoDepositNeutralPFIso')),
 )
+
+#################################
+### ELECTRON trigger matching ###
+#################################
+
+pathTriggerEle ='(path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0) && filter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter")) || (path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter"))'
+
+process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
+                                             src     = cms.InputTag( "selectedElectronsWithIsolationData" ),
+                                             matched = cms.InputTag( "patTrigger"),
+                                             matchedCuts = cms.string(pathTriggerEle),
+                                             maxDPtRel = cms.double( 0.5 ),
+                                             maxDeltaR = cms.double( 0.3 ),
+                                             resolveAmbiguities    = cms.bool( True ),
+                                             resolveByMatchQuality = cms.bool( True )
+                                           )
+
+process.patElectronsWithTrigger = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
+                                                  src     = cms.InputTag("selectedElectronsWithIsolationData"),
+                                                  matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'))
+                                                )
+
+switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' )
 
 ### Our electron collections: all, tight, matched
 process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs(eta) < 2.5' ) 
@@ -324,8 +323,36 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 
 process.patMuons.useParticleFlow=True
 
+### embedding objects
+process.patMuons.embedCombinedMuon = cms.bool(True)
+process.patMuons.embedStandAloneMuon = cms.bool(False)
+process.patMuons.embedPickyMuon = cms.bool(False)
+process.patMuons.embedTpfmsMuon = cms.bool(False)
+process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
+
+###########################
+#### MUON Isolation #######
+###########################
+
+### create the particle-based isolation values for gsfElectrons and muons
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFMuonIso
+process.muIsoSequence = setupPFMuonIso(process, 'muons')
+
+#check here for values: CommonTools/ParticleFlow/python/Isolation/pfIsolatedMuons_cfi.py
+#check here for values of the isolation deposits:  RecoMuon/MuonIsolation/python/muonPFIsolationValues_cff.py
+# DEFAULT ones are: muPFIsoValueCharged04/muPFIsoValueNeutral04/muPFIsoValueGamma04...
+process.pfIsolatedMuons.isolationCut = 0.5 ## very loose, true isolation done later, exploiting deposits...
+## default cone is 0.4, as recommended at: https://twiki.cern.ch/twiki/bin/view/CMS/TWikiSMP-MUO#MuORecommendations
+
+### Muons with isolation data embedded
+process.selectedMuonsWithIsolationData = cms.EDProducer(
+   "MuonIsolationEmbedder",
+   src = cms.InputTag("selectedPatMuons"),
+   rho = cms.InputTag("kt6PFJetsForIsolation:rho")
+)
+
 #################################
-### MUON Trigger matching #######
+#### MUON Trigger matching ######
 #################################
 
 pathTriggerMu = 'path("HLT_DoubleMu6_v*",0,0) || path("HLT_DoubleMu7_v*",0,0) || path("HLT_Mu13_Mu8_v*",0,1) || path("HLT_Mu17_Mu8_v*",0,1)'
@@ -341,28 +368,15 @@ process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
                                                   )
 
 switchOnTriggerMatchEmbedding(process ,triggerMatchers = ['muonTriggerMatchHLTMuons'],)
-removeCleaningFromTriggerMatching(process)
-
 #Switch to selected PAT objects in the trigger matching removeCleaningFromTriggerMatching( process )
 #match the trigger object to the reconstructed muon (no cuts on id iso...) 
-from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons
-
-#process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'selectedPatMuons' )
-#process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'pfSelectedMuons' ) 
-#process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'pfSelectedMuons' )
-
-from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *
-process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'selectedPatMuons' )
+from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons 
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *                       
+process.muonTriggerMatchHLTMuons.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
+process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
 process.selectedPatMuonsTriggerMatch.matches = cms.VInputTag('muonTriggerMatchHLTMuons')
 
-#the selectedMuons are created with the trigger matched muons as input collection.
-
-# Muons with UserData ###############################
-process.userDataSelectedMuons = cms.EDProducer(
-   "Higgs2l2bMuonUserData",
-   src = cms.InputTag("selectedPatMuons"),
-   rho = cms.InputTag("kt6PFJetsForIsolation:rho")
-)
+removeCleaningFromTriggerMatching(process)
 
 ### Our muon collections: all, tight, matched
 process.allMuons = selectedPatMuons.clone(
@@ -400,35 +414,6 @@ process.matchedMuons = selectedPatMuons.clone(
                      #' trackIso < 3 &'                                      # VBTF choice
                      'triggerObjectMatches.size > 0')
     )
-
-
-#add muon cuts
-#check here for values: CommonTools/ParticleFlow/python/Isolation/pfIsolatedMuons_cfi.py
-#check here for values of the isolation deposits:  RecoMuon/MuonIsolation/python/muonPFIsolationValues_cff.py
-# DEFAULT ones are: muPFIsoValueCharged04/muPFIsoValueNeutral04/muPFIsoValueGamma04...
-
-process.pfIsolatedMuons.isolationCut = 0.5 ## very loose, true isolation done later, exploiting deposits...
-## default cone is 0.4, as recommended at: https://twiki.cern.ch/twiki/bin/view/CMS/TWikiSMP-MUO#MuORecommendations
-
-## embedding objects
-
-process.patMuons.embedCombinedMuon = cms.bool(True)
-process.patMuons.embedStandAloneMuon = cms.bool(False)
-process.patMuons.embedPickyMuon = cms.bool(False)
-process.patMuons.embedTpfmsMuon = cms.bool(False)
-process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
-
-#build the Z candidates taking 2 muons with opposite charge and a loose pT, eta cut (pfSelectedMuons).
-#from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons
-#process.selectedMuons = pfSelectedMuons.clone()
-#process.selectedMuons.src = cms.InputTag("pfSelectedMuons")
-#process.selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
-
-#uncomment to select the two mouns with highest pT
-## process.selectedMuonsForZ = cms.EDFilter("LargestPtCandViewSelector",
-##                                          src = cms.InputTag("selectedMuonsAll"),
-##                                          maxNumber = cms.uint32(2)
-##                                          )
 
 
 #################################
@@ -503,7 +488,6 @@ process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
    puJetIdFlag = cms.InputTag("puJetMva","fullId"),
    puJetIdentifier = cms.InputTag("puJetId"),
 )
-process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
 process.selectedPatJets.src      = cms.InputTag("patJetsWithBeta")
 process.selectedPatJets.cut      = 'pt > 20. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
@@ -715,6 +699,10 @@ process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('PFmuon
 ##    SEQUENCES     ##
 ######################
 
+process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
+process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
+process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
+
 process.PFmuon = cms.Path(
     process.TotalEventCounter*
     process.goodPV*                                            ## Primary vertex
@@ -734,18 +722,13 @@ process.PFmuon = cms.Path(
     process.patDefaultSequence*
     process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
     process.bjets*                                             ## our b jets
-    process.userDataSelectedMuons*                             ## Muons + isolation variables
-    process.userDataSelectedElectrons*                         ## Electrons + isolation variables
-    process.eleTriggerMatchHLT *
-    process.patElectronsWithTrigger *
-    process.allElectrons*                                      ## our final electron collections
-    process.tightElectrons*                                    ##
-    process.matchedElectrons*                                  ##
-    process.muonTriggerMatchHLTMuons*
-    process.selectedPatMuonsTriggerMatch*
-    process.allMuons*                                          ## our final muon collections
-    process.tightMuons*                                        ##
-    process.matchedMuons*                                      ##
+    process.patElectronsWithTrigger *                          ## Include trigger matching
+    process.allElectrons*                                      ## our final electron collection: all electrons
+    process.tightElectrons*                                    ## our final electron collection: tight electrons
+    process.matchedElectrons*                                  ## our final electron collection: matched electrons
+    process.allMuons*                                          ## our final muon collection: all muons
+    process.tightMuons*                                        ## our final muon collection: tight muons
+    process.matchedMuons*                                      ## our final muon collection: matched muons
     (process.zelAllelAll+                                      ## the Z candidates
      process.zelTightelTight+                                  ##
      process.zelMatchedelMatched+                              ##
@@ -776,18 +759,13 @@ process.PFelectron = cms.Path(
     process.patDefaultSequence*
     process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
     process.bjets*                                             ## our b jets
-    process.userDataSelectedMuons*                             ## Muons + isolation variables
-    process.userDataSelectedElectrons*                         ## Electrons + isolation variables
-    process.eleTriggerMatchHLT *
-    process.patElectronsWithTrigger *
-    process.allElectrons*                                      ## our final electron collections
-    process.tightElectrons*                                    ##
-    process.matchedElectrons*                                  ##
-    process.muonTriggerMatchHLTMuons*
-    process.selectedPatMuonsTriggerMatch*
-    process.allMuons*                                          ## our final muon collections
-    process.tightMuons*                                        ##
-    process.matchedMuons*                                      ##
+    process.patElectronsWithTrigger *                          ## Include trigger matching
+    process.allElectrons*                                      ## our final electron collection: all electrons
+    process.tightElectrons*                                    ## our final electron collection: tight electrons
+    process.matchedElectrons*                                  ## our final electron collection: matched electrons
+    process.allMuons*                                          ## our final muon collection: all muons
+    process.tightMuons*                                        ## our final muon collection: tight muons
+    process.matchedMuons*                                      ## our final muon collection: matched muons
     (process.zelAllelAll+                                      ## the Z candidates
      process.zelTightelTight+                                  ##
      process.zelMatchedelMatched+                              ##
