@@ -40,10 +40,8 @@ is8Nov = bool(options.bool8Nov)
 #isMC=False
 #is8Nov=False
 
-### Torino's counter ################
-
+### Torino's counters ###############
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-
 process.TotalEventCounter = cms.EDProducer("EventCountProducer")
 process.TotalEventCounter = cms.EDProducer("EventCountProducer")
 process.AfterPVFilterCounter = cms.EDProducer("EventCountProducer")
@@ -53,31 +51,27 @@ process.AfterCandidatesCounter = cms.EDProducer("EventCountProducer")
 process.AfterJetsCounter = cms.EDProducer("EventCountProducer")
 #####################################
 
+########################
+## Standard Modules  ###
+########################
+
+##----------------- Load standard PAT tools -----------------------------
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process,sequence='patDefaultSequence',hltProcess = '*')
-
 from PhysicsTools.PatAlgos.tools.coreTools import *
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
 process.load('CommonTools.ParticleFlow.pfParticleSelection_cff') 
 
-########################
-## Standard Modules  ###
-########################
-
-## Load standard Reco modules
+##----------------- Load standard Reco modules --------------------------
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-## Generator informations
+
+##----------------- Generator informations ------------------------------
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
 process.load("Configuration.StandardSequences.Generator_cff")
-
-from RecoJets.JetProducers.FastjetParameters_cfi import *
-from RecoJets.JetProducers.ak5TrackJets_cfi import *
-from RecoJets.JetProducers.GenJetParameters_cfi import *
-from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 
 ##----------------- Import the Particle Flow modules  --------------------
 process.load("CommonTools.ParticleFlow.pfElectrons_cff")
@@ -85,21 +79,30 @@ process.load("CommonTools.ParticleFlow.pfMuons_cff")
 process.load("CommonTools.ParticleFlow.ParticleSelectors.pfSortByType_cff")
 process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 process.load("CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi")
+
+##-------------------- Import the Jet RECO modules -----------------------
+from RecoJets.JetProducers.FastjetParameters_cfi import *
+from RecoJets.JetProducers.ak5TrackJets_cfi import *
+from RecoJets.JetProducers.GenJetParameters_cfi import *
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.load("RecoJets.Configuration.GenJetParticles_cff")
+process.load("RecoJets.Configuration.RecoGenJets_cff")
+
 ##-------------------- Import the JEC services ---------------------------
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
 
+##-------------------- load the PU JetID sequence ------------------------
+process.load("CMGTools.External.pujetidsequence_cff")
+
 ##-------------------- Import the MET correction modules -----------------
 process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-##-------------------- Import the Jet RECO modules -----------------------
-process.load('RecoJets.Configuration.RecoPFJets_cff')
-process.load("RecoJets.Configuration.GenJetParticles_cff")
-process.load("RecoJets.Configuration.RecoGenJets_cff")
-
+##-------------------- Standard tools ------------------------------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -110,11 +113,9 @@ process.kt6PFJets.doRhoFastjet = True
 ##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
 process.kt6PFJets.doAreaFastjet = True
 process.ak5PFJets.doAreaFastjet = True
-
-# to compute FastJet rho to correct isolation (note: EtaMax restricted to 2.5)
+##-------------------- To compute FastJet rho to correct isolation (note: EtaMax restricted to 2.5) ---------------
 process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6 ,doRhoFastjet = True)
 process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
-
 
 ######### REMOVAL OF MC MATCHING
 
@@ -178,27 +179,25 @@ process.goodPV.cut=cms.string('ndof > 4&'
                               ' position.Rho <2 '
                               )
 
-###########################
+##########################
 #### PRE-SEQUENCES #######
 ##########################
+
 if isMC:
     process.electronMatch.matched = "genParticles"
     process.muonMatch.matched = "genParticles"
-
     process.preMuonSequence = cms.Sequence(
-                                           process.muonMatch+
-                                           process.patTrigger) 
+             process.muonMatch+
+             process.patTrigger
+    ) 
     
     process.preElectronSequence = cms.Sequence(
-                                               process.electronMatch+
-                                               process.patTrigger
-                                               ) 
-
+             process.electronMatch+
+             process.patTrigger
+    ) 
 else:
     process.preMuonSequence = cms.Sequence(process.patTrigger) 
-    
     process.preElectronSequence = cms.Sequence(process.patTrigger) 
-
 
 ###########################
 #### ELECTRON ISOLATION ###
@@ -361,7 +360,6 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                roles = cms.vstring('matched1', 'matched2')
                               )
 
-
 ###########################
 #### MUON selection #######
 ###########################
@@ -372,7 +370,6 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 #Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded and it can also be used to build the Z candidate. 
 
 process.patMuons.useParticleFlow=True
-
 
 #################################
 ### MUON Trigger matching #######
@@ -524,47 +521,48 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #### JETS #######################################
 #################################################
 
-#from PhysicsTools.PatAlgos.tools.jetTools import *
-# Use ak5PF instead of ak5Calo
-##-------------------- Import the JEC services -----------------------
-#process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-##-------------------- Import the Jet RECO modules -----------------------
-#process.load('RecoJets.Configuration.RecoPFJets_cff')
-##-------------------- Turn-on the FastJet density calculation -----------------------
-#process.kt6PFJets.doRhoFastjet = True
-##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
-#process.ak5PFJets.doAreaFastjet = True
-
-
-inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #  ,'L5Flavor','L7Parton'OUTDATED: do not use them!
+# Jet Correction label. 'L5Flavor' and 'L7Parton' are OUTDATED: do not use them!
 if isMC:
     inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
+else:
+    inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual'])
 
-
+# Use ak5PFJets
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
                     jetCorrLabel = inputJetCorrLabel,
-                    doType1MET   = False,
+                    doType1MET   = False, # that doesn't work (yet in 44X)
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
                     jetIdLabel   = "ak5"
                     )
 
+# official PU JetID sequence (approved on 28.05.2012)
+process.puJetId.rho  = cms.InputTag("kt6PFJetsForIsolation:rho")
+process.puJetId.jets = cms.InputTag("patJets")
+process.puJetMva.rho = cms.InputTag("kt6PFJetsForIsolation:rho")
+process.puJetMva.jets = cms.InputTag("patJets")
+
+# beta and beta*, added as UserFloats (private definition, just in case)
+# that producer also puts the official values as userFloats
 process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
    src = cms.InputTag("patJets"),
    primaryVertices = cms.InputTag("goodPV"),
+   puJetIdMVA = cms.InputTag("puJetMva","fullDiscriminant"),
+   puJetIdFlag = cms.InputTag("puJetMva","fullId"),
+   puJetIdentifier = cms.InputTag("puJetId"),
 )
-process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.patJetsWithBeta))
+process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
 process.selectedPatJets.src      = cms.InputTag("patJetsWithBeta")
-
 process.selectedPatJets.cut      = 'pt > 20. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
+# b-jets
 process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
-
 process.filterbjets = process.countPatJets.clone(src= "bjets", minNumber = 2)
     
+# combined objects
 process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("bjets bjets"),
                                cut = cms.string("mass > 0"),
@@ -732,6 +730,9 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    ##################################################                                   
                                 
                                    'keep *_*atJets*_*_*',
+                                   'keep *_puJetId_*_*',
+                                   'keep *_puJetMva_*_*',
+
                                    #### keep candidates based on b jets
                                    'keep *_bjets*_*_*',
                                    ####################################
@@ -812,6 +813,7 @@ process.PFmuon = cms.Path(
     #process.patTrigger*
     (process.preMuonSequence * process.preElectronSequence)*
     process.patDefaultSequence*
+    #process.puJetIdSqeuence*
 
     #### b-jets candidates #####
     process.bjets*
@@ -893,6 +895,7 @@ process.PFelectron = cms.Path(
     (process.preMuonSequence * process.preElectronSequence)*
     # process.patTrigger*
     process.patDefaultSequence*
+    #process.puJetIdSqeuence*
 
     #### b-jets candidates #####
     process.bjets*
