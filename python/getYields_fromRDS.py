@@ -24,16 +24,19 @@ totalCutString = ""+extraCut
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["TT","DY","ZZ","ZHbb"]
-SMMCsampleList = ["TT","DY","ZZ"]
-totsampleList  = ["DATA","TT","DY","ZZ","ZHbb"]
+MCsampleList   = ["TT","Zb","Zc","Zl","ZZ","ZHbb"]
+SMMCsampleList = ["TT","Zb","Zc","Zl","ZZ"]
+totsampleList  = ["DATA","TT","Zb","Zc","Zl","ZZ","ZHbb"]
 
 
 lumi = { "DATA" : 5.051                   ,
          "TT"   : (3701947./157.5)/1000.  ,
-         "DY"   : (35907791./3048.)/1000. ,
+         "Zb"   : (35907791./3048.)/1000. ,
+         "Zc"   : (35907791./3048.)/1000. ,
+         "Zl"   : (35907791./3048.)/1000. ,
          "ZZ"   : 4191045./6206.          ,
-         "ZHbb" : 12000.                  }
+         "ZHbb" : (1100000./15.31)/1000.
+         }
 
 MCweight = {}
 
@@ -55,14 +58,18 @@ myRDS_red_w = {}
 
 filename_el = {"DATA" : "File_rds_zbb_El_DATA.root",
                "TT"  : "File_rds_zbb_Ttbar_El_MC.root",
-               "DY"  : "File_rds_zbb_El_MC.root",
+               "Zb"  : "File_rds_zbb_El_MC.root",
+               "Zc"  : "File_rds_zbb_El_MC.root",
+               "Zl"  : "File_rds_zbb_El_MC.root",
                "ZZ"  : "File_rds_zbb_ZZ_El_MC.root",
                "ZHbb": "File_rds_zbb_ZHbb_El_MC.root"
                }
 
 filename_mu = {"DATA" : "File_rds_zbb_Mu_DATA.root",
                "TT"  : "File_rds_zbb_Ttbar_Mu_MC.root",
-               "DY"  : "File_rds_zbb_Mu_MC.root",
+               "Zb"  : "File_rds_zbb_Mu_MC.root",
+               "Zc"  : "File_rds_zbb_Mu_MC.root",
+               "Zl"  : "File_rds_zbb_Mu_MC.root",
                "ZZ"  : "File_rds_zbb_ZZ_Mu_MC.root",
                "ZHbb": "File_rds_zbb_ZHbb_Mu_MC.root"
                }
@@ -86,6 +93,7 @@ for sample in totsampleList :
 ###############
 ### weights ###
 ###############
+
 
 rrv_w_b = {"5"  : ws.var("BtaggingReweightingHE")  ,
            "6"  : ws.var("BtaggingReweightingHP")  ,
@@ -123,6 +131,13 @@ for sample in totsampleList:
     elif channel=="Mu" : myRDS_red[sample] = myRDS_mu[sample].reduce("rc_eventSelection_"+WP+"==1")
 
     if extraCut : myRDS_red[sample] = myRDS_red[sample].reduce(extraCut)
+
+    if   sample == "Zb" : isZbcl = "mcSelectioneventType==3"
+    elif sample == "Zc" : isZbcl = "mcSelectioneventType==2"
+    elif sample == "Zl" : isZbcl = "mcSelectioneventType==1"
+    else                : isZbcl = ""
+    
+    if isZbcl : myRDS_red[sample] = myRDS_red[sample].reduce(isZbcl)
 
     if channel =="Mu" :
         myRDS_red[sample]=myRDS_red[sample].reduce(muMassCut)
@@ -376,32 +391,47 @@ for name in namePlotList:
     print "numList    = ", numList    
     rap[name] = RooAddPdf("sum"+name,"sum"+name,sampleList,numList)    
 
+    totalMConDATA = (num_MC["Zb"].getVal()+num_MC["Zc"].getVal()+num_MC["Zl"].getVal()+num_MC["TT"].getVal()+num_MC["ZZ"].getVal())/myRDS_red_w["DATA"].numEntries()
     var_frame[name] = var[name].frame()
     myRDS_red_w["DATA"].plotOn(var_frame[name],
                                RooFit.MarkerSize(1.0),
                                RooFit.XErrorSize(0.035),
                                RooFit.DrawOption("pe2"))
     rap[name].plotOn(var_frame[name],
-                     RooFit.Components("rhp_TT,rhp_DY,rhp_ZZ"),
+                     RooFit.Components("rhp_TT,rhp_Zb,rhp_ZZ,rhp_Zc,rhp_Zl"),
+                     RooFit.LineColor(kBlack),
+                     RooFit.FillColor(kBlue-7),
+                     RooFit.DrawOption("F"),
+                     RooFit.LineWidth(1),
+                     RooFit.Normalization(totalMConDATA))
+    rap[name].plotOn(var_frame[name],
+                     RooFit.Components("rhp_TT,rhp_Zb,rhp_ZZ,rhp_Zc"),
+                     RooFit.LineColor(kBlack),
+                     RooFit.FillColor(kGreen-7),
+                     RooFit.DrawOption("F"),
+                     RooFit.LineWidth(1),
+                     RooFit.Normalization(totalMConDATA))
+    rap[name].plotOn(var_frame[name],
+                     RooFit.Components("rhp_TT,rhp_Zb,rhp_ZZ"),
                      RooFit.LineColor(kBlack),
                      RooFit.FillColor(kRed-7),
                      RooFit.DrawOption("F"),
                      RooFit.LineWidth(1),
-                     RooFit.Normalization((num_MC["TT"].getVal()+num_MC["DY"].getVal()+num_MC["ZZ"].getVal())/myRDS_red_w["DATA"].numEntries()))
+                     RooFit.Normalization(totalMConDATA))
     rap[name].plotOn(var_frame[name],
                      RooFit.Components("rhp_TT,rhp_ZZ"),
                      RooFit.LineColor(kBlack),
                      RooFit.FillColor(kYellow-7),
                      RooFit.DrawOption("F"),
                      RooFit.LineWidth(1),
-                     RooFit.Normalization((+num_MC["DY"].getVal()+num_MC["TT"].getVal()+num_MC["ZZ"].getVal())/myRDS_red_w["DATA"].numEntries()))
+                     RooFit.Normalization(totalMConDATA))
     rap[name].plotOn(var_frame[name],
                      RooFit.Components("rhp_ZZ"),
                      RooFit.LineColor(kBlack),
                      RooFit.FillColor(kPink-7),
                      RooFit.DrawOption("F"),
                      RooFit.LineWidth(1),
-                     RooFit.Normalization((num_MC["DY"].getVal()+num_MC["TT"].getVal()+num_MC["ZZ"].getVal())/myRDS_red_w["DATA"].numEntries()))
+                     RooFit.Normalization(totalMConDATA))
     rhp["ZHbb"].plotOn(var_frame[name],
                        RooFit.LineColor(kRed),
                        RooFit.LineWidth(1),
@@ -419,7 +449,7 @@ for name in namePlotList:
     var_frame[name].Draw()
     CANVAS[name].cd(2)
     th1["DATA"+name].Draw()                                      
-    for sample in ("DY","TT","ZZ"): th1[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
+    for sample in ("Zb","Zc","Zl","TT","ZZ"): th1[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
     #th1_copy["DATA"+name].Draw()                                      
     #for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
     
