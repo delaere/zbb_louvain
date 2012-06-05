@@ -15,7 +15,7 @@
 //
 // Original Author:  Christophe Delaere
 //         Created:  Wed May 16 21:12:25 CEST 2012
-// $Id: JetBetaProducer.cc,v 1.2 2012/05/17 14:03:55 delaer Exp $
+// $Id: JetBetaProducer.cc,v 1.3 2012/05/20 20:12:50 delaer Exp $
 //
 //
 
@@ -40,7 +40,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "FWCore/Utilities/interface/EDMException.h"
-
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
 
 //
 // class declaration
@@ -63,14 +63,17 @@ class JetBetaProducer : public edm::EDProducer {
       float betaStar(pat::Jet const&) const;
 
       // ----------member data ---------------------------
-      edm::InputTag src_, primaryVertices_;
+      edm::InputTag src_, primaryVertices_, puJetIdMVA_, puJetIdFlag_, puJetIdentifier_;
       std::list<int> _trackrefs_PV;
       std::list<int> _trackrefs_PU;
 };
 
 JetBetaProducer::JetBetaProducer(const edm::ParameterSet& iConfig):
    src_( iConfig.getParameter<edm::InputTag>( "src" ) ),
-   primaryVertices_(iConfig.getParameter<edm::InputTag>( "primaryVertices" ) )
+   primaryVertices_(iConfig.getParameter<edm::InputTag>( "primaryVertices" ) ),
+   puJetIdMVA_( iConfig.getParameter<edm::InputTag>( "puJetIdMVA" ) ), 
+   puJetIdFlag_( iConfig.getParameter<edm::InputTag>( "puJetIdFlag" ) ), 
+   puJetIdentifier_( iConfig.getParameter<edm::InputTag>( "puJetIdentifier" ) )
 {
    produces<std::vector<pat::Jet> >();
 }
@@ -171,25 +174,41 @@ JetBetaProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   using namespace edm;
 
-  Handle<vector<pat::Jet>  > jets; // Jet collection
+  Handle<edm::View<pat::Jet>  > jets; // Jet collection as a view
   iEvent.getByLabel(src_,jets); // load it
+  Handle<vector<pat::Jet>  > jetsv; // Jet collection as a vector
+  iEvent.getByLabel(src_,jetsv); // load it
 
   Handle<VertexCollection> primaryVertices;  // Collection of primary Vertices
   iEvent.getByLabel(primaryVertices_, primaryVertices); // load them
   buildTrackRefs(primaryVertices);  // build the list of track refs
 
+  Handle<ValueMap<float> > puJetIdMVA; // Discriminant for PU jets
+  iEvent.getByLabel(puJetIdMVA_, puJetIdMVA); // load it
+  Handle<ValueMap<int> > puJetIdFlag; // Outcome of the discriminant
+  iEvent.getByLabel(puJetIdFlag_, puJetIdFlag); // load it
+  Handle<ValueMap<StoredPileupJetIdentifier> > puJetIdentifier; // The Identifier
+  iEvent.getByLabel(puJetIdentifier_, puJetIdentifier);
+
   // the output
-  auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet> (*jets) );
+  auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet> (*jetsv) );
   // loop over jets, and add beta and beta*
   for (unsigned int i = 0; i< jetColl->size();++i){
-    pat::Jet & j = (*jetColl)[i];
+    pat::Jet & j = jetColl->at(i);
     // check that these are PFJets
     if ( !j.isPFJet() )
       throw cms::Exception("InvalidInput") 
          << "Input pat::Jet is not of PF-type !!\n";
     // add payload to the jets
-    j.addUserFloat("beta",beta(j));
-    j.addUserFloat("betaStar",betaStar(j));
+    j.addUserFloat("puJetMva",(*puJetIdMVA)[jets->refAt(i)]);
+    j.addUserInt("puJetId",(*puJetIdFlag)[jets->refAt(i)]);
+    j.addUserFloat("beta",((*puJetIdentifier)[jets->refAt(i)]).beta());
+    j.addUserFloat("betaStar",((*puJetIdentifier)[jets->refAt(i)]).betaStar());
+    j.addUserFloat("betaClassic",((*puJetIdentifier)[jets->refAt(i)]).betaClassic());
+    j.addUserFloat("betaStarClassic",((*puJetIdentifier)[jets->refAt(i)]).betaStarClassic());
+    j.addUserFloat("betaZbb",beta(j));
+    j.addUserFloat("betaStarZbb",betaStar(j));
+    
     LogDebug("JetBetaProducerSummary") << "jet Pt = " << j.pt() << " beta= " << j.userFloat("beta") << " beta*= " << j.userFloat("betaStar");
   }
   // add to the event
