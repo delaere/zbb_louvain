@@ -144,7 +144,9 @@ readFiles.extend([
     #"file:/tmp/castello/Run2011A_DoubleElectron_AOD_08Nov2011-v1_0000_001ED292-B51B-E111-A231-001BFCDBD130.root" ### test file for electrons
     #"file:/tmp/castello/Run2011A_DoubleMu_AOD_08Nov2011-v1_0000_00011B62-381B-E111-8425-002618943810.root" ## test file for muons
     #"file:/tmp/castello/Fall11_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph_PU_S6-START44_V5-v1_FE772459-D80A-E111-ABBE-E0CB4E1A1186.root" ## test file for MC Drell-Yan
-    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/7A64B1BE-CE36-E111-BE8E-003048FFD7D4.root"
+    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/7A64B1BE-CE36-E111-BE8E-003048FFD7D4.root",
+    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/4A8BD06C-CE36-E111-B940-00304867D446.root",
+    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root
     ])
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
@@ -695,7 +697,7 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_*bjets*_*_*',
                                    'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
                                    'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
-                                   'keep *_jetProbabilityBJetTags_*_PAT',
+                                   'keep *_jetProbabilityBJetTags*_*_PAT',
                                    ### rho corrections saved ---------------------------------------------------------------
                                    'keep *_kt6PFJetsForIsolation_*_*',
                                    ### MET ---------------------------------------------------------------------------------
