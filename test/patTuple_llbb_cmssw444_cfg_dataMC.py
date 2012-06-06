@@ -1,3 +1,4 @@
+
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
 import os
@@ -493,7 +494,10 @@ process.selectedPatJets.cut      = 'pt > 20. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
 # b-jets
-process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
+#Let the possibility to skim the PAT with either CSV, JP or SSV
+#WP : SSVHEM, JPL, CSVL for 44X
+#more info at : https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagPerformanceOP and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookBTagging
+process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74 || bDiscriminator("combinedSecondaryVertexBJetTags") > 0.244  || bDiscriminator("jetProbabilityBJetTags") > 0.275' )
 process.filterbjets = process.countPatJets.clone(src= "bjets", minNumber = 2)
     
 # combined objects
@@ -674,7 +678,8 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_puJetMva_*_*',
                                    'keep *_bjets*_*_*',
                                    'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
-                                   'keep *_combinedSecondaryVertex*BJetTags*_*_PAT',
+                                   'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
+                                   'keep *_jetProbabilityBJetTags_*_PAT',
                                    ### rho corrections saved ---------------------------------------------------------------
                                    'keep *_kt6PFJetsForIsolation_*_*',
                                    ### MET ---------------------------------------------------------------------------------
