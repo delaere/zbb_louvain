@@ -497,7 +497,10 @@ process.patJets.addTagInfos = cms.bool( True )
 #Let the possibility to skim the PAT with either CSV, JP or SSV
 #WP : SSVHEM, JPL, CSVL for 44X
 #more info at : https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagPerformanceOP and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookBTagging
-process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74 || bDiscriminator("combinedSecondaryVertexBJetTags") > 0.244  || bDiscriminator("jetProbabilityBJetTags") > 0.275' )
+process.bjets =    process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
+process.CSVbjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("combinedSecondaryVertexBJetTags") > 0.244' )
+process.JPbjets =  process.cleanPatJets.clone( preselection = 'bDiscriminator("jetProbabilityBJetTags") > 0.275' )
+
 process.filterbjets = process.countPatJets.clone(src= "bjets", minNumber = 2)
     
 # combined objects
@@ -676,7 +679,7 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*',
                                    'keep *_*5PFJets*_*_*',
                                    'keep *_puJetId_*_*',
                                    'keep *_puJetMva_*_*',
-                                   'keep *_bjets*_*_*',
+                                   'keep *_*bjets*_*_*',
                                    'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
                                    'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
                                    'keep *_jetProbabilityBJetTags_*_PAT',
@@ -727,6 +730,8 @@ process.PFmuon = cms.Path(
     process.patDefaultSequence*
     process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
     process.bjets*                                             ## our b jets
+    process.CSVbjets*
+    process.JPbjets* 
     process.patElectronsWithTrigger *                          ## Include trigger matching
     process.allElectrons*                                      ## our final electron collection: all electrons
     process.tightElectrons*                                    ## our final electron collection: tight electrons
@@ -764,6 +769,8 @@ process.PFelectron = cms.Path(
     process.patDefaultSequence*
     process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
     process.bjets*                                             ## our b jets
+    process.CSVbjets*
+    process.JPbjets*
     process.patElectronsWithTrigger *                          ## Include trigger matching
     process.allElectrons*                                      ## our final electron collection: all electrons
     process.tightElectrons*                                    ## our final electron collection: tight electrons
