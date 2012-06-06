@@ -65,6 +65,7 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   fwevent.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
+  rho = RhoHandle.product()
   vertices = PrimaryVertexHandle.product()
   if vertices.size()>0 :
     vertex = vertices[0]
@@ -121,13 +122,13 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 #def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #data elChannel
-def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+#def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #MC muChannel
 #def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #MC elChannel
-#def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
