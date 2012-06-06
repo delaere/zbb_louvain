@@ -226,6 +226,10 @@ process.selectedElectronsWithIsolationData = cms.EDProducer(
    src = cms.InputTag("selectedPatElectrons"),
    rho = cms.InputTag("kt6PFJetsForIsolation:rho"),
    PFCandidateMap = cms.InputTag('particleFlow:electrons'),
+   gsfElectrons = cms.InputTag('gsfElectrons'),
+   conversions = cms.InputTag('allConversions'),
+   beamSpot = cms.InputTag('offlineBeamSpot'),
+   primaryVertex = cms.InputTag('offlinePrimaryVertices'),
    # NOT yet backported in 44X and 42X
    #IsoValElectronNoPF = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03NoPFIdPFIso'),
    #                                   cms.InputTag('elPFIsoValueGamma03NoPFIdPFIso'),
@@ -265,11 +269,20 @@ switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultS
 process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs(eta) < 2.5' ) 
 process.allElectrons.src = "patElectronsWithTrigger"
 
-process.tightElectrons = process.selectedPatElectrons.clone( cut = 
-                                                  ##  WP85 2011, same as 2010+ H/E cut: https://twiki.cern.ch/twiki/bin/view/CMS/VbtfEleID2011#Basic_Cuts
-                                                  'electronID("simpleEleId85relIso") == 5 &' ## passing conversion rejection and ID 
-                                                  'userFloat("PFIsoPUCorrected") < 0.15 &'
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
+if isMC:
+  process.tightElectrons = process.selectedPatElectrons.clone( cut = 
+                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5'
+                                                  )
+else:
+  process.tightElectrons = process.selectedPatElectrons.clone( cut = 
+                                                  'userFloat(MediumWP)==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
