@@ -146,7 +146,7 @@ readFiles.extend([
     #"file:/tmp/castello/Fall11_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph_PU_S6-START44_V5-v1_FE772459-D80A-E111-ABBE-E0CB4E1A1186.root" ## test file for MC Drell-Yan
     "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/7A64B1BE-CE36-E111-BE8E-003048FFD7D4.root",
     "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/4A8BD06C-CE36-E111-B940-00304867D446.root",
-    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root
+    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root"
     ])
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
@@ -158,7 +158,7 @@ process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
                                       makeTriggerResults=cms.untracked.bool(True),
                                     )
 
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(30000) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -659,7 +659,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##      OUTPUT      ##
 ######################
 
-process.out.fileName = cms.untracked.string('PATskim-test.root')
+process.out.fileName = cms.untracked.string('/storage/data/cms/store/user/acaudron/outputPAT/TTbar-test.root')
 
 process.out.outputCommands = cms.untracked.vstring( 'drop *' )
                                    ### vertex, incl. Torino's Z vertex producer and mergeable counter ----------------------
