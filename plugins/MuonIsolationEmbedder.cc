@@ -38,7 +38,6 @@ void MuonIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
   Handle<double> rhoHandle;
   evt.getByLabel(rho_,rhoHandle);
   double rho = *rhoHandle; 
-  float PUEnergyInCone = (TMath::Pi()) * R04 * R04 * rho;  
 
   auto_ptr<vector<pat::Muon> > muonColl( new vector<pat::Muon> (*muons) );
   
@@ -56,11 +55,18 @@ void MuonIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
                                         /std::max(0.5, m.pt());   
     m.addUserFloat("RelativePFIsolationDBetaCorr",RelativeIsolationDBetaCorr);
 
-    // OPTION 2: rho correctios BUT without Effective area.
-    neutralHadronIso =std::max(0., neutralHadronIso-PUEnergyInCone);
-    photonIso =std::max(0., photonIso-PUEnergyInCone);
-    float RelativeIsolationRhoCorr   = (chargedHadronIso+neutralHadronIso+photonIso)/std::max(0.5, m.pt());
-    m.addUserFloat("RelativeIsolationRhoCorr",RelativeIsolationRhoCorr);
+    // OPTION 2: rho correctios with Effective area.
+    double A_eff;
+    if     (abs(m.eta())<=1.0)                     { A_eff=0.132; }
+    else if(abs(m.eta())>1.0 && abs(m.eta())<=1.5) { A_eff=0.120; }
+    else if(abs(m.eta())>1.5 && abs(m.eta())<=2.0) { A_eff=0.114; }
+    else if(abs(m.eta())>2.0 && abs(m.eta())<=2.2) { A_eff=0.139; }
+    else if(abs(m.eta())>2.2 && abs(m.eta())<=2.3) { A_eff=0.168; }
+    else                                           { A_eff=0.189; }
+   
+    float RelativeIsolationRhoCorr = (chargedHadronIso + max( (photonIso + neutralHadronIso) - max(rho,0.0)*A_eff, 0.0))
+                                      /std::max(0.5, m.pt());
+    m.addUserFloat("RelativePFIsolationRhoCorr",RelativeIsolationRhoCorr);
 
   }
   evt.put( muonColl);
