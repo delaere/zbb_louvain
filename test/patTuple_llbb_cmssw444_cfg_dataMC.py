@@ -152,8 +152,8 @@ readFiles.extend([
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(100),  )
 # Example of how to debug a specific module
-#process.MessageLogger.debugModules = cms.untracked.vstring('patJetsWithBeta')
-#process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
+process.MessageLogger.debugModules = cms.untracked.vstring('selectedElectronsWithIsolationData')
+process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
                                       makeTriggerResults=cms.untracked.bool(True),
                                     )
@@ -298,7 +298,7 @@ else:
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
                                                   )
- process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
+  process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
                                                   'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
