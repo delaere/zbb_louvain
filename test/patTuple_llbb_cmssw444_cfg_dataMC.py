@@ -152,8 +152,8 @@ readFiles.extend([
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(100),  )
 # Example of how to debug a specific module
-process.MessageLogger.debugModules = cms.untracked.vstring('selectedElectronsWithIsolationData')
-process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
+#process.MessageLogger.debugModules = cms.untracked.vstring('selectedElectronsWithIsolationData')
+#process.MessageLogger.cerr = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') )
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
                                       makeTriggerResults=cms.untracked.bool(True),
                                     )
@@ -273,7 +273,7 @@ process.allElectrons.src = "patElectronsWithTrigger"
 
 if isMC:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
-                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
@@ -281,17 +281,17 @@ if isMC:
                                                   'abs(eta) < 2.5'
                                                   )
   process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
-                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
-                                                  'abs(eta) < 2.5'
+                                                  'abs(eta) < 2.5 &'
                                                   'triggerObjectMatches.size > 0' # trigger match           
                                                   )
 else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
-                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
@@ -299,12 +299,12 @@ else:
                                                   'abs(eta) < 2.5'
                                                   )
   process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
-                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
-                                                  'abs(eta) < 2.5'
+                                                  'abs(eta) < 2.5 &'
                                                   'triggerObjectMatches.size > 0' # trigger match
                                                    )
 
@@ -668,7 +668,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##      OUTPUT      ##
 ######################
 
-process.out.fileName = cms.untracked.string('/storage/data/cms/store/user/acaudron/outputPAT/TTbar-test.root')
+process.out.fileName = cms.untracked.string('PATskim-test.root')
 
 process.out.outputCommands = cms.untracked.vstring( 'drop *' )
                                    ### vertex, incl. Torino's Z vertex producer and mergeable counter ----------------------
