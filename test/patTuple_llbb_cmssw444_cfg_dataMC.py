@@ -280,26 +280,35 @@ if isMC:
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
                                                   )
+  process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
+                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5'
+                                                  'triggerObjectMatches.size > 0' # trigger match           
+                                                  )
 else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
-                                                  'userFloat(MediumWP)==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
                                                   )
-process.tightElectrons.src = "patElectronsWithTrigger"
-
-process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
-                                                   'electronID("simpleEleId85relIso") == 5 &'
-                                                   'userFloat("PFIsoPUCorrected") < 0.15 &'
-                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
-                                                   'abs(dB) < 0.02 & '
-                                                   'pt>20 &'
-                                                   'abs(eta) < 2.5 &'
-                                                   'triggerObjectMatches.size > 0'                           
+ process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
+                                                  'userFloat("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5'
+                                                  'triggerObjectMatches.size > 0' # trigger match
                                                    )
+
+process.tightElectrons.src = "patElectronsWithTrigger"
 process.matchedElectrons.src = "patElectronsWithTrigger"
 
 #################################
