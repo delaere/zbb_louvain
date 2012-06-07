@@ -3,6 +3,7 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"
 #include <vector>
@@ -89,8 +90,10 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     double neutral = (*(*electronIsoVals)[2])[el.originalObjectRef()];
 
     // introduce the new definition of the medium WP, approved on June 1st.
+    LogDebug("ElectronIsolationEmbedder") << "WP inputs: " << charged << " " << photon << " " << neutral << " " << rho;
     bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, gsfele, conversions_h, beamSpot, vtx_h, charged, photon, neutral, rho);
     el.addUserInt("MediumWP", medium);
+    LogDebug("ElectronIsolationEmbedder") << "MediumWP: " << medium;
 
     // Effective area for 2011 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/Main/HVVElectronId2012 )
     double A_eff_PH, A_eff_NH;
@@ -102,8 +105,10 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     else if(abs(eta)>2.3 && abs(eta)<=2.4)   { A_eff_PH=0.097 ; A_eff_NH=0.021; }   
     else                                     { A_eff_PH=0.110 ; A_eff_NH=0.021; }
 
+    LogDebug("ElectronIsolationEmbedder") << "Effective area, PH and NH: " << A_eff_PH << " " << A_eff_NH;
     float PFIsoPUCorrected =(charged + max(photon - rho*A_eff_PH  , 0.) +  max(neutral - rho * A_eff_NH, 0.))/std::max(0.5, el.pt());
     el.addUserFloat("PFIsoPUCorrected", PFIsoPUCorrected);  
+    LogDebug("ElectronIsolationEmbedder") << "PFIsoPUCorrected=" << PFIsoPUCorrected;
 
     // Effective area for 2011 MC. From  https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection
     if     (abs(eta)<=1.0)                   { A_eff_PH=0.084 ; A_eff_NH=0.022; }
@@ -114,8 +119,10 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     else if(abs(eta)>2.3 && abs(eta)<=2.4)   { A_eff_PH=0.132 ; A_eff_NH=0.024; }   
     else                                     { A_eff_PH=0.155 ; A_eff_NH=0.030; }
 
+    LogDebug("ElectronIsolationEmbedder") << "Effective area for MC, PH and NH: " << A_eff_PH << " " << A_eff_NH;
     float PFIsoPUCorrectedMC =(charged + max(photon - rho*A_eff_PH  , 0.) +  max(neutral - rho * A_eff_NH, 0.))/std::max(0.5, el.pt());
-    el.addUserFloat("PFIsoPUCorrectedMC", PFIsoPUCorrectedMC);  
+    el.addUserFloat("PFIsoPUCorrectedMC", PFIsoPUCorrectedMC);
+    LogDebug("ElectronIsolationEmbedder") << "PFIsoPUCorrectedMC=" << PFIsoPUCorrectedMC;  
   
   }
   evt.put(electronColl);
