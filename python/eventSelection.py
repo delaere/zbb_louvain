@@ -124,33 +124,8 @@ def isTightMuon(muon):
     ROOT.SetOwnership( mu, False ) 
   else:
     mu = muon
-
-### temporary patch for muon selection
-    #print "muon = ", mu
-  chargedHadronIso = mu.pfIsolationR04().sumChargedHadronPt
-  chargedHadronIsoPU = mu.pfIsolationR04().sumPUPt  
-  neutralHadronIso  = mu.pfIsolationR04().sumNeutralHadronEt
-  photonIso  = mu.pfIsolationR04().sumPhotonEt
-  RelativeIsolationDBetaCorr=(chargedHadronIso + max(photonIso+neutralHadronIso-0.5*chargedHadronIsoPU ,0.))/(max(0.5,mu.pt()))   
-  #print "RelativeIsolationDBetaCorr : " , RelativeIsolationDBetaCorr
-
-  Iso = RelativeIsolationDBetaCorr < 0.2
-  dB = abs(mu.dB()) < 0.02
-  if mu.innerTrack().isNonnull() and mu.globalTrack().isNonnull():
-    track = (mu.innerTrack().hitPattern().numberOfValidPixelHits() > 0 and mu.globalTrack().hitPattern().numberOfValidMuonHits() > 0 )
-    Id = mu.innerTrack().hitPattern().trackerLayersWithMeasurement()>8 
-    chi2 =  mu.normChi2() < 10
-  else :
-    track = False
-    Id = False
-    chi2 = False
-  station  = mu.numberOfMatchedStations>1
-  pT = mu.pt() > 20
-  Eta = abs(mu.eta())< 2.4
-  Global = mu.isGlobalMuon()
-  Tracker = mu.isTrackerMuon()
   
-  return (isLooseMuon(muon) and Iso and Id and dB and track and chi2 and station and pT and Eta and Global and Tracker) ###and chi2 and track !!!
+  return (isLooseMuon(muon))
 
 def isMatchedMuon(muon):
   """Perform additional checks that define a matched muon"""
@@ -182,7 +157,7 @@ def isLooseElectron(electron):
 
   return True
 
-def isTightElectron(electron,rho):
+def isTightElectron(electron):
   """Perform additional checks that define a tight electron"""
 
   # anything else on top of PAT cfg ?
@@ -196,48 +171,13 @@ def isTightElectron(electron,rho):
     ROOT.SetOwnership( el, False ) 
   else:
     el = electron
-
-### temporary patch for electron selection
-  charged =  el.pfIsolationVariables().chargedHadronIso
-  photon = el.pfIsolationVariables().photonIso
-  neutral = el.pfIsolationVariables().neutralHadronIso    
-  ##Effective area for 2011 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/Main/HVVElectronId2012 ) 
-  if(abs(el.eta())<=1.0):
-    A_eff_PH=0.081
-    A_eff_NH=0.024
-  elif(abs(el.eta())>1.0 and abs(el.eta())<=1.479) :
-    A_eff_PH=0.084
-    A_eff_NH=0.037
-  elif(abs(el.eta())>1.479 and abs(el.eta())<=2.0) :
-    A_eff_PH=0.048
-    A_eff_NH=0.037
-  elif(abs(el.eta())>2.0 and abs(el.eta())<=2.2) :
-    A_eff_PH=0.089
-    A_eff_NH=0.023
-  elif(abs(el.eta())>2.2 and abs(el.eta())<=2.3) :
-    A_eff_PH=0.092
-    A_eff_NH=0.023
-  elif(abs(el.eta())>2.3 and abs(el.eta())<=2.4):
-    A_eff_PH=0.097
-    A_eff_NH=0.021   
-  else :
-    A_eff_PH=0.11
-    A_eff_NH=0.021  
-  PFIsoPUCorrected =(charged+max((photon-(rho[0]*A_eff_PH)),0.) + max((neutral-(rho[0]*A_eff_NH)),0.))/max(0.5,el.pt())
-
-  Id = ((el.electronID("simpleEleId85relIso") == 7) or (el.electronID("simpleEleId85relIso") == 5))                                                   
-  Iso = PFIsoPUCorrected < 0.15
-  dB = abs(el.dB()) < 0.02
-  Fiducial = ((abs(el.superCluster().eta())< 1.442)or((1.566<(abs(el.superCluster().eta())))and((abs(el.superCluster().eta()))<2.50)))
-  Eta = abs(el.eta()) < 2.4
-  pT = el.pt()>20
-  
+ 
    ##everything should be in the pat now
     #isMatched = True # no need anymore: this is done in PAT and complemented by the trigger check at step 1.
 
-  return (Id and Iso and dB and Fiducial and Eta and pT)
+  return (isLooseElectron(electron))
 
-def isMatchedElectron(electron,rho):
+def isMatchedElectron(electron):
 
   """Perform additional checks that define a matched electron"""
 
@@ -248,15 +188,15 @@ def isMatchedElectron(electron,rho):
   #print "clone:",electron.masterClone().isNonnull()
   #if electron.hasOverlaps("muons"): return False
 
-  return (isTightElectron(electron,rho) and True)
+  return (isTightElectron(electron) and True)
 
-def isGoodElectron(electron,role,rho):
+def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
 ### Atttention!! very Temporary  Due to the lepton selection problem in the PAT and the use of zallall + offline selection as a solution
-  if string.find(role,"all")!=-1   : return isMatchedElectron(electron,rho)
+  if string.find(role,"all")!=-1   : return isMatchedElectron(electron)
   #if string.find(role,"all")!=-1   : return isLooseElectron(electron)
-  if string.find(role,"tight")!=-1   : return isTightElectron(electron,rho)
-  if string.find(role,"matched")!=-1 : return isMatchedElectron(electron,rho)
+  if string.find(role,"tight")!=-1   : return isTightElectron(electron)
+  if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown electron role:",role
   return True
@@ -349,7 +289,7 @@ def isBJet(jet,workingPoint,algo="SSV"):
     return False
 
 
-def isZcandidate(zCandidate, rho, vertex=None):
+def isZcandidate(zCandidate,vertex=None):
   """Checks that this is a suitable candidate from lepton quality"""
   result = True
   flavor = 1
@@ -362,7 +302,7 @@ def isZcandidate(zCandidate, rho, vertex=None):
       flavor *= -1
       result = result and isGoodMuon(zCandidate.daughter(r),r)  
     elif zCandidate.daughter(r).isElectron():
-      result = result and isGoodElectron(zCandidate.daughter(r),r,rho)
+      result = result and isGoodElectron(zCandidate.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
   if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"
@@ -477,7 +417,7 @@ def isTriggerMatchPair(l1,l2,runNumber):
 
   return False
 
-def findBestCandidate(muChannel, rho, vertex, *zCandidates):
+def findBestCandidate(muChannel, vertex, *zCandidates):
   """Finds the best Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates.
      muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
@@ -486,14 +426,14 @@ def findBestCandidate(muChannel, rho, vertex, *zCandidates):
   if muChannel is None:
     for col in zCandidates:
       for z in col:
-        if not isZcandidate(z,rho,vertex): continue
+        if not isZcandidate(z,vertex): continue
         if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
           bestM = z.mass()
           bestZ = z
   else:
     for col in zCandidates:
       for z in col:
-        if not isZcandidate(z,rho,vertex): continue
+        if not isZcandidate(z,vertex): continue
 	if (muChannel==True and z.daughter(0).isElectron() ) or (muChannel==False and z.daughter(0).isMuon()) : continue
         if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
           bestM = z.mass()
@@ -623,14 +563,14 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
   """Check analysis requirements for various steps."""
   output = []
   if vertices.size()>0 :
     vertex = vertices[0]
   else:
     vertex = None
-  bestZcandidate = findBestCandidate(muChannel, rho, vertex, zCandidatesMu, zCandidatesEle)
+  bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
   # output[0]: Trigger
   #print "runnumber in eventcqt = ", runNumber
   if isTriggerOK(triggerInfo,bestZcandidate, runNumber, muChannel):
