@@ -53,18 +53,21 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   # load objects
   jetHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
+  noPUcorrmetHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
   RhoHandle = Handle("double")
   fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
   fwevent.getByLabel (zbblabel.metlabel,metHandle)
+  fwevent.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
   fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
   fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
   fwevent.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
   fwevent.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
   jets = jetHandle.product()
   met = metHandle.product()
+  noPUcorrmet = noPUcorrmetHandle.product()
   rho = RhoHandle.product()
   vertices = PrimaryVertexHandle.product()
   if vertices.size()>0 :
@@ -74,7 +77,7 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   #find the best z candidate
-  bestZcandidate = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle)
+  bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
   # loop over jets and print
 
   bjetp=[]
@@ -161,6 +164,14 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   Met_phi=  n.zeros(1, dtype=float)
   Met_sig=  n.zeros(1, dtype=float)
   
+  noPUcorrMet=  n.zeros(1, dtype=float)
+  noPUcorrMet_phi=  n.zeros(1, dtype=float)
+  noPUcorrMet_sig=  n.zeros(1, dtype=float)
+  
+  llM = n.zeros(1, dtype=float)
+  bbM = n.zeros(1, dtype=float)
+
+
   E_l1 = n.zeros(1, dtype=float)
   E_l2 = n.zeros(1, dtype=float)
   phi_l1 = n.zeros(1, dtype=float)
@@ -195,7 +206,11 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   tree1.Branch("Pt_j2",Pt_j2,"Pt_j2/D")
   tree1.Branch("btag_j1",btag_j1,"btag_j1/D")
   tree1.Branch("btag_j2",btag_j2,"btag_j2/D")
+
+  tree1.Branch("llM",llM,"llM/D")
+  tree1.Branch("bbM",bbM,"bbM/D")
   
+
   tree1.Branch("E_l1",E_l1,"E_l1/D")
   tree1.Branch("E_l2",E_l2,"E_l2/D")
   tree1.Branch("Eta_l1",Eta_l1,"Eta_l1/D")
@@ -209,6 +224,10 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   tree1.Branch("Met", Met, "Met/D")
   tree1.Branch("Met_phi", Met_phi, "Met_phi/D")
   tree1.Branch("Met_sig", Met_sig, "Met_sig/D")
+
+  tree1.Branch("noPUcorrMet", noPUcorrMet, "noPUcorrMet/D")
+  tree1.Branch("noPUcorrMet_phi", noPUcorrMet_phi, "noPUcorrMet_phi/D")
+  tree1.Branch("noPUcorrMet_sig", noPUcorrMet_sig, "noPUcorrMet_sig/D")
 
   tree1.Branch("isZb", isZb, "isZb/I")
   tree1.Branch("isZc", isZc, "isZc/I")
@@ -263,6 +282,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   jetHandle = Handle ("vector<pat::Jet>")
   jetallHandle = Handle ("vector<pat::Jet>")
   metHandle = Handle ("vector<pat::MET>")
+  noPUcorrmetHandle = Handle ("vector<pat::MET>")
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
@@ -285,6 +305,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     event.getByLabel (jetlabel,jetHandle)
     event.getByLabel (jetalllabel,jetallHandle)
     event.getByLabel (metlabel,metHandle)
+    event.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
     event.getByLabel (zmulabel,zmuHandle)
     event.getByLabel (zelelabel,zeleHandle)
     event.getByLabel (labelElectron,electronHandle)
@@ -298,6 +319,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 
     jets = jetHandle.product()
     met = metHandle.product()
+    noPUcorrmet = noPUcorrmetHandle.product()
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
 #    triggerInfo = trigInfoHandle.product()
@@ -344,12 +366,11 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
 # Start procedure selection
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
-    #if isInCategory(stage, eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run ,muChannel)) :
+    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
         
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
-      bestZ = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle)
+      bestZ = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
 
       bjetp=[]
       for jet in jets:
@@ -365,6 +386,13 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
           dphi= (2*pi) - dphi
         DR=sqrt(pow(dijet[0].eta()-dijet[1].eta(),2)+pow(dphi,2))
 
+        b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+	b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+	bb = b1 + b2
+	bbM[0] = bb.M()
+	
+	llM[0] = bestZ.mass()
+	
         E_j1[0]=dijet[0].energy() 
         E_j2[0]=dijet[1].energy()
         Eta_j1[0]=dijet[0].eta()
@@ -394,6 +422,14 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
         if met[0].getSignificanceMatrix()(0,0)<1e10 and met[0].getSignificanceMatrix()(1,1)<1e10 : 
           Met_sig[0] = met[0].significance()
 	
+        #info about MET, collection no PU corr
+        noPUcorrMet[0] = noPUcorrmet[0].pt()
+        noPUcorrMet_phi[0] = noPUcorrmet[0].phi()
+        noPUcorrMet_sig[0] = 0.
+        if noPUcorrmet[0].getSignificanceMatrix()(0,0)<1e10 and noPUcorrmet[0].getSignificanceMatrix()(1,1)<1e10 : 
+          noPUcorrMet_sig[0] = noPUcorrmet[0].significance()
+	
+
 	#info about nJets, nbtagged jets
 	nJets[0] = 0
         nBjetsHE[0] = 0
