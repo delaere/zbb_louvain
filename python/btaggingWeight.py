@@ -18,6 +18,7 @@ class btaggingWeight:
     self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
     self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
     self.myJetSet = ROOT.JetSet(file)
+    self.vertexHandle = Handle ("vector<reco::Vertex>")
 
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
@@ -45,10 +46,16 @@ class btaggingWeight:
     event.getByLabel(zbblabel.jetlabel,self.jetHandle)
     event.getByLabel(zbblabel.zmumulabel,self.zmuHandle)
     event.getByLabel(zbblabel.zelelabel,self.zeleHandle)
+    event.getByLabel (zbblabel.vertexlabel,self.vertexHandle)          
     jets = self.jetHandle.product()
     zCandidatesMu  = self.zmuHandle.product()
-    zCandidatesEle = self.zeleHandle.product()    
-    Z = findBestCandidate(muChannel, zCandidatesMu, zCandidatesEle)
+    zCandidatesEle = self.zeleHandle.product()
+    vertices = self.vertexHandle.product()
+    if vertices.size()>0 :
+      vertex = vertices[0]
+    else:
+      vertex = None    
+    Z = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
