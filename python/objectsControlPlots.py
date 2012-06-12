@@ -130,7 +130,8 @@ class ElectronsControlPlots(BaseControlPlots):
       self.add("elephotonIso","Electron photon isolation",100,0,0.2)
       self.add("eleneutralIso","Electron neutral Hadron isolation ",100,0,0.2)
       self.add("elepfIsoPUc","Electron pfIsoPUCorrected",100,0,0.2)
-      self.add("rho","Rho Variable",100,0,100)
+      self.add("elepfIsoPUcMC","Electron pfIsoPUCorrectedMC",100,0,0.2)
+      #self.add("rho","Rho Variable",100,0,100)
       #self.add("eleHoE","Electron H over E",100,0,0.1)
       self.add("eledphi","Electron dphi at calo",100,0,0.1)
       self.add("eledeta","Electron deta at calo",100,0,0.01)
@@ -140,7 +141,7 @@ class ElectronsControlPlots(BaseControlPlots):
       self.electronHandle = Handle ("vector<pat::Electron>")
       self.electronlabel  = electronlabel
       self.electronType   = electronType
-      self.rhoHandle = Handle ("double")
+      #self.rhoHandle = Handle ("double")
 
     #@print_timing
     def process(self, event):
@@ -149,8 +150,8 @@ class ElectronsControlPlots(BaseControlPlots):
       # load event
       event.getByLabel(self.electronlabel,self.electronHandle)
       electrons = self.electronHandle.product()
-      event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
-      rho = self.rhoHandle.product()
+      #event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
+      #rho = self.rhoHandle.product()
       
       # lepton selection
       result["eleid"] = [ ]
@@ -160,11 +161,12 @@ class ElectronsControlPlots(BaseControlPlots):
       result["eleetapm"] = [ ]
       result["eledb"] = [ ]
       result["eleoverlapmu"] = [ ]
-      result["elechargedIso"] = [ ]
-      result["elephotonIso"] = [ ]
-      result["eleneutralIso"] = [ ]
+      #result["elechargedIso"] = [ ]
+      #result["elephotonIso"] = [ ]
+      #result["eleneutralIso"] = [ ]
       result["elepfIsoPUc"] = [ ]
-      result["rho"] = [ ]
+      result["elepfIsoPUcMC"] = [ ]
+      #result["rho"] = [ ]
       #result["eleHoE"] = [ ]
       result["eledphi"] = [ ]
       result["eledeta"] = [ ]
@@ -172,41 +174,16 @@ class ElectronsControlPlots(BaseControlPlots):
       nel = 0
       for electron in electrons:
         # for electrons
-        charged =  electron.pfIsolationVariables().chargedHadronIso
-        photon = electron.pfIsolationVariables().photonIso
-        neutral = electron.pfIsolationVariables().neutralHadronIso    
-  ##Effective area for 2011 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/Main/HVVElectronId2012 ) 
-        if(abs(electron.eta())<=1.0):
-            A_eff_PH=0.081
-            A_eff_NH=0.024
-        elif(abs(electron.eta())>1.0 and abs(electron.eta())<=1.479) :
-            A_eff_PH=0.084
-            A_eff_NH=0.037
-        elif(abs(electron.eta())>1.479 and abs(electron.eta())<=2.0) :
-            A_eff_PH=0.048
-            A_eff_NH=0.037
-        elif(abs(electron.eta())>2.0 and abs(electron.eta())<=2.2) :
-            A_eff_PH=0.089
-            A_eff_NH=0.023
-        elif(abs(electron.eta())>2.2 and abs(electron.eta())<=2.3) :
-            A_eff_PH=0.092
-            A_eff_NH=0.023
-        elif(abs(electron.eta())>2.3 and abs(electron.eta())<=2.4):
-            A_eff_PH=0.097
-            A_eff_NH=0.021   
-        else :
-            A_eff_PH=0.11
-            A_eff_NH=0.021  
-        PFIsoPUCorrected =(charged+max((photon-(rho[0]*A_eff_PH)),0.) + max((neutral-(rho[0]*A_eff_NH)),0.))/max(0.5,electron.pt())
-      
+              
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
-        result["eleid"].append(electron.electronID("simpleEleId85relIso"))
+        result["eleid"].append(electron.userInt("MediumWP"))
         result["elemisshits"].append(electron.gsfTrack().numberOfLostHits())
-        result["elechargedIso"].append(charged)
-        result["elephotonIso"].append(photon)
-        result["eleneutralIso"].append(neutral)
-        result["elepfIsoPUc"].append(PFIsoPUCorrected)
-        result["rho"].append(rho[0])
+        #result["elechargedIso"].append()
+        #result["elephotonIso"].append()
+        #result["eleneutralIso"].append()
+        result["elepfIsoPUc"].append(electron.userFloat("PFIsoPUCorrected"))
+        result["elepfIsoPUcMC"].append(electron.userFloat("PFIsoPUCorrectedMC"))
+        #result["rho"].append(rho[0])
         #result["eleHcalIso"].append(electron.dr03HcalTowerSumEt()/scEt)
         #result["eleEcalIso"].append(electron.dr03EcalRecHitSumEt()/scEt)
         #result["eleTkIso"].append(electron.dr03TkSumPt()/scEt)
@@ -219,7 +196,7 @@ class ElectronsControlPlots(BaseControlPlots):
         result["eleetapm"].append(electron.eta())
         result["eledb"].append(abs(electron.dB()))
         result["eleoverlapmu"].append(electron.hasOverlaps("muons"))
-        if isGoodElectron(electron,self.electronType,rho) : nel += 1
+        if isGoodElectron(electron,self.electronType) : nel += 1
       result["nel"] = nel
       return result
     
@@ -233,7 +210,7 @@ class JetmetControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, jetlabel=zbblabel.jetlabel, metlabel=zbblabel.metlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, btagging="SSV"):
+    def beginJob(self, jetlabel=zbblabel.jetlabel, metlabel=zbblabel.metlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel,vertexlabel=zbblabel.vertexlabel, btagging="SSV"):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,0,10)
@@ -337,10 +314,12 @@ class JetmetControlPlots(BaseControlPlots):
       self.metHandle = Handle("vector<pat::MET>")
       self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
       self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
+      self.vertexHandle = Handle ("vector<reco::Vertex>")
       self.jetlabel  = jetlabel
       self.metlabel  = metlabel
       self.zmulabel = zmulabel
       self.zelelabel = zelelabel
+      self.vertexlabel = vertexlabel      
     
     #@print_timing
     def process(self, event):
@@ -351,11 +330,17 @@ class JetmetControlPlots(BaseControlPlots):
       event.getByLabel(self.metlabel,self.metHandle)
       event.getByLabel(self.zmulabel,self.zmuHandle)
       event.getByLabel(self.zelelabel,self.zeleHandle)
+      event.getByLabel (self.vertexlabel,self.vertexHandle)      
       jets = self.jetHandle.product()
       met  = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
-      bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
+      vertices = self.vertexHandle.product()
+      if vertices.size()>0 :
+          vertex = vertices[0]
+      else:
+          vertex = None
+      bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
