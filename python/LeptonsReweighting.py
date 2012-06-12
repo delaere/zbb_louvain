@@ -75,7 +75,7 @@ class LeptonsReWeighting:
      self.zmuHandle_  = Handle ("vector<reco::CompositeCandidate>")
      self.zeleHandle_ = Handle ("vector<reco::CompositeCandidate>")
      self.vertexHandle_ = Handle ("vector<reco::Vertex>")
-     self.rhoHandle_ = Handle ("double")
+     #self.rhoHandle_ = Handle ("double")
      # the efficiency maps
      self._elePidWeight_A = PtEtaMap([50],[0.8, 1.44, 2.0],
                                    [[(1.002,0.006), (1.001,0.007), (1.009,0.008), (1.008,0.010)], 
@@ -165,9 +165,9 @@ class LeptonsReWeighting:
             vertex = vertices[0]
          else:
             vertex = None
-         fwevent.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle_)
-         rho = self.rhoHandle_.product()
-         bestZcandidate = findBestCandidate(muChannel, rho, vertex, zCandidatesMu, zCandidatesEle)
+         #fwevent.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle_)
+         #rho = self.rhoHandle_.product()
+         bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
          if not bestZcandidate is None:
            if muChannel :
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]

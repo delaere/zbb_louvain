@@ -77,10 +77,7 @@ trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 genInfoHandle = Handle("GenEventInfoProduct")
 vertexHandle = Handle("vector<reco::Vertex>")
-rhoHandle = Handle("double")
-#chargedIsoHandle = Handle("edm::ValueMap<double>")
-#gammaIsoHandle = Handle("edm::ValueMap<double>")
-#neutralIsoHandle = Handle("edm::ValueMap<double>")
+#rhoHandle = Handle("double")
 
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
@@ -96,7 +93,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
   event.getByLabel(zbblabel.vertexlabel,vertexHandle)
-  event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
+  #event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
   #event.getByLabel("ak5PFJets","rho",rhoHandle)
 
   #event.getByLabel("elPFIsoValueCharged03PFIso",chargedIsoHandle)
@@ -107,18 +104,14 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   vertices = vertexHandle.product()
-  rho = rhoHandle.product()
-  #print "rhoHandle.product()" , rhoHandle.product()
-  #charged_iso = chargedIsoHandle.product()
-  #gamma_iso = gammaIsoHandle.product()
-  #neutral_iso = neutralIsoHandle.product()
-  
+  #rho = rhoHandle.product()
+
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel, btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo)
 
 
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
@@ -187,7 +180,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       tightmuonsPlots[level].beginJob(muonlabel=zbblabel.muonlabel, muonType="tight")
       allelectronsPlots[level].beginJob(electronlabel=zbblabel.allelectronslabel, electronType="none")
       tightelectronsPlots[level].beginJob(electronlabel=zbblabel.electronlabel, electronType="tight")
-      jetmetAK5PFPlots[level].beginJob(jetlabel=zbblabel.jetlabel,btagging=btagAlgo)
+      jetmetAK5PFPlots[level].beginJob(jetlabel=zbblabel.jetlabel,vertexlabel=zbblabel.vertexlabel,btagging=btagAlgo)
       vertexPlots[level].beginJob(zlabel=zlabel)
       selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
       if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")

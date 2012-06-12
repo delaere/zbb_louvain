@@ -81,7 +81,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.zelelabel = zelelabel
       self.trigInfolabel = triggerlabel
       self.vertexlabel = vertexlabel
-      self.rhoHandle = Handle ("double")
+      #self.rhoHandle = Handle ("double")
 
     #@print_timing
     def process(self, event):
@@ -93,20 +93,20 @@ class EventSelectionControlPlots(BaseControlPlots):
       event.getByLabel(self.zmulabel,self.zmuHandle)
       event.getByLabel(self.zelelabel,self.zeleHandle)
       event.getByLabel(self.vertexlabel,self.vertexHandle)
-      event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
+      #event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
 
       jets = self.jetHandle.product()
       met = self.metHandle.product()
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
       vertices = self.vertexHandle.product()
-      rho = self.rhoHandle.product()
+      #rho = self.rhoHandle.product()
       
       if vertices.size()>0 :
           vertex = vertices[0]
       else:
           vertex = None
-      bestZcandidate = findBestCandidate(None,rho,vertex,zCandidatesMu,zCandidatesEle) 
+      bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle) 
       runNumber= event.eventAuxiliary().run()
       #lumi= event.eventAuxiliary().lumi()
       #print "RunNumber" , runNumber
@@ -119,7 +119,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, self.muChannel)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, self.muChannel)
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel)
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
@@ -265,6 +265,6 @@ def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
     zCandidatesEle = zeleHandle.product()
     vertices = vertexHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel)
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel)
     if isInCategory(stage, categoryData):
       print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()

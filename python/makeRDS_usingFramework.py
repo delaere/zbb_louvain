@@ -84,7 +84,7 @@ zeleHandle = Handle ("vector<reco::CompositeCandidate>")
 trigInfoHandle = Handle ("pat::TriggerEvent")
 genHandle = Handle ("vector<reco::GenParticle>")
 vertexHandle = Handle ("vector<reco::Vertex>")
-rhoHandle = Handle ("double")
+#rhoHandle = Handle ("double")
 
 
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
@@ -100,7 +100,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   event.getByLabel(zbblabel.zmumulabel,zmuHandle)
   event.getByLabel(zbblabel.zelelabel,zeleHandle)
   event.getByLabel(zbblabel.vertexlabel,vertexHandle)
-  event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
+  #event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
 
   runNumber= event.eventAuxiliary().run()
   
@@ -109,14 +109,14 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   zCandidatesMu = zmuHandle.product()
   zCandidatesEle = zeleHandle.product()
   vertices = vertexHandle.product()
-  rho = rhoHandle.product()
+  #rho = rhoHandle.product()
   if checkTrigger:
     event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
     triggerInfo = trigInfoHandle.product()
   else:
     triggerInfo = None
   #print triggerInfo   
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel,btagAlgo)
 
 ############################################
 ### Define RooRealVars and RooCategories ###
