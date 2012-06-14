@@ -60,8 +60,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #rawjet = jet.correctedJet("Uncorrected")
 
   # category
-  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.)
-  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=30.)
+  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.)
+  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=15.)
   print "Event category info in muon channel:",catMu
   print "Event category info in electron channel:",catEle
 
@@ -82,15 +82,24 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   for z in zCandidatesEle:
     PrintCandidate("Z->elel",z)
   # additional composite candidates from the event
-  dijetHandle = Handle ("vector<reco::CompositeCandidate>")
-  zmmbbHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeebbHandle = Handle ("vector<reco::CompositeCandidate>")
+  dijetHandle  = Handle ("vector<reco::CompositeCandidate>")
+  zmmbbHandle  = Handle ("vector<reco::CompositeCandidate>")
+  zeebbHandle  = Handle ("vector<reco::CompositeCandidate>")
+  vertexHandle = Handle ("vector<reco::Vertex>")
+
   fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
   fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
   fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
+  fwevent.getByLabel(zbblabel.vertexlabel,self.vertexHandle_)
   dijets = dijetHandle.product()
   zeebbs = zeebbHandle.product()
   zmmbbs = zmmbbHandle.product()
+  vertices = self.vertexHandle_.product()
+  if vertices.size()>0 :
+    vertex = vertices[0]
+  else:
+    vertex = None
+
   for dijet in dijets:
     PrintCandidate("dijet",dijet)
   for zeebb in zeebbs:
@@ -98,7 +107,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   for zmmbb in zmmbbs: 
     PrintCandidate("Zbb",zmmbb)
   # handcrafted candidates: bb Zb Zbb
-  bestZcandidate = findBestCandidate(None,zCandidatesMu,zCandidatesEle)
+  bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
   if bestZcandidate is not None:
     for jet in jets:
       if isGoodJet(jet,bestZcandidate) and isBJet(jet,"HP") :
