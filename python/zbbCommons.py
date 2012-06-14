@@ -27,7 +27,7 @@ class zbbfile:
   ssvperfData="reweighting_files_V2/performance_ssv_witheff.root"
   pileupData="reweighting_files_V2/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
   pileupMC="reweighting_files_V2/pileupDistMC.root"
-  jecUncertainty="reweighting_files/Jec11_V2_Uncertainty_AK5PF.txt"
+  jecUncertainty="reweighting_files_V2/Jec11_V2_Uncertainty_AK5PF.txt"
 
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
