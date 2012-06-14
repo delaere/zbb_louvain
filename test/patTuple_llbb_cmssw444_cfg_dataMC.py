@@ -116,7 +116,10 @@ process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6 ,doRhoFast
 process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 ##-------------------- Removal of MC matching ----------------------------
-removeMCMatching(process, ['All']) ## needed also on MC? very strange...
+if isMC:
+    process.muonMatch.src = "pfMuons"
+else:
+    removeMCMatching(process, ['All']) ## needed also on MC? very strange...
     
 ##########################
 #### GLOBAL TAG  #########
@@ -145,8 +148,12 @@ readFiles.extend([
     #"file:/tmp/castello/Run2011A_DoubleMu_AOD_08Nov2011-v1_0000_00011B62-381B-E111-8425-002618943810.root" ## test file for muons
     #"file:/tmp/castello/Fall11_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph_PU_S6-START44_V5-v1_FE772459-D80A-E111-ABBE-E0CB4E1A1186.root" ## test file for MC Drell-Yan
     "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/7A64B1BE-CE36-E111-BE8E-003048FFD7D4.root",
-    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/4A8BD06C-CE36-E111-B940-00304867D446.root",
-    "file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root"
+    #"file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/4A8BD06C-CE36-E111-B940-00304867D446.root",
+    #"file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root"
+    #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A06A3717-C52B-E111-BFFA-00304867BEC0.root",
+    #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A2A2AAA2-AA2B-E111-9DA6-002618943951.root",
+    #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A41BD3D4-A22B-E111-B6D9-003048678AE2.root"
+
     ])
 
 process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
@@ -346,6 +353,7 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 #Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded 
 #and it can also be used to build the Z candidate. 
 
+process.patMuons.pfMuonSource = cms.InputTag("pfMuons")
 process.patMuons.useParticleFlow=True
 
 ### embedding objects
@@ -668,7 +676,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##      OUTPUT      ##
 ######################
 
-process.out.fileName = cms.untracked.string('PATskim-test.root')
+process.out.fileName = cms.untracked.string('PATprod-MC.root')
 
 process.out.outputCommands = cms.untracked.vstring( 'drop *' )
                                    ### vertex, incl. Torino's Z vertex producer and mergeable counter ----------------------
