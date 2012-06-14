@@ -27,11 +27,10 @@ void JetSet::addJet(std::string themode, std::string uncert, int flavor, double 
 
 // add a jet to the set, checking that the efficiencies and scale factors are well defined.
 void JetSet::addJet(const JetInfo& jet) {
+  //jet.print(); // for debugging
   if(jet.isValid()) jets_.push_back(jet);
-  else std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl
-                 << jet.eff_SSVHEM << " " << jet.sf_SSVHEM << " " 
-                 << jet.eff_SSVHPT << " " << jet.sf_SSVHPT << " "
-                 << jet.flavor << std::endl; 
+  else std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl;
+  jet.print(true);
 }
 
 // filter events passing the selection

@@ -1,6 +1,7 @@
 #include <vector>
 #include "TString.h"
 #include <string>
+#include <iostream>
 
 class btagPerfFWLiteInterface;
 
@@ -16,7 +17,24 @@ class JetInfo {
     float sf_SSVHPT;
     int   flavor;
     bool isValid() const {
-      return eff_SSVHEM>=0 && eff_SSVHEM<=1 && eff_SSVHPT>=0 && eff_SSVHPT<=1 && sf_SSVHEM>=0 && sf_SSVHEM<=10 && sf_SSVHPT>=0 && sf_SSVHPT<=10;
+      return eff_SSVHEM>=0 && eff_SSVHEM<=1 && eff_SSVHPT>=0 && eff_SSVHPT<=1 && sf_SSVHEM>=0 && sf_SSVHEM<=10 && sf_SSVHPT>=0 && sf_SSVHPT<=10 && flavor != 0;
+    }
+    void print(bool usecerr = false) const {
+      if(usecerr) {
+        std::cerr << "Jet info (flavor " << flavor << ") :" 
+                  << " eff_SSVHEM=" << eff_SSVHEM
+                  << " sf_SSVHEM=" << sf_SSVHEM
+                  << " eff_SSVHPT=" << eff_SSVHPT
+                  << " sf_SSVHPT=" << sf_SSVHPT
+                  << ". Validity: " << isValid() << std::endl;
+      } else {
+        std::cout << "Jet info (flavor " << flavor << ") :" 
+                  << " eff_SSVHEM=" << eff_SSVHEM
+                  << " sf_SSVHEM=" << sf_SSVHEM
+                  << " eff_SSVHPT=" << eff_SSVHPT
+                  << " sf_SSVHPT=" << sf_SSVHPT
+                  << ". Validity: " << isValid() << std::endl;
+      }
     }
 };
 
