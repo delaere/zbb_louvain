@@ -24,10 +24,10 @@ class zbblabel:
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData="reweighting_files_V2/performance_ssv_witheff.root"
-  pileupData="reweighting_files_V2/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
-  pileupMC="reweighting_files_V2/pileupDistMC.root"
-  jecUncertainty="reweighting_files_V2/Jec11_V2_Uncertainty_AK5PF.txt"
+  ssvperfData="../data/performance_ssv_witheff.root"
+  pileupData="../data/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
+  pileupMC="../data/Fall11_PU_MC.root"
+  jecUncertainty="../data/Jec11_V2_Uncertainty_AK5PF.txt"
 
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
