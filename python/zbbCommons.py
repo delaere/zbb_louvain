@@ -56,11 +56,11 @@ class zbbnorm:
   xsec_tbarW_8TeV=11.1      #approx. NNLO inclusive
 
   #number of events processed for the PATtuple production
-  nev_DY_fall11=35907791.     #1st prod. to be updated when new DY will be available
-  nev_TT_fall1=37710785       #to be updated with matching
-  nev_ZZ_fall11=4191045.      #if needed to be updated with matching
-  nev_ZH_125_fall11=1100000.  #if needed to be updated with matching
-  nev_TTpowheg_fall11=3691947.#1st prod. to be updated
-  nev_tW_fall11=814390.       #if needed to be updated with matching
-  nev_tbarW_fall11=809984.    #if needed to be updated with matching
+  nev_DY_fall11=35907791.       #1st prod. to be updated when new DY will be available
+  nev_TT_fall1=37710785         #to be updated with matching
+  nev_ZZ_fall11=4191045.        #if needed to be updated with matching
+  nev_ZH_125_fall11=1100000.    #if needed to be updated with matching
+  nev_TTpowheg_fall11=16352171. #if needed to be updated with matching
+  nev_tW_fall11=814390.         #if needed to be updated with matching
+  nev_tbarW_fall11=809984.      #if needed to be updated with matching
   
