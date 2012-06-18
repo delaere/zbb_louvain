@@ -58,6 +58,32 @@ ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.m
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
 ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
 
+def electron_iswrongPS(electron, runNumber):
+  lumi_section = event.eventAuxiliary().luminosityBlock() 
+  if runNumber==171050 and (lumi_section==47 or lumi_section==92):
+    return True
+  if runNumber==171156 and (lumi_section==42 or lumi_section==211):
+    return True
+  if runNumber==171219 and (lumi_section==48 or lumi_section==163):
+    return True
+  if runNumber==171274 and (lumi_section==88 or lumi_section==148):
+    return True
+  if runNumber==171282 and (lumi_section==1 or lumi_section==172):
+    return True
+  if runNumber==171315 and (lumi_section==53 or lumi_section==226):
+    return True
+  if runNumber==171369 and (lumi_section==42 or lumi_section==162):
+    return True
+  if runNumber==171446 and (lumi_section==58 or lumi_section==374):
+    return True  
+  if runNumber==171484 and (lumi_section==61 or lumi_section==358):
+    return True
+  if runNumber==171578 and (lumi_section==47 or lumi_section==347):
+    return True
+  
+  else : return False
+
+
 def selectedTriggers(triggerInfo):
   """Returns a list with the decision of each trigger considered in the analysis"""
   if triggerInfo is None:
@@ -74,6 +100,8 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
+
+
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
@@ -138,9 +166,7 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
-### Atttention!! very Temporary  Due to the lepton selection problem in the PAT and the use of zallall + offline selection as a solution
-  if string.find(role,"all")!=-1   : return isMatchedMuon(muon)
-  ###if string.find(role,"all")!=-1   : return isLooseMuon(muon)
+  if string.find(role,"all")!=-1   : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
   if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
@@ -192,15 +218,14 @@ def isMatchedElectron(electron):
 
 def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
-### Atttention!! very Temporary  Due to the lepton selection problem in the PAT and the use of zallall + offline selection as a solution
-  if string.find(role,"all")!=-1   : return isMatchedElectron(electron)
-  #if string.find(role,"all")!=-1   : return isLooseElectron(electron)
+  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown electron role:",role
   return True
 
+  
 def hasNoOverlap(jet, Z):
   """check overlap between jets and leptons from the Z"""
   l1 = Z.daughter(0)
@@ -383,6 +408,10 @@ def isTriggerMatchPair(l1,l2,runNumber):
       
       
   if l1.isElectron() :
+    if electron_iswrongPS(l1, runNumber):
+      return False
+    else :
+
     #print "Electrons :"
     #print "run number : ", runNumber
     #print "l1 path(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*,0,0)",l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()
@@ -398,24 +427,24 @@ def isTriggerMatchPair(l1,l2,runNumber):
     #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,1).size())   
     #print "filter * match" , (l1.triggerObjectMatchesByFilter("*").size())
     
-    if runNumber < 165121:
+       if runNumber < 165121:
        #print "run number < 165121"
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 0 0", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size())
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size() 
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()
-      if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0)and (l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) :
-        return True
+           if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0)and (l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) :
+             return True
     
-    if runNumber >= 165121 :
+       if runNumber >= 165121 :
        #print "run number > 165121"
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size() 
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
        #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,1).size())
        #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
-      if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())) or ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0)) :
-        return True
+           if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())) or ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0)) :
+             return True
 
-  return False
+       return False
 
 def findBestCandidate(muChannel, vertex, *zCandidates):
   """Finds the best Z candidate. Might be none.
