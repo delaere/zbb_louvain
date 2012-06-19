@@ -2,6 +2,19 @@ import FWCore.ParameterSet.Config as cms
 #import os
 process = cms.Process("ZplusJets")
 
+#need to be implmented all what was done for 444 : leptons, jets, MET and adapt in 52X
+#electron and muons recommandations : https://indico.cern.ch/conferenceDisplay.py?confId=193787
+#twiki : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification and ...
+#MET : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis#PAT
+#packages for 52X/53X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes53X#V08_10_00
+#btag ? : don't excpect to change, just WP to be checked for CSV, and later on the JP calibration for Torino 
+#Jets ? , beta/beta*, vertx ... JEC...
+#444pat : https://twiki.cern.ch/twiki/bin/view/CMSPublic/LeptonSelectionVjets2011
+#Trigger to be checked
+#check saved outputs
+
+#packages are OK in 525, problems in 531 then before passing to 53X need a explicit recipe for 53X
+
 ###############################
 ##### Loading what we need ####
 ###############################
