@@ -29,8 +29,10 @@ void JetSet::addJet(std::string themode, std::string uncert, int flavor, double 
 void JetSet::addJet(const JetInfo& jet) {
   //jet.print(); // for debugging
   if(jet.isValid()) jets_.push_back(jet);
-  else std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl;
-  jet.print(true);
+  if(jet.flavor==0) {
+    std::cerr << "WARNING : attempt to use a ill-defined jet for btagging." << std::endl;
+    jet.print(true);
+  }
 }
 
 // filter events passing the selection
