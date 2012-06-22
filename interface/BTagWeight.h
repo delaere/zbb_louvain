@@ -17,7 +17,7 @@ class JetInfo {
     float sf_SSVHPT;
     int   flavor;
     bool isValid() const {
-      return eff_SSVHEM>=0 && eff_SSVHEM<=1 && eff_SSVHPT>=0 && eff_SSVHPT<=1 && sf_SSVHEM>=0 && sf_SSVHEM<=10 && sf_SSVHPT>=0 && sf_SSVHPT<=10 && flavor != 0;
+      return eff_SSVHEM>=0 && eff_SSVHEM<=1 && eff_SSVHPT>=0 && eff_SSVHPT<=1 && sf_SSVHEM>=0 && sf_SSVHEM<=10 && sf_SSVHPT>=0 && sf_SSVHPT<=10;
     }
     void print(bool usecerr = false) const {
       if(usecerr) {
