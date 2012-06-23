@@ -29,8 +29,8 @@ void JetSet::addJet(std::string themode, std::string uncert, int flavor, double 
 void JetSet::addJet(const JetInfo& jet) {
   //jet.print(); // for debugging
   if(jet.isValid()) jets_.push_back(jet);
-  if(jet.flavor==0) {
-    std::cerr << "WARNING : attempt to use a ill-defined jet for btagging." << std::endl;
+  if(jet.flavor==0 && (jet.eff_SSVHEM>0.10 || jet.eff_SSVHPT>0.1)) { //true if jets not matched with a parton are not considered like a light jet 
+    std::cerr << "ERROR : attempt to use a ill-defined jet for btagging. with high eficiency" << std::endl;
     jet.print(true);
   }
 }
