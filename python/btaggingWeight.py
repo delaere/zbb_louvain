@@ -60,6 +60,8 @@ class btaggingWeight:
     self.myJetSet.reset()
     ntagsHE = 0
     ntagsHP = 0
+    ntagsNoFlvavorHE = 0
+    ntagsNoFlvavorHP = 0
     # retrieve the jets
     for jet in jets:
       # apply selection
@@ -67,11 +69,20 @@ class btaggingWeight:
       # check flavor
       flavor = jet.partonFlavour()
       # check btagging
-      if isBJet(jet,"HP","SSV"): ntagsHP += 1
-      if isBJet(jet,"HE","SSV"): ntagsHE += 1
-      
+      if isBJet(jet,"HP","SSV"):
+        ntagsHP += 1
+        if flavor == 0:
+          if jet.et() > 100. : print "WARNING : SSVHP tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          ntagsNoFlvavorHP += 1
+      if isBJet(jet,"HE","SSV"):
+        ntagsHE += 1
+        if flavor == 0:
+          if jet.et() > 100. : print "WARNING : SSVHE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          ntagsNoFlvavorHE += 1
       # add to the jetset class
       self.myJetSet.addJet(zbblabel.SF_running_mode,zbblabel.SF_uncert, flavor,jet.et(),jet.eta()) ## r.c. 2012
+    if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 SSVHP tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
+    if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 SSVHE tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
     return self.getWeight(self.myJetSet,ntagsHE,ntagsHP)
 
   def getWeight(self,jetset, ntags1, ntags2):
