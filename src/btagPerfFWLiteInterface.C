@@ -77,7 +77,6 @@ btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
 }
 
 btagPerfBase::value btagPerfFWLiteInterface::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
-  std::cerr << "DEBUGGING getbEffScaleFactor " << flavor << " " << algo << " " << pt << " " << eta << std::endl;
   BinningPointByMap p;
   p.insert(BinningVariables::JetEta,fabs(eta));
   p.insert(BinningVariables::JetEt,pt<30. ? 30. : pt);
