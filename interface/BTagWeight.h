@@ -2,8 +2,7 @@
 #include "TString.h"
 #include <string>
 #include <iostream>
-
-class btagPerfFWLiteInterface;
+#include "UserCode/zbb_louvain/interface/btagPerfBase.h"
 
 // jet info class
 class JetInfo {
@@ -41,15 +40,15 @@ class JetInfo {
 // a vector of jetsets, easily handled in python
 class JetSet {
   public:
-    JetSet(const char* infile);
+    JetSet(std::string themode, const char* infile = "");
     ~JetSet();
-    void addJet(std::string themode,std::string uncert, int flavor, double et, double eta);
+    void addJet(std::string uncert, int flavor, double et, double eta);
     void addJet(const JetInfo& jet);
     const std::vector<JetInfo>& getJets() const { return jets_; }
     void reset() { jets_.clear(); }
   private:
     std::vector<JetInfo> jets_;
-    boost::shared_ptr<btagPerfFWLiteInterface> interface_;
+    boost::shared_ptr<btagPerfBase> interface_;
 };
 
 // the algorithm.

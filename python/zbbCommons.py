@@ -20,11 +20,12 @@ class zbblabel:
   bblabel ="bbbar"
   genlabel="genParticles"
   SF_uncert="mean" ## choose among min/max/mean
-  SF_running_mode= "hardcoded" ## choose between hardcoded/database
+  #SF_running_mode= "hardcoded" ## choose between hardcoded/database
+  SF_running_mode= "database" ## choose between hardcoded/database
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData="../data/performance_ssv_witheff.root"
+  ssvperfData="../data/performance_ssv_witheff_062012.root"
   pileupData="../data/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
   pileupMC="../data/Fall11_PU_MC.root"
   jecUncertainty="../data/Jec11_V2_Uncertainty_AK5PF.txt"

@@ -4,23 +4,43 @@
 #include <map>
 #include <string>
 #include <utility>
-#include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
+#include <boost/shared_ptr.hpp>
 #include "UserCode/zbb_louvain/interface/BTagWeight.h"
+#include "UserCode/zbb_louvain/interface/btagPerfPOGformulas.h"
+#include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
 
 using namespace std; 
 
-JetSet::JetSet(const char* infile) { interface_ = boost::shared_ptr<btagPerfFWLiteInterface>(new btagPerfFWLiteInterface(infile)); }
+JetSet::JetSet(std::string themode, const char* infile) {
+  if(themode=="hardcoded")
+    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas());
+  else if(themode=="database")
+    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile));
+  else {
+    std::cout << "Warning: UNKNOWN MODE: please check the spelling, 'database' or 'hardcoded' "<< std::endl;
+    if(std::string(infile)=="") {
+      std::cout << "  using hardcoded values." << std::endl;
+      interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas());
+    } else {
+      std::cout << "  using database." << std::endl;
+      interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile));
+    }
+  }
+}
 
 JetSet::~JetSet() { }
 
 // add a jet to the set. 
 // Efficiencies and scale factors are automatically extracted from the db,
 // and the jet is added to the set only if meaningful data can be obtained.
-void JetSet::addJet(std::string themode, std::string uncert, int flavor, double et, double eta) { 
-  addJet(JetInfo(interface_->getbEfficiency(flavor,1,et,eta),
-                 interface_->getbEffScaleFactor(themode,uncert,flavor,1,et,eta),
-                 interface_->getbEfficiency(flavor,2,et,eta),
-                 interface_->getbEffScaleFactor(themode,uncert,flavor,2,et,eta),
+void JetSet::addJet(std::string uncert, int flavor, double et, double eta) { 
+  btagPerfBase::SystematicVariation mode = btagPerfBase::MEAN;
+  if(uncert=="min") mode = btagPerfBase::MIN;
+  if(uncert=="max") mode = btagPerfBase::MAX;
+  addJet(JetInfo(interface_->getbEfficiency(mode,flavor,1,et,eta),
+                 interface_->getbEffScaleFactor(mode,flavor,1,et,eta),
+                 interface_->getbEfficiency(mode,flavor,2,et,eta),
+                 interface_->getbEffScaleFactor(mode,flavor,2,et,eta),
                  flavor)
         );
 }
@@ -29,6 +49,10 @@ void JetSet::addJet(std::string themode, std::string uncert, int flavor, double 
 void JetSet::addJet(const JetInfo& jet) {
   //jet.print(); // for debugging
   if(jet.isValid()) jets_.push_back(jet);
+  else {
+    std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl;
+    jet.print(true);
+  }
   if(jet.flavor==0 && (jet.eff_SSVHEM>0.10 || jet.eff_SSVHPT>0.1)) { //true if jets not matched with a parton are not considered like a light jet 
     std::cerr << "ERROR : attempt to use a ill-defined jet for btagging. with high eficiency" << std::endl;
     jet.print(true);

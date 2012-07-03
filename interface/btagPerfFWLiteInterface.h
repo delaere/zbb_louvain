@@ -1,19 +1,24 @@
-#include "TFile.h"
-#include "TString.h"
-#include "TF1.h"
 #include <string>
-#include "DataFormats/FWLite/interface/EventSetup.h"
+#include "UserCode/zbb_louvain/interface/btagPerfBase.h"
 #include "DataFormats/FWLite/interface/ESHandle.h"
-#include "RecoBTag/PerformanceDB/interface/BtagPerformance.h"
 
 class TH1F;
+class TFile;
+class TF1;
+namespace fwlite {
+class EventSetup;
+}
+class BtagPerformance;
+class PerformancePayload;
+class PerformanceWorkingPoint;
 
-class btagPerfFWLiteInterface {
+class btagPerfFWLiteInterface : public btagPerfBase {
   public:
     btagPerfFWLiteInterface(const char* inputfile);
-    ~btagPerfFWLiteInterface();
-    double getbEffScaleFactor(std::string mode, std::string meanminmax ,int flavor, int algo, double pt, double eta) const;
-    double getbEfficiency(int flavor, int algo, double pt, double eta) const;
+    virtual ~btagPerfFWLiteInterface();
+  protected:
+    virtual btagPerfBase::value getbEffScaleFactor(int flavor, int algo, double pt, double eta) const;
+    virtual btagPerfBase::value getbEfficiency(int flavor, int algo, double pt, double eta) const;
   private:
     TFile* esdata_;
     fwlite::EventSetup* es_;
@@ -31,6 +36,5 @@ class btagPerfFWLiteInterface {
     BtagPerformance* perfMISTAGSSVHPT_;
     TH1F *h_eff_ssvhem_b_brl_, *h_eff_ssvhem_b_fwd_, *h_eff_ssvhem_c_brl_, *h_eff_ssvhem_c_fwd_;
     TH1F *h_eff_ssvhpt_b_brl_, *h_eff_ssvhpt_b_fwd_, *h_eff_ssvhpt_c_brl_, *h_eff_ssvhpt_c_fwd_;
-    TF1 *tmpSFl_1, *tmpSFl_2, *tmpSFl_3, *tmpSFl_4, *tmpSFl_5, *tmpSFl_6, *tmpSFl_7, *tmpSFl_8, *tmpSFl_9, *tmpSFl_10, *tmpSFl_11, *tmpSFl_12;
 };
 
