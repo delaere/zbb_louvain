@@ -60,14 +60,10 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
-                                fileNames = cms.untracked.vstring(
-        pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
-                                                      , relVal        = 'RelValTTbar'
-                                                      , globalTag     = 'START42_V12'
-                                                      , numberOfFiles = 1
-                                                      )
-            )
+                            fileNames = cms.untracked.vstring('file:/storage/data/cms/users/llbb/production2012_44X/Fall11_ZZ/PATskim-Zjets_9_2_JjJ.root')#/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_6_1_q0x.root')
                             )
+
+
 ## Maximal Number of Events
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
@@ -102,9 +98,9 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
+    name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
 )
 
@@ -116,7 +112,7 @@ process.configurationMetadata = cms.untracked.PSet(
 
 
 # for the latest reprocessed samples. You can find it here : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
+process.GlobalTag.globaltag = cms.string('START44_V13::All')
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -147,7 +143,10 @@ process.bFilter = cms.EDFilter("CandViewCountFilter",
                                src = cms.InputTag("bjets"),
                                minNumber = cms.uint32(1),
                                )
-
+process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
+                               src = cms.InputTag("CSVbjets"),
+                               minNumber = cms.uint32(1),
+                               )
 
 #------------------------------ Sequence
 #------------------------------------------------------------------------------------------------------------------------------------------------		
@@ -160,8 +159,9 @@ process.bFilter = cms.EDFilter("CandViewCountFilter",
 # Run it
 
 process.p4 = cms.Path(process.bFilter)
+process.p5 = cms.Path(process.CSVbFilter)
 
-process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4'))
+process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5'))
 
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
@@ -172,10 +172,21 @@ print "*** GOING TO LOOK AT ", sample
 print "*** dataset slice #  ", slice 
 ###############
 
-path = {"DY_MC"   : "/home/fynu/tdupree/store/zbb_13Sep/DY_MC/" ,
-        "TT_MC"   : "/home/fynu/tdupree/store/zbb_13Sep/TT_MC/" ,
-        "Mu_Data" : "/home/fynu/tdupree/store/zbb_13Sep/Mu_Data/" ,
-        "El_Data" : "/home/fynu/tdupree/store/zbb_13Sep/El_Data/" ,
+path = {"DY_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/" ,
+        "TT_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_TTbar_v3/" ,
+        "Mu_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011A/50e19e0266f4f061bdccd79330eb70f3/" ,
+        "El_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011A/50e19e0266f4f061bdccd79330eb70f3/" ,
+        "Mu_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011B/50e19e0266f4f061bdccd79330eb70f3/" ,
+        "El_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011B/50e19e0266f4f061bdccd79330eb70f3/" ,
+        "ZZ_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZZ_v2/" ,
+        "ZH115_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_115/" ,
+        "ZH120_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_120/" ,
+        "ZH125_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_125/" ,
+        "ZH130_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_130/" ,
+        "ZH135_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_135/" ,
+        "Zbb_MC"   : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/zbbProd/" ,
+        "tW_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_T_tW_v3/" ,
+        "tbarW_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_Tbar_tW_v3/" 
         }
 
 pathname = "file:"+path[sample]
@@ -188,21 +199,16 @@ for fname in dirList:
     files.append(pathname+fname)
 
 print files
-if slice: files = files[len(files)*(slice-1)/10:len(files)*slice/10]
+njobs=200
+if slice: files = files[len(files)*(slice-1)/njobs:len(files)*slice/njobs]
 
 print files
 
-process.source.fileNames = files #[ files
-    #"file:/home/fynu/tdupree/store/zbb_13Sep/DY_MC/DY_MC_100_1_Xvi.root"
-    #"file:/storage/data/cms/users/lceard/test/MC_test_Summer11_DYToMuMu_M-20_TuneZ2_7TeV-pythia6_AODSIM.root"
-    #"file:/storage/data/cms/users/lceard/test/TTJets_TuneZ2_7TeV-madgraph-tauola_AODSIM.root"
-    #"file:/storage/data/cms/users/lceard/test/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_AODSIM.root"
-    #"file:/home/fynu/jdf/scratch/CMSSW_4_2_3/src/UserCode/zbb_louvain/test/ZA_bbll.root"
-    #]                                     
+process.source.fileNames = files           
 
 process.maxEvents.input = -1
 
-if slice : process.out.fileName = path[sample]+'/skim/'+sample+'_'+str(slice)+'.root'
-else     : process.out.fileName = path[sample]+'/skim/'+sample+'.root'
+if slice : process.out.fileName = '/storage/data/cms/store/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
+else     : process.out.fileName = '/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/test/'+sample+'.root'
 
 process.options.wantSummary = False
