@@ -116,7 +116,7 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
   else:
     triggerInfo = None
   #print triggerInfo   
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel,btagAlgo)
+  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo, 15., event.eventAuxiliary().luminosityBlock())
 
 ############################################
 ### Define RooRealVars and RooCategories ###

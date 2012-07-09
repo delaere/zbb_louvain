@@ -119,7 +119,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, self.muChannel)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel, event.eventAuxiliary().luminosityBlock())
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel, "SSV", 15., event.eventAuxiliary().luminosityBlock())
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
@@ -265,6 +265,6 @@ def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
     zCandidatesEle = zeleHandle.product()
     vertices = vertexHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, event.eventAuxiliary().luminosityBlock())
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, "SSV", 15., event.eventAuxiliary().luminosityBlock())
     if isInCategory(stage, categoryData):
       print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
