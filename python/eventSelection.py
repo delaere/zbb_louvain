@@ -58,8 +58,8 @@ ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.m
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
 ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
 
-def electron_iswrongPS(electron, runNumber):
-  lumi_section = event.eventAuxiliary().luminosityBlock() 
+def electron_iswrongPS(electron, runNumber, lumi_section):
+  #lumi_section = event.eventAuxiliary().luminosityBlock() 
   if runNumber==171050 and (lumi_section==47 or lumi_section==92):
     return True
   if runNumber==171156 and (lumi_section==42 or lumi_section==211):
@@ -96,7 +96,7 @@ def selectedTriggers(triggerInfo):
       return False
   return map(lambda path:isFired(path),paths)
 
-def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
+def isTriggerOK(triggerInfo, zCandidate, runNumber, lumi_section, muChannel=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
@@ -126,8 +126,8 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, muChannel=True):
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
   outcome = len(intersect)>0
 
-  #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber)
-  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber))
+  #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber, lumi_section)
+  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber, lumi_section))
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
@@ -284,7 +284,7 @@ def isGoodMet(met,cut=50):
   """Apply the MET cut"""
   return met.pt()<cut
 
-def isGoodMet_Sig(met,cut=5):
+def isGoodMet_Sig(met,cut=10):
   """Apply the MET cut"""
   if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
     return met.significance()<cut
@@ -342,7 +342,7 @@ def isZcandidate(zCandidate,vertex=None):
   # if everything ok, return the result of the lepton check
   return result
 
-def isTriggerMatchZcandidate(zCandidate, runNumber):
+def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
     daughter1 = zCandidate.daughter(0)
     daughter2 = zCandidate.daughter(1)
@@ -350,15 +350,15 @@ def isTriggerMatchZcandidate(zCandidate, runNumber):
     ROOT.SetOwnership( Daugh1, False )
     Daugh2 = daughter2.masterClone()
     ROOT.SetOwnership( Daugh2, False )
-    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber) 
-    case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber)
+    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber, lumi_section) 
+    case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber, lumi_section)
     #print "isTriggerMatchZcandidate decisions: ", case1, case2
     return (case1 or case2)
-    #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber) or isTriggerMatchPair(Daugh2,Daugh1,runNumber))
+    #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber, lumi_section) or isTriggerMatchPair(Daugh2,Daugh1,runNumber, lumi_section))
   else:
     return False
 
-def isTriggerMatchPair(l1,l2,runNumber):
+def isTriggerMatchPair(l1,l2,runNumber, lumi_section):
     
   if l1.isMuon() :
     #print "Muons"
@@ -408,7 +408,7 @@ def isTriggerMatchPair(l1,l2,runNumber):
       
       
   if l1.isElectron() :
-    if electron_iswrongPS(l1, runNumber):
+    if electron_iswrongPS(l1, runNumber, lumi_section):
       return False
     else :
 
@@ -592,7 +592,7 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15., lumi_section=0):
   """Check analysis requirements for various steps."""
   output = []
   if vertices.size()>0 :
@@ -602,7 +602,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
   bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
   # output[0]: Trigger
   #print "runnumber in eventcqt = ", runNumber
-  if isTriggerOK(triggerInfo,bestZcandidate, runNumber, muChannel):
+  if isTriggerOK(triggerInfo,bestZcandidate, runNumber, lumi_section, muChannel):
     output.append(1)
     #print "passed"
   else:
