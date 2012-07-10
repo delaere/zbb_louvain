@@ -90,6 +90,7 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
        SFb = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
        SFb_unc = SFb_error_SSVHPT[index];
      }
+     break;
    }
    case 4: {
      // c-jets // assumes the same SF as for b-jets: THE SAME as for the b (but twice the uncertainty)   
@@ -102,6 +103,7 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
        SFb = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
        SFb_unc = SFb_error_SSVHPT[index]*2.;
      }
+     break;
    }
    default: {
      // udsg-jets + untags (assumes these are light jets)
