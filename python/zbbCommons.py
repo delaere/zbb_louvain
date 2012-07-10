@@ -36,7 +36,7 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-  lumi_tot2011=5.051 #in fb-1
+  lumi_tot2011=5.21 #in fb-1
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
