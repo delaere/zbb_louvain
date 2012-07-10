@@ -125,9 +125,8 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, lumi_section, muChannel=True
       else:  
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
   outcome = len(intersect)>0
-
   #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber, lumi_section)
-  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber, lumi_section))
+  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber,lumi_section))
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
@@ -350,15 +349,15 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
     ROOT.SetOwnership( Daugh1, False )
     Daugh2 = daughter2.masterClone()
     ROOT.SetOwnership( Daugh2, False )
-    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber, lumi_section) 
-    case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber, lumi_section)
+    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber,lumi_section) 
+    case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber,lumi_section)
     #print "isTriggerMatchZcandidate decisions: ", case1, case2
     return (case1 or case2)
     #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber, lumi_section) or isTriggerMatchPair(Daugh2,Daugh1,runNumber, lumi_section))
   else:
     return False
 
-def isTriggerMatchPair(l1,l2,runNumber, lumi_section):
+def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
     
   if l1.isMuon() :
     #print "Muons"
@@ -444,7 +443,7 @@ def isTriggerMatchPair(l1,l2,runNumber, lumi_section):
            if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())) or ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0)) :
              return True
 
-       return False
+  return False
 
 def findBestCandidate(muChannel, vertex, *zCandidates):
   """Finds the best Z candidate. Might be none.
