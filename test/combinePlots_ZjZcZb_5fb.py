@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 #from ROOT import EColor
 
 from UserCode.zbb_louvain.zbbCommons import zbbnorm
+lumi=zbbnorm.lumi_tot2011*1000 #in pb-1
 
 class EColor:
  """ROOT colors taken from RTypes.h"""
@@ -50,33 +51,33 @@ process.CombinePlots = cms.PSet(
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZZ/ZZ_Fall11_finalSum.root'),
     color = cms.uint32(EColor.kMagenta+palette),
-    scale = cms.double(zbbnorm.xsec_ZZ_7TeV*zbbnorm.lumi_tot2011/zbbnorm.nev_ZZ_fall11),#6.206*5051./(4191045.)), #Xs 
+    scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11),#6.206*5051./(4191045.)), #Xs 
     role = cms.string('ZZ')
    ),
 
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_TT/TT_Fall11_finalSum.root'),
     color = cms.uint32(EColor.kYellow+palette),
-    scale = cms.double(zbbnorm.xsec_TTjets_7TeV*zbbnorm.lumi_tot2011/zbbnorm.nev_TTjets_fall11),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
+    scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
     role = cms.string('t#bar{t}')
    ),
 
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZbfromDY/Zb_Fall11_finalSum.root'),
     color = cms.uint32(EColor.kRed+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*zbbnorm.lumi_tot2011/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
     role = cms.string('Z+b')
    ), 
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZcfromDY/Zc_Fall11_finalSum.root'),     
     color = cms.uint32(EColor.kGreen+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*zbbnorm.lumi_tot2011/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
     role = cms.string('Z+c')
    ), 
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZlfromDY/Zl_Fall11_finalSum.root'),
     color = cms.uint32(EColor.kBlue+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*zbbnorm.lumi_tot2011/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
     role = cms.string('Z+l')
    ),
 
