@@ -27,7 +27,7 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-        outputFile = cms.string('mergedPlots_ZlZcZb_5051pb_2011AB_V3.root'),
+        outputFile = cms.string('mergedPlots_ZlZcZb_5210pb_2011AB_V1.root'),
         
   data = cms.VPSet (
    cms.PSet(
@@ -39,9 +39,9 @@ process.CombinePlots = cms.PSet(
    cms.PSet(
     fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011A/Mu2011A_finalSum.root') 
    ),
-   #cms.PSet(
-    #fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011B/Mu2011B_finalSum.root')    
-   #),   
+   cms.PSet(
+    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011B/Mu2011B_finalSum.root')    
+   ),   
 
   ),
 
@@ -275,14 +275,26 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('dijetdR'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R(b^{1}b^{2}) (GeV)"),
-      labely = cms.untracked.string("Events/10GeV")
+      labelx = cms.untracked.string("Delta_R(b^{1}b^{2})"),
+      labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
       name = cms.string('dijetSVdR'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R_SV(b^{1}b^{2}) (GeV)"),
-      labely = cms.untracked.string("Events/10GeV")
+      labelx = cms.untracked.string("Delta_R_SV(b^{1}b^{2})"),
+      labely = cms.untracked.string("Events/0.5")
+    ),
+   cms.PSet(
+      name = cms.string('drEleEle'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("Delta_R(e^{1}e^{2})"),
+      labely = cms.untracked.string("Events/0.5")
+    ),
+    cms.PSet(
+      name = cms.string('drMuMu'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("Delta_R(#mu^{1}#mu^{2})"),
+      labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
       name = cms.string('ZbbM'),
