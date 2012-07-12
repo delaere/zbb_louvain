@@ -57,14 +57,14 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   else 
     perfMISTAGSSVHPT_ = NULL;
   // load data for the efficiency curves
-  h_eff_ssvhem_b_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb1_brl");
-  h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb1_fwd");
-  h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc1_brl");
-  h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc1_fwd");
-  h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb1_brl");
-  h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb1_fwd");
-  h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc1_brl");
-  h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc1_fwd");
+  h_eff_ssvhem_b_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb_Barrel");
+  h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb_Endcaps");
+  h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Barrel");
+  h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Endcaps");
+  h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Barrel");
+  h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Endcaps");
+  h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Barrel");
+  h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Endcaps");
 }
 
 btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
