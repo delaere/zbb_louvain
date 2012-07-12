@@ -20,8 +20,8 @@ class zbblabel:
   bblabel ="bbbar"
   genlabel="genParticles"
   SF_uncert="mean" ## choose among min/max/mean
-  SF_running_mode= "hardcoded" ## choose between hardcoded/database
-  #SF_running_mode= "database" ## choose between hardcoded/database
+  #SF_running_mode= "hardcoded" ## choose between hardcoded/database
+  SF_running_mode= "database" ## choose between hardcoded/database
 
 class zbbfile:
   """files containing calibrations and other data"""
@@ -44,11 +44,11 @@ class zbbnorm:
   xsec_TTjets_7TeV=  157.5    #NLO inclusive
   xsec_TTlept_7TeV=   16.7    #ttbar->llvvbb_
   xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
-  xsec_ZH115_7TeV =    0.0246 #ZHxsec"0.4107"
-  xsec_ZH120_7TeV =    0.0216 #ZHxsec"0.3598" 
+  xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
   xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
-  xsec_ZH130_7TeV =    0.0167 #ZHxsec"0.2778"
-  xsec_ZH135_7TeV =    0.0147 #ZHxsec"0.2453" 
+  xsec_ZH130_7TeV =    0.0143 #ZHxsec"0.2778", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404" 
   xsec_tW_7TeV    =    5.3    #NLO inclusive
   xsec_tbarW_7TeV =    5.3    #NLO inclusive
   
