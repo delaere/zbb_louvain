@@ -72,4 +72,4 @@ def runTest():
     i += 1
   controlplots.endJob()
 
-runTest()
+#runTest()
