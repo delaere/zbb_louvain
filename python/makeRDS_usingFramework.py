@@ -33,6 +33,29 @@ from itertools import combinations
 from baseControlPlots import getArgSet
 from zbbCommons import zbbfile
 from eventSelection import eventCategories, eventCategory, isInCategory
+from optparse import OptionParser
+
+
+
+###############
+##  USAGE #####
+################
+narguments = len(sys.argv)
+if narguments != 2:
+  print "Usage: python ", sys.argv[0], " process"
+  print "Examples"
+
+  print "python ", sys.argv[0], " Mu_DATA"
+  print "python ", sys.argv[0], " El_DATA"
+  print "python ", sys.argv[0], " Mu_MC"
+  print "python ", sys.argv[0], " El_MC"
+  print "python ", sys.argv[0], " Ttbar_Mu_MC"
+  print "python ", sys.argv[0], " Ttbar_El_MC"
+  print "python ", sys.argv[0], " ZZ_Mu_MC"
+  print "python ", sys.argv[0], " ZZ_El_MC"
+  print "python ", sys.argv[0], " ZHbb_Mu_MC"
+  print "python ", sys.argv[0], " ZHbb_El_MC"
+  exit()
 
 ###################
 ### Run options ###
