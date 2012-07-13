@@ -104,8 +104,9 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       antibottomPz = 0
       antibottomEn = 0
       
+      
       for part in particles:
-        print "status id = ", part.status(), " ", part.pdgId()
+        #print "status id = ", part.status(), " ", part.pdgId()
 	if part.status()!=3: break;
         
 	if part.pdgId() == -11 or part.pdgId() == -13 or part.pdgId() == -15  :
