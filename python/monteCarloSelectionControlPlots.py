@@ -71,7 +71,6 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       if isZcEvent(particles,0,False):
         self.cjet += 1
         result["eventType"] = 2
-      print "[mcControlPlots]:isZlEvent(particles,0,False)"
       if isZlEvent(particles,0,False):
         self.ljet += 1
         result["eventType"] = 1
@@ -106,7 +105,6 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       
       
       for part in particles:
-        #print "status id = ", part.status(), " ", part.pdgId()
 	if part.status()!=3: break;
         
 	if part.pdgId() == -11 or part.pdgId() == -13 or part.pdgId() == -15  :
