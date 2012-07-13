@@ -53,6 +53,7 @@ process = cms.Process("PAT2")
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 ## Options and Output Report
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -60,7 +61,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('file:/storage/data/cms/users/llbb/production2012_44X/Fall11_ZZ/PATskim-Zjets_9_2_JjJ.root')#/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_6_1_q0x.root')
+                            fileNames = cms.untracked.vstring('file:/storage/data/cms/users/llbb/production2012_44X/Fall11_ZZ/PATskim-Zjets_9_2_JjJ.root')
                             )
 
 
@@ -98,7 +99,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -139,14 +140,21 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 #------------------------------ Filter
 
+process.CSVMbjets = cms.EDFilter("PATJetSelector",
+                            src = cms.InputTag("CSVbjets"),
+                            cut = cms.string('bDiscriminator("combinedSecondaryVertexBJetTags")>0.679'),
+                            filter = cms.bool(True)
+                            )
+
 process.bFilter = cms.EDFilter("CandViewCountFilter",
                                src = cms.InputTag("bjets"),
                                minNumber = cms.uint32(1),
                                )
+
 process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
-                               src = cms.InputTag("CSVbjets"),
-                               minNumber = cms.uint32(1),
-                               )
+                                  src = cms.InputTag("CSVbjets"),
+                                  minNumber = cms.uint32(1),
+                                  )
 
 #------------------------------ Sequence
 #------------------------------------------------------------------------------------------------------------------------------------------------		
@@ -159,7 +167,8 @@ process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
 # Run it
 
 process.p4 = cms.Path(process.bFilter)
-process.p5 = cms.Path(process.CSVbFilter)
+process.p5 = cms.Path(process.CSVMbjets)
+#process.p5 = cms.Path(process.CSVbFilter)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5'))
 
@@ -199,7 +208,7 @@ for fname in dirList:
     files.append(pathname+fname)
 
 print files
-njobs=200
+njobs=10
 if slice: files = files[len(files)*(slice-1)/njobs:len(files)*slice/njobs]
 
 print files
@@ -211,4 +220,4 @@ process.maxEvents.input = -1
 if slice : process.out.fileName = '/storage/data/cms/store/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
 else     : process.out.fileName = '/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/test/'+sample+'.root'
 
-process.options.wantSummary = False
+#process.options.wantSummary = False
