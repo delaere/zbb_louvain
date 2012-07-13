@@ -13,9 +13,18 @@ import glob
 
 from optparse import OptionParser
 
-FarmDirectory = "FARM"
+FarmDirectory = "FARM_makeRDSfrom1btagskimV2geninfo"
 
-processesToRun = ["Mu_DATA", "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
+#processesToRun = ["Mu_DATA", "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
+processesToRun = ["ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
+#processesToRun = ["Mu_DATA", "El_DATA"]
+#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
+#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"]
+#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC"]
+#processesToRun = ["ZZ_Mu_MC", "ZZ_El_MC"]
+#processesToRun = ["Ttbar_Mu_MC", "Ttbar_El_MC"]
+
+
 print "I will run over ", len(processesToRun), "processes"
 
 
@@ -24,9 +33,6 @@ LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 LaunchOnCondor.Jobs_RunHere= 1
 
-command = "/home/fynu/vizangarciaj/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/makeRDS_usingFramework_batch.py"  
-print "command = ", command
-
 
 
 for x in processesToRun[:]:
@@ -34,7 +40,7 @@ for x in processesToRun[:]:
   #
   #option  = " " + x
 
-  command = "/home/fynu/vizangarciaj/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/makeRDS_usingFramework_batch.py" + " " + x
+  command = "./makeRDS_usingFramework.py" + " " + x
 
   print "command  = ", command
  

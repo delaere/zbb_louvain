@@ -38,7 +38,9 @@ from eventSelection import eventCategories, eventCategory, isInCategory
 ### Run options ###
 ###################
 
-channel = "El_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+print sys.argv
+channel = sys.argv[1]
+#channel = "El_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
 jobNumber = 1
 Njobs = 1
 MonteCarloPUFileName=zbbfile.pileupMC
@@ -61,16 +63,16 @@ muChannel = { "Mu_DATA"     : True,
               "ZHbb_El_MC"  : False
               }
 
-path = { "Mu_DATA"     : "/storage/data/cms/store/user/acaudron/skim/Mu_Data/" ,
-         "El_DATA"     : "/storage/data/cms/store/user/acaudron/skim/El_Data/" ,
-         "Ttbar_Mu_MC" : "/storage/data/cms/store/user/acaudron/skim/TT_MC/"   ,
-         "Ttbar_El_MC" : "/storage/data/cms/store/user/acaudron/skim/TT_MC/"   ,
-         "Mu_MC"       : "/storage/data/cms/store/user/acaudron/skim/DY_MC/"   ,
-         "El_MC"       : "/storage/data/cms/store/user/acaudron/skim/DY_MC/"   ,
-         "ZZ_Mu_MC"    : "/storage/data/cms/store/user/acaudron/skim/ZZ_MC/"   ,
-         "ZZ_El_MC"    : "/storage/data/cms/store/user/acaudron/skim/ZZ_MC/"   ,
-         "ZHbb_Mu_MC"  : "/storage/data/cms/store/user/acaudron/skim/ZH_MC/"   , 
-         "ZHbb_El_MC"  : "/storage/data/cms/store/user/acaudron/skim/ZH_MC/"   ,
+path = { "Mu_DATA"     : "/home/fynu/vizangarciaj/scratch/productionJune2012_444/Skims/Mu_Data/" ,
+         "El_DATA"     : "/home/fynu/vizangarciaj/scratch/productionJune2012_444/Skims/El_Data/" ,
+         "Ttbar_Mu_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_TTbar_v3/"   ,
+         "Ttbar_El_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_TTbar_v3/"   ,
+         "Mu_MC"       : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_DYjets_v4/"   ,
+         "El_MC"       : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_DYjets_v4/"   ,
+         "ZZ_Mu_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZZ_v2//"   ,
+         "ZZ_El_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZZ_v2/"   ,
+         "ZHbb_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZHbb_125/"   , 
+         "ZHbb_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZHbb_125/"   ,
          }
 
 ###############################
@@ -197,6 +199,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
+      #if i > 40: break;
       if i%5000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -255,3 +258,5 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     rds_zbb_tree.Write("test.root")
     f.Close()
 
+print "Running processInputFile(", muChannel[channel], ", ", path[channel], ")"
+processInputFile(muChannel[channel], path[channel])

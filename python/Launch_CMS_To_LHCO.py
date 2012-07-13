@@ -41,17 +41,38 @@ if narguments != 4:
 
   print "python ", sys.argv[0], " /storage/data/cms/users/rcastello/Ele_2011A_44X_newAl/ 119 _test44"
 
-#  /storage/data/cms/users/llbb/Prod_data_2fb/Aug05ReReco/Ele_Aug05ReReco/Ele_Aug05ReReco_Sub3
-#  /storage/data/cms/users/llbb/Prod_data_2fb/Aug05ReReco/Mu_Aug05ReReco/Mu_Aug05ReReco_Sub3
-#  /storage/data/cms/users/llbb/Prod_data_2fb/May10ReReco/Ele_May10ReReco/Ele_May10
-#  /storage/data/cms/users/llbb/Prod_data_2fb/May10ReReco/Mu_May10ReReco/Mu_May10
-#  /storage/data/cms/users/llbb/Prod_data_2fb/PromptRecoV4/Ele_PromptRecoV4/Ele_PromptRecoV4
-#  /storage/data/cms/users/llbb/Prod_data_2fb/PromptRecoV4/Mu_PromptRecoV4/Mu_PromptRecoV4
-#  /storage/data/cms/users/llbb/Prod_data_2fb/PromptRecoV6/Ele_PromptRecoV6/Ele_PromptRecoV6
-#  /storage/data/cms/users/llbb/Prod_data_2fb/PromptRecoV6/Mu_PromptRecoV6/Mu_PromptRecoV6
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/production2012_44X/Fall11_TTbar/ 363 _TTtest44"
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/production2012_44X/Fall11_ZZ/ 841 _1fileperjobZZTest44"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/production2012_44X/Fall11_ZZ/ 29 _ZZTest44"
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/Fall11_Hbb/ 55 _ZHbb125"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/Fall11_T_tW/ 17 _tW"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/Fall11_Tbar_tW/ 18 _tbarW"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/Fall11_TT_powheg/ 47 _TTpow"
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/Fall11_ZZ/ 421 _ZZ"
 
 
-  
+  print "python ", sys.argv[0], " /storage/data/cms/store/user/acaudron/Fall11MC_444/Fall11_DYjets_v4/acaudron/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/production5fb_June2012_Fall11_DYjets_v4/918089973f5ad18b0c79d580ed9142aa/ 1451 _DY"
+
+
+  print "python ", sys.argv[0], " /home/fynu/vizangarciaj/scratch/DY444secondProdMissingFile/ 1 _DY1missingfileEE"
+  print "python ", sys.argv[0], " /home/fynu/vizangarciaj/scratch/DY444secondProdMissingFile/ 1 _DY1missingfileMM"
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/zbbProd/ 3 _Zbb4Flavee"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/zbbProd/ 3 _Zbb4Flavmumu"
+
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/zbbProd/ 3 _Zbb4Flavmumu"
+
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_TTbar_v3/ 54 _TTmumu"
+  print "python ", sys.argv[0], " /storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_TTbar_v3/ 54 _TTee"
+
+  print "python ", sys.argv[0], " /home/fynu/vizangarciaj/scratch/DATA_5fb_EleA/ 499 _DataEleA"
+  print "python ", sys.argv[0], " /home/fynu/vizangarciaj/scratch/DATA_5fb_EleB/ 353 _DataEleB"
+
+  print "python ", sys.argv[0], " /home/fynu/vizangarciaj/scratch/DATA_5fb_Mu/ 183 _DataMu"
   exit()
 
 path=sys.argv[1]
@@ -90,7 +111,7 @@ LaunchOnCondor.Jobs_RunHere= 1
 
 for i in range(0,njobs):
    #command = path isection Nfilessection suffix 
-   command = "/home/fynu/vizangarciaj/CMSSW_4_2_7/src/UserCode/zbb_louvain/python/CMS_To_LHCO_usingFramework_batch.py" + " " + path + " " + str(i) + " " + str(int(nrootfile/njobs)) + " " + suffix
+   command = "./CMS_To_LHCO_usingFramework_batch.py" + " " + path + " " + str(i) + " " + str(int(nrootfile/njobs)) + " " + suffix
 
    #print "command = ", command
    LaunchOnCondor.SendCluster_Push(["PYTHON", command])

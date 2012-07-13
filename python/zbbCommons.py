@@ -14,7 +14,7 @@ class zbblabel:
   vertexlabel="goodPV"
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
-  metlabel="patMETsPF"
+  metlabel="patType01SCorrectedPFMet"
   zmmbblabel="Zmmbb"
   zeebblabel="Zeebb"
   bblabel ="bbbar"
