@@ -13,16 +13,9 @@ import glob
 
 from optparse import OptionParser
 
-FarmDirectory = "FARM_makeRDSfrom1btagskimV2geninfo"
+FarmDirectory = "FARM"
 
-#processesToRun = ["Mu_DATA", "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
-processesToRun = ["ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
-#processesToRun = ["Mu_DATA", "El_DATA"]
-#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
-#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"]
-#processesToRun = ["Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC"]
-#processesToRun = ["ZZ_Mu_MC", "ZZ_El_MC"]
-#processesToRun = ["Ttbar_Mu_MC", "Ttbar_El_MC"]
+processesToRun = ["Mu_DATA", "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
 
 
 print "I will run over ", len(processesToRun), "processes"
