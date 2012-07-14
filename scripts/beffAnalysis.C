@@ -15,8 +15,8 @@ void beffAnalysis(const char* input, const char* output) {
   TFile* outputFile = TFile::Open(output,"RECREATE");
 
   // histogram with proper binning... cloned later on 
-  Double_t binning[23] = {25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,300,650};
-  TH1F* ptSpectrum = new TH1F("PtSpectrum","PtSpectrum",22,binning);
+  Double_t binning[22] = {25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,1000};
+  TH1F* ptSpectrum = new TH1F("PtSpectrum","PtSpectrum",21,binning);
   ptSpectrum->Sumw2();
 
   // produce the ratio plot for the 12 combinations of (SSVHE,SSVHP),(Barrel,Endcap),(b,c,l)
@@ -26,8 +26,8 @@ void beffAnalysis(const char* input, const char* output) {
   new(algorithms[1]) TCut("SSVHPT","ssvhp>2.0");
 
   TClonesArray etaRegions("TCut",2);
-  new(etaRegions[0]) TCut("Barrel","abs(eta)<1.4");
-  new(etaRegions[1]) TCut("Endcaps","abs(eta)>1.4");
+  new(etaRegions[0]) TCut("Barrel","abs(eta)<=1.2");
+  new(etaRegions[1]) TCut("Endcaps","abs(eta)>1.2");
 
   TClonesArray flavor("TCut",3);
   new(flavor[0]) TCut("l","abs(flavor)!=4 && abs(flavor)!=5");
@@ -41,10 +41,10 @@ void beffAnalysis(const char* input, const char* output) {
       for(int k=0; k< flavor.GetEntries() ; ++k) {
         // histogram before tagging
         TH1F* pretag = ptSpectrum->Clone("pretag");
-        btagEff->Draw("pt>>pretag",(*(TCut*)etaRegions.At(j))&&(*(TCut*)flavor.At(k)));
+        btagEff->Draw("pt>>pretag",((*(TCut*)etaRegions.At(j))&&(*(TCut*)flavor.At(k)))*"eventWeight");
         // histogram after tagging
         TH1F* posttag = ptSpectrum->Clone("posttag");
-        btagEff->Draw("pt>>posttag",(*(TCut*)algorithms.At(i))&&(*(TCut*)etaRegions.At(j))&&(*(TCut*)flavor.At(k)));
+        btagEff->Draw("pt>>posttag",((*(TCut*)algorithms.At(i))&&(*(TCut*)etaRegions.At(j))&&(*(TCut*)flavor.At(k)))*"eventWeight");
         // ratio
         TH1F* ratio = posttag->Clone(Form("h_eff_bTagOverGoodJet_pt%s_%s",((TCut*)flavor.At(k))->GetName(),
                                                                           ((TCut*)etaRegions.At(j))->GetName()));

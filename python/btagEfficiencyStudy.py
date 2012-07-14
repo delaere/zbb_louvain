@@ -3,6 +3,7 @@ import sys
 import os 
 from DataFormats.FWLite import Events, Handle
 from eventSelection import *
+from LumiReWeighting import *
 from zbbCommons import zbblabel,zbbfile
 
 
@@ -15,12 +16,13 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
      Int_t       flavor;\
      Float_t     ssvhe;\
      Float_t     ssvhp;\
+     Float_t     eventWeight;\
   };" )
   from ROOT import MyStruct
   mystruct = MyStruct()
   f = ROOT.TFile( 'mybtagEfftree.root', 'RECREATE' )
   tree = ROOT.TTree( 'btagEff', 'btag efficiency' )
-  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F' )
+  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:eventWeight/F' )
   # input
   dirList=os.listdir(path) 
   files=[]
@@ -39,6 +41,7 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   vertexHandle = Handle ("vector<reco::Vertex>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
+  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, "pileup","pileup", zbblabel.pulabel)
   # event loop
   eventCnt = 0
   for event in events:
@@ -66,6 +69,8 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
       eventCnt = eventCnt +1
       if eventCnt%100==0 : print ".",
       if eventCnt%1000==0 : print ""
+      # event weight
+      mystruct.eventWeight = weight_engine.weight( fwevent=event )
       # that's where we access the jets
       for jet in jets:
         if not isGoodJet(jet,bestZcandidate): continue
@@ -79,4 +84,3 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   f.Close()
   print ""
 
- 
