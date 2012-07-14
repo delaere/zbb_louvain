@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 #import os
 process = cms.Process("ZplusJets")
+print "bigining"
 
 #need to be implmented all what was done for 444 : leptons, jets, MET and adapt in 52X
 #electron and muons recommandations : https://indico.cern.ch/conferenceDisplay.py?confId=193787
@@ -13,7 +14,13 @@ process = cms.Process("ZplusJets")
 #Trigger to be checked
 #check saved outputs
 
-#packages are OK in 525, problems in 531 then before passing to 53X need a explicit recipe for 53X
+#packages are OK in 526, problems in 531 then before passing to 53X need a explicit recipe for 53X
+
+#vertex ok : replace by module to match PFnoPU recommandation ?, in patSequence collection of PV replaced by goodPV
+#Jets : JEC ok, PFnoPU or not ?
+#bjets : ok : keep IVF infos ?
+#combined objects OK
+
 
 ###############################
 ##### Loading what we need ####
@@ -34,7 +41,7 @@ process.AfterPATCounter = cms.EDProducer("EventCountProducer")
 process.AfterCandidatesCounter = cms.EDProducer("EventCountProducer")
 process.AfterJetsCounter = cms.EDProducer("EventCountProducer")
 #####################################
-
+print "output"
 process.out = cms.OutputModule("PoolOutputModule",
                                fileName = cms.untracked.string('MC_summer2012.root'),
                                                               # save only events passing the full path
@@ -43,8 +50,8 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                               # unpack the list of commands 'patEventContent'
                                outputCommands = cms.untracked.vstring('drop *',
                                                                       'keep *_offlinePrimaryVertices*_*_*',
-                                                                      #'keep *_offlinePrimaryVertexFromZ_*_*', ## Torino's Z vertex producer
-                                                                      #'keep edmMergeableCounter_*_*_*', ## Torino's mergeable counter
+                                                                      'keep *_offlinePrimaryVertexFromZ_*_*', ## Torino's Z vertex producer
+                                                                      'keep edmMergeableCounter_*_*_*', ## Torino's mergeable counter
                                                                       'keep *_offlineBeamSpot*_*_*',
                                                                       'keep *_patMETs*_*_*',
                                                                       'keep *_patTriggerEvent_*_*',
@@ -68,15 +75,16 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       ## b-tagger ###################################
                                                                       'keep *_bjets_*_*',
                                                                       'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
-                                                                      'keep *_combinedSecondaryVertex*BJetTags*_*_PAT',
+                                                                      'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
+                                                                      'keep *_jetProbabilityBJetTags*_*_PAT',
                                                                       ### for Torino's studies on SV ############################
-                                                                      #'keep recoJetedmRefToBaseProdrecoTracksrecoTrackrecoTracksTorecoTrackedmrefhelperFindUsingAdvanceedmRefVectorsAssociationVector_*_*_*',
-                                                                      #'keep recoBaseTagInfosOwned_selectedPatJets_tagInfos_PAT',
-                                                                      #'keep recoBaseTagInfosOwned_patJets_tagInfos_PAT',
-                                                                      #'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAK5PFOffset__PAT',
-                                                                      #'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAOD__PAT',
-                                                                      #'keep recoBaseTagInfosOwned_selectedPatJetsAK5PFOffset_tagInfos_PAT',
-                                                                      #'keep recoBaseTagInfosOwned_patJetsAK5PFOffset_tagInfos_PAT',
+                                                                      'keep recoJetedmRefToBaseProdrecoTracksrecoTrackrecoTracksTorecoTrackedmrefhelperFindUsingAdvanceedmRefVectorsAssociationVector_*_*_*',
+                                                                      'keep recoBaseTagInfosOwned_selectedPatJets_tagInfos_PAT',
+                                                                      'keep recoBaseTagInfosOwned_patJets_tagInfos_PAT',
+                                                                      'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAK5PFOffset__PAT',
+                                                                      'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAOD__PAT',
+                                                                      'keep recoBaseTagInfosOwned_selectedPatJetsAK5PFOffset_tagInfos_PAT',
+                                                                      'keep recoBaseTagInfosOwned_patJetsAK5PFOffset_tagInfos_PAT',
 
                                                                       # MC ######################################################
                                                                       'keep GenEventInfoProduct_generator_*_*',
@@ -88,11 +96,38 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       )
                                )
 
+
+##########################
+#### INPUT files #########
+##########################
+print "input"
+readFiles = cms.untracked.vstring()
+readFiles.extend([
+       #'/store/data/Run2012A/DoubleElectron/RECO/PromptReco-v1/000/190/705/6C49578C-A083-E111-A629-5404A63886E6.root'
+       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root'
+       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root',
+       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/DCAE2B35-8B82-E111-A830-00215AEDFCCC.root'
+      #'/store/relval/CMSSW_5_2_3_patch3/RelValTTbar/GEN-SIM-RECO/START52_V9_special_120410-v1/0122/4C156E86-1183-E111-BED9-003048FFCBF0.root'
+        'file:/storage/data/cms/store/mc/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S7_START52_V9-v2/0000/ACEB2F43-F396-E111-A7E3-002481E150DA.root'
+    ])
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(reportEvery = cms.untracked.int32(15))
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
+process.source = cms.Source("PoolSource",
+                            fileNames = readFiles,
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+                            )
+
+
+
+
 ############LOAD PART.2####################
+print "pat tools"
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process,sequence='patDefaultSequence',hltProcess = '*')
 
-from PhysicsTools.PatAlgos.tools.coreTools import *
+#from PhysicsTools.PatAlgos.tools.coreTools import * #dead
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
 process.load('CommonTools.ParticleFlow.pfParticleSelection_cff') 
@@ -100,19 +135,14 @@ process.load('CommonTools.ParticleFlow.pfParticleSelection_cff')
 ########################
 ## Standard Modules  ###
 ########################
-
+print "load"
 ## Load standard Reco modules
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-## Generator informations
-#process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-#process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
-#process.load("Configuration.StandardSequences.Generator_cff")
 
 from RecoJets.JetProducers.FastjetParameters_cfi import *
 from RecoJets.JetProducers.ak5TrackJets_cfi import *
-#from RecoJets.JetProducers.GenJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 
 ##----------------- Import the Particle Flow modules  --------------------
@@ -127,38 +157,17 @@ process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
 
-##-------------------- Import the Jet RECO modules -----------------------
-#process.load('RecoJets.Configuration.RecoPFJets_cff')
-#process.load("RecoJets.Configuration.GenJetParticles_cff")
-#process.load("RecoJets.Configuration.RecoGenJets_cff")
-
-process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-
-##-------------------- Turn-on the FastJet density calculation ----------------------------------------------------
-process.kt6PFJets.doRhoFastjet = True
-
-##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
-process.kt6PFJets.doAreaFastjet = True
-process.ak5PFJets.doAreaFastjet = True
-
-#make the best choice for the eta max.
-#process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
-#process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
-
-# to compute FastJet rho to correct isolation (note: EtaMax restricted to 2.5)
-process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True)
-process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
-
 
 ############ WARNING! to be run on data only!
 ############  need to be adapted for MC 
+print "remove matching"
 removeMCMatching(process, ['All'])
 
-process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
-                                     makeTriggerResults=cms.untracked.bool(True),
+process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
+                                     makeTriggerResults=cms.untracked.bool(False),
                                      )
-
+print "global tag"
 MC = True
 
 if MC :
@@ -166,59 +175,16 @@ if MC :
 else :    
     process.GlobalTag.globaltag = 'GR_R_52_V7::All'
 
-process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
-process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
-
-from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
-process.muIsoSequence = setupPFMuonIso(process, 'muons')
-
-
-##########################
-#### INPUT files #########
-##########################
-
-readFiles = cms.untracked.vstring()
-readFiles.extend([
-           #'/store/relval/CMSSW_5_2_2/DoubleMu/RECO/GR_R_52_V4_RelVal_zMu2011A-v2/0252/ECB07DA5-9274-E111-83D5-0018F3D09652.root'
-       #'/store/relval/CMSSW_5_2_2/DoubleElectron/RECO/GR_R_52_V4_RelVal_zEl2011A-v1/0004/04A3F83B-B473-E111-9233-003048F118AC.root'
-       #'/store/data/Run2012A/DoubleElectron/RECO/PromptReco-v1/000/190/705/6C49578C-A083-E111-A629-5404A63886E6.root'
-       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root'
-       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root',
-       #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/DCAE2B35-8B82-E111-A830-00215AEDFCCC.root'
-      '/store/relval/CMSSW_5_2_3_patch3/RelValTTbar/GEN-SIM-RECO/START52_V9_special_120410-v1/0122/4C156E86-1183-E111-BED9-003048FFCBF0.root'
-    ])
-
-process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(
-    reportEvery = cms.untracked.int32(150),  )
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
-process.source = cms.Source("PoolSource",
-                            fileNames = readFiles,
-                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
-                            )
-
 #import FWCore.PythonUtilities.LumiList as LumiList
 #import FWCore.ParameterSet.Types as CfgTypes
 #myLumis = LumiList.LumiList(filename = 'Cert_190456-190688_8TeV_PromptReco_Collisions12_JSON.txt').getCMSSWString().split(',')
 #process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
 #process.source.lumisToProcess.extend(myLumis)
 
-######################
-#### VERTEX FILTER ###
-######################
-
-from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi import *
-process.goodPV= offlinePrimaryVertices.clone()
-process.goodPV.cut=cms.string('ndof > 4&'
-                              'abs(z) <24&'
-                              '!isFake &'
-                              ' position.Rho <2 '
-                             )
-
-
-###########################
+##########################
 #### PRE-SEQUENCES #######
 ##########################
+print "pre-sequences"
 if MC:
     process.electronMatch.matched = "genParticles"
     process.muonMatch.matched = "genParticles"
@@ -237,6 +203,57 @@ else:
 
     process.preElectronSequence = cms.Sequence(process.patTrigger)
                                         
+
+
+
+######################
+#### VERTEX FILTER ###
+######################
+
+#from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi import *
+#process.goodPV= offlinePrimaryVertices.clone()
+#process.goodPV.cut=cms.string('ndof > 4&'
+#                              'abs(z) <24&'
+#                              '!isFake &'
+#                              ' position.Rho <2 '
+#                             )
+
+#from https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2012V2
+from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
+process.goodPV = cms.EDFilter(
+    "PrimaryVertexObjectFilter",
+    filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
+    src=cms.InputTag('offlinePrimaryVertices')
+    )
+
+process.patPF2PATSequence = cms.Sequence( process.patDefaultSequence )
+adaptPVs(process, pvCollection="goodPV")
+
+##-------------------- Turn-on the FastJet density calculation ----------------------------------------------------
+#process.kt6PFJets.doRhoFastjet = True
+
+##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
+#process.kt6PFJets.doAreaFastjet = True
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.ak5PFJets.doAreaFastjet = True
+
+# to compute FastJet rho to correct isolation (note: EtaMax restricted to 2.5)
+#process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True)
+#process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
+
+###rho already computed at RECO level
+
+
+process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
+process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
+
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
+process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.muIsoSequence = setupPFMuonIso(process, 'muons')
+
+
+
+
 
 ###########################
 #### ELECTRON selection ###
@@ -393,7 +410,7 @@ process.zelMatchedTrigelMatchedTrig = cms.EDProducer("CandViewShallowCloneCombin
 #process.patMuons.pfMuonSource = cms.InputTag("pfMuons")  
 #Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded and it can also be used to build the Z candidate. 
 
-process.patMuons.useParticleFlow=True
+#process.patMuons.useParticleFlow=True
 
 #################################
 ### MUON Trigger matching #######
@@ -429,11 +446,11 @@ process.selectedPatMuonsTriggerMatch.matches = cms.VInputTag('muonTriggerMatchHL
 #the selectedMuons are created with the trigger matched muons as input collection.
 
 # Muons with UserData ###############################
-process.userDataSelectedMuons = cms.EDProducer(
-       "Higgs2l2bMuonUserData",
-          src = cms.InputTag("selectedPatMuons"),
-          rho = cms.InputTag("kt6PFJetsForIsolation:rho")
-       )
+#process.userDataSelectedMuons = cms.EDProducer(
+#       "Higgs2l2bMuonUserData",
+#          src = cms.InputTag("selectedPatMuons"),
+#          rho = cms.InputTag("kt6PFJetsForIsolation:rho")
+#       )
 ###################################################
 
 process.allMuons = selectedPatMuons.clone(
@@ -548,65 +565,45 @@ process.zmuMatchedTrigmuMatchedTrig = cms.EDProducer('CandViewShallowCloneCombin
 #process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 ##-------------------- Import the Jet RECO modules -----------------------
 #process.load('RecoJets.Configuration.RecoPFJets_cff')
-##-------------------- Turn-on the FastJet density calculation -----------------------
-#process.kt6PFJets.doRhoFastjet = True
 ##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
 #process.ak5PFJets.doAreaFastjet = True
 
-inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) # ,'L5Flavor','L7Parton' OUTDATED: do not use them!
+#check the good one
+inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual'])
 if MC:
      inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
-        
 
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     doJTA  = True,
                     doBTagging   = True,
-                    # for MC, use only  ['L1FastJet','L2Relative','L3Absolute', 'L5Flavor', 'L7Parton']
-                    jetCorrLabel = inputJetCorrLabel,#('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']),    #,'L5Flavor','L7Parton']),  
+                    jetCorrLabel = inputJetCorrLabel,  
                     doType1MET   = False,
                     genJetCollection=cms.InputTag("ak5GenJets"),
                     doJetID      = True,
                     jetIdLabel   = "ak5"
                     )
 
-process.selectedPatJets.cut      = 'pt > 10. & abs(eta) < 2.4 '
+process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
-
-#process.cleanPatJets.checkOverlaps = cms.PSet(
-#                       muons = cms.PSet(
-#                              src       = cms.InputTag("cleanPatMuons"),
-#                                                        algorithm = cms.string("byDeltaR"),
-#                                                        preselection        = cms.string(""),
-#                                                        deltaR              = cms.double(0.5),
-#                                                        checkRecoComponents = cms.bool(False), # don't check if they share some AOD object ref
-#                                                        pairCut             = cms.string(""),
-#                                                        requireNoOverlaps   = cms.bool(True), # overlaps don't cause the jet to be discared
-#                                                     ),
-#                       electrons = cms.PSet(
-#                              src       = cms.InputTag("cleanPatElectrons"),
-#                                                        algorithm = cms.string("byDeltaR"),
-#                                                        preselection        = cms.string(""),
-#                                                        deltaR              = cms.double(0.5),
-#                                                        checkRecoComponents = cms.bool(False), # don't check if they share some AOD object ref
-#                                                        pairCut             = cms.string(""),
-#                                                        requireNoOverlaps   = cms.bool(True), # overlaps don't cause the jet to be discared
-#                                                     )
-#                                   )
-
-
 #clean 
-process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' ) ## FIXME:change the TAGGER!
+process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
+process.CSVbjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679' )
+process.JPbjets =  process.cleanPatJets.clone( preselection = 'bDiscriminator("jetProbabilityBJetTags") > 0.545' )
 
-#process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
-#                               decay = cms.string("bjets bjets"),
-#                               cut = cms.string("mass > 0"),
-#                               name = cms.string('bbbar'),
-#                               roles = cms.vstring('b1', 'b2'),
-#                               checkCharge = cms.bool(False)
-#                              )
+##################################
+####### combined objects #########
+##################################
 
-process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
+process.bbbar = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("bjets bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('bbar'),
+                               roles = cms.vstring('b1', 'b2'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zeej = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("zelMatchedelMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zeej'),
@@ -614,7 +611,7 @@ process.Zeej = cms.EDProducer("CandViewShallowCloneCombiner",
                                checkCharge = cms.bool(False)
                               )
 
-process.Zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
+process.zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("zmuMatchedmuMatched selectedPatJets"),
                                cut = cms.string("mass > 0"),
                                name = cms.string('Zmmj'),
@@ -622,37 +619,38 @@ process.Zmmj = cms.EDProducer("CandViewShallowCloneCombiner",
                                checkCharge = cms.bool(False)
                               )
 
-#process.Zeeb = cms.EDProducer("CandViewShallowCloneCombiner",
-#                              decay = cms.string("ZelMatchedelMatched bjets"),
-#                              cut = cms.string("mass > 0"),
-#                              name = cms.string('Zb'),
-#                              roles = cms.vstring('Z', 'b'),
-#                              checkCharge = cms.bool(False)
-#                             )
 
-#process.Zmmb = cms.EDProducer("CandViewShallowCloneCombiner",
-#                              decay = cms.string("ZmuMatchedmuMatched bjets"),
-#                              cut = cms.string("mass > 0"),
-#                              name = cms.string('Zbb'),
-#                              roles = cms.vstring('Z', 'b'),
-#                              checkCharge = cms.bool(False)
-#                             )
+process.zeeb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zelMatchedelMatched bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zeeb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
 
-#process.Zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
-#                               decay = cms.string("ZelMatchedelMatched bbbar"),
-#                               cut = cms.string("mass > 0"),
-#                               name = cms.string('Zbb'),
-#                               roles = cms.vstring('Z', 'b'),
-#                               checkCharge = cms.bool(False)
-#                              )
+process.zmmb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zmuMatchedmuMatched bjets"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zmmbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
 
-#process.Zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
-#                               decay = cms.string("ZmuMatchedmuMatched bbbar"),
-#                               cut = cms.string("mass > 0"),
-#                               name = cms.string('Zbb'),
-#                               roles = cms.vstring('Z', 'b'),
-#                               checkCharge = cms.bool(False)
-#                              )
+process.zeebb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zelMatchedelMatched bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
+
+process.zmmbb = cms.EDProducer("CandViewShallowCloneCombiner",
+                               decay = cms.string("zmuMatchedmuMatched bbbar"),
+                               cut = cms.string("mass > 0"),
+                               name = cms.string('Zbb'),
+                               roles = cms.vstring('Z', 'b'),
+                               checkCharge = cms.bool(False)
+                              )
 
 
 ##################################
@@ -673,39 +671,38 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #################################################
 
 # add MET (for PF objects)
-from PhysicsTools.PatAlgos.tools.metTools import *
-addPfMET(process, 'PF')
+#from PhysicsTools.PatAlgos.tools.metTools import *
+#addPfMET(process, 'PF')
 
 
-#####################Filter########################
-process.ZMuMuFilter = cms.EDFilter("CandViewCountFilter",
-                                   src = cms.InputTag("zmuAllmuAll"),
-                                   minNumber = cms.uint32(1),
-                                   )
+######################
+##      FILTER      ##
+######################
+
+process.ZMMFilter = cms.EDFilter("CandViewCountFilter",
+                                 src = cms.InputTag("zmuAllmuAll"),
+                                 minNumber = cms.uint32(1),
+                                 )
 
 process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
                                  src = cms.InputTag("zelAllelAll"),
                                  minNumber = cms.uint32(1),
                                  )
-from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import *
-from PhysicsTools.PatAlgos.selectionLayer1.electronCountFilter_cfi import *
-process.mutrigger = countPatMuons.clone(src = 'allMuons', minNumber = 2)
-process.eltrigger = countPatElectrons.clone(src = 'allElectrons', minNumber = 2)
 
 ######################
 ##    SEQUENCES     ##
 ######################
 process.PFLepton = cms.Sequence(
-    process.goodPV +
-    process.TotalEventCounter +
+    process.goodPV *
+    process.TotalEventCounter *
         
-    process.kt6PFJetsForIsolation+
-    process.kt6PFJets+
-    process.ak5PFJets+
-    process.simpleEleIdSequence+
+    #process.kt6PFJetsForIsolation+
+    #process.kt6PFJets+
+    process.ak5PFJets *
+    process.simpleEleIdSequence *
 
     ##to create the collection pfNoPileUp
-    process.pfNoPileUpSequence+
+    process.pfNoPileUpSequence *
     ## to create the isoVariables with pfNoPileUp
     ##and the values in the cfg
     
@@ -722,15 +719,16 @@ process.PFLepton = cms.Sequence(
     process.pfElectronSequence+
  
     (process.preMuonSequence + process.preElectronSequence)+
-    process.patDefaultSequence+
 
-    process.userDataSelectedMuons+
-    process.userDataSelectedElectrons+
+    #process.patDefaultSequence*
+    process.patPF2PATSequence *
+    #process.userDataSelectedMuons+
+    #process.userDataSelectedElectrons+
         
     ###### electron candidates #####
     process.eleTriggerMatchHLT+
     process.patElectronsWithTrigger+
-  
+ 
     (process.allElectrons +
      process.tightElectrons +
      process.matchedElectrons +
@@ -757,26 +755,11 @@ process.PFLepton = cms.Sequence(
      process.zmuMatchedmuMatched+
      process.zmuMatchedTrigmuMatchedTrig)+
 
-    process.bjets+
-    #process.bbbar+
-
-    #process.offlinePrimaryVertexFromZ +
-    
-    #### Z+jets candidates ##########
-    (process.Zmmj+
-     process.Zeej)
-
-    #(process.Zeeb+
-     #process.Zmmb)
-    
-    #(process.Zeebb+
-    # process.Zmmbb)
-
-    
+    process.bjets
     )
 
-process.p1 = cms.Path(process.PFLepton*process.mutrigger *process.ZMuMuFilter)
-process.p2 = cms.Path(process.PFLepton*process.eltrigger *process.ZEEFilter)
+process.p1 = cms.Path(process.PFLepton*process.ZMMFilter)
+process.p2 = cms.Path(process.PFLepton*process.ZEEFilter)
     
 
 #####################
