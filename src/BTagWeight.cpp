@@ -15,7 +15,7 @@ JetSet::JetSet(std::string themode, const char* infile) {
   if(themode=="hardcoded")
     interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas());
   else if(themode=="database")
-    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile));
+    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile)); 
   else {
     std::cout << "Warning: UNKNOWN MODE: please check the spelling, 'database' or 'hardcoded' "<< std::endl;
     if(std::string(infile)=="") {
