@@ -36,5 +36,6 @@ class btagPerfFWLiteInterface : public btagPerfBase {
     BtagPerformance* perfMISTAGSSVHPT_;
     TH1F *h_eff_ssvhem_b_brl_, *h_eff_ssvhem_b_fwd_, *h_eff_ssvhem_c_brl_, *h_eff_ssvhem_c_fwd_;
     TH1F *h_eff_ssvhpt_b_brl_, *h_eff_ssvhpt_b_fwd_, *h_eff_ssvhpt_c_brl_, *h_eff_ssvhpt_c_fwd_;
+    TH1F *h_eff_ssvhem_l_brl_, *h_eff_ssvhem_l_fwd_, *h_eff_ssvhpt_l_brl_, *h_eff_ssvhpt_l_fwd_;
 };
 

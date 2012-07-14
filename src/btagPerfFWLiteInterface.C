@@ -61,10 +61,14 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb_Endcaps");
   h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Barrel");
   h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Endcaps");
+  h_eff_ssvhem_l_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptl_Barrel");
+  h_eff_ssvhem_l_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptl_Endcaps");
   h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Barrel");
   h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Endcaps");
   h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Barrel");
   h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Endcaps");
+  h_eff_ssvhpt_l_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptl_Barrel");
+  h_eff_ssvhpt_l_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptl_Endcaps");
 }
 
 btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
@@ -108,18 +112,22 @@ btagPerfBase::value btagPerfFWLiteInterface::getbEfficiency(int flavor, int algo
   // small protection against large et (shere we have no measurement).
   // the subject is a bit delicate, but I think it is better to use 
   // the efficiency for the last bin than to set it to 0.
-  if(pt>249) pt=249;
+  if(pt>900) pt=900;
   switch(abs(flavor)) {
     case 5:
       // this is not in the db and must be parametrized from OUR mc
       if(fabs(eta)<1.2 && algo==1) 
-        return std::make_pair(h_eff_ssvhem_b_brl_->GetBinContent(h_eff_ssvhem_b_brl_->FindBin(pt)),0.);
+        return std::make_pair(h_eff_ssvhem_b_brl_->GetBinContent(h_eff_ssvhem_b_brl_->FindBin(pt)),
+                              h_eff_ssvhem_b_brl_->GetBinError(h_eff_ssvhem_b_brl_->FindBin(pt)));
       else if(fabs(eta)>1.2 && algo==1)
-        return std::make_pair(h_eff_ssvhem_b_fwd_->GetBinContent(h_eff_ssvhem_b_fwd_->FindBin(pt)),0.);
+        return std::make_pair(h_eff_ssvhem_b_fwd_->GetBinContent(h_eff_ssvhem_b_fwd_->FindBin(pt)),
+                              h_eff_ssvhem_b_fwd_->GetBinError(h_eff_ssvhem_b_fwd_->FindBin(pt)));
       else if(fabs(eta)<1.2 && algo==2)
-        return std::make_pair(h_eff_ssvhpt_b_brl_->GetBinContent(h_eff_ssvhpt_b_brl_->FindBin(pt)),0.);
+        return std::make_pair(h_eff_ssvhpt_b_brl_->GetBinContent(h_eff_ssvhpt_b_brl_->FindBin(pt)),
+                              h_eff_ssvhpt_b_brl_->GetBinError(h_eff_ssvhpt_b_brl_->FindBin(pt)));
       else if(fabs(eta)>1.2 && algo==2)
-        return std::make_pair(h_eff_ssvhpt_b_fwd_->GetBinContent(h_eff_ssvhpt_b_fwd_->FindBin(pt)),0.);
+        return std::make_pair(h_eff_ssvhpt_b_fwd_->GetBinContent(h_eff_ssvhpt_b_fwd_->FindBin(pt)),
+                              h_eff_ssvhpt_b_fwd_->GetBinError(h_eff_ssvhpt_b_fwd_->FindBin(pt)));
       else 
         return std::make_pair(0.,0.);
     case 4:
@@ -139,13 +147,21 @@ btagPerfBase::value btagPerfFWLiteInterface::getbEfficiency(int flavor, int algo
       else 
         return std::make_pair(0.,0.);
     default: {
-      // difficult to measure the fake rate in our sample... use official mistag.
-      BtagPerformance* perf_ = algo==1 ? perfMISTAGSSVHEM_ : perfMISTAGSSVHPT_ ;
-      if(!perf_) return std::make_pair(0.,0.);
-      BinningPointByMap p;
-      p.insert(BinningVariables::JetEta,fabs(eta));
-      p.insert(BinningVariables::JetEt,pt<30. ? 30. : pt);
-      return std::make_pair(perf_->getResult(PerformanceResult::BTAGLEFF,p),0.);
+      // this better parametrized from OUR mc
+      if(fabs(eta)<1.2 && algo==1) 
+        return std::make_pair(h_eff_ssvhem_l_brl_->GetBinContent(h_eff_ssvhem_l_brl_->FindBin(pt)),
+                              h_eff_ssvhem_l_brl_->GetBinError(h_eff_ssvhem_l_brl_->FindBin(pt)));
+      else if(fabs(eta)>1.2 && algo==1)
+        return std::make_pair(h_eff_ssvhem_l_fwd_->GetBinContent(h_eff_ssvhem_l_fwd_->FindBin(pt)),
+                              h_eff_ssvhem_l_fwd_->GetBinError(h_eff_ssvhem_l_fwd_->FindBin(pt)));
+      else if(fabs(eta)<1.2 && algo==2)
+        return std::make_pair(h_eff_ssvhpt_l_brl_->GetBinContent(h_eff_ssvhpt_l_brl_->FindBin(pt)),
+                              h_eff_ssvhpt_l_brl_->GetBinError(h_eff_ssvhpt_l_brl_->FindBin(pt)));
+      else if(fabs(eta)>1.2 && algo==2)
+        return std::make_pair(h_eff_ssvhpt_l_fwd_->GetBinContent(h_eff_ssvhpt_l_fwd_->FindBin(pt)),
+                              h_eff_ssvhpt_l_fwd_->GetBinError(h_eff_ssvhpt_l_fwd_->FindBin(pt)));
+      else 
+        return std::make_pair(0.,0.);
     }
   }
 }
