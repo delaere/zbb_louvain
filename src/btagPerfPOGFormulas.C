@@ -48,7 +48,7 @@ float btagPerfPOGFormulas::SFb_error_SSVHPT[] = {
 
 btagPerfPOGFormulas::btagPerfPOGFormulas() {
   // just a sigmoid. Used to parametrize the efficiencies
-  eff_ = new TF1("sigmoid","[0]+[3]/(1+exp([1]-x*[2]))",0,1000);
+  eff_ = new TF1("sigmoidTimesL","[0]+([3]+[4]*x)/(1+exp([1]-x*[2]))",20,1000);
 }
 
 btagPerfPOGFormulas::~btagPerfPOGFormulas() {
@@ -138,15 +138,15 @@ btagPerfBase::value btagPerfPOGFormulas::getbEfficiency(int flavor, int algo, do
     case 5: {
       if(algo==1) {
         if(fabs(eta)<1.2) {
-          eff_->SetParameters(-5.51040e-02,2.23373e+00,8.77422e-02,8.08854e-01);
+          eff_->SetParameters(-1.48976e+01,-2.33468e+00,5.63766e-02,1.54646e+01,-1.76495e-04);
         } else {
-          eff_->SetParameters(-7.09015e-01,6.94739e-01,6.66446e-02,1.38546e+00);
+          eff_->SetParameters(-1.49449e+01,-2.48731e+00,5.10619e-02,1.54167e+01,-9.20870e-05);
         }
       } else {
         if(fabs(eta)<1.2) {
-          eff_->SetParameters(1.34081e-01,5.44067e+00,1.47838e-01,4.44133e-01);
+          eff_->SetParameters(-2.22397e+01,-2.73586e+00,5.61474e-02,2.28068e+01,-1.76713e-04);
         } else {
-          eff_->SetParameters(2.24147e-02,2.86102e+00,8.52067e-02,4.82894e-01);
+          eff_->SetParameters(-4.46156e+01,-3.58358e+00,5.06866e-02,4.50875e+01,-9.21825e-05);
         }
       }
       return std::make_pair(eff_->Eval(pt),0.);
@@ -154,31 +154,34 @@ btagPerfBase::value btagPerfPOGFormulas::getbEfficiency(int flavor, int algo, do
     case 4: {
       if(algo==1) {
         if(fabs(eta)<1.2) {
-          eff_->SetParameters(-6.70200e-01,-6.94898e-01,3.31213e-02,9.39803e-01);
+          eff_->SetParameters(-2.35646e+00,-2.23076e+00,5.30713e-02,2.44600e+00,-4.10810e-05);
         } else {
-          eff_->SetParameters(-1.77879e-01,9.01356e-01,4.12996e-02,4.40469e-01);
+          eff_->SetParameters(-2.36127e+00,-2.39206e+00,4.54041e-02,2.44112e+00,-6.91750e-05);
         }
       } else {
         if(fabs(eta)<1.2) {
-          eff_->SetParameters(1.12619e-01,4.03054e+00,-3.16668e-02,-1.00842e+01);
+          eff_->SetParameters(-1.31439e+01,-3.95421e+00,5.24966e-02,1.32335e+01,-4.11156e-05);
         } else {
-          eff_->SetParameters(1.00000e-02,5.05689e+00,1.09649e-01,7.14612e-02);
+          eff_->SetParameters(-1.31488e+01,-4.11692e+00,4.49178e-02,1.32286e+01,-6.91372e-05);
         }
       }
       return std::make_pair(eff_->Eval(pt),0.);
     }
     default: {
       if(algo==1) {
-        if(fabs(eta)<0.8) {
-          return std::make_pair(0.000547883+0.00023023*pt-7.317920e-07*pt*pt+1.15659e-09*pt*pt*pt-7.00641e-13*pt*pt*pt*pt,0.);
-        } else if(fabs(eta)<1.6) {
-          return std::make_pair(0.000615562+0.000240254*pt-7.00237e-07*pt*pt+1.25660e-09*pt*pt*pt-8.59011e-13*pt*pt*pt*pt,0.);
+        if(fabs(eta)<1.2) {
+          eff_->SetParameters(1.69103e-04,5.09983e+00,6.26066e-02,9.38001e-04,2.13956e-06);
         } else {
-          return std::make_pair(0.000372388+0.000309735*pt-4.35952e-07*pt*pt+3.63763e-10*pt*pt*pt-2.11993e-13*pt*pt*pt*pt,0.);
+          eff_->SetParameters(1.86636e-04,4.41344e+00,4.72039e-02,3.77524e-03,-1.22904e-06);
         }
       } else {
-          return std::make_pair(-2.9605e-05+2.35624e-05*pt-1.77552e-08*pt*pt,0.);
+        if(fabs(eta)<1.2) {
+          eff_->SetParameters(-1.31642e+01,-8.03625e+00,3.84933e-03,1.31682e+01,-1.84878e-06);
+        } else {
+          eff_->SetParameters(-1.31639e+01,-7.84069e+00,8.51549e-03,1.31682e+01,0.00000e+00);
+        }
       }
+      return std::make_pair(eff_->Eval(pt),0.);
     }
   }
 }
