@@ -99,7 +99,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.4 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -156,6 +156,17 @@ process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
                                   minNumber = cms.uint32(1),
                                   )
 
+process.zMuMuFilter = cms.EDFilter("CandViewCountFilter",
+                               src = cms.InputTag("zmuMatchedmuMatched"),
+                               minNumber = cms.uint32(1),
+                               )
+
+process.zElElFilter = cms.EDFilter("CandViewCountFilter",
+                               src = cms.InputTag("zelMatchedelMatched"),
+                               minNumber = cms.uint32(1),
+                               )
+
+
 #------------------------------ Sequence
 #------------------------------------------------------------------------------------------------------------------------------------------------		
 # vertex filter
@@ -166,11 +177,13 @@ process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
 
 # Run it
 
-process.p4 = cms.Path(process.bFilter)
-process.p5 = cms.Path(process.CSVMbjets)
+process.p4 = cms.Path(process.zMuMuFilter*process.bFilter)
+process.p5 = cms.Path(process.zMuMuFilter*process.CSVMbjets)
 #process.p5 = cms.Path(process.CSVbFilter)
+process.p6 = cms.Path(process.zElElFilter*process.bFilter)
+process.p7 = cms.Path(process.zElElFilter*process.CSVMbjets)
 
-process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5'))
+process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5','p6','p7'))
 
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
