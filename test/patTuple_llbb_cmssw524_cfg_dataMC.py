@@ -7,9 +7,9 @@ print "bigining"
 #electron and muons recommandations : https://indico.cern.ch/conferenceDisplay.py?confId=193787
 #twiki : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification and ...
 #MET : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis#PAT
-#packages for 52X/53X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes53X#V08_10_00
-#btag ? : don't excpect to change, just WP to be checked for CSV, and later on the JP calibration for Torino 
-#Jets ? , beta/beta*, vertx ... JEC...
+#packages for 52X/53X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X
+#btag : IVF ? 
+#Jets ? , beta/beta*
 #444pat : https://twiki.cern.ch/twiki/bin/view/CMSPublic/LeptonSelectionVjets2011
 #Trigger to be checked
 #check saved outputs
@@ -162,13 +162,13 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 ############ WARNING! to be run on data only!
 ############  need to be adapted for MC 
 print "remove matching"
-removeMCMatching(process, ['All'])
+MC = True
+if not MC : removeMCMatching(process, ['All'])
 
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
                                      makeTriggerResults=cms.untracked.bool(False),
                                      )
 print "global tag"
-MC = True
 
 if MC :
     process.GlobalTag.globaltag = 'START52_V9::All'
@@ -185,6 +185,7 @@ else :
 #### PRE-SEQUENCES #######
 ##########################
 print "pre-sequences"
+#This should not change from 444
 if MC:
     process.electronMatch.matched = "genParticles"
     process.muonMatch.matched = "genParticles"
@@ -202,9 +203,6 @@ else:
     process.preMuonSequence = cms.Sequence(process.patTrigger)
 
     process.preElectronSequence = cms.Sequence(process.patTrigger)
-                                        
-
-
 
 ######################
 #### VERTEX FILTER ###
@@ -229,20 +227,11 @@ process.goodPV = cms.EDFilter(
 process.patPF2PATSequence = cms.Sequence( process.patDefaultSequence )
 adaptPVs(process, pvCollection="goodPV")
 
-##-------------------- Turn-on the FastJet density calculation ----------------------------------------------------
-#process.kt6PFJets.doRhoFastjet = True
 
-##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
-#process.kt6PFJets.doAreaFastjet = True
+#Do we need this ?
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 process.ak5PFJets.doAreaFastjet = True
-
-# to compute FastJet rho to correct isolation (note: EtaMax restricted to 2.5)
-#process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True)
-#process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
-
-###rho already computed at RECO level
-
+##
 
 process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
 process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
@@ -250,10 +239,6 @@ process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.muIsoSequence = setupPFMuonIso(process, 'muons')
-
-
-
-
 
 ###########################
 #### ELECTRON selection ###
@@ -372,7 +357,7 @@ process.matchedElectronsTrig.src = "patElectronsWithTrigger"
 
 process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('allElectrons@+ allElectrons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('zelallelall'),
                                   roles = cms.vstring('all1', 'all2')
                                   )
@@ -380,21 +365,21 @@ process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
 
 process.zelTightelTight = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("tightElectrons@+ tightElectrons@-"),
-                               cut = cms.string("mass > 12.0"),
+                               cut = cms.string("mass > 50.0"),
                                name = cms.string('zeltighteltight'), 
                                roles = cms.vstring('tight1', 'tight2')
                               )
 
 process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("matchedElectrons@+ matchedElectrons@-"),
-                               cut = cms.string("mass > 12.0"),
+                               cut = cms.string("mass > 50.0"),
                                name = cms.string('zelmatchedelmatched'), 
                                roles = cms.vstring('matched1', 'matched2')
                               )
 
 process.zelMatchedTrigelMatchedTrig = cms.EDProducer("CandViewShallowCloneCombiner",
                                decay = cms.string("matchedElectronsTrig@+ matchedElectronsTrig@-"),
-                               cut = cms.string("mass > 12.0"),
+                               cut = cms.string("mass > 50.0"),
                                name = cms.string('zelmatchedtrigelmatchedtrig'), 
                                roles = cms.vstring('matchedtrig1', 'matchedtrig2')
                               )
@@ -559,16 +544,6 @@ process.zmuMatchedTrigmuMatchedTrig = cms.EDProducer('CandViewShallowCloneCombin
 #### JETS #######################################
 #################################################
 
-#from PhysicsTools.PatAlgos.tools.jetTools import *
-# Use ak5PF instead of ak5Calo
-##-------------------- Import the JEC services -----------------------
-#process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-##-------------------- Import the Jet RECO modules -----------------------
-#process.load('RecoJets.Configuration.RecoPFJets_cff')
-##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
-#process.ak5PFJets.doAreaFastjet = True
-
-#check the good one
 inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual'])
 if MC:
      inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
@@ -586,7 +561,7 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
 process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
-#clean 
+#bjets collections 
 process.bjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("simpleSecondaryVertexHighEffBJetTags") > 1.74' )
 process.CSVbjets = process.cleanPatJets.clone( preselection = 'bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679' )
 process.JPbjets =  process.cleanPatJets.clone( preselection = 'bDiscriminator("jetProbabilityBJetTags") > 0.545' )
@@ -670,10 +645,21 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 ###### MET ######################################
 #################################################
 
-# add MET (for PF objects)
-#from PhysicsTools.PatAlgos.tools.metTools import *
-#addPfMET(process, 'PF')
+process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+#    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')        
+)
 
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+if not MC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+
+process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfJetMETcorr', 'type1') ,
+    #cms.InputTag('pfMEtSysShiftCorr')       
+)
 
 ######################
 ##      FILTER      ##
@@ -699,6 +685,7 @@ process.PFLepton = cms.Sequence(
     #process.kt6PFJetsForIsolation+
     #process.kt6PFJets+
     process.ak5PFJets *
+
     process.simpleEleIdSequence *
 
     ##to create the collection pfNoPileUp
@@ -722,6 +709,13 @@ process.PFLepton = cms.Sequence(
 
     #process.patDefaultSequence*
     process.patPF2PATSequence *
+
+    #process.type0PFMEtCorrection * #missing class, seems not yet tagged : edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Vertex>,std::vector<reco::Track>,float,unsigned int> > >
+    process.pfType1CorrectedMet *
+    process.pfMEtSysShiftCorrSequence * 
+    process.pfType1p2CorrectedMet * #producePFMETCorrections *
+
+
     #process.userDataSelectedMuons+
     #process.userDataSelectedElectrons+
         
