@@ -1,25 +1,46 @@
 import FWCore.ParameterSet.Config as cms
 #import os
 process = cms.Process("ZplusJets")
-print "bigining"
 
-#need to be implmented all what was done for 444 : leptons, jets, MET and adapt in 52X
-#electron and muons recommandations : https://indico.cern.ch/conferenceDisplay.py?confId=193787
-#twiki : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection and https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification and ...
-#MET : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis#PAT
-#packages for 52X/53X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X
-#btag : IVF ? 
-#Jets ? , beta/beta*
+#electron and muons approvals : https://indico.cern.ch/conferenceDisplay.py?confId=193787
+#Muons : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId , https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT
+#electrons : https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection , https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification , https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation
+
+#jet and met approvals : https://indico.cern.ch/conferenceDisplay.py?confId=172447
+#MET : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis , https://twiki.cern.ch/twiki/bin/view/CMS/MissingET
+#Jet : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections , https://twiki.cern.ch/twiki/bin/view/CMS/JetID , https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetID 
+
+#trigger : http://fwyzard.web.cern.ch/fwyzard/hlt/summary
+
+#packages for 52X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X
 #444pat : https://twiki.cern.ch/twiki/bin/view/CMSPublic/LeptonSelectionVjets2011
-#Trigger to be checked
-#check saved outputs
 
-#packages are OK in 526, problems in 531 then before passing to 53X need a explicit recipe for 53X
+#packages are for 526, no recipe for 53X : working except for met correction 0 
+#--- Tag ---    -------- Package --------
+#V00-02-05      CMGTools/External
+#V00-03-15      CommonTools/ParticleFlow
+#V00-00-12      CommonTools/RecoUtils
+#V15-03-02      DataFormats/ParticleFlowCandidate
+#V06-05-01      DataFormats/PatCandidates
+#V00-00-18      EGamma/EGammaAnalysisTools
+#V04-06-09      JetMETCorrections/Type1MET
+#V08-09-21      PhysicsTools/PatAlgos
+#V03-09-23      PhysicsTools/PatUtils
+#V01-08-00      RecoBTag/SecondaryVertex
+#V02-02-00      RecoVertex/AdaptiveVertexFinder
+#NoTag          UserCode/zbb_louvain
+#NoTag          ZbbAnalysis/AnalysisStep
+#NoTag          ZbbAnalysis/Tools
 
-#vertex ok : replace by module to match PFnoPU recommandation ?, in patSequence collection of PV replaced by goodPV
-#Jets : JEC ok, PFnoPU or not ?
-#bjets : ok : keep IVF infos ?
-#combined objects OK
+#changes from 444
+#vertex : modules define like in JEC twiki and in patSequence collection of PV replaced by goodPV
+#electrons : EGamma package changed, check Effective Areas (rho already present in AOD) , use of NoPFIdPFIso , vetoes for endcap not yet in cmssw
+#muons : 'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &' and fabs(recoMu.innerTrack()->dz(vertex->position())) < 0.5 probably to be applied offline , use also Effective Areas (to be checked also), a delta beta isolation also possible but need to be implemented for electron before to use it , trigger it's also possible use of HLT_Mu17_TkMu8_v*
+#electrons and muons abs(db)>0.2 or 0.02 ? twiki confusing
+#Jets : no changes
+#bjets : no changes, keep IVF infos ?
+#MET : easier to use, porblem for correction 0 due to missing class in the packages, should be fixed ; do we need add other MET ?
+#combined objects : no changes
 
 
 ###############################
@@ -41,7 +62,7 @@ process.AfterPATCounter = cms.EDProducer("EventCountProducer")
 process.AfterCandidatesCounter = cms.EDProducer("EventCountProducer")
 process.AfterJetsCounter = cms.EDProducer("EventCountProducer")
 #####################################
-print "output"
+
 process.out = cms.OutputModule("PoolOutputModule",
                                fileName = cms.untracked.string('MC_summer2012.root'),
                                                               # save only events passing the full path
@@ -50,34 +71,11 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                               # unpack the list of commands 'patEventContent'
                                outputCommands = cms.untracked.vstring('drop *',
                                                                       'keep *_offlinePrimaryVertices*_*_*',
-                                                                      'keep *_offlinePrimaryVertexFromZ_*_*', ## Torino's Z vertex producer
-                                                                      'keep edmMergeableCounter_*_*_*', ## Torino's mergeable counter
+                                                                      'keep *_goodPV*_*_*',
+                                                                      'keep *_offlinePrimaryVertexFromZ_*_*',
+                                                                      'keep edmMergeableCounter_*_*_*',
                                                                       'keep *_offlineBeamSpot*_*_*',
-                                                                      'keep *_patMETs*_*_*',
-                                                                      'keep *_patTriggerEvent_*_*',
-                                                                      'keep patTriggerPaths_patTrigger_*_*',
-                                                                      'keep *_*Tracks_*_*',
-
-                                                                      ## rho corrections saved #########################
-                                                                      'keep *_kt6PFJetsForIsolation_*_*',
-
-                                                                      ### isolation deposits/ conversion information for building isolation/ID ######
-                                                                      'keep *_elPFIsoValue_*_*',
-                                                                      'keep *_allConversions_*_*',
-
-                                                                      ##################################################
-                                                                      'keep *_*atJets*_*_*',
-                                                                      'keep reco*_z*_*_*',
-                                                                      'keep *_*Muons*_*_*',
-                                                                      'keep *_*Electrons*_*_*',
-                                                                      #'keep *_patMETs*_*_*',
-
-                                                                      ## b-tagger ###################################
-                                                                      'keep *_bjets_*_*',
-                                                                      'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
-                                                                      'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
-                                                                      'keep *_jetProbabilityBJetTags*_*_PAT',
-                                                                      ### for Torino's studies on SV ############################
+                                                                      ### for Torino's studies on SV ----------------------------------------------------------
                                                                       'keep recoJetedmRefToBaseProdrecoTracksrecoTrackrecoTracksTorecoTrackedmrefhelperFindUsingAdvanceedmRefVectorsAssociationVector_*_*_*',
                                                                       'keep recoBaseTagInfosOwned_selectedPatJets_tagInfos_PAT',
                                                                       'keep recoBaseTagInfosOwned_patJets_tagInfos_PAT',
@@ -85,8 +83,35 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       'keep recoSecondaryVertexTagInfos_secondaryVertexTagInfosAOD__PAT',
                                                                       'keep recoBaseTagInfosOwned_selectedPatJetsAK5PFOffset_tagInfos_PAT',
                                                                       'keep recoBaseTagInfosOwned_patJetsAK5PFOffset_tagInfos_PAT',
-
-                                                                      # MC ######################################################
+                                                                      ### Trigger -----------------------------------------------------------------------------
+                                                                      'keep *_patTriggerEvent_*_*',
+                                                                      'keep patTriggerPaths_patTrigger_*_*',
+                                                                      ### Tracks ------------------------------------------------------------------------------
+                                                                      'keep *_*Tracks_*_*',
+                                                                      ### muons -------------------------------------------------------------------------------
+                                                                      'keep *_*Muons*_*_*',
+                                                                      ### electrons, incl. isolation deposits/ conversions for isolation/ID -------------------
+                                                                      'keep *_*Electrons*_*_*',
+                                                                      'keep *_elPFIso*_*_*',
+                                                                      'keep *_allConversions_*_*',  ## maybe useless?
+                                                                      ### Z candidates ------------------------------------------------------------------------
+                                                                      'keep *_z*_*_*',
+                                                                      ### Jets and b-jets ---------------------------------------------------------------------
+                                                                      'keep *_*atJets*_*_*',
+                                                                      'keep *_*5PFJets*_*_*',
+                                                                      'keep *_puJetId_*_*',
+                                                                      'keep *_puJetMva_*_*',
+                                                                      'keep *_*bjets*_*_*',
+                                                                      'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
+                                                                      'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
+                                                                      'keep *_jetProbabilityBJetTags*_*_PAT',
+                                                                      ### rho corrections saved ---------------------------------------------------------------
+                                                                      'keep *_kt6PFJets*_*_*',
+                                                                      ### MET ---------------------------------------------------------------------------------
+                                                                      'keep *_pat*METs*_*_*',
+                                                                      'keep *_pf*CorrectedMet*_*_*',
+                                                                      'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
+                                                                      # MC ------------------------------------------------------------------------------------
                                                                       'keep GenEventInfoProduct_generator_*_*',
                                                                       'keep *_genMetTrue_*_*',
                                                                       'keep recoGenJets_ak5GenJets_*_*',
@@ -96,11 +121,10 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       )
                                )
 
-
 ##########################
 #### INPUT files #########
 ##########################
-print "input"
+
 readFiles = cms.untracked.vstring()
 readFiles.extend([
        #'/store/data/Run2012A/DoubleElectron/RECO/PromptReco-v1/000/190/705/6C49578C-A083-E111-A629-5404A63886E6.root'
@@ -119,15 +143,10 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             )
 
-
-
-
 ############LOAD PART.2####################
-print "pat tools"
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process,sequence='patDefaultSequence',hltProcess = '*')
 
-#from PhysicsTools.PatAlgos.tools.coreTools import * #dead
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
 process.load('CommonTools.ParticleFlow.pfParticleSelection_cff') 
@@ -135,7 +154,6 @@ process.load('CommonTools.ParticleFlow.pfParticleSelection_cff')
 ########################
 ## Standard Modules  ###
 ########################
-print "load"
 ## Load standard Reco modules
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load('Configuration.StandardSequences.Services_cff')
@@ -159,22 +177,21 @@ process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
+##-------------------- load the PU JetID sequence ------------------------
+process.load("CMGTools.External.pujetidsequence_cff")
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
-############ WARNING! to be run on data only!
-############  need to be adapted for MC 
-print "remove matching"
-MC = True
-if not MC : removeMCMatching(process, ['All'])
+###remove MC matching for DATA and use the good collection for muons for MC
+isMC = True
+if not isMC : removeMCMatching(process, ['All'])
 else : process.muonMatch.src = "pfIsolatedMuons"
 
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
                                      makeTriggerResults=cms.untracked.bool(False),
                                      )
-print "global tag"
 
-if MC :
+if isMC :
     process.GlobalTag.globaltag = 'START52_V9::All'
 else :    
     process.GlobalTag.globaltag = 'GR_R_52_V7::All'
@@ -188,9 +205,8 @@ else :
 ##########################
 #### PRE-SEQUENCES #######
 ##########################
-print "pre-sequences"
-#This should not change from 444
-if MC:
+
+if isMC:
     process.electronMatch.matched = "genParticles"
     process.muonMatch.matched = "genParticles"
 
@@ -231,12 +247,6 @@ process.goodPV = cms.EDFilter(
 process.patPF2PATSequence = cms.Sequence( process.patDefaultSequence )
 adaptPVs(process, pvCollection="goodPV")
 
-
-#Do we need this ?
-process.load('RecoJets.Configuration.RecoPFJets_cff')
-process.ak5PFJets.doAreaFastjet = True
-##
-
 process.pfPileUp.PFCandidates = cms.InputTag("particleFlow")
 process.pfNoPileUp.bottomCollection = cms.InputTag("particleFlow")
 
@@ -266,12 +276,9 @@ process.patElectrons.electronIDSources = cms.PSet(
 
 process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 
-
-
-#process.patElectrons.useParticleFlow=True
-
 process.pfIsolatedElectrons.isolationCut = 0.5 ### TBC
 
+#https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#Recommended_electron_vetoes_Upda
 process.load("RecoParticleFlow.PFProducer.electronPFIsolationValues_cff")
 process.elPFIsoValueCharged03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.015)')
 process.elPFIsoValueChargedAll03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.015)')
@@ -326,7 +333,7 @@ process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs
 process.allElectrons.src = "patElectronsWithTrigger"
 
 
-if MC:
+if isMC:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
                                                   'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
@@ -405,11 +412,11 @@ process.patMuons.pfMuonSource = cms.InputTag("pfIsolatedMuons")
 process.patMuons.useParticleFlow=True
 
 ### embedding objects
-#process.patMuons.embedCombinedMuon = cms.bool(True)
-#process.patMuons.embedStandAloneMuon = cms.bool(False)
-#process.patMuons.embedPickyMuon = cms.bool(False)
-#process.patMuons.embedTpfmsMuon = cms.bool(False)
-#process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
+process.patMuons.embedCombinedMuon = cms.bool(True)
+process.patMuons.embedStandAloneMuon = cms.bool(False)
+process.patMuons.embedPickyMuon = cms.bool(False)
+process.patMuons.embedTpfmsMuon = cms.bool(False)
+process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
 
 ###########################
 #### MUON Isolation #######
@@ -470,7 +477,7 @@ process.tightMuons = selectedPatMuons.clone(
    cut = cms.string('isGlobalMuon & isTrackerMuon &'
                     'isPFMuon &'
                     'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &'
-                    #'abs(innerTrack.dxy(vertex.position()))>0.5 &'
+                    #fabs(recoMu.innerTrack()->dz(vertex->position())) < 0.5  # to be applied offline ?
                     'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation
                     'abs(dB) < 0.02 &' 
                     'normChi2 < 10 &'
@@ -492,21 +499,21 @@ process.matchedMuons = process.tightMuons.clone(
 
 process.zmuAllmuAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('allMuons@+ allMuons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('Zmuallmuall'),
                                   roles = cms.vstring('all1', 'all2')
                                   )
 
 process.zmuTightmuTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('tightMuons@+ tightMuons@-'),
-                                  cut   = cms.string('mass > 12.0'),
+                                  cut   = cms.string('mass > 50.0'),
                                   name  = cms.string('Zmutightmutight'),
                                   roles = cms.vstring('tight1', 'tight2')
                                   )
 
 process.zmuMatchedmuMatched = cms.EDProducer('CandViewShallowCloneCombiner',
                                   decay = cms.string('matchedMuons@+ matchedMuons@-'),
-                                  cut   = cms.string('mass >12.0'),
+                                  cut   = cms.string('mass >50.0'),
                                   name  = cms.string('Zmumatchedmumatched'),
                                   roles = cms.vstring('matched1', 'matched2')
                                   )
@@ -523,8 +530,11 @@ process.zmuMatchedTrigmuMatchedTrig = cms.EDProducer('CandViewShallowCloneCombin
 #### JETS #######################################
 #################################################
 
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.ak5PFJets.doAreaFastjet = True
+
 inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual'])
-if MC:
+if isMC:
      inputJetCorrLabel = ('AK5PF',['L1FastJet', 'L2Relative', 'L3Absolute'])
 
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
@@ -537,6 +547,22 @@ switchJetCollection(process,cms.InputTag('ak5PFJets'),
                     jetIdLabel   = "ak5"
                     )
 
+# official PU JetID sequence (approved on 28.05.2012)
+process.puJetId.rho  = cms.InputTag("kt6PFJets:rho")
+process.puJetId.jets = cms.InputTag("patJets")
+process.puJetMva.rho = cms.InputTag("kt6PFJets:rho")
+process.puJetMva.jets = cms.InputTag("patJets")
+
+# beta and beta*, added as UserFloats (private definition, just in case)
+# that producer also puts the official values as userFloats
+process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
+   src = cms.InputTag("patJets"),
+   primaryVertices = cms.InputTag("goodPV"),
+   puJetIdMVA = cms.InputTag("puJetMva","fullDiscriminant"),
+   puJetIdFlag = cms.InputTag("puJetMva","fullId"),
+   puJetIdentifier = cms.InputTag("puJetId"),
+)
+process.selectedPatJets.src      = cms.InputTag("patJetsWithBeta")
 process.selectedPatJets.cut      = 'pt > 15. & abs(eta) < 2.4 '
 process.patJets.addTagInfos = cms.bool( True )
 
@@ -623,6 +649,9 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #################################################
 ###### MET ######################################
 #################################################
+# standard (raw) MET
+from PhysicsTools.PatAlgos.tools.metTools import *
+addPfMET(process, 'PF')
 
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
@@ -633,8 +662,8 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
 )
 
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-if not MC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-# use for Spring'12 MC : is it needed for summer12 ?
+if not isMC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+# use for Spring'12 MC : means for summer12 ?
 else : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 
 process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
@@ -663,11 +692,12 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 
 process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
 process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
-#process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
+process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
 
 process.PFLeptons = cms.Sequence(
     process.TotalEventCounter*
-    process.goodPV*                                            ## Primary vertex
+    process.goodPV *
+    process.ak5PFJets *
     process.simpleEleIdSequence*
     process.pfNoPileUpSequence*
     process.pfParticleSelectionSequence*
@@ -678,18 +708,12 @@ process.PFLeptons = cms.Sequence(
     process.pfAllPhotons*
     process.pfMuonSequence* 
     process.pfElectronSequence*
-    #(process.kt4PFJets+process.kt6PFJets+process.ak5PFJets)*   ## reco jets
-    #process.kt6PFJetsForIsolation*                             ##
     (process.preMuonSequence * process.preElectronSequence)*
-    #process.patDefaultSequence*
     process.patPF2PATSequence *
     #process.type0PFMEtCorrection * #missing class, seems not yet tagged : edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Vertex>,std::vector<reco::Track>,float,unsigned int> > >
     process.pfType1CorrectedMet *
     process.pfMEtSysShiftCorrSequence * 
     process.pfType1p2CorrectedMet * #producePFMETCorrections *
-
-
-    #process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
     process.bjets*                                             ## our b jets
     process.CSVbjets*
     process.JPbjets* 
