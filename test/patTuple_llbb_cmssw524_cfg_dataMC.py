@@ -301,7 +301,7 @@ process.selectedElectronsWithIsolationData = cms.EDProducer(
 #################################
 ### ELECTRON trigger matching ###
 #################################
-#check trigger for 2012
+#check trigger for 2012 : still ok, used by H->ZZ->4l : https://twiki.cern.ch/twiki/bin/view/CMS/HZZTriggers2012
 pathTriggerEle ='path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")'
 
 process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
@@ -406,8 +406,9 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 #################################
 ### MUON Trigger matching #######
 #################################
-
-pathTriggerMu = 'path("HLT_Mu13_Mu8_v*",0,1) || path("HLT_Mu17_Mu8_v*",0,1) || path("HLT_Mu17_TkMu8_v*",0,1)'
+#https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT#2012_Runs
+#http://fwyzard.web.cern.ch/fwyzard/hlt/summary
+pathTriggerMu = 'path("HLT_Mu17_Mu8_v*",0,1)'# || path("HLT_Mu17_TkMu8_v*",0,1)'
 
 process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
                                                   src     = cms.InputTag( 'selectedPatMuons' ) ,
