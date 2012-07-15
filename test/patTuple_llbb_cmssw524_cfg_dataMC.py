@@ -39,7 +39,7 @@ process = cms.Process("ZplusJets")
 #electrons and muons abs(db)>0.2 or 0.02 ? twiki confusing
 #Jets : no changes
 #bjets : no changes, keep IVF infos ?
-#MET : easier to use, porblem for correction 0 due to missing class in the packages, should be fixed ; do we need add other MET ?
+#MET : no modifications, add examples from the twiki (possibility to create reco met with corection, but seems easier to do with pat), porblem for correction 0 due to missing class in the packages, should be fixed 
 #combined objects : no changes
 
 
@@ -110,6 +110,7 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       ### MET ---------------------------------------------------------------------------------
                                                                       'keep *_pat*METs*_*_*',
                                                                       'keep *_pf*CorrectedMet*_*_*',
+                                                                      'keep *_pat*CorrectedPFMet*_*_*',
                                                                       'drop *_selectedPatJetsForMETtype1p2Corr_*_*',
                                                                       # MC ------------------------------------------------------------------------------------
                                                                       'keep GenEventInfoProduct_generator_*_*',
@@ -179,7 +180,12 @@ process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff"
 process.load("JetMETCorrections.Configuration.JetCorrectionProducers_cff")
 ##-------------------- load the PU JetID sequence ------------------------
 process.load("CMGTools.External.pujetidsequence_cff")
-
+##-------------------- load MET sequences --------------------------------
+process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+##------------------------------------------------------------------------
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
 ###remove MC matching for DATA and use the good collection for muons for MC
@@ -649,26 +655,78 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #################################################
 ###### MET ######################################
 #################################################
+#addpkg JetMETCorrections/Type1MET V04-06-09
+#addpkg PhysicsTools/PatUtils V03-09-22
+#addpkg CommonTools/RecoUtils V00-00-09
+
+#from the twiki
+#if isMC : process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3")
+#else : process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
+
+#process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+#process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+#    cms.InputTag('pfMETcorrType0'), #to be fixed
+#    cms.InputTag('pfJetMETcorr', 'type1')        
+#)
+
+#if not isMC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+# use for Spring'12 MC : means for summer12 ?
+#else : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+
+#process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
+#    cms.InputTag('pfJetMETcorr', 'type1') ,
+    #cms.InputTag('pfMEtSysShiftCorr')       
+#)
+
+#from config file in 444
 # standard (raw) MET
 from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
 
-process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-#    cms.InputTag('pfMETcorrType0'), #to be fixed
-    cms.InputTag('pfJetMETcorr', 'type1')        
+process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
+process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
+process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
+process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
+
+# this is to add the various corrections to the MET that we use.
+process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
+   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
 )
 
-process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-if not isMC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-# use for Spring'12 MC : means for summer12 ?
-else : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+process.patType01CorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     #cms.InputTag('patPFMETtype0Corr'),               #type0
+   )
+)
 
-process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
-    cms.InputTag('pfJetMETcorr', 'type1') ,
-    #cms.InputTag('pfMEtSysShiftCorr')       
+process.patType1SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     cms.InputTag('pfMEtSysShiftCorr')                #sysShift
+   )
+)
+
+process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
+   srcType1Corrections = cms.VInputTag(
+     cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
+     #cms.InputTag('patPFMETtype0Corr'),               #type0
+     cms.InputTag('pfMEtSysShiftCorr')                #sysShift
+   )
+)
+
+# MET sequence
+process.producePatPFMETobjectWithCorrections = cms.Sequence(
+    process.patPFMet
+    #process.type0PFMEtCorrection
+    #* process.patPFMETtype0Corr
+    * process.pfMEtSysShiftCorrSequence
+    * process.selectedPatJetsForMETtype1p2Corr
+    * process.patPFJetMETtype1p2Corr
+    * process.patType1CorrectedPFMet
+    * process.patType01CorrectedPFMet
+    * process.patType1SCorrectedPFMet
+    * process.patType01SCorrectedPFMet
 )
 
 ######################
@@ -710,10 +768,12 @@ process.PFLeptons = cms.Sequence(
     process.pfElectronSequence*
     (process.preMuonSequence * process.preElectronSequence)*
     process.patPF2PATSequence *
+    # this is to add the various corrections to the MET that we use.
+    process.producePatPFMETobjectWithCorrections *
     #process.type0PFMEtCorrection * #missing class, seems not yet tagged : edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Vertex>,std::vector<reco::Track>,float,unsigned int> > >
-    process.pfType1CorrectedMet *
-    process.pfMEtSysShiftCorrSequence * 
-    process.pfType1p2CorrectedMet * #producePFMETCorrections *
+    #process.pfType1CorrectedMet *
+    #process.pfMEtSysShiftCorrSequence * 
+    #process.pfType1p2CorrectedMet * #producePFMETCorrections *
     process.bjets*                                             ## our b jets
     process.CSVbjets*
     process.JPbjets* 
