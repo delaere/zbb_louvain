@@ -13,9 +13,35 @@ import glob
 
 from optparse import OptionParser
 
-FarmDirectory = "FARM"
+FarmDirectory = "condorRDSmaker"
 
-processesToRun = ["Mu_DATA", "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC", "ZZ_Mu_MC", "ZZ_El_MC", "ZHbb_Mu_MC", "ZHbb_El_MC"]
+processesToRun = ["MuA_DATA"   ,
+                  "ElA_DATA"   ,
+                  "MuB_DATA"   ,
+                  "ElB_DATA"   ,
+                  "Mu_MC"      ,
+                  "El_MC"      ,
+                  "Zbb_Mu_MC"  ,
+                  "Zbb_El_MC"  ,
+                  "TT_Mu_MC"   ,
+                  "TT_El_MC"   ,
+                  "ZZ_Mu_MC"   ,
+                  "ZZ_El_MC"   ,
+                  "ZH115_Mu_MC",
+                  "ZH115_El_MC",
+                  "ZH120_Mu_MC",
+                  "ZH120_El_MC",
+                  "ZH125_Mu_MC",
+                  "ZH125_El_MC",
+                  "ZH130_Mu_MC",
+                  "ZH130_El_MC",
+                  "ZH135_Mu_MC",
+                  "ZH135_El_MC",
+                  "tW_Mu_MC"   ,
+                  "tW_El_MC"   ,
+                  "tbarW_Mu_MC",
+                  "tbarW_El_MC"
+                  ]
 
 
 print "I will run over ", len(processesToRun), "processes"
