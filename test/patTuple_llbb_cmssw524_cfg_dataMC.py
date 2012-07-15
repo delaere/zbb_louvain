@@ -151,6 +151,9 @@ process.load("CommonTools.ParticleFlow.pfMuons_cff")
 process.load("CommonTools.ParticleFlow.ParticleSelectors.pfSortByType_cff")
 process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 process.load("CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi")
+##-------------------- Working point and electron ID for 2011 ------------
+process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
+process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff") ##somthing to change ?
 ##-------------------- Import the JEC services ---------------------------
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
@@ -223,7 +226,7 @@ process.goodPV = cms.EDFilter(
     filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
     src=cms.InputTag('offlinePrimaryVertices')
     )
-
+#replace the PV sequence
 process.patPF2PATSequence = cms.Sequence( process.patDefaultSequence )
 adaptPVs(process, pvCollection="goodPV")
 
@@ -243,6 +246,26 @@ process.muIsoSequence = setupPFMuonIso(process, 'muons')
 ###########################
 #### ELECTRON selection ###
 ###########################
+#25 may 2012
+#addpkg  CommonTools/ParticleFlow V00-03-13  
+#addpkg  RecoParticleFlow/PFProducer V15-01-11 
+#cvs co -r V00-00-18 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+
+################################
+#### ELECTRON IDENTIFICATION ###
+################################
+
+#To change ? not clear
+process.patElectrons.addElectronID = cms.bool(True)
+process.patElectrons.electronIDSources = cms.PSet(
+    simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
+    simpleEleId85relIso= cms.InputTag("simpleEleId85relIso"),
+    simpleEleId80relIso= cms.InputTag("simpleEleId80relIso")
+    )
+
+process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
+
+
 
 #process.patElectrons.useParticleFlow=True
 
@@ -255,20 +278,34 @@ process.elPFIsoValuePU03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeV
 process.elPFIsoValueGamma03NoPFId.deposits[0].vetos =cms.vstring('EcalEndcaps:ConeVeto(0.08)')
 
 process.pfAllElectrons.src = "particleFlow" # default = pfNoMuons
-#process.pfAllElectrons.src = "pfNoPileUp"
 
-# pfIsolated electrons are input for PATelectron producer (when usePF==True)
-
+## Electrons with UserData ###############################
+process.selectedElectronsWithIsolationData = cms.EDProducer(
+   "ElectronIsolationEmbedder",
+   src = cms.InputTag("selectedPatElectrons"),
+   rho = cms.InputTag("kt6PFJets:rho"),
+   PFCandidateMap = cms.InputTag('particleFlow:electrons'),
+   gsfElectrons = cms.InputTag('gsfElectrons'),
+   conversions = cms.InputTag('allConversions'),
+   beamSpot = cms.InputTag('offlineBeamSpot'),
+   primaryVertex = cms.InputTag('offlinePrimaryVertices'),
+   IsoValElectronNoPF = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03NoPFIdPFIso'),
+                                      cms.InputTag('elPFIsoValueGamma03NoPFIdPFIso'),
+                                      cms.InputTag('elPFIsoValueNeutral03NoPFIdPFIso')),
+   IsoDepElectron = cms.VInputTag(cms.InputTag('elPFIsoDepositChargedPFIso'),
+                                  cms.InputTag('elPFIsoDepositGammaPFIso'),
+                                  cms.InputTag('elPFIsoDepositNeutralPFIso')),
+)
 
 
 #################################
 ### ELECTRON trigger matching ###
 #################################
-
+#check trigger for 2012
 pathTriggerEle ='path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")'
 
 process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
-                                             src     = cms.InputTag( "selectedPatElectrons" ),
+                                             src     = cms.InputTag( "selectedElectronsWithIsolationData" ),
                                              matched = cms.InputTag( "patTrigger"),
                                              matchedCuts = cms.string(pathTriggerEle),
                                              maxDPtRel = cms.double( 0.5 ),
@@ -278,78 +315,55 @@ process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
                                              )
 
 process.patElectronsWithTrigger = cms.EDProducer("PATTriggerMatchElectronEmbedder",
-                                                 src     = cms.InputTag("selectedPatElectrons"),
+                                                 src     = cms.InputTag("selectedElectronsWithIsolationData"),
                                                  matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'))
                                                  )
 
 switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' )
 
-#from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedElectrons_cfi import pfSelectedElectrons
-#process.selectedPatElectronsTriggerMatch.src = cms.InputTag( 'selectedPatElectrons' )
-#process.selectedPatElectronsTriggerMatch.matches = cms.VInputTag('eleTriggerMatchHLT')
-
-################################
-#### ELECTRON IDENTIFICATION ###
-################################
-
-## Working point and electron ID
-process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
-process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
-
-process.patElectrons.addElectronID = cms.bool(True)
-process.patElectrons.electronIDSources = cms.PSet(
-    simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
-    simpleEleId85relIso= cms.InputTag("simpleEleId85relIso"),
-    simpleEleId80relIso= cms.InputTag("simpleEleId80relIso")
-    )
-
-process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
-
-#process.load("RecoParticleFlow.PFProducer.electronPFIsolationValues_cff")
-## Electrons with UserData ###############################
-process.userDataSelectedElectrons = cms.EDProducer(
-       "Higgs2l2bElectronUserData",
-          src = cms.InputTag("patElectrons"),
-          rho = cms.InputTag("kt6PFJetsForIsolation:rho"),
-          #Electrons = cms.InputTag("gsfElectrons"),
-          PFCandidateMap = cms.InputTag('particleFlow:electrons'),
-
-          ## NOT yet backported in 44X and 42X
-          IsoValElectronNoPF = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03NoPFIdPFIso'),
-                                             cms.InputTag('elPFIsoValueGamma03NoPFIdPFIso'),
-                                             cms.InputTag('elPFIsoValueNeutral03NoPFIdPFIso')),
-          IsoDepElectron = cms.VInputTag(cms.InputTag('elPFIsoDepositChargedPFIso'),
-                                         cms.InputTag('elPFIsoDepositGammaPFIso'),
-                                         cms.InputTag('elPFIsoDepositNeutralPFIso')),
-       )
-
-process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 10 && abs(eta) < 2.5' ) 
+process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 20 && abs(eta) < 2.5' ) 
 process.allElectrons.src = "patElectronsWithTrigger"
 
 
-process.tightElectrons = process.selectedPatElectrons.clone( cut = 
-                                                  'electronID("simpleEleId80relIso") == 5 &' ## passing conversion rejection and ID
-                                                  'userFloat("PFIsoPUCorrected") < 0.15 &'           
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
+if MC:
+  process.tightElectrons = process.selectedPatElectrons.clone( cut = 
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
-                                                  'pt>10 &'
+                                                  'pt>20 &'
                                                   'abs(eta) < 2.5'
                                                   )
-process.tightElectrons.src = "patElectronsWithTrigger"
-
-process.matchedElectrons = process.tightElectrons.clone()
-
-process.matchedElectronsTrig = process.cleanPatElectrons.clone( preselection =
-                                                   'electronID("simpleEleId80relIso") == 5 &'
-                                                   'userFloat("PFIsoPUCorrected") < 0.15 &'         
-                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &'
-                                                   'abs(dB) < 0.02 & '
-                                                   'pt>10 &'
-                                                   'abs(eta) < 2.5 &'
-                                                   'triggerObjectMatches.size > 0'                           
-
+  process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5 &'
+                                                  'triggerObjectMatches.size > 0' # trigger match           
+                                                  )
+else:
+  process.tightElectrons = process.selectedPatElectrons.clone( cut = 
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5'
+                                                  )
+  process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
+                                                  'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
+                                                  'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
+                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
+                                                  'abs(dB) < 0.02 &'
+                                                  'pt>20 &'
+                                                  'abs(eta) < 2.5 &'
+                                                  'triggerObjectMatches.size > 0' # trigger match
                                                    )
-process.matchedElectronsTrig.src = "patElectronsWithTrigger"
+
+process.tightElectrons.src = "patElectronsWithTrigger"
+process.matchedElectrons.src = "patElectronsWithTrigger"
 
 #################################
 ### Z electron candidates #######
@@ -376,14 +390,6 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
                                name = cms.string('zelmatchedelmatched'), 
                                roles = cms.vstring('matched1', 'matched2')
                               )
-
-process.zelMatchedTrigelMatchedTrig = cms.EDProducer("CandViewShallowCloneCombiner",
-                               decay = cms.string("matchedElectronsTrig@+ matchedElectronsTrig@-"),
-                               cut = cms.string("mass > 50.0"),
-                               name = cms.string('zelmatchedtrigelmatchedtrig'), 
-                               roles = cms.vstring('matchedtrig1', 'matchedtrig2')
-                              )
-
 
 ###########################
 #### MUON selection #######
@@ -431,11 +437,6 @@ process.selectedPatMuonsTriggerMatch.matches = cms.VInputTag('muonTriggerMatchHL
 #the selectedMuons are created with the trigger matched muons as input collection.
 
 # Muons with UserData ###############################
-#process.userDataSelectedMuons = cms.EDProducer(
-#       "Higgs2l2bMuonUserData",
-#          src = cms.InputTag("selectedPatMuons"),
-#          rho = cms.InputTag("kt6PFJetsForIsolation:rho")
-#       )
 ###################################################
 
 process.allMuons = selectedPatMuons.clone(
@@ -649,12 +650,14 @@ process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
 process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
 process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-#    cms.InputTag('pfMETcorrType0'),
+#    cms.InputTag('pfMETcorrType0'), #to be fixed
     cms.InputTag('pfJetMETcorr', 'type1')        
 )
 
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 if not MC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+# use for Spring'12 MC : is it needed for summer12 ?
+else : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 
 process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
     cms.InputTag('pfJetMETcorr', 'type1') ,
@@ -675,86 +678,62 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
                                  minNumber = cms.uint32(1),
                                  )
 
+
 ######################
 ##    SEQUENCES     ##
 ######################
-process.PFLepton = cms.Sequence(
-    process.goodPV *
-    process.TotalEventCounter *
-        
-    #process.kt6PFJetsForIsolation+
-    #process.kt6PFJets+
-    process.ak5PFJets *
 
-    process.simpleEleIdSequence *
+#process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
+process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
+#process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
 
-    ##to create the collection pfNoPileUp
-    process.pfNoPileUpSequence *
-    ## to create the isoVariables with pfNoPileUp
-    ##and the values in the cfg
-    
-    process.pfParticleSelectionSequence+ 
-    process.eleIsoSequence + ### check if they are alrady in the PAT default sequence
-    process.muIsoSequence +
-    #process.electronPFIsolationValuesSequence+
-    
-    process.pfAllNeutralHadrons+
-    process.pfAllChargedHadrons+
-    process.pfAllPhotons+
- 
-    process.pfMuonSequence+ 
-    process.pfElectronSequence+
- 
-    (process.preMuonSequence + process.preElectronSequence)+
-
+process.PFLeptons = cms.Sequence(
+    process.TotalEventCounter*
+    process.goodPV*                                            ## Primary vertex
+    process.simpleEleIdSequence*
+    process.pfNoPileUpSequence*
+    process.pfParticleSelectionSequence*
+    process.eleIsoSequence*
+    process.muIsoSequence*
+    process.pfAllNeutralHadrons*
+    process.pfAllChargedHadrons*
+    process.pfAllPhotons*
+    process.pfMuonSequence* 
+    process.pfElectronSequence*
+    #(process.kt4PFJets+process.kt6PFJets+process.ak5PFJets)*   ## reco jets
+    #process.kt6PFJetsForIsolation*                             ##
+    (process.preMuonSequence * process.preElectronSequence)*
     #process.patDefaultSequence*
     process.patPF2PATSequence *
-
     #process.type0PFMEtCorrection * #missing class, seems not yet tagged : edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Vertex>,std::vector<reco::Track>,float,unsigned int> > >
     process.pfType1CorrectedMet *
     process.pfMEtSysShiftCorrSequence * 
     process.pfType1p2CorrectedMet * #producePFMETCorrections *
 
 
-    #process.userDataSelectedMuons+
-    #process.userDataSelectedElectrons+
-        
-    ###### electron candidates #####
-    process.eleTriggerMatchHLT+
-    process.patElectronsWithTrigger+
- 
-    (process.allElectrons +
-     process.tightElectrons +
-     process.matchedElectrons +
-     process.matchedElectronsTrig )+
-    
-    ###### muon candidates #####
-    process.muonTriggerMatchHLTMuons+
-    process.selectedPatMuonsTriggerMatch+
-  
-    (process.allMuons+
-     process.tightMuons+
-     process.matchedMuons+
-     process.matchedMuonsTrig)+
-
-    #### Z candidates ##########
-
-    (process.zelAllelAll+
-     process.zelTightelTight+
-     process.zelMatchedelMatched +
-     process.zelMatchedTrigelMatchedTrig)+
-
-    (process.zmuAllmuAll+
-     process.zmuTightmuTight+
-     process.zmuMatchedmuMatched+
-     process.zmuMatchedTrigmuMatchedTrig)+
-
-    process.bjets
+    #process.producePatPFMETobjectWithCorrections*              ## MET with various corrections
+    process.bjets*                                             ## our b jets
+    process.CSVbjets*
+    process.JPbjets* 
+    process.patElectronsWithTrigger *                          ## Include trigger matching
+    process.allElectrons*                                      ## our final electron collection: all electrons
+    process.tightElectrons*                                    ## our final electron collection: tight electrons
+    process.matchedElectrons*                                  ## our final electron collection: matched electrons
+    process.allMuons*                                          ## our final muon collection: all muons
+    process.tightMuons*                                        ## our final muon collection: tight muons
+    process.matchedMuons*                                      ## our final muon collection: matched muons
+    (process.zelAllelAll+                                      ## the Z candidates
+     process.zelTightelTight+                                  ##
+     process.zelMatchedelMatched+                              ##
+     process.zmuAllmuAll+                                      ##
+     process.zmuTightmuTight+                                  ##
+     process.zmuMatchedmuMatched)*                             ##
+    process.offlinePrimaryVertexFromZ*                         ## Offline PV from Z for Torino's analysis
+    (process.zmmj+process.zeej+process.zmmb+process.zeeb)      ## the Z+j and Z+b candidates
     )
 
-process.p1 = cms.Path(process.PFLepton*process.ZMMFilter)
-process.p2 = cms.Path(process.PFLepton*process.ZEEFilter)
-    
+process.p1 = cms.Path(process.PFLeptons*process.ZMMFilter)
+process.p2 = cms.Path(process.PFLeptons*process.ZEEFilter)
 
 #####################
 ###  OUTPATH    #####
