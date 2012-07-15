@@ -40,6 +40,7 @@ from optparse import OptionParser
 ###############
 ##  USAGE #####
 ################
+
 narguments = len(sys.argv)
 if narguments != 2:
   print "Usage: python ", sys.argv[0], " process"
@@ -74,29 +75,62 @@ btagPerfData=zbbfile.ssvperfData
 ### Maps ###
 ############
 
-muChannel = { "Mu_DATA"     : True,
-              "El_DATA"     : False,
-              "Mu_MC"       : True,
-              "El_MC"       : False,
-              "Ttbar_Mu_MC" : True,
-              "Ttbar_El_MC" : False,
-              "ZZ_Mu_MC"    : True,
-              "ZZ_El_MC"    : False,
-              "ZHbb_Mu_MC"  : True,
-              "ZHbb_El_MC"  : False
+muChannel = { "MuA_DATA"     : True ,
+              "ElA_DATA"     : False,
+              "MuB_DATA"     : True ,
+              "ElB_DATA"     : False,
+              "Mu_MC"        : True ,
+              "El_MC"        : False,
+              "Zbb_Mu_MC"    : True ,
+              "Zbb_El_MC"    : False,
+              "TT_Mu_MC"     : True ,
+              "TT_El_MC"     : False,
+              "ZZ_Mu_MC"     : True ,
+              "ZZ_El_MC"     : False,
+              "ZH115_Mu_MC"  : True ,
+              "ZH115_El_MC"  : False,
+              "ZH120_Mu_MC"  : True ,
+              "ZH120_El_MC"  : False,
+              "ZH125_Mu_MC"  : True ,
+              "ZH125_El_MC"  : False,
+              "ZH130_Mu_MC"  : True ,
+              "ZH130_El_MC"  : False,
+              "ZH135_Mu_MC"  : True ,
+              "ZH135_El_MC"  : False,
+              "tW_Mu_MC"     : True ,
+              "tW_El_MC"     : False,
+              "tbarW_Mu_MC"  : True ,
+              "tbarW_El_MC"  : False
               }
 
-path = { "Mu_DATA"     : "/home/fynu/vizangarciaj/scratch/productionJune2012_444/Skims/Mu_Data/" ,
-         "El_DATA"     : "/home/fynu/vizangarciaj/scratch/productionJune2012_444/Skims/El_Data/" ,
-         "Ttbar_Mu_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_TTbar_v3/"   ,
-         "Ttbar_El_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_TTbar_v3/"   ,
-         "Mu_MC"       : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_DYjets_v4/"   ,
-         "El_MC"       : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_DYjets_v4/"   ,
-         "ZZ_Mu_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZZ_v2//"   ,
-         "ZZ_El_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZZ_v2/"   ,
-         "ZHbb_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZHbb_125/"   , 
-         "ZHbb_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/Skims/Fall11_ZHbb_125/"   ,
-         }
+path = { 
+  "MuA_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Mu_DataA/" ,
+  "ElA_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/El_DataA/" ,
+  "MuB_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Mu_DataB/" ,
+  "ElB_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/El_DataB/" ,
+  "Mu_MC"        : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/DY_MC/"    ,
+  "El_MC"        : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/DY_MC/"    ,
+  "Zbb_Mu_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/"   ,
+  "Zbb_El_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/"   ,
+  "TT_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/TT_MC/"    ,
+  "TT_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZZ_MC/"    ,
+  "ZH115_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH135_MC/" ,
+  "tW_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
+  "tW_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
+  "tbarW_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
+  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_M/"             
+  }
 
 ###############################
 ### Proxy for eventCategory ###
@@ -148,17 +182,33 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
 ############################################
 
 checkTrigger = {
-              "Mu_DATA"     : True,
-              "El_DATA"     : True,
-              "Mu_MC"       : False,
-              "El_MC"       : False,
-              "Ttbar_Mu_MC" : False,
-              "Ttbar_El_MC" : False,
-              "ZZ_Mu_MC"    : False,
-              "ZZ_El_MC"    : False,
-              "ZHbb_Mu_MC"  : False,
-              "ZHbb_El_MC"  : False
-              }
+  "MuA_DATA"     : True ,
+  "ElA_DATA"     : True ,
+  "MuB_DATA"     : True ,
+  "ElB_DATA"     : True ,
+  "Mu_MC"        : False,
+  "El_MC"        : False,
+  "Zbb_Mu_MC"    : False,
+  "Zbb_El_MC"    : False,
+  "TT_Mu_MC"     : False,
+  "TT_El_MC"     : False,
+  "ZZ_Mu_MC"     : False,
+  "ZZ_El_MC"     : False,
+  "ZH115_Mu_MC"  : False,
+  "ZH115_El_MC"  : False,
+  "ZH120_Mu_MC"  : False,
+  "ZH120_El_MC"  : False,
+  "ZH125_Mu_MC"  : False,
+  "ZH125_El_MC"  : False,
+  "ZH130_Mu_MC"  : False,
+  "ZH130_El_MC"  : False,
+  "ZH135_Mu_MC"  : False,
+  "ZH135_El_MC"  : False,
+  "tW_Mu_MC"     : False,
+  "tW_El_MC"     : False,
+  "tbarW_Mu_MC"  : False,
+  "tbarW_El_MC"  : False
+  }
 
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
@@ -223,7 +273,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     
     for event in events:
       #if i > 40: break;
-      if i%5000==1 :
+      if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo="SSV")
