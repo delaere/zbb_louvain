@@ -167,6 +167,7 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 print "remove matching"
 MC = True
 if not MC : removeMCMatching(process, ['All'])
+else : process.muonMatch.src = "pfIsolatedMuons"
 
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
                                      makeTriggerResults=cms.untracked.bool(False),
@@ -395,19 +396,45 @@ process.zelMatchedelMatched = cms.EDProducer("CandViewShallowCloneCombiner",
 #### MUON selection #######
 ###########################
 
-
 #Use PF for PAT muons. Then one can run the patDefaultSequence after the pfNoPU stuff.
 #The patDefaultSequence takes the pfIsolatedMuons as default input collection. To change the input collection one can use:
 #process.patMuons.pfMuonSource = cms.InputTag("pfMuons")  
 #Then one can use the selectedPatMuons as collection and it will have the trigger matching embedded and it can also be used to build the Z candidate. 
 
-#process.patMuons.useParticleFlow=True
+process.patMuons.pfMuonSource = cms.InputTag("pfIsolatedMuons")
+process.patMuons.useParticleFlow=True
+
+### embedding objects
+#process.patMuons.embedCombinedMuon = cms.bool(True)
+#process.patMuons.embedStandAloneMuon = cms.bool(False)
+#process.patMuons.embedPickyMuon = cms.bool(False)
+#process.patMuons.embedTpfmsMuon = cms.bool(False)
+#process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
+
+###########################
+#### MUON Isolation #######
+###########################
+
+### Muons with isolation data embedded
+process.selectedMuonsWithIsolationData = cms.EDProducer(
+   "MuonIsolationEmbedder",
+   src = cms.InputTag("selectedPatMuons"),
+   rho = cms.InputTag("kt6PFJets:rho")
+)
+
+#add muon cuts
+#check here for values: CommonTools/ParticleFlow/python/Isolation/pfIsolatedMuons_cfi.py
+#check here for values of the isolation deposits:  RecoMuon/MuonIsolation/python/muonPFIsolationValues_cff.py
+# DEFAULT ones are: muPFIsoValueCharged04/muPFIsoValueNeutral04/muPFIsoValueGamma04...
+
+process.pfIsolatedMuons.isolationCut = 0.5
 
 #################################
 ### MUON Trigger matching #######
 #################################
 #https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT#2012_Runs
 #http://fwyzard.web.cern.ch/fwyzard/hlt/summary
+#In 2012A introduced a dz cut in double muon triggers; was removed in 2012B (except for Mu17_TkMu8, where it was fixed)
 pathTriggerMu = 'path("HLT_Mu17_Mu8_v*",0,1)'# || path("HLT_Mu17_TkMu8_v*",0,1)'
 
 process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
@@ -421,93 +448,43 @@ process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
                                                   )
 
 switchOnTriggerMatchEmbedding(process ,triggerMatchers = ['muonTriggerMatchHLTMuons'],)
-removeCleaningFromTriggerMatching(process)
 
 #Switch to selected PAT objects in the trigger matching removeCleaningFromTriggerMatching( process )
 #match the trigger object to the reconstructed muon (no cuts on id iso...) 
-from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons
-
-#process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'selectedPatMuons' )
-#process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'pfSelectedMuons' ) 
-#process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'pfSelectedMuons' )
-
-from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *
-process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'selectedPatMuons' )
+from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons 
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *                       
+process.muonTriggerMatchHLTMuons.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
+process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
 process.selectedPatMuonsTriggerMatch.matches = cms.VInputTag('muonTriggerMatchHLTMuons')
 
-#the selectedMuons are created with the trigger matched muons as input collection.
-
-# Muons with UserData ###############################
-###################################################
+removeCleaningFromTriggerMatching(process)
 
 process.allMuons = selectedPatMuons.clone(
     src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-    cut = cms.string("pt>10  & abs(eta) < 2.4")    
+    cut = cms.string("pt>20  & abs(eta) < 2.4")    
     )
+
 
 process.tightMuons = selectedPatMuons.clone(
    src = cms.InputTag('selectedPatMuonsTriggerMatch'),
    cut = cms.string('isGlobalMuon & isTrackerMuon &'
-                    'innerTrack.hitPattern.trackerLayersWithMeasurement()>8 &'  ## new requirement in 44X due to changes in tracking
-                    'userFloat("RelativePFIsolationRhoCorr") < 0.2 &' # PF isolation
-                    #'innerTrack.numberOfValidHits > 10 &'  
+                    'isPFMuon &'
+                    'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &'
+                    #'abs(innerTrack.dxy(vertex.position()))>0.5 &'
+                    'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation
                     'abs(dB) < 0.02 &' 
                     'normChi2 < 10 &'
                     'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                    'numberOfMatches>1 &'                                 
+                    'numberOfMatchedStations>1 &'                                 
                     'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'
-                    'pt>10 &'
+                    'pt>20 &'
                     'abs(eta) < 2.4')
    )
 
-process.matchedMuons = process.tightMuons.clone()
-
-process.matchedMuonsTrig = selectedPatMuons.clone(
+process.matchedMuons = process.tightMuons.clone(
     src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-    cut = cms.string('isGlobalMuon & isTrackerMuon &'
-                     'innerTrack.hitPattern.trackerLayersWithMeasurement()>8 &'  ## new requirement in 44X due to changes in tracking
-                     'userFloat("RelativePFIsolationRhoCorr") < 0.2 &' # PF isolation
-                     #'innerTrack.numberOfValidHits > 10 &'    
-                     'abs(dB) < 0.02 &' 
-                     'normChi2 < 10 &'
-                     'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                     'numberOfMatches>1 &'                                   # segments matched in at least two muon stations 
-                     'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
-                     'pt>10 &'
-                     'abs(eta) < 2.4 &'
-                     #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
-                     #' trackIso < 3 &'                                      # VBTF choice
-                     'triggerObjectMatches.size > 0')
+    cut = cms.string('triggerObjectMatches.size > 0')
     )
-
-
-#add muon cuts
-#check here for values: CommonTools/ParticleFlow/python/Isolation/pfIsolatedMuons_cfi.py
-#check here for values of the isolation deposits:  RecoMuon/MuonIsolation/python/muonPFIsolationValues_cff.py
-# DEFAULT ones are: muPFIsoValueCharged04/muPFIsoValueNeutral04/muPFIsoValueGamma04...
-
-process.pfIsolatedMuons.isolationCut = 0.2
-
-#embedding objects
-process.patMuons.embedCombinedMuon = cms.bool(True)
-process.patMuons.embedStandAloneMuon = cms.bool(False)
-process.patMuons.embedPickyMuon = cms.bool(False)
-process.patMuons.embedTpfmsMuon = cms.bool(False)
-process.patMuons.embedPFCandidate = cms.bool(True)  # embedding of track info process.patMuons.embedTrack = cms.bool(True)
-
-
-#build the Z candidates taking 2 muons with opposite charge and a loose pT, eta cut (pfSelectedMuons).
-#from CommonTools.ParticleFlow.ParticleSelectors.pfSelectedMuons_cfi import pfSelectedMuons
-#process.selectedMuons = pfSelectedMuons.clone()
-#process.selectedMuons.src = cms.InputTag("pfSelectedMuons")
-#process.selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
-
-#uncomment to select the two mouns with highest pT
-## process.selectedMuonsForZ = cms.EDFilter("LargestPtCandViewSelector",
-##                                          src = cms.InputTag("selectedMuonsAll"),
-##                                          maxNumber = cms.uint32(2)
-##                                          )
-
 
 #################################
 ### Z muon candidates ###########
@@ -684,7 +661,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##    SEQUENCES     ##
 ######################
 
-#process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
+process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
 process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
 #process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
 
