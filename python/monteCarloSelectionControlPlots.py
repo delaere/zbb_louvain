@@ -64,18 +64,9 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result = { }
       event.getByLabel (self.genlabel,self.genHandle)
       particles = self.genHandle.product()
-      self.i += 1
-      if isZbEvent(particles,0,False):
-        self.bjet += 1
-        result["eventType"] = 3
-      if isZcEvent(particles,0,False):
-        self.cjet += 1
-        result["eventType"] = 2
-      if isZlEvent(particles,0,False):
-        self.ljet += 1
-        result["eventType"] = 1
-      result["eventType"] = 0
 
+     
+      #Fill some gen information for the status 3 leptons and b, and bbar quarks
       nLepPos = 0
       nLepNeg = 0
       nBottom = 0
@@ -171,7 +162,26 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result["AntibottomPz"] = antibottomPz
       result["AntibottomEn"] = antibottomEn
       
+
+
+      #Clasify the event in Zb, Zcc, or Zl
+
+      self.i += 1
+      if isZbEvent(particles,0,False):
+        self.bjet += 1
+        result["eventType"] = 3
+        return result
+      if isZcEvent(particles,0,False):
+        self.cjet += 1
+        result["eventType"] = 2
+        return result
+      if isZlEvent(particles,0,False):
+        self.ljet += 1
+        result["eventType"] = 1
+        return result
+      result["eventType"] = 0
       return result
+
 
     def endJob(self):
       BaseControlPlots.endJob(self)
