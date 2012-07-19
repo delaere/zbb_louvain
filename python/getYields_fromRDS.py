@@ -16,7 +16,7 @@ from zbbCommons import zbbnorm
 #####################################################
 
 WP       = "9"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
-channel  = "El"    #"El","Mu"
+channel  = "Mu"    #"El","Mu"
 extraCut = ""#jetmetbjet1pt>25.&jetmetbjet2pt>25.&jetmetMET<50."
 
 totalCutString = ""+extraCut
@@ -28,6 +28,7 @@ totalCutString = ""+extraCut
 MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
 totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
+sampleList  = ["DATA","DY","TT","ZZ","ZH125"]
 
 
 lumi = { "DATA"   : zbbnorm.lumi_tot2011,
@@ -51,87 +52,79 @@ for sample in MCsampleList:
 ### files ###
 #############
 
-myRDS_el    = {}
-myRDS_mu    = {}
 myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {} 
 
 
-filename_el = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElA_DATA.root",
-               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElB_DATA.root",
-               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_El_MC.root",
-               "Zb"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
-               "Zc"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
-               "Zl"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
-               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_El_MC.root",
-               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_El_MC.root"
-               } 
+###########################################
+##########INPUT FILES SELECTED HERE#######
+###########################################
+if channel  == "El" :
+  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElA_DATA.root",
+                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElB_DATA.root",
+                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_El_MC.root",
+                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_El_MC.root",
+                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_El_MC.root",
+                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_El_MC.root"
+                 }
+		 
+elif channel == "Mu" :
+  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuA_DATA.root",
+                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuB_DATA.root",
+                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_Mu_MC.root",
+                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_Mu_MC.root",
+                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_Mu_MC.root",
+                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_Mu_MC.root"
+                 }
+else :
+  print "Invalid channel name = ", channel, ". Exitting!"
+  exit()
 
-filename_mu = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuA_DATA.root",
-               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuB_DATA.root",
-               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_Mu_MC.root",
-               "Zb"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
-               "Zc"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
-               "Zl"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
-               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_Mu_MC.root",
-               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_Mu_MC.root"
-               }
 
-for sample in totsampleList :
+for sample in sampleList :
 
     redStage = "rc_eventSelection_"+WP+"==1"
 
     if sample != "DATA":
-        if   sample == "Zb" : redStage += "&mcSelectioneventType==3"
-        elif sample == "Zc" : redStage += "&mcSelectioneventType==2"
-        elif sample == "Zl" : redStage += "&mcSelectioneventType==1"
-
-        file_el  = TFile(filename_el[sample])
-        file_mu  = TFile(filename_mu[sample])
         
-        nEntries_el = file_el.Get("rds_zbb").numEntries()
-        nEntries_mu = file_mu.Get("rds_zbb").numEntries()
-
-        myRDS_el[sample] = file_el.Get("rds_zbb").reduce(redStage)
-        myRDS_mu[sample] = file_mu.Get("rds_zbb").reduce(redStage)
-
-        print "myRDS_el.numEntries() for ", sample , " = ", nEntries_el, ". After stage ", WP, " : ", myRDS_el[sample].numEntries()
-        print "myRDS_mu.numEntries() for ", sample , " = ", nEntries_mu, ". After stage ", WP, " : ", myRDS_mu[sample].numEntries()
+        file_mc  = TFile(filename[sample])
         
-        file_el.Close()
-        file_mu.Close()
+        nEntries = file_mc.Get("rds_zbb").numEntries()
+
+        if   sample == "DY" :
+          myRDS["Zb"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==3")
+          myRDS["Zc"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==2")
+          myRDS["Zl"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==1")
+          print "myRDS.numEntries() for ", "Zb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS["Zb"].numEntries()
+          print "myRDS.numEntries() for ", "Zc" , " = ", nEntries, ". After stage ", WP, " : ", myRDS["Zc"].numEntries()
+          print "myRDS.numEntries() for ", "Zl" , " = ", nEntries, ". After stage ", WP, " : ", myRDS["Zl"].numEntries()
+        else :
+	  myRDS[sample] = file_mc.Get("rds_zbb").reduce(redStage)
+          print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[sample].numEntries()
+        
+        file_mc.Close()
 
     else :
-        file_elA  = TFile(filename_el["DATA_A"])
-        file_elB  = TFile(filename_el["DATA_B"])
-        file_muA  = TFile(filename_mu["DATA_A"])
-        file_muB  = TFile(filename_mu["DATA_B"])
+        file_A  = TFile(filename["DATA_A"])
+        file_B  = TFile(filename["DATA_B"])
 
-        nEntries_el = file_elA.Get("rds_zbb").numEntries()+file_elB.Get("rds_zbb").numEntries()
-        nEntries_mu = file_muA.Get("rds_zbb").numEntries()+file_muB.Get("rds_zbb").numEntries()
+        nEntries = file_A.Get("rds_zbb").numEntries()+file_B.Get("rds_zbb").numEntries()
 
-        myRDS_el[sample] = file_elA.Get("rds_zbb").reduce(redStage)
-        tmp = file_elB.Get("rds_zbb").reduce(redStage)
-        myRDS_el[sample].append(tmp)
+        myRDS[sample] = file_A.Get("rds_zbb").reduce(redStage)
+        tmp = file_B.Get("rds_zbb").reduce(redStage)
+        myRDS[sample].append(tmp)
 
-        myRDS_mu[sample] = file_muA.Get("rds_zbb").reduce(redStage)
-        tmp = file_muB.Get("rds_zbb").reduce(redStage)
-        myRDS_mu[sample].append(tmp)
+        print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[sample].numEntries()
 
-        print "myRDS_el.numEntries() for ", sample , " = ", nEntries_el, ". After stage ", WP, " : ", myRDS_el[sample].numEntries()
-        print "myRDS_mu.numEntries() for ", sample , " = ", nEntries_mu, ". After stage ", WP, " : ", myRDS_mu[sample].numEntries()
-
-        file_elA.Close()
-        file_elB.Close()
-        file_muA.Close()
-        file_muB.Close()
+        file_A.Close()
+        file_B.Close()
 
 ###############
 ### weights ###
 ###############
 
-ras_zbb = myRDS_el["Zb"].get()
+ras_zbb = myRDS["Zb"].get()
 
 rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHE"]  ,
            "6"  : ras_zbb["BtaggingReweightingHP"]  ,
@@ -165,8 +158,7 @@ muMassCut = "(eventSelectionbestzmassMu>76&eventSelectionbestzmassMu<106)"
 elMassCut = "(eventSelectionbestzmassEle>76&eventSelectionbestzmassEle<106)"
 
 for sample in totsampleList:
-    if   channel=="El" : myRDS_red[sample] = myRDS_el[sample].reduce("rc_eventSelection_"+WP+"==1")
-    elif channel=="Mu" : myRDS_red[sample] = myRDS_mu[sample].reduce("rc_eventSelection_"+WP+"==1")
+    myRDS_red[sample] = myRDS[sample].reduce("rc_eventSelection_"+WP+"==1")
 
     if extraCut : myRDS_red[sample] = myRDS_red[sample].reduce(extraCut)
 
@@ -260,7 +252,7 @@ min = {
     "eventSelectiondrZbj1"      :    0 ,
     "jetmetbjet1pt"             :    5 ,
     "jetmetbjet2pt"             :    5 ,   
-    "jetmetMET"                 :  200 , 
+    "jetmetMET"                 :    0 , 
     "eventSelectiondphiZbj1"    :    0 ,
     "eventSelectiondphiZbb"     :    0 ,
     "eventSelectiondrZbb"       :    0 ,
@@ -480,6 +472,10 @@ for name in namePlotList:
     var_frame[name].Draw()
     CANVAS[name].cd(2)
     th1["DATA"+name].Draw()                                      
+    #CANVAS[name].SaveAs(name+"_"+channel+".gif")
+    #CANVAS[name].SaveAs(name+"_"+channel+".eps")
+
+
     for sample in ("Zb","Zc","Zl","TT","ZZ"): th1[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
     #th1_copy["DATA"+name].Draw()                                      
     #for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormalized("same hist",num_MC[sample].getVal())
