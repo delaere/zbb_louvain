@@ -50,12 +50,6 @@ if narguments != 2:
   print "python ", sys.argv[0], " El_DATA"
   print "python ", sys.argv[0], " Mu_MC"
   print "python ", sys.argv[0], " El_MC"
-  print "python ", sys.argv[0], " Ttbar_Mu_MC"
-  print "python ", sys.argv[0], " Ttbar_El_MC"
-  print "python ", sys.argv[0], " ZZ_Mu_MC"
-  print "python ", sys.argv[0], " ZZ_El_MC"
-  print "python ", sys.argv[0], " ZHbb_Mu_MC"
-  print "python ", sys.argv[0], " ZHbb_El_MC"
   exit()
 
 ###################
@@ -129,7 +123,7 @@ path = {
   "tW_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
   "tW_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
   "tbarW_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
-  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_M/"             
+  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/"             
   }
 
 ###############################
@@ -322,13 +316,13 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    ws.writeToFile("File_rds_zbb_"+channel+".root") 
-    gDirectory.Add(ws)
+    #ws.writeToFile("File_rds_zbb_"+channel+".root") 
+    #gDirectory.Add(ws)
 
-    f=TFile("test.root","RECREATE")
-    rds_zbb.Write("test.root")
-    rds_zbb_tree = rds_zbb.tree()
-    rds_zbb_tree.Write("test.root")
+    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
+    rds_zbb.Write()
+    #rds_zbb_tree = rds_zbb.tree()
+    #rds_zbb_tree.Write("test.root")
     f.Close()
 
 print "Running processInputFile(", muChannel[channel], ", ", path[channel], ")"

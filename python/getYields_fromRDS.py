@@ -9,14 +9,15 @@
 #####################################################
 
 from ROOT import *
+from zbbCommons import zbbnorm
 
 #####################################################
 ### sample/wp/selection of interest
 #####################################################
 
 WP       = "9"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
-channel  = "Mu"    #"El","Mu"
-extraCut = "jetmetbjet1pt>25.&jetmetbjet2pt>25.&jetmetMET<50."
+channel  = "El"    #"El","Mu"
+extraCut = ""#jetmetbjet1pt>25.&jetmetbjet2pt>25.&jetmetMET<50."
 
 totalCutString = ""+extraCut
 
@@ -24,19 +25,20 @@ totalCutString = ""+extraCut
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["TT","Zb","Zc","Zl","ZZ","ZHbb"]
-SMMCsampleList = ["TT","Zb","Zc","Zl","ZZ"]
-totsampleList  = ["DATA","TT","Zb","Zc","Zl","ZZ","ZHbb"]
+MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]
+SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
+totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
 
 
-lumi = { "DATA" : 5.051                   ,
-         "TT"   : (3701947./157.5)/1000.  ,
-         "Zb"   : (35907791./3048.)/1000. ,
-         "Zc"   : (35907791./3048.)/1000. ,
-         "Zl"   : (35907791./3048.)/1000. ,
-         "ZZ"   : 4191045./6206.          ,
-         "ZHbb" : (1100000./18.)
+lumi = { "DATA"   : zbbnorm.lumi_tot2011,
+         "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
+         "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
+         "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
+         "Zl"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
+         "ZZ"     : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
+         "ZH125"  : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV/1000.
          }
+print lumi["DATA"]
 
 MCweight = {}
 
@@ -56,65 +58,101 @@ myRDS_red   = {}
 myRDS_red_w = {} 
 
 
-filename_el = {"DATA" : "File_rds_zbb_El_DATA.root",
-               "TT"  : "File_rds_zbb_Ttbar_El_MC.root",
-               "Zb"  : "File_rds_zbb_El_MC.root",
-               "Zc"  : "File_rds_zbb_El_MC.root",
-               "Zl"  : "File_rds_zbb_El_MC.root",
-               "ZZ"  : "File_rds_zbb_ZZ_El_MC.root",
-               "ZHbb": "File_rds_zbb_ZHbb_El_MC.root"
-               }
+filename_el = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElA_DATA.root",
+               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElB_DATA.root",
+               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_El_MC.root",
+               "Zb"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
+               "Zc"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
+               "Zl"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
+               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_El_MC.root",
+               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_El_MC.root"
+               } 
 
-filename_mu = {"DATA" : "File_rds_zbb_Mu_DATA.root",
-               "TT"  : "File_rds_zbb_Ttbar_Mu_MC.root",
-               "Zb"  : "File_rds_zbb_Mu_MC.root",
-               "Zc"  : "File_rds_zbb_Mu_MC.root",
-               "Zl"  : "File_rds_zbb_Mu_MC.root",
-               "ZZ"  : "File_rds_zbb_ZZ_Mu_MC.root",
-               "ZHbb": "File_rds_zbb_ZHbb_Mu_MC.root"
+filename_mu = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuA_DATA.root",
+               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuB_DATA.root",
+               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_Mu_MC.root",
+               "Zb"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
+               "Zc"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
+               "Zl"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
+               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_Mu_MC.root",
+               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_Mu_MC.root"
                }
 
 for sample in totsampleList :
 
-    file_el  = TFile(filename_el[sample])
-    file_mu  = TFile(filename_mu[sample])
+    redStage = "rc_eventSelection_"+WP+"==1"
 
-    ws_el    = file_el.Get("ws")
-    ws_mu    = file_mu.Get("ws")
+    if sample != "DATA":
+        if   sample == "Zb" : redStage += "&mcSelectioneventType==3"
+        elif sample == "Zc" : redStage += "&mcSelectioneventType==2"
+        elif sample == "Zl" : redStage += "&mcSelectioneventType==1"
 
-    myRDS_el[sample] = ws_el.data("rds_zbb")
-    myRDS_mu[sample] = ws_mu.data("rds_zbb")
+        file_el  = TFile(filename_el[sample])
+        file_mu  = TFile(filename_mu[sample])
+        
+        nEntries_el = file_el.Get("rds_zbb").numEntries()
+        nEntries_mu = file_mu.Get("rds_zbb").numEntries()
 
-    print "myRDS_el.numEntries() for ", sample , " = ", myRDS_el[sample].numEntries()
-    print "myRDS_mu.numEntries() for ", sample , " = ", myRDS_mu[sample].numEntries()
+        myRDS_el[sample] = file_el.Get("rds_zbb").reduce(redStage)
+        myRDS_mu[sample] = file_mu.Get("rds_zbb").reduce(redStage)
 
-    ws=ws_el
+        print "myRDS_el.numEntries() for ", sample , " = ", nEntries_el, ". After stage ", WP, " : ", myRDS_el[sample].numEntries()
+        print "myRDS_mu.numEntries() for ", sample , " = ", nEntries_mu, ". After stage ", WP, " : ", myRDS_mu[sample].numEntries()
+        
+        file_el.Close()
+        file_mu.Close()
+
+    else :
+        file_elA  = TFile(filename_el["DATA_A"])
+        file_elB  = TFile(filename_el["DATA_B"])
+        file_muA  = TFile(filename_mu["DATA_A"])
+        file_muB  = TFile(filename_mu["DATA_B"])
+
+        nEntries_el = file_elA.Get("rds_zbb").numEntries()+file_elB.Get("rds_zbb").numEntries()
+        nEntries_mu = file_muA.Get("rds_zbb").numEntries()+file_muB.Get("rds_zbb").numEntries()
+
+        myRDS_el[sample] = file_elA.Get("rds_zbb").reduce(redStage)
+        tmp = file_elB.Get("rds_zbb").reduce(redStage)
+        myRDS_el[sample].append(tmp)
+
+        myRDS_mu[sample] = file_muA.Get("rds_zbb").reduce(redStage)
+        tmp = file_muB.Get("rds_zbb").reduce(redStage)
+        myRDS_mu[sample].append(tmp)
+
+        print "myRDS_el.numEntries() for ", sample , " = ", nEntries_el, ". After stage ", WP, " : ", myRDS_el[sample].numEntries()
+        print "myRDS_mu.numEntries() for ", sample , " = ", nEntries_mu, ". After stage ", WP, " : ", myRDS_mu[sample].numEntries()
+
+        file_elA.Close()
+        file_elB.Close()
+        file_muA.Close()
+        file_muB.Close()
 
 ###############
 ### weights ###
 ###############
 
+ras_zbb = myRDS_el["Zb"].get()
 
-rrv_w_b = {"5"  : ws.var("BtaggingReweightingHE")  ,
-           "6"  : ws.var("BtaggingReweightingHP")  ,
-           "7"  : ws.var("BtaggingReweightingHE")  ,
-           "8"  : ws.var("BtaggingReweightingHP")  ,
-           "9"  : ws.var("BtaggingReweightingHEHE"), 
-           "10" : ws.var("BtaggingReweightingHEHP"),
-           "11" : ws.var("BtaggingReweightingHPHP"),
-           "12" : ws.var("BtaggingReweightingHEHE"),
-           "13" : ws.var("BtaggingReweightingHEHP"),
-           "14" : ws.var("BtaggingReweightingHPHP"),
-           "15" : ws.var("BtaggingReweightingHE")  ,
-           "16" : ws.var("BtaggingReweightingHP")  ,
-           "17" : ws.var("BtaggingReweightingHEHE"), 
-           "18" : ws.var("BtaggingReweightingHEHP"),
-           "19" : ws.var("BtaggingReweightingHPHP"),
+rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHE"]  ,
+           "6"  : ras_zbb["BtaggingReweightingHP"]  ,
+           "7"  : ras_zbb["BtaggingReweightingHE"]  ,
+           "8"  : ras_zbb["BtaggingReweightingHP"]  ,
+           "9"  : ras_zbb["BtaggingReweightingHEHE"], 
+           "10" : ras_zbb["BtaggingReweightingHEHP"],
+           "11" : ras_zbb["BtaggingReweightingHPHP"],
+           "12" : ras_zbb["BtaggingReweightingHEHE"],
+           "13" : ras_zbb["BtaggingReweightingHEHP"],
+           "14" : ras_zbb["BtaggingReweightingHPHP"],
+           "15" : ras_zbb["BtaggingReweightingHE"]  ,
+           "16" : ras_zbb["BtaggingReweightingHP"]  ,
+           "17" : ras_zbb["BtaggingReweightingHEHE"], 
+           "18" : ras_zbb["BtaggingReweightingHEHP"],
+           "19" : ras_zbb["BtaggingReweightingHPHP"],
            
            }
 
-rrv_w_lep  = ws.var("LeptonsReweightingweight")
-rrv_w_lumi = ws.var("lumiReweightingLumiWeight")
+rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
+rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
 
 
 w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
@@ -132,13 +170,6 @@ for sample in totsampleList:
 
     if extraCut : myRDS_red[sample] = myRDS_red[sample].reduce(extraCut)
 
-    if   sample == "Zb" : isZbcl = "mcSelectioneventType==3"
-    elif sample == "Zc" : isZbcl = "mcSelectioneventType==2"
-    elif sample == "Zl" : isZbcl = "mcSelectioneventType==1"
-    else                : isZbcl = ""
-    
-    if isZbcl : myRDS_red[sample] = myRDS_red[sample].reduce(isZbcl)
-
     if channel =="Mu" :
         myRDS_red[sample]=myRDS_red[sample].reduce(muMassCut)
         totalCutString+="&"+muMassCut
@@ -146,11 +177,11 @@ for sample in totsampleList:
         myRDS_red[sample]=myRDS_red[sample].reduce(elMassCut)
         totalCutString+="&"+elMassCut
 
-    if sample != "DATA": myRDS_red[sample].addColumn(w)
+    if sample != "DATA" : myRDS_red[sample].addColumn(w)
     #myRDS_red[sample].addColumn(w)
 
-    if sample != "DATA": myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
-    else               : myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get())
+    if sample != "DATA" : myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get(),"","w")
+    else : myRDS_red_w[sample] = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red[sample],myRDS_red[sample].get())
 
 #################
 ### printouts ###
@@ -311,7 +342,7 @@ binning = {
 var = {}
 for name in namePlotList:
     print "name = ", name
-    var[name] = ws.var(name)
+    var[name] = ras_zbb[name] #ws.var(name)
     var[name].setMin(min[name])
     var[name].setMax(max[name])
     var[name].setBins(binning[name])
@@ -432,10 +463,10 @@ for name in namePlotList:
                      RooFit.DrawOption("F"),
                      RooFit.LineWidth(1),
                      RooFit.Normalization(totalMConDATA))
-    rhp["ZHbb"].plotOn(var_frame[name],
+    rhp["ZH125"].plotOn(var_frame[name],
                        RooFit.LineColor(kRed),
                        RooFit.LineWidth(1),
-                       RooFit.Normalization(norm["ZHbb"]))
+                       RooFit.Normalization(norm["ZH125"]))
     myRDS_red_w["DATA"].plotOn(var_frame[name],
                                RooFit.MarkerSize(1.0),
                                RooFit.XErrorSize(0.035),
