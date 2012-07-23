@@ -21,74 +21,73 @@ class EColor:
  kAzure  = 860
  kViolet = 880
  kPink   = 900 
-
+ 
 palette=-7
 print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-        outputFile = cms.string('mergedPlots_ZlZcZb_5210pb_2011AB_V1.root'),
-        
+    outputFile = cms.string('mergedPlots_bsub_5210pb_2011AB_V1.root'),
+    
   data = cms.VPSet (
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Ele2011A/Ele2011A_finalSum.root')
-   ), 
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Ele2011B/Ele2011B_finalSum.root')
-   ), 
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011A/Mu2011A_finalSum.root') 
-   ),
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011B/Mu2011B_finalSum.root')    
-   ),   
-
-  ),
-
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Ele2011A/Ele2011A_finalSum.root')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Ele2011B/Ele2011B_finalSum.root')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011A/Mu2011A_finalSum.root') 
+            ),
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_Mu2011B/Mu2011B_finalSum.root')    
+            ),   
         
-  mc   = cms.VPSet (
-
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZZ/ZZ_Fall11_finalSum.root'),
-    color = cms.uint32(EColor.kMagenta+palette),
-    scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11),#6.206*5051./(4191045.)), #Xs 
-    role = cms.string('ZZ')
-   ),
-
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_TT/TT_Fall11_finalSum.root'),
-    color = cms.uint32(EColor.kYellow+palette),
-    scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-    role = cms.string('t#bar{t}')
-   ),
-
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZbfromDY/Zb_Fall11_finalSum.root'),
-    color = cms.uint32(EColor.kRed+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
-    role = cms.string('Z+b')
-   ), 
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZcfromDY/Zc_Fall11_finalSum.root'),     
-    color = cms.uint32(EColor.kGreen+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
-    role = cms.string('Z+c')
-   ), 
-   cms.PSet(
-    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZlfromDY/Zl_Fall11_finalSum.root'),
-    color = cms.uint32(EColor.kBlue+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
-    role = cms.string('Z+l')
-   ),
-
-   #cms.PSet(
-    #fileName = cms.string('/home/fynu/lceard/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Control_Plots_5fb/ZH/ZH_Fall11_ControlPlots_all.root'),
-    #color = cms.uint32(EColor.kAzure+palette),
-    #scale = cms.double(6.206*5051./(1100000.)), #Xs 
-    #role = cms.string('ZH')
-    #),
-   
   ),
+    
+    
+  mc   = cms.VPSet (
+        
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZZ/ZZ_Fall11_finalSum.root'),
+            color = cms.uint32(EColor.kMagenta+palette),
+            scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11),#6.206*5051./(4191045.)), #Xs 
+            role = cms.string('ZZ')
+            ),
+
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_TT/TT_Fall11_finalSum.root'),
+            color = cms.uint32(EColor.kYellow+palette),
+            scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
+            role = cms.string('t#bar{t}')
+            ),
+
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZbfromDY/Zb_Fall11_finalSum.root'),
+            color = cms.uint32(EColor.kRed+palette),
+            scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+            role = cms.string('Z+b')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZcfromDY/Zc_Fall11_finalSum.root'),     
+            color = cms.uint32(EColor.kGreen+palette),
+            scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+            role = cms.string('Z+c')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZlfromDY/Zl_Fall11_finalSum.root'),
+            color = cms.uint32(EColor.kBlue+palette),
+            scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
+            role = cms.string('Z+l')
+            ),
+        #cms.PSet(
+        #    fileName = cms.string('/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZH_125/ZH125_Fall11_finalSum.root'),
+        #    color = cms.uint32(EColor.kWhite),#EColor.kAzure+palette),
+        #    scale = cms.double(50*zbbnorm.xsec_ZH125_7TeV*lumi/zbbnorm.nev_ZH125_fall11), #Xs 
+        #    role = cms.string('50*ZH_125')
+        #    ),
+  ),
+
   options = cms.PSet (
       nostack = cms.untracked.bool(False)
   ),
@@ -100,7 +99,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{Z} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('bestzmassMu'),
@@ -109,7 +108,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{#mu^{+}#mu^{-}} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('bestzmassEle'),
@@ -118,7 +117,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{e^{+}e^{-}} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('bjet1pt'),
@@ -134,7 +133,8 @@ process.CombinePlots = cms.PSet(
       name = cms.string('bjet2pt'),
       begin = cms.untracked.double(0),
       end = cms.untracked.double(265),
-      rebin = cms.untracked.uint32(10),
+      width = cms.untracked.double(10),
+      #rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("p_{T}^{b-sublead} (GeV)"),
@@ -180,9 +180,10 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
           name = cms.string('el1pt'),
 	  rebin = cms.untracked.uint32(5),
-	  logy = cms.untracked.bool(True),
+	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{e_{1}} (GeV)"),
 	  labely = cms.untracked.string("Events/5GeV")
+          rangex = cms.untracked.vdouble(0.,250.)
     ),
     cms.PSet(
           name = cms.string('el1eta'),
@@ -192,11 +193,19 @@ process.CombinePlots = cms.PSet(
 	  labely = cms.untracked.string("Events")
     ),
     cms.PSet(
+          name = cms.string('el1etapm'),
+	  rebin = cms.untracked.uint32(2),
+	  logy = cms.untracked.bool(True),
+	  labelx = cms.untracked.string("#eta^{e_{1}}"),
+	  labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
           name = cms.string('el2pt'),
 	  rebin = cms.untracked.uint32(5),
-	  logy = cms.untracked.bool(True),
+	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{e_{2}} (GeV)"),
-	  labely = cms.untracked.string("Events/5GeV")
+	  labely = cms.untracked.string("Events/5GeV"),
+          rangex = cms.untracked.vdouble(0.,150.)
     ),
      cms.PSet(
           name = cms.string('el2eta'),
@@ -205,12 +214,20 @@ process.CombinePlots = cms.PSet(
 	  labelx = cms.untracked.string("#eta^{e_{2}}"),
 	  labely = cms.untracked.string("Events")
     ),
+     cms.PSet(
+          name = cms.string('el2etapm'),
+	  rebin = cms.untracked.uint32(2),
+	  logy = cms.untracked.bool(True),
+	  labelx = cms.untracked.string("#eta^{e_{2}}"),
+	  labely = cms.untracked.string("Events")
+    ),
     cms.PSet(
           name = cms.string('mu1pt'),
 	  rebin = cms.untracked.uint32(5),
-	  logy = cms.untracked.bool(True),
+	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{#mu_{1}} (GeV)"),
-	  labely = cms.untracked.string("Events/5GeV")
+	  labely = cms.untracked.string("Events/5GeV"),
+          rangex = cms.untracked.vdouble(0.,250.)
     ),
      cms.PSet(
           name = cms.string('mu1eta'),
@@ -219,16 +236,31 @@ process.CombinePlots = cms.PSet(
 	  labelx = cms.untracked.string("#eta^{#mu_{1}}"),
 	  labely = cms.untracked.string("Events")
     ),
+     cms.PSet(
+          name = cms.string('mu1etapm'),
+	  rebin = cms.untracked.uint32(2),
+	  logy = cms.untracked.bool(True),
+	  labelx = cms.untracked.string("#eta^{#mu_{1}}"),
+	  labely = cms.untracked.string("Events")
+    ),
     cms.PSet(
           name = cms.string('mu2pt'),
 	  rebin = cms.untracked.uint32(5),
-	  logy = cms.untracked.bool(True),
+	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{#mu_{2}} (GeV)"),
-	  labely = cms.untracked.string("Events/5GeV")
+	  labely = cms.untracked.string("Events/5GeV"),
+          rangex = cms.untracked.vdouble(0.,150.)
     ),
     cms.PSet(
           name = cms.string('mu2eta'),
 	  #rebin = cms.untracked.uint32(5),
+	  logy = cms.untracked.bool(True),
+	  labelx = cms.untracked.string("#eta^{#mu_{2}}"),
+	  labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+          name = cms.string('mu2etapm'),
+	  rebin = cms.untracked.uint32(2),
 	  logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("#eta^{#mu_{2}}"),
 	  labely = cms.untracked.string("Events")
@@ -275,25 +307,31 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('dijetdR'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R(b^{1}b^{2})"),
+      labelx = cms.untracked.string("#DeltaR(b^{1}b^{2})"),
       labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
       name = cms.string('dijetSVdR'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R_SV(b^{1}b^{2})"),
-      labely = cms.untracked.string("Events/0.5")
-    ),
-   cms.PSet(
-      name = cms.string('drEleEle'),
-      rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R(e^{1}e^{2})"),
+      labelx = cms.untracked.string("#DeltaR_{SV}(b^{1}b^{2})"),
       labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
-      name = cms.string('drMuMu'),
+      name = cms.string('dphidijetMET'),
+      rebin = cms.untracked.uint32(2),
+      labelx = cms.untracked.string("#Delta#phi(b#bar{b},MET)"),
+      labely = cms.untracked.string("Events/0.2")
+    ),
+   cms.PSet(
+      name = cms.string('drllEle'),
       rebin = cms.untracked.uint32(10),
-      labelx = cms.untracked.string("Delta_R(#mu^{1}#mu^{2})"),
+      labelx = cms.untracked.string("#DeltaR(e^{1}e^{2})"),
+      labely = cms.untracked.string("Events/0.5")
+    ),
+    cms.PSet(
+      name = cms.string('drllMu'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("#DeltaR(#mu^{1}#mu^{2})"),
       labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
@@ -413,9 +451,10 @@ process.CombinePlots = cms.PSet(
     ###Zb quantities
     cms.PSet(
       name = cms.string('scaldptZbj1'),
-      rebin = cms.untracked.uint32(10),
+      rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("#Delta Pt(Z,bjet_{1})"),
-      labely = cms.untracked.string("Events/10 GeV")
+      labely = cms.untracked.string("Events/10 GeV"),
+      rangex = cms.untracked.vdouble(-250.,250.)
     ),
     
     ### Zbb quantities
@@ -423,13 +462,14 @@ process.CombinePlots = cms.PSet(
       name = cms.string('drZbb'),
       rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("#Delta R(Z,bb)"),
-      labely = cms.untracked.string("Events/5")
+      labely = cms.untracked.string("Events/0.5")
     ), 
    cms.PSet(
       name = cms.string('scaldptZbb'),
-      rebin = cms.untracked.uint32(10),
+      rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("#Delta Pt(Z,bb)"),
-      labely = cms.untracked.string("Events/10 GeV")
+      labely = cms.untracked.string("Events/10 GeV"),
+      rangex = cms.untracked.vdouble(-250.,250.)
     ),
 
     
