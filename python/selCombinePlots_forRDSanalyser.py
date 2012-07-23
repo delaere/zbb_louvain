@@ -1,5 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
+from UserCode.zbb_louvain.zbbCommons import zbbnorm
+lumi=zbbnorm.lumi_tot2011*1000 #in pb-1  
+
+DIR="Higgs1"
+WP="17"
+
 class EColor:
  """ROOT colors taken from RTypes.h"""
  kWhite  = 0
@@ -23,54 +29,54 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('MERGED.root'),
+  outputFile = cms.string(DIR+'/MERGED.root'),
   data = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('histoStage9extraCutsDATA.root')
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsDATA.root')
    ),
   ),
   mc   = cms.VPSet (
    cms.PSet(
-     fileName = cms.string('histoStage9extraCutsZZ.root'),
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZZ.root'),
      color = cms.uint32(EColor.kMagenta+palette),
-     scale = cms.double(6.206*5051./(4191045.)), 
+     scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11), 
      role = cms.string('ZZ')
    ),
    cms.PSet(
-     fileName = cms.string('histoStage9extraCutsTT.root'),
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsTT.root'),
      color = cms.uint32(EColor.kYellow+palette),
-     scale = cms.double(157.5*5051./(3701947.)), #NLO k=1.67
+     scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11), #NLO k=1.67
      role = cms.string('ttbar'),
    ),
    cms.PSet(
-     fileName = cms.string('histoStage9extraCutsZb.root'),
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZb.root'),
      color = cms.uint32(EColor.kRed+palette),
-     scale = cms.double(3048.*5051./35907791.), 
+     scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
      role = cms.string('Z+b')
    ),
    cms.PSet(
-    fileName = cms.string('histoStage9extraCutsZc.root'),
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZc.root'),
     color = cms.uint32(EColor.kGreen+palette),
-    scale = cms.double(3048.*5051./35907791.), 
+    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
     role = cms.string('Z+c')
    ),
    cms.PSet(
-    fileName = cms.string('histoStage9extraCutsZl.root'),
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZl.root'),
     color = cms.uint32(EColor.kBlue+palette),
-    scale = cms.double(3048.*5051./35907791.), 
+    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
     role = cms.string('Z+l')
    ),
    #cms.PSet(
-   #  fileName = cms.string('histoStage9extraCutsZA.root'),
+   #  fileName = cms.string('histoStage'+WP+'extraCutsZA.root'),
    #  color = cms.uint32(1),
    #  scale = cms.double(100*0.003*5051/70000), 
    #  role = cms.string('100*ZA'),
    #  stacked = cms.untracked.bool(False)
    #),
    cms.PSet(
-    fileName = cms.string('histoStage9extraCutsZH.root'),
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZH125.root'),
     color = cms.uint32(1),
-    scale = cms.double(10*0.018*5051*304791./1000000./50000.), 
+    scale = cms.double(10*zbbnorm.xsec_ZH125_7TeV*lumi/zbbnorm.nev_ZH125_fall11), 
     role = cms.string('10*ZH M_H=125'),
     stacked = cms.untracked.bool(False)
    ),
