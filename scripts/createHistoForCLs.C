@@ -1,12 +1,12 @@
 {
 
-  TFile *_fileWrite = new TFile("toCLsTest.root","RECREATE");
+  TFile *_fileWrite = new TFile("toCLsTestMbb.root","RECREATE");
   _fileWrite.mkdir("mu");
   _fileWrite.mkdir("el");
   //_fileWrite.mkdir("combined");
   _fileWrite->Close();
   
-  string stage = "stage_12"; string *EorM = new string[3]; string plot ="selection/dijetM";
+  string stage = "Cut2"; string *EorM = new string[3]; string plot ="eventSelectiondijetM";
 
   EorM[0]="Combined";
   EorM[1]="EEChannel";
@@ -35,10 +35,10 @@
     cout<<"looking at channel "<<EM<<endl;
 
     //data
-    TFile *_fileEle2011A = TFile::Open("ControlPlots_Ele2011A/Ele2011A_finalSum.root");
-    TFile *_fileEle2011B = TFile::Open("ControlPlots_Ele2011B/Ele2011B_finalSum.root");
-    TFile *_fileMu2011A = TFile::Open("ControlPlots_Mu2011A/Mu2011A_finalSum.root");
-    TFile *_fileMu2011B = TFile::Open("ControlPlots_Mu2011B/Mu2011B_finalSum.root");
+    /*    TFile *_fileEle2011A = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs1bin/");//ControlPlots_Ele2011A/Ele2011A_finalSum.root");
+    TFile *_fileEle2011B = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs1bin/");//ControlPlots_Ele2011B/Ele2011B_finalSum.root");
+    TFile *_fileMu2011A = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs1bin/");//ControlPlots_Mu2011A/Mu2011A_finalSum.root");
+    TFile *_fileMu2011B = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs1bin/");//ControlPlots_Mu2011B/Mu2011B_finalSum.root");
 
     TH1F* data_obs = (TH1F*) _fileEle2011A->Get((EM+"/"+stage+"/"+plot).c_str());
     TH1F* datatmp = (TH1F*) _fileEle2011B->Get((EM+"/"+stage+"/"+plot).c_str());
@@ -47,21 +47,25 @@
     data_obs.Add(datatmp);
     datatmp = (TH1F*) _fileMu2011B->Get((EM+"/"+stage+"/"+plot).c_str());
     data_obs.Add(datatmp);
-    
-    TFile *_fileWrite = new TFile("toCLsTest.root","UPDATE");
+    */
+    TFile *_fileDATA = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsDATA.root");
+    TH1F* data_obs = (TH1F*) _fileDATA->Get((EM+"/"+stage+"/"+plot).c_str());
+
+    TFile *_fileWrite = new TFile("toCLsTestMbb.root","UPDATE");
     if(EM=="MuMuChannel") _fileWrite->cd("mu");
     else if(EM=="EEChannel") _fileWrite->cd("el");
     //else _fileWrite->cd("combined");
     data_obs->SetName("data_obs");
     data_obs->SetTitle("data_obs");
-    data_obs->Rebin(10);
-    data_obs->SetBins(44,10,450);
+    data_obs->Rebin(2);
+    data_obs->SetBins(18,20,380);
     data_obs->Write();
     _fileWrite->Close();
-    _fileEle2011A->Close();
+    /*   _fileEle2011A->Close();
     _fileEle2011B->Close();
     _fileMu2011A->Close();
-    _fileMu2011B->Close();
+    _fileMu2011B->Close();*/
+    _fileDATA->Close();
     cout<<"data done"<<endl;
     //end data
 
@@ -74,20 +78,20 @@
       oss << m;
       string mass = oss.str();
       cout<<"looking at signal of mass "<<mass<<endl;
-      TFile *_fileHi = TFile::Open(("ControlPlots_ZH_"+mass+"/ZH"+mass+"_Fall11_finalSum.root").c_str()); 
+      TFile *_fileHi = TFile::Open(("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsZH"+mass+".root").c_str());//("ControlPlots_ZH_"+mass+"/ZH"+mass+"_Fall11_finalSum.root").c_str()); 
 
       TH1F* signal = (TH1F*) _fileHi->Get((EM+"/"+stage+"/"+plot).c_str());
       signal->Scale(xsec[n]*lumi/xsec[n+1]);
       cout<<xsec[n]<<endl;
       cout<<n<<endl;
-      TFile *_fileWrite = new TFile("toCLsTest.root","UPDATE");
+      TFile *_fileWrite = new TFile("toCLsTestMbb.root","UPDATE");
       if(EM=="MuMuChannel") _fileWrite->cd("mu");
       else if(EM=="EEChannel") _fileWrite->cd("el");
       //else _fileWrite->cd("combined");
       signal->SetName(("signal"+mass).c_str());
       signal->SetTitle(("signal"+mass).c_str());
-      signal->Rebin(10);
-      signal->SetBins(44,10,450);
+      signal->Rebin(2);
+      signal->SetBins(18,20,380);
       signal->Write();
       _fileWrite->Close();
       _fileHi->Close();
@@ -96,63 +100,63 @@
 
     cout<<"bkg"<<endl;
     //background
-    TFile *_fileTT = TFile::Open("ControlPlots_TT/TT_Fall11_finalSum.root");
+    TFile *_fileTT = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsTT.root");//ControlPlots_TT/TT_Fall11_finalSum.root");
     TH1F* TT = (TH1F*) _fileTT->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     TT->Scale(157.5*5210/59244088);
     TT->SetName("TT");
     TT->SetTitle("TT");
-    TT->Rebin(10);
-    TT->SetBins(44,10,450);
+    TT->Rebin(2);
+    TT->SetBins(18,20,380);
 
-    TFile *_fileZZ = TFile::Open("ControlPlots_ZZ/ZZ_Fall11_finalSum.root");
+    TFile *_fileZZ = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsZZ.root");//ControlPlots_ZZ/ZZ_Fall11_finalSum.root");
     TH1F* ZZ = (TH1F*) _fileZZ->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     ZZ->Scale(6.206*5210/4191045);
     ZZ->SetName("ZZ");
     ZZ->SetTitle("ZZ");
-    ZZ->Rebin(10);
-    ZZ->SetBins(44,10,450);
+    ZZ->Rebin(2);
+    ZZ->SetBins(18,20,380);
 
-    TFile *_fileZb = TFile::Open("ControlPlots_ZbfromDY/Zb_Fall11_finalSum.root");
+    TFile *_fileZb = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsZb.root");//ControlPlots_ZbfromDY/Zb_Fall11_finalSum.root");
     TH1F* Zb = (TH1F*) _fileZb->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     Zb->Scale(3048.0*5210/36264432);
     Zb->SetName("Zb");
     Zb->SetTitle("Zb");
-    Zb->Rebin(10);
-    Zb->SetBins(44,10,450);
+    Zb->Rebin(2);
+    Zb->SetBins(18,20,380);
 
-    TFile *_fileZc = TFile::Open("ControlPlots_ZcfromDY/Zc_Fall11_finalSum.root");
+    TFile *_fileZc = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsZc.root");//ControlPlots_ZcfromDY/Zc_Fall11_finalSum.root");
     TH1F* Zc = (TH1F*) _fileZc->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     Zc->Scale(3048.0*5210/36264432);
     Zc->SetName("Zc");
     Zc->SetTitle("Zc");
-    Zc->Rebin(10);
-    Zc->SetBins(44,10,450);
+    Zc->Rebin(2);
+    Zc->SetBins(18,20,380);
 
-    TFile *_fileZl = TFile::Open("ControlPlots_ZlfromDY/Zl_Fall11_finalSum.root");
+    TFile *_fileZl = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/histoStage17extraCutsZl.root");//ControlPlots_ZlfromDY/Zl_Fall11_finalSum.root");
     TH1F* Zl = (TH1F*) _fileZl->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     Zl->Scale(3048.0*5210/36264432);
     Zl->SetName("Zl");
     Zl->SetTitle("Zl");
-    Zl->Rebin(10);
-    Zl->SetBins(44,10,450);
-
-    TFile *_filetW = TFile::Open("ControlPlots_tW/tW_Fall11_finalSum.root");
+    Zl->Rebin(2);
+    Zl->SetBins(18,20,380);
+    /*
+    TFile *_filetW = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/");//ControlPlots_tW/tW_Fall11_finalSum.root");
     TH1F* tW = (TH1F*) _filetW->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     tW->Scale(5.3*5210/814390);
     tW->SetName("tW");
     tW->SetTitle("tW");
-    tW->Rebin(10);
-    tW->SetBins(44,10,450);
+    tW->Rebin(2);
+    tW->SetBins(18,20,380);
 
-    TFile *_filetbarW = TFile::Open("ControlPlots_tbarW/tbarW_Fall11_finalSum.root");
+    TFile *_filetbarW = TFile::Open("/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/Higgs3bin/");//ControlPlots_tbarW/tbarW_Fall11_finalSum.root");
     TH1F* tbarW = (TH1F*) _filetbarW->Get((EM+"/"+stage+"/"+plot).c_str());                                                             
     tbarW->Scale(5.3*5210/809984);
     tbarW->SetName("tbarW");
     tbarW->SetTitle("tbarW");
-    tbarW->Rebin(10);
-    tbarW->SetBins(44,10,450);
-
-    TFile *_fileWrite = new TFile("toCLsTest.root","UPDATE");
+    tbarW->Rebin(2);
+    tbarW->SetBins(18,20,380);
+    */
+    TFile *_fileWrite = new TFile("toCLsTestMbb.root","UPDATE");
     if(EM=="MuMuChannel") _fileWrite->cd("mu");
     else if(EM=="EEChannel") _fileWrite->cd("el");
     //else _fileWrite->cd("combined");
@@ -161,16 +165,16 @@
     Zb->Write();
     Zc->Write();
     Zl->Write();
-    tW->Write();
-    tbarW->Write();
+    //tW->Write();
+    //tbarW->Write();
     _fileWrite->Close();
     _fileTT->Close();
     _fileZZ->Close();
     _fileZb->Close();
     _fileZc->Close();
     _fileZl->Close();
-    _filetW->Close();
-    _filetbarW->Close();
+    //_filetW->Close();
+    //_filetbarW->Close();
 
   }
 

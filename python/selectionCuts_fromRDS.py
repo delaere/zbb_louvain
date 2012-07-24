@@ -30,12 +30,12 @@ channels  = [
 
 #choose you set of cuts
 extraCuts = [
-    "eventSelectiondijetdR>0",#no effect
-    "((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))",
+    #"jetmetbjet1pt>50",#no effect
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))",
     #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)",
-    "eventSelectiondphidijetMET<1.",
-    "eventSelectiondphiZbb>2.25",
-    "eventSelectiondijetM>95&eventSelectiondijetM<155",
+    #"eventSelectiondphidijetMET<1.",
+    #"eventSelectiondphiZbb>2.25",
+    #"eventSelectiondijetM>95&eventSelectiondijetM<155",
     #"eventSelectionZbbM>176&eventSelectionZbbM<256",
     #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25",
     #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25&eventSelectiondijetM>95&eventSelectiondijetM<155",
@@ -46,23 +46,33 @@ extraCuts = [
     #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5",
     #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectiondijetdR>1.5&eventSelectiondijetdR<3.",
     #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectionZbPt<150",
+    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&eventSelectiondphiZbb>2.5",
+    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&((eventSelectionbestzmassEle>82.&eventSelectionbestzmassEle<100.)||(eventSelectionbestzmassMu>82.&eventSelectionbestzmassMu<100.))",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&jetmetbjet1pt>52",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondphiZbb>2.25",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    #"eventSelectiondphiZbb>2.25&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    #"eventSelectiondphiZbb>2.25&jetmetbjet1pt>54",
+    #"jetmetMETSignificance<15",
+    "eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    "eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85"
     ]
 
 titleCuts = [
     "stage_"+WP,
-    "mass Z",
-    "dPhi(bb,MET)",
+    "mass bb+dPhi(Z,bb)",
+    "mass bb+mass Z",
     "dPhi(Z,bb)",
     "bb mass",
-    #"zbb mass",
-    #"dPhi(bb,MET)+dPhi(Z,bb)",
-    #"dPhi(bb,MET)+dPhi(Z,bb)+bb mass",
+    "zbb mass",
+    "dPhi(bb,MET)+dPhi(Z,bb)",
+    "dPhi(bb,MET)+dPhi(Z,bb)+bb mass",
     #"dPhi(Z,bb)+bb mass",
     ]
 
 extraCutsLep = {
-    "EEChannel"     : "(eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.)",
-    "MuMuChannel"   : "(eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.)"
+    "EEChannel"     : "(eventSelectionbestzmassEle>82.&eventSelectionbestzmassEle<100.)",
+    "MuMuChannel"   : "(eventSelectionbestzmassMu>82.&eventSelectionbestzmassMu<100.)"
     }
 
 stringCut = {}
@@ -77,11 +87,11 @@ for i in range(0,len(extraCuts)) :
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH115","ZH120","ZH125","ZH130","ZH135"]#,"ZA"]
+MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
-NSMMCsampleList= ["ZH115","ZH120","ZH125","ZH130","ZH135"]#,"ZA"]
-totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH115","ZH120","ZH125","ZH130","ZH135"]#,"ZA"]
-sampleList     = ["DATA","DY","TT","ZZ","ZH115","ZH120","ZH125","ZH130","ZH135"]
+NSMMCsampleList= ["ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+sampleList     = ["DATA","DY","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]
 
 lumi = { "DATA"   : zbbnorm.lumi_tot2011,
          "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
@@ -497,7 +507,7 @@ print " "
 file={}
 #her you could choose the root ouput filenames
 for sample in totsampleList:
-    file[sample]=TFile("Higgs1bin/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
+    file[sample]=TFile("Higgs3bin/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
     for channel in channels:
         if channel=="Combined" : continue
         chDir=file[sample].mkdir(channel,channel)
