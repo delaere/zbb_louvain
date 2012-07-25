@@ -1,9 +1,15 @@
 <config name="top" version="1">
  <config name="CommonPreferences" version="1">
+  <config name="     " version="0">
+    <string>2</string>
+  </config>
+  <config name="Show y=0 points as markers" version="0">
+    <string>1</string>
+  </config>
   <config name="backgroundColIdx" version="0">
     <string>1</string>
   </config>
-  <config name="brightness" version="0">
+  <config name="Brightness" version="0">
     <string>0</string>
   </config>
   <config name="Transparency 2D" version="0">
@@ -11,18 +17,6 @@
   </config>
   <config name="Transparency 3D" version="0">
     <string>90</string>
-  </config>
-  <config name="PlotEt" version="0">
-    <string>1</string>
-  </config>
-  <config name="ScaleMode" version="0">
-    <string>1</string>
-  </config>
-  <config name="ValueToHeight [GeV/m]" version="0">
-    <string>50</string>
-  </config>
-  <config name="MaxTowerH [m]" version="0">
-    <string>1</string>
   </config>
   <config name="GeometryColor 0 " version="0">
     <string>1032</string>
@@ -42,9 +36,21 @@
   <config name="GeometryColor 5 " version="0">
     <string>1022</string>
   </config>
+  <config name="ScaleMode" version="0">
+    <string>1</string>
+  </config>
+  <config name="EnergyToLength [GeV/m]" version="0">
+    <string>50</string>
+  </config>
+  <config name="MaximumLength [m]" version="0">
+    <string>1</string>
+  </config>
+  <config name="PlotEt" version="0">
+    <string>1</string>
+  </config>
  </config>
  <config name="EventItems" version="1">
-  <config name="Jets" version="5">
+  <config name="Jets" version="6">
    <config name="type" version="0">
      <string>std::vector&lt;pat::Jet&gt;</string>
    </config>
@@ -61,7 +67,7 @@
      <string></string>
    </config>
    <config name="color" version="0">
-     <string>1000</string>
+     <string>1015</string>
    </config>
    <config name="isVisible" version="0">
      <string>t</string>
@@ -75,72 +81,21 @@
    <config name="transparency" version="0">
      <string>0</string>
    </config>
-  </config>
-  <config name="Muons" version="5">
-   <config name="type" version="0">
-     <string>std::vector&lt;pat::Muon&gt;</string>
-   </config>
-   <config name="moduleLabel" version="0">
-     <string>looseMuons</string>
-   </config>
-   <config name="productInstanceLabel" version="0">
-     <string></string>
-   </config>
-   <config name="processName" version="0">
-     <string>PAT</string>
-   </config>
-   <config name="filterExpression" version="0">
-     <string></string>
-   </config>
-   <config name="color" version="0">
-     <string>1008</string>
-   </config>
-   <config name="isVisible" version="0">
-     <string>t</string>
-   </config>
-   <config name="layer" version="0">
-     <string>5</string>
-   </config>
-   <config name="purpose" version="0">
-     <string>Muons</string>
-   </config>
-   <config name="transparency" version="0">
-     <string>0</string>
+   <config name="PBConfig" version="1">
+    <config name="Var" version="1">
+     <config name="Draw Labels in RhoPhi View" version="0">
+       <string>0</string>
+     </config>
+     <config name="Draw Labels in RhoZ View" version="0">
+       <string>0</string>
+     </config>
+     <config name="Label Offset" version="0">
+       <string>2.1</string>
+     </config>
+    </config>
    </config>
   </config>
-  <config name="Electrons" version="5">
-   <config name="type" version="0">
-     <string>std::vector&lt;pat::Electron&gt;</string>
-   </config>
-   <config name="moduleLabel" version="0">
-     <string>cleanPatElectrons</string>
-   </config>
-   <config name="productInstanceLabel" version="0">
-     <string></string>
-   </config>
-   <config name="processName" version="0">
-     <string>PAT</string>
-   </config>
-   <config name="filterExpression" version="0">
-     <string></string>
-   </config>
-   <config name="color" version="0">
-     <string>1007</string>
-   </config>
-   <config name="isVisible" version="0">
-     <string>t</string>
-   </config>
-   <config name="layer" version="0">
-     <string>3</string>
-   </config>
-   <config name="purpose" version="0">
-     <string>Electrons</string>
-   </config>
-   <config name="transparency" version="0">
-     <string>0</string>
-   </config>
-  </config>
-  <config name="Vertices" version="5">
+  <config name="Vertices" version="6">
    <config name="type" version="0">
      <string>std::vector&lt;reco::Vertex&gt;</string>
    </config>
@@ -171,13 +126,88 @@
    <config name="transparency" version="0">
      <string>0</string>
    </config>
+   <config name="PBConfig" version="1">
+    <config name="Var" version="1">
+     <config name="Draw Tracks" version="0">
+       <string>0</string>
+     </config>
+    </config>
+   </config>
   </config>
-  <config name="MET" version="5">
+  <config name="matchedMuons" version="6">
+   <config name="type" version="0">
+     <string>std::vector&lt;pat::Muon&gt;</string>
+   </config>
+   <config name="moduleLabel" version="0">
+     <string>matchedMuons</string>
+   </config>
+   <config name="productInstanceLabel" version="0">
+     <string></string>
+   </config>
+   <config name="processName" version="0">
+     <string></string>
+   </config>
+   <config name="filterExpression" version="0">
+     <string></string>
+   </config>
+   <config name="color" version="0">
+     <string>1008</string>
+   </config>
+   <config name="isVisible" version="0">
+     <string>t</string>
+   </config>
+   <config name="layer" version="0">
+     <string>13</string>
+   </config>
+   <config name="purpose" version="0">
+     <string>Muons</string>
+   </config>
+   <config name="transparency" version="0">
+     <string>0</string>
+   </config>
+   <config name="PBConfig" version="1">
+   </config>
+  </config>
+  <config name="matchedElectrons" version="6">
+   <config name="type" version="0">
+     <string>std::vector&lt;pat::Electron&gt;</string>
+   </config>
+   <config name="moduleLabel" version="0">
+     <string>matchedElectrons</string>
+   </config>
+   <config name="productInstanceLabel" version="0">
+     <string></string>
+   </config>
+   <config name="processName" version="0">
+     <string></string>
+   </config>
+   <config name="filterExpression" version="0">
+     <string></string>
+   </config>
+   <config name="color" version="0">
+     <string>1007</string>
+   </config>
+   <config name="isVisible" version="0">
+     <string>t</string>
+   </config>
+   <config name="layer" version="0">
+     <string>14</string>
+   </config>
+   <config name="purpose" version="0">
+     <string>Electrons</string>
+   </config>
+   <config name="transparency" version="0">
+     <string>0</string>
+   </config>
+   <config name="PBConfig" version="1">
+   </config>
+  </config>
+  <config name="patType01SCorrectedPFMet" version="6">
    <config name="type" version="0">
      <string>std::vector&lt;pat::MET&gt;</string>
    </config>
    <config name="moduleLabel" version="0">
-     <string>patMETs</string>
+     <string>patType01SCorrectedPFMet</string>
    </config>
    <config name="productInstanceLabel" version="0">
      <string></string>
@@ -195,21 +225,23 @@
      <string>t</string>
    </config>
    <config name="layer" version="0">
-     <string>11</string>
+     <string>15</string>
    </config>
    <config name="purpose" version="0">
-     <string>Candidates</string>
+     <string>recoMET</string>
    </config>
    <config name="transparency" version="0">
      <string>0</string>
    </config>
+   <config name="PBConfig" version="1">
+   </config>
   </config>
-  <config name="Z candidates" version="5">
+  <config name="zelMatchedelMatched" version="6">
    <config name="type" version="0">
      <string>std::vector&lt;reco::CompositeCandidate&gt;</string>
    </config>
    <config name="moduleLabel" version="0">
-     <string>Ztightloose</string>
+     <string>zelMatchedelMatched</string>
    </config>
    <config name="productInstanceLabel" version="0">
      <string></string>
@@ -227,7 +259,7 @@
      <string>t</string>
    </config>
    <config name="layer" version="0">
-     <string>12</string>
+     <string>16</string>
    </config>
    <config name="purpose" version="0">
      <string>Candidates</string>
@@ -235,19 +267,93 @@
    <config name="transparency" version="0">
      <string>0</string>
    </config>
+   <config name="PBConfig" version="1">
+   </config>
+  </config>
+  <config name="zmuMatchedmuMatched" version="6">
+   <config name="type" version="0">
+     <string>std::vector&lt;reco::CompositeCandidate&gt;</string>
+   </config>
+   <config name="moduleLabel" version="0">
+     <string>zmuMatchedmuMatched</string>
+   </config>
+   <config name="productInstanceLabel" version="0">
+     <string></string>
+   </config>
+   <config name="processName" version="0">
+     <string></string>
+   </config>
+   <config name="filterExpression" version="0">
+     <string></string>
+   </config>
+   <config name="color" version="0">
+     <string>1001</string>
+   </config>
+   <config name="isVisible" version="0">
+     <string>t</string>
+   </config>
+   <config name="layer" version="0">
+     <string>17</string>
+   </config>
+   <config name="purpose" version="0">
+     <string>Candidates</string>
+   </config>
+   <config name="transparency" version="0">
+     <string>0</string>
+   </config>
+   <config name="PBConfig" version="1">
+   </config>
+  </config>
+  <config name="bjets" version="6">
+   <config name="type" version="0">
+     <string>std::vector&lt;pat::Jet&gt;</string>
+   </config>
+   <config name="moduleLabel" version="0">
+     <string>bjets</string>
+   </config>
+   <config name="productInstanceLabel" version="0">
+     <string></string>
+   </config>
+   <config name="processName" version="0">
+     <string></string>
+   </config>
+   <config name="filterExpression" version="0">
+     <string></string>
+   </config>
+   <config name="color" version="0">
+     <string>1009</string>
+   </config>
+   <config name="isVisible" version="0">
+     <string>t</string>
+   </config>
+   <config name="layer" version="0">
+     <string>18</string>
+   </config>
+   <config name="purpose" version="0">
+     <string>PF PatJet</string>
+   </config>
+   <config name="transparency" version="0">
+     <string>0</string>
+   </config>
+   <config name="PBConfig" version="1">
+   </config>
   </config>
  </config>
  <config name="EventNavigator" version="1">
-  <config name="EventFilter0_enabled" version="0">
-    <string>1</string>
+  <config name="EventFilters" version="1">
+   <config name="------Filter[0]------" version="1">
+    <config name="expression" version="0">
+      <string>patJets_bjets__PAT.@obj.size()&gt;1</string>
+    </config>
+    <config name="enabled" version="0">
+      <string>1</string>
+    </config>
+    <config name="comment" version="0">
+      <string></string>
+    </config>
+   </config>
   </config>
-  <config name="EventFilter0_selection" version="0">
-    <string>recoCompositeCandidates_Ztightloose__PAT.@obj.size()&gt;0</string>
-  </config>
-  <config name="EventFilter0_comment" version="0">
-    <string></string>
-  </config>
-  <config name="EventFilter_total" version="0">
+  <config name="EventFilter_mode" version="0">
     <string>1</string>
   </config>
   <config name="EventFilter_enabled" version="0">
@@ -255,18 +361,21 @@
   </config>
  </config>
  <config name="GUI" version="1">
-  <config name="main window" version="2">
+  <config name="main window" version="3">
    <config name="x" version="0">
-     <string>207</string>
+     <string>0</string>
    </config>
    <config name="y" version="0">
-     <string>56</string>
+     <string>20</string>
    </config>
    <config name="width" version="0">
-     <string>992</string>
+     <string>1440</string>
    </config>
    <config name="height" version="0">
-     <string>720</string>
+     <string>853</string>
+   </config>
+   <config name="summaryWeight" version="0">
+     <string>20</string>
    </config>
    <config name="leftWeight" version="0">
      <string>1.22259</string>
@@ -276,7 +385,10 @@
    </config>
   </config>
   <config name="views" version="1">
-   <config name="Rho Phi" version="6">
+   <config name="Rho Phi" version="7">
+    <config name="Image Scale" version="0">
+      <string>1</string>
+    </config>
     <config name="Overlay Event Info" version="0">
       <string>3</string>
     </config>
@@ -304,14 +416,41 @@
     <config name="Show Camera Guide" version="0">
       <string>0</string>
     </config>
+    <config name="UseGlobalEnergyScale" version="0">
+      <string>1</string>
+    </config>
+    <config name="Show Pixel Barrel" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Pixel Endcap" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Tracker Barrel" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Tracker Endcap" version="0">
+      <string>0</string>
+    </config>
+    <config name="Shift origin to beam-spot" version="0">
+      <string>0</string>
+    </config>
+    <config name="Distortion" version="0">
+      <string>0</string>
+    </config>
+    <config name="FixedRadius" version="0">
+      <string>138.4</string>
+    </config>
     <config name="Calo compression" version="0">
       <string>0.08</string>
     </config>
     <config name="Muon compression" version="0">
       <string>0.5</string>
     </config>
-    <config name="Show projection axes" version="0">
+    <config name="Show projection axis" version="0">
       <string>0</string>
+    </config>
+    <config name="Projection axis label size" version="0">
+      <string>0.015</string>
     </config>
     <config name="Compress detectors" version="0">
       <string>0</string>
@@ -340,16 +479,13 @@
     <config name="LogoPosY" version="0">
       <string>0.98</string>
     </config>
-    <config name="UseGlobalScales" version="0">
-      <string>1</string>
-    </config>
     <config name="ScaleMode" version="0">
       <string>1</string>
     </config>
-    <config name="ValueToHeight [GeV/m]" version="0">
+    <config name="EnergyToLength [GeV/m]" version="0">
       <string>50</string>
     </config>
-    <config name="MaxTowerH [m]" version="0">
+    <config name="MaximumLength [m]" version="0">
       <string>1</string>
     </config>
     <config name="PlotEt" version="0">
@@ -398,16 +534,19 @@
       <string>2337.41</string>
     </config>
     <config name="cameraMatrix13Rho Phi" version="0">
-      <string>0</string>
+      <string>0.151972</string>
     </config>
     <config name="cameraMatrix14Rho Phi" version="0">
-      <string>0</string>
+      <string>-0.0815583</string>
     </config>
     <config name="cameraMatrix15Rho Phi" version="0">
       <string>1</string>
     </config>
    </config>
-   <config name="Lego" version="4">
+   <config name="Lego" version="7">
+    <config name="Image Scale" version="0">
+      <string>1</string>
+    </config>
     <config name="Overlay Event Info" version="0">
       <string>0</string>
     </config>
@@ -434,6 +573,9 @@
     </config>
     <config name="Show Camera Guide" version="0">
       <string>0</string>
+    </config>
+    <config name="UseGlobalEnergyScale" version="0">
+      <string>1</string>
     </config>
     <config name="Auto rebin on zoom-out" version="0">
       <string>1</string>
@@ -471,16 +613,13 @@
     <config name="LogoPosY" version="0">
       <string>0.98</string>
     </config>
-    <config name="UseGlobalScales" version="0">
-      <string>1</string>
-    </config>
     <config name="ScaleMode" version="0">
       <string>1</string>
     </config>
-    <config name="ValueToHeight [GeV/m]" version="0">
+    <config name="EnergyToLength [GeV/m]" version="0">
       <string>50</string>
     </config>
-    <config name="MaxTowerH [m]" version="0">
+    <config name="MaximumLength [m]" version="0">
       <string>1</string>
     </config>
     <config name="PlotEt" version="0">
@@ -541,7 +680,10 @@
       <string>1</string>
     </config>
    </config>
-   <config name="Rho Z" version="6">
+   <config name="Rho Z" version="7">
+    <config name="Image Scale" version="0">
+      <string>1</string>
+    </config>
     <config name="Overlay Event Info" version="0">
       <string>0</string>
     </config>
@@ -569,14 +711,41 @@
     <config name="Show Camera Guide" version="0">
       <string>0</string>
     </config>
+    <config name="UseGlobalEnergyScale" version="0">
+      <string>1</string>
+    </config>
+    <config name="Show Pixel Barrel" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Pixel Endcap" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Tracker Barrel" version="0">
+      <string>0</string>
+    </config>
+    <config name="Show Tracker Endcap" version="0">
+      <string>0</string>
+    </config>
+    <config name="Shift origin to beam-spot" version="0">
+      <string>0</string>
+    </config>
+    <config name="Distortion" version="0">
+      <string>0</string>
+    </config>
+    <config name="FixedRadius" version="0">
+      <string>138.4</string>
+    </config>
     <config name="Calo compression" version="0">
       <string>1</string>
     </config>
     <config name="Muon compression" version="0">
       <string>0.2</string>
     </config>
-    <config name="Show projection axes" version="0">
+    <config name="Show projection axis" version="0">
       <string>0</string>
+    </config>
+    <config name="Projection axis label size" version="0">
+      <string>0.015</string>
     </config>
     <config name="Compress detectors" version="0">
       <string>0</string>
@@ -599,16 +768,13 @@
     <config name="LogoPosY" version="0">
       <string>0.98</string>
     </config>
-    <config name="UseGlobalScales" version="0">
-      <string>1</string>
-    </config>
     <config name="ScaleMode" version="0">
       <string>1</string>
     </config>
-    <config name="ValueToHeight [GeV/m]" version="0">
+    <config name="EnergyToLength [GeV/m]" version="0">
       <string>50</string>
     </config>
-    <config name="MaxTowerH [m]" version="0">
+    <config name="MaximumLength [m]" version="0">
       <string>1</string>
     </config>
     <config name="PlotEt" version="0">
@@ -654,19 +820,22 @@
       <string>0</string>
     </config>
     <config name="cameraMatrix12Rho Z" version="0">
-      <string>375</string>
+      <string>375.152</string>
     </config>
     <config name="cameraMatrix13Rho Z" version="0">
-      <string>0</string>
+      <string>-0.0678452</string>
     </config>
     <config name="cameraMatrix14Rho Z" version="0">
-      <string>0</string>
+      <string>-0.0452635</string>
     </config>
     <config name="cameraMatrix15Rho Z" version="0">
       <string>1</string>
     </config>
    </config>
-   <config name="3D" version="6">
+   <config name="3D Tower" version="7">
+    <config name="Image Scale" version="0">
+      <string>1</string>
+    </config>
     <config name="Overlay Event Info" version="0">
       <string>3</string>
     </config>
@@ -694,6 +863,9 @@
     <config name="Show Camera Guide" version="0">
       <string>0</string>
     </config>
+    <config name="UseGlobalEnergyScale" version="0">
+      <string>1</string>
+    </config>
     <config name="Show Muon Barrel" version="0">
       <string>0</string>
     </config>
@@ -712,8 +884,14 @@
     <config name="Show Tracker Endcap" version="0">
       <string>0</string>
     </config>
-    <config name="Show Wire Frame" version="0">
-      <string>1</string>
+    <config name="Render Style" version="0">
+      <string>0</string>
+    </config>
+    <config name="View dependent Clip" version="0">
+      <string>0</string>
+    </config>
+    <config name="Enable Tooltips" version="0">
+      <string>0</string>
     </config>
     <config name="EventInfoTextSize" version="0">
       <string>0.03</string>
@@ -733,38 +911,35 @@
     <config name="LogoPosY" version="0">
       <string>0.98</string>
     </config>
-    <config name="UseGlobalScales" version="0">
-      <string>1</string>
-    </config>
     <config name="ScaleMode" version="0">
       <string>1</string>
     </config>
-    <config name="ValueToHeight [GeV/m]" version="0">
+    <config name="EnergyToLength [GeV/m]" version="0">
       <string>50</string>
     </config>
-    <config name="MaxTowerH [m]" version="0">
+    <config name="MaximumLength [m]" version="0">
       <string>1</string>
     </config>
     <config name="PlotEt" version="0">
       <string>1</string>
     </config>
     <config name="cameraMatrix0Plain3D" version="0">
-      <string>0.578195</string>
+      <string>0.971762</string>
     </config>
     <config name="cameraMatrix1Plain3D" version="0">
-      <string>0.777283</string>
+      <string>-0.234768</string>
     </config>
     <config name="cameraMatrix2Plain3D" version="0">
-      <string>0.248036</string>
+      <string>-0.0237204</string>
     </config>
     <config name="cameraMatrix3Plain3D" version="0">
       <string>0</string>
     </config>
     <config name="cameraMatrix4Plain3D" version="0">
-      <string>-0.802355</string>
+      <string>0.234834</string>
     </config>
     <config name="cameraMatrix5Plain3D" version="0">
-      <string>0.596846</string>
+      <string>0.972035</string>
     </config>
     <config name="cameraMatrix6Plain3D" version="0">
       <string>0</string>
@@ -773,25 +948,25 @@
       <string>0</string>
     </config>
     <config name="cameraMatrix8Plain3D" version="0">
-      <string>-0.14804</string>
+      <string>0.0230577</string>
     </config>
     <config name="cameraMatrix9Plain3D" version="0">
-      <string>-0.199012</string>
+      <string>-0.00556926</string>
     </config>
     <config name="cameraMatrix10Plain3D" version="0">
-      <string>0.968751</string>
+      <string>0.999719</string>
     </config>
     <config name="cameraMatrix11Plain3D" version="0">
       <string>0</string>
     </config>
     <config name="cameraMatrix12Plain3D" version="0">
-      <string>2778.98</string>
+      <string>4617.75</string>
     </config>
     <config name="cameraMatrix13Plain3D" version="0">
-      <string>3687.26</string>
+      <string>-1145.44</string>
     </config>
     <config name="cameraMatrix14Plain3D" version="0">
-      <string>1155.92</string>
+      <string>-138.304</string>
     </config>
     <config name="cameraMatrix15Plain3D" version="0">
       <string>1</string>
@@ -1150,7 +1325,7 @@
     </config>
     <config name="TableView" version="1">
      <config name="collection" version="0">
-       <string>Z candidates</string>
+       <string>NULL</string>
      </config>
      <config name="sortColumn" version="0">
      </config>
@@ -1159,8 +1334,8 @@
     </config>
    </config>
   </config>
-  <config name="view area" version="2">
-   <config name="Rho Phi" version="2">
+  <config name="view area" version="3">
+   <config name="Rho Phi" version="3">
     <config name="weight" version="0">
       <string>1.22259</string>
     </config>
@@ -1168,7 +1343,7 @@
       <string>0</string>
     </config>
    </config>
-   <config name="Lego" version="2">
+   <config name="Lego" version="3">
     <config name="weight" version="0">
       <string>1.20883</string>
     </config>
@@ -1176,7 +1351,7 @@
       <string>0</string>
     </config>
    </config>
-   <config name="Rho Z" version="2">
+   <config name="Rho Z" version="3">
     <config name="weight" version="0">
       <string>1.31769</string>
     </config>
@@ -1184,14 +1359,14 @@
       <string>0</string>
     </config>
    </config>
-   <config name="3D" version="2">
+   <config name="3D Tower" version="3">
     <config name="weight" version="0">
       <string>0.988693</string>
     </config>
     <config name="undocked" version="0">
       <string>1</string>
     </config>
-    <config name="UndockedWindowPos" version="2">
+    <config name="UndockedWindowPos" version="3">
      <config name="weight" version="0">
        <string>0.988693</string>
      </config>
@@ -1199,10 +1374,10 @@
        <string>1</string>
      </config>
      <config name="x" version="0">
-       <string>2</string>
+       <string>467</string>
      </config>
      <config name="y" version="0">
-       <string>389</string>
+       <string>229</string>
      </config>
      <config name="width" version="0">
        <string>640</string>
@@ -1212,7 +1387,7 @@
      </config>
     </config>
    </config>
-   <config name="Table" version="2">
+   <config name="Table" version="3">
     <config name="weight" version="0">
       <string>0.484796</string>
     </config>
