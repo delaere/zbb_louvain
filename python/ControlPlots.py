@@ -183,14 +183,14 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       jetmetAK5PFPlots[level].beginJob(jetlabel=zbblabel.jetlabel,vertexlabel=zbblabel.vertexlabel,btagging=btagAlgo)
       vertexPlots[level].beginJob(zlabel=zlabel)
       selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
-      if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup")
+      if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName)
       if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
       #if NLOWeight: nloReWeightingPlots[level].beginJob()
 
   # the PU reweighting engine
   if handlePU: 
-    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, MonteCarloHistName="pileup", DataHistName="pileup", systematicShift=0)
+    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, systematicShift=0)
   # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
   if handleBT:
     BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)

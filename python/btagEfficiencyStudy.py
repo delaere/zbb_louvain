@@ -41,7 +41,7 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   vertexHandle = Handle ("vector<reco::Vertex>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
-  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, "pileup","pileup", zbblabel.pulabel)
+  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, zbblabel.pulabel)
   # event loop
   eventCnt = 0
   for event in events:
