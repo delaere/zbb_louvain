@@ -26,7 +26,7 @@ class zbblabel:
 class zbbfile:
   """files containing calibrations and other data"""
   ssvperfData="../data/performance_ssv_witheff_062012.root"
-  pileupData="../data/Cert_160404-180252_7TeV_ALL_Collisions11_JSON.pileupTruth.root"
+  pileupData="../data/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON_v2_pileupTruth.root"
   pileupMC="../data/Fall11_PU_MC.root"
   jecUncertainty="../data/Jec11_V2_Uncertainty_AK5PF.txt"
 

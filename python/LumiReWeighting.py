@@ -10,11 +10,12 @@ from zbbCommons import zbblabel,zbbfile
 class LumiReWeighting:
    """A class to reweight MC according to number of pileup events."""
 
-   def __init__(self, MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData, MonteCarloHistName="pileup", DataHistName="pileup", PileupSummaryInfo=zbblabel.pulabel, systematicShift=0):
+   def __init__(self, MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData, PileupSummaryInfo=zbblabel.pulabel, systematicShift=0):
+      # set the names for histograms. In the new scheme, the data file contains three histograms for nominal and +/-1sigma.
+      MonteCarloHistName = "pileup"
+      DataHistName = { 0 : "pileup", -1 : "pileupDOWN1", 1 : "pileupUP1" }
       # access histograms and initialize the weights
-      self.engine = ROOT.edm.LumiReWeighting(MonteCarloFileName,DataFileName,MonteCarloHistName,DataHistName)
-      self.PoissonMeanShifter = ROOT.reweight.PoissonMeanShifter(systematicShift)
-      self.systematicShift = systematicShift
+      self.engine = ROOT.edm.LumiReWeighting(MonteCarloFileName,DataFileName,MonteCarloHistName,DataHistName[systematicShift])
       self.PileupSummaryInfo = PileupSummaryInfo
       self.PupInfo = Handle ("std::vector< PileupSummaryInfo >")
 
@@ -33,8 +34,8 @@ class LumiReWeighting:
            print "warning: Both npu and event are specified. npu will be ignored"
          npu = self.npu(fwevent)
      if not npu is None:
-       # return the weight, maybe shifted for systematic studies
-       return self.engine.weight(npu)*self.shiftWeight(npu)
+       # return the weight
+       return self.engine.weight(npu)
      else:
        print "ERROR:  no in-time beam crossing found! "
        return 0.
@@ -43,24 +44,8 @@ class LumiReWeighting:
      # get pileup summary information
      fwevent.getByLabel(self.PileupSummaryInfo, self.PupInfo)
      pileup = self.PupInfo.product()
-     # average PU in 3BX
-     #npu = 0.
-     #nbc = 0
-     #for pvi in pileup:
-     #  if pvi.getBunchCrossing() in [-1,0,1]:
-     #    npu += pvi.getPU_NumInteractions()
-     #    nbc += 1
-     #if nbc>0 : npu = npu/nbc
-     #return npu
-     # find the "BX0" and the number of PU interactions in there
+     # find the "BX0" and the true number of PU interactions in there
      for pvi in pileup:
        if pvi.getBunchCrossing()==0:
-         ##return pvi.getPU_NumInteractions()   ##Pile Up for 2.2/fb
          return pvi.getTrueNumInteractions()
      return None
-
-   def shiftWeight( self, npu):
-     if self.systematicShift==0 :
-       return 1
-     else:
-       return self.PoissonMeanShifter.ShiftWeight(npu)

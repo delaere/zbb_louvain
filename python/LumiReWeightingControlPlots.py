@@ -17,11 +17,15 @@ class LumiReWeightingControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="lumiReweighting", dataset=dataset, mode=mode)
       self.PileupSummaryInfo = PileupSummaryInfo
     
-    def beginJob(self, MonteCarloFileName, DataFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel):
+    def beginJob(self, MonteCarloFileName, DataFileName, vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel):
       # reweighting engine
-      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, MonteCarloHistName,DataHistName, PileupSummaryInfo=self.PileupSummaryInfo)
+      self.engine = LumiReWeighting(MonteCarloFileName, DataFileName, self.PileupSummaryInfo, 0)
+      self.engineUp = LumiReWeighting(MonteCarloFileName, DataFileName, self.PileupSummaryInfo, +1)
+      self.engineDown = LumiReWeighting(MonteCarloFileName, DataFileName, self.PileupSummaryInfo, -1)
       # declare histograms
       self.add("LumiWeight","LumiWeight",1000,0,10)
+      self.add("LumiWeightUp","LumiWeightUp",1000,0,10)
+      self.add("LumiWeightDown","LumiWeightDown",1000,0,10)
       self.add("pu","pu",50,0,50)
       self.add("pv","pv",50,0,50)
       # fill the histogram with the configured weights
@@ -40,6 +44,8 @@ class LumiReWeightingControlPlots(BaseControlPlots):
       """LumiReWeightingControlPlots"""
       result = { }
       result["LumiWeight"] = self.engine.weight( fwevent=event )
+      result["LumiWeightUp"] = self.engineUp.weight( fwevent=event )
+      result["LumiWeightDown"] = self.engineDown.weight( fwevent=event )
       event.getByLabel (self.vertexlabel,self.vertexHandle)
       vs = self.vertexHandle.product()
       npv = vs.size()
