@@ -1,0 +1,26 @@
+# number of channels
+imax 1
+# number of backgrounds
+jmax 5
+# number of nuisance parameters (sources of systematic uncertainties)
+kmax *
+---------------
+shapes * * TH1shapes.root $PROCESS 
+---------------
+# number of channels
+bin 1
+# number of observed events
+observation -1
+------------------------------
+# number of expected events, per source 
+bin             1          1           1     1    1   1
+process         signal130  Zb          TT    Zl   Zc  ZZ
+process         0          1           2     3    4   5
+rate            -1         -1          -1    -1   -1  -1
+--------------------------------
+# the description of the systematic uncertainties 
+#lumi     lnN    1.10       1.1         1.1   1.1  1.1  1.1
+#bgnorm   lnN    -          1.3         1.3   1.3  1.3  1.3
+
+
+
