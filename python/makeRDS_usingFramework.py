@@ -325,12 +325,12 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    ws.writeToFile("File_rds_zbb_"+channel+".root") 
-    gDirectory.Add(ws)
+    #ws.writeToFile("File_rds_zbb_"+channel+".root") 
+    #gDirectory.Add(ws)
 
-    #f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
-    #rds_zbb.Write()
-    #f.Close()
+    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
+    rds_zbb.Write()
+    f.Close()
 
 print "Running processInputFile(", muChannel[channel], ", ", path[channel], ")"
 processInputFile(muChannel[channel], path[channel])
