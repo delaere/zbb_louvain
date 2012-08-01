@@ -14,7 +14,8 @@ files_run = open("files_Ele_Stage12_ZHEHEMET_eventslist_Aug05.txt","w")
 #files_run = open("files_Ele_Stage12_ZHEHEMET_eventslist_PV4.txt","w")
 #files_run = open("files_Ele_Stage12_ZHEHEMET_eventslist_PV6.txt","w")
 
-def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/Aug05ReReco/Ele_Aug05ReReco/"):
+def main (cat=12 , path="/storage/data/cms/users/llbb/production2012_44X/"):
+#def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/Aug05ReReco/Ele_Aug05ReReco/"):
 #def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/May10ReReco/Ele_May10/"):
 #def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/PromptRecoV4/Ele_PromptRecoV4/"):
 #def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/PromptRecoV6/Ele_PromptRecoV6/"):
@@ -33,6 +34,8 @@ def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/Aug05ReReco/E
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
   #genHandle = Handle ("vector<reco::GenParticle>")
+
+  #run=166512
   
   for fwevent in fwevents:
     #if fwevent.eventAuxiliary().run()==run :

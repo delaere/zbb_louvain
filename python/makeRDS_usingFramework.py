@@ -94,7 +94,10 @@ muChannel = { "MuA_DATA"     : True ,
               "tW_Mu_MC"     : True ,
               "tW_El_MC"     : False,
               "tbarW_Mu_MC"  : True ,
-              "tbarW_El_MC"  : False
+              "tbarW_El_MC"  : False,
+              "evtgen_MC"    : False,
+              "herwig_MC"    : False,
+              "pythia_MC"    : False,
               }
 
 path = { 
@@ -123,7 +126,10 @@ path = {
   "tW_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
   "tW_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
   "tbarW_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
-  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/"             
+  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
+  "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
+  "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
+  "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
   }
 
 ###############################
@@ -201,7 +207,10 @@ checkTrigger = {
   "tW_Mu_MC"     : False,
   "tW_El_MC"     : False,
   "tbarW_Mu_MC"  : False,
-  "tbarW_El_MC"  : False
+  "tbarW_El_MC"  : False,
+  "evtgen_MC"    : False,
+  "herwig_MC"    : False,
+  "pythia_MC"    : False,
   }
 
 obsSet  = RooArgSet()
@@ -316,14 +325,12 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    #ws.writeToFile("File_rds_zbb_"+channel+".root") 
-    #gDirectory.Add(ws)
+    ws.writeToFile("File_rds_zbb_"+channel+".root") 
+    gDirectory.Add(ws)
 
-    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
-    rds_zbb.Write()
-    #rds_zbb_tree = rds_zbb.tree()
-    #rds_zbb_tree.Write("test.root")
-    f.Close()
+    #f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
+    #rds_zbb.Write()
+    #f.Close()
 
 print "Running processInputFile(", muChannel[channel], ", ", path[channel], ")"
 processInputFile(muChannel[channel], path[channel])

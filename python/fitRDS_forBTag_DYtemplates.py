@@ -23,13 +23,14 @@ import os
 gROOT.SetStyle("Plain")
 gStyle.SetErrorX(0)
 
-WP       = "HEHE"  #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
-channel  = "El"    #"El","Mu"
-template = "keys"  #"keys", "hist"
+WP       = "HPMET"  #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+channel  = "Mu"    #"El","Mu"
+template = "hist"  #"keys", "hist"
 jec      = 0       #1,3,5
 numbins  = 160     #20,40,80
 PVreduce = 0
-if WP=="HP" : numbins=numbins/2
+if WP=="HP" : numbins=numbins/4
+if WP=="HPMET" : numbins=numbins/8
 if WP=="HEHE" : numbins=numbins/4
 
 jet2 = False
@@ -38,8 +39,8 @@ if template=="keys": numbins=40
 
 ### Getting a file and a tree
 
-if   channel == "El" : file  = TFile("File_rds_zbb_El_MC.root")
-elif channel == "Mu" : file  = TFile("File_rds_zbb_Mu_MC.root")
+if   channel == "El" : file  = TFile("~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/File_rds_zbb_El_MC.root")
+elif channel == "Mu" : file  = TFile("~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/File_rds_zbb_Mu_MC.root")
 
 ws    = file.Get("ws")
 myRDS = ws.data("rds_zbb")
@@ -74,8 +75,8 @@ rrv_msv.setBins(numbins)
 #rrv_nPV.setBins(20)
 
 f_data = 0
-if channel == "El"  : f_data = TFile("File_rds_zbb_El_DATA.root")
-elif channel == "Mu" : f_data = TFile("File_rds_zbb_Mu_DATA.root")
+if channel == "El"  : f_data = TFile("~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/File_rds_zbb_ElB_DATA.root")
+elif channel == "Mu" : f_data = TFile("~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/File_rds_zbb_MuB_DATA.root")
 
 ws_data=f_data.Get("ws")
 DATA = ws_data.data("rds_zbb")
@@ -108,8 +109,8 @@ if WP=="HP"         :
     DATA = DATA.reduce("rc_eventSelection_6==1")
     myRDS=myRDS.reduce("rc_eventSelection_6==1")
 if WP=="HPMET"      :
-    DATA = DATA.reduce("rc_HPMET==1")
-    myRDS=myRDS.reduce("rc_HPMET==1")
+    DATA = DATA.reduce("rc_eventSelection_8==1")
+    myRDS=myRDS.reduce("rc_eventSelection_8==1")
 if WP=="HP_excl"    :
     DATA = DATA.reduce("rc_HP_excl==1")
     myRDS=myRDS.reduce("rc_HP_excl==1")
@@ -146,9 +147,9 @@ for i in range(0,DATA.numEntries()):
 
 DATA = DATA_withunc
 
-myRDS_l = myRDS.reduce("mcSelectioneventType==1")
-myRDS_c = myRDS.reduce("mcSelectioneventType==2")
-myRDS_b = myRDS.reduce("mcSelectioneventType==3")
+myRDS_l = myRDS.reduce("jetmetbjet1Flavor==1||jetmetbjet1Flavor==-1||jetmetbjet1Flavor==2||jetmetbjet1Flavor==-2||jetmetbjet1Flavor==3||jetmetbjet1Flavor==-3||jetmetbjet1Flavor==21")
+myRDS_c = myRDS.reduce("jetmetbjet1Flavor==4||jetmetbjet1Flavor==-4")
+myRDS_b = myRDS.reduce("jetmetbjet1Flavor==5||jetmetbjet1Flavor==-5")
 
 print "myRDS_l.numEntries() = ", myRDS_l.numEntries()
 print "myRDS_c.numEntries() = ", myRDS_c.numEntries()
@@ -174,9 +175,9 @@ myRDH_l = RooDataHist("myRDH_l", "myRDH_l", RooArgSet(rrv_msv), myRDS_l)
 print "made datahists, making histpdfs"
 
 myRHP   = RooHistPdf("myRHP",  "myRHP",  RooArgSet(rrv_msv),myRDH  )
-myRHP_b = RooHistPdf("myRHP_b","myRHP_b",RooArgSet(rrv_msv),myRDH_b)
-myRHP_c = RooHistPdf("myRHP_c","myRHP_c",RooArgSet(rrv_msv),myRDH_c)
-myRHP_l = RooHistPdf("myRHP_l","myRHP_l",RooArgSet(rrv_msv),myRDH_l)
+myRHP_b = RooHistPdf("b_sumPdf","myRHP_b",RooArgSet(rrv_msv),myRDH_b)
+myRHP_c = RooHistPdf("c_sumPdf","myRHP_c",RooArgSet(rrv_msv),myRDH_c)
+myRHP_l = RooHistPdf("l_sumPdf","myRHP_l",RooArgSet(rrv_msv),myRDH_l)
 
 print "made histpdfs, going to plot"
 
@@ -359,25 +360,25 @@ elif template == "hist":
     l_sumHist = RooDataHist("l_sumHist", "l_sumHist", RooArgSet(rrv_msv), myRDS_l)
     l_sumPdf  = RooHistPdf( "l_sumPdf",  "l_sumPdf",  RooArgSet(rrv_msv), l_sumHist)
 
-Nb = RooRealVar("N_{b}","N_{b}",DATA.numEntries()*0.70,0,DATA.numEntries())
-Nc = RooRealVar("N_{c}","N_{c}",DATA.numEntries()*0.20,0,DATA.numEntries())
-Nl = RooRealVar("N_{l}","N_{l}",DATA.numEntries()*0.10,0,DATA.numEntries())
+Nb = RooRealVar("N_{b}","N_{b}",DATA.numEntries()*0.80,0,DATA.numEntries())
+Nc = RooRealVar("N_{c}","N_{c}",DATA.numEntries()*0.15,0,DATA.numEntries())
+Nl = RooRealVar("N_{l}","N_{l}",DATA.numEntries()*0.05,0,DATA.numEntries())
 
-f_Sum_b = RooRealVar("f_{b}","f_{b}", 0.70, 0.00, 1.  )
-f_Sum_c = RooRealVar("f_{c}","f_{c}", 0.20, 0.00, 1.  )
+f_Sum_b = RooRealVar("f_{b}","f_{b}", 0.80, 0.70, 0.90  )
+f_Sum_c = RooRealVar("f_{c}","f_{c}", 0.15, 0.08, 0.22  )
 
-#sumPdf = RooAddPdf("sumPdf","sumPdf",
-#                   RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
-#                   RooArgList(Nb,      Nc       ,Nl        ) )
-#sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
-#                    RooArgList(b_sumPdf, c_sumPdf, l_sumPdf),
-#                    RooArgList(f_Sum_b,  f_Sum_c            ) )
 sumPdf = RooAddPdf("sumPdf","sumPdf",
-                   RooArgList(b_sumPdf, c_sumPdf),
-                   RooArgList(Nb,      Nc               ) )
+                   RooArgList(myRHP_b, myRHP_c, myRHP_l),
+                   RooArgList(Nb,      Nc       ,Nl        ) )
 sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
-                    RooArgList(b_sumPdf, c_sumPdf),
-                    RooArgList(f_Sum_b,             ) )
+                    RooArgList(myRHP_b, myRHP_c, myRHP_l),
+                    RooArgList(f_Sum_b,  f_Sum_c            ) )
+#sumPdf = RooAddPdf("sumPdf","sumPdf",
+#                   RooArgList(b_sumPdf, c_sumPdf),
+#                   RooArgList(Nb,      Nc               ) )
+#sumPdf2 = RooAddPdf("sumPdf2","sumPdf2",
+#                    RooArgList(b_sumPdf, c_sumPdf),
+#                    RooArgList(f_Sum_b,             ) )
 
 rrv_msv.setRange("r",0,5)
 rrv_msv.SetTitle("m(SV) (GeV)")
@@ -492,8 +493,8 @@ DATA.plotOn(FRAME,
             RooFit.DrawOption("pe2"))
 #sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.DrawOption("F"), RooFit.LineWidth(1))
 #sumPdf2.plotOn(FRAME,RooFit.LineColor(kBlack), RooFit.FillColor(kBlue), RooFit.LineWidth(1))
-#sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
-#sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
+sumPdf.plotOn(FRAME,RooFit.Components("l_sumPdf,b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kBlue-7), RooFit.LineWidth(1))
 sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
 sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf,c_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kGreen-7), RooFit.LineWidth(1))
 sumPdf.plotOn(FRAME,RooFit.Components("b_sumPdf"),RooFit.LineColor(kBlack), RooFit.FillColor(kRed-7), RooFit.DrawOption("F"), RooFit.LineWidth(1))
