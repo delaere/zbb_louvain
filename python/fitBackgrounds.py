@@ -36,6 +36,8 @@
 # - Fractions                                           #
 # - Number of events                                    #
 #                                                       #
+# Also: include shape uncertainty                       #
+#                                                       #
 #########################################################
 
 from ROOT import *
