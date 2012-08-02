@@ -77,50 +77,63 @@ class LeptonsReWeighting:
      self.vertexHandle_ = Handle ("vector<reco::Vertex>")
      #self.rhoHandle_ = Handle ("double")
      # the efficiency maps
-     self._elePidWeight_A = PtEtaMap([50],[0.8, 1.44, 2.0],
-                                   [[(1.002,0.006), (1.001,0.007), (1.009,0.008), (1.008,0.010)], 
-                                    [(1.004,0.005), (0.984,0.029), (0.993,0.009), (0.944,0.020)]])
-     self._eleIsoWeight_A = PtEtaMap([50],[1.6],
-                                   [[(1.004,0.006), (1.043,0.007)], 
-                                    [(0.988,0.006), (1.013,0.012)]])
-     self._ele17TrgWeight_A1 = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
-     self._ele8TrgWeight_A1  = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.99,0.010), (0.99,0.010), (0.99,0.010)]])
-     self._ele17TrgWeight_A2 = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.990,0.001), (0.989,0.001), (0.989,0.001)]])
-     self._ele8TrgWeight_A2  = PtEtaMap([],[0.8, 1.6],
-                                        [[(0.991,0.001), (0.989,0.001), (0.989,0.001)]])
+
+     ## CAVEAT: systematics due to TnP method still missing.
+
+     self._elePidWeight = PtEtaMap([],[0.9, 1.44],
+                                   [[(0.997,0.0036), (1.00,0.0045), (1.01,0.0055)]])
+     self._eleIsoWeight = PtEtaMap([],[0.9, 1.44],
+                                   [[(1.00,0.0041), (0.993,0.0055), (1.010,0.008)]])
      
-     self._muPidWeight  = PtEtaMap([50],[1.2],
-                                   [[(0.995,0.004), (0.993,0.004)], 
-                                    [(0.987,0.004), (0.996,0.005)]])
-     self._muIsoWeight  = PtEtaMap([50],[1.2],
-                                   [[(1.022,0.004), (1.017,0.004)], 
-                                    [(1.001,0.004), (1.002,0.005)]])
-     self._mu7TrgWeight = PtEtaMap([],[0.9, 1.5],
-                                   [[(0.971,0.0010), (0.957,0.0010), (0.954,0.0050)]])
-     self._mu8TrgWeight = PtEtaMap([],[0.9, 1.5],
-                                   [[(0.973,0.0010), (0.964,0.0010), (0.952,0.0040)]])
-     self._mu13TrgWeight = PtEtaMap([],[0.9, 1.5],
-                                   [[(0.973,0.0010), (0.962,0.0010), (0.946,0.0040)]])
+     self._ele17TrgWeight = PtEtaMap([30,50],[1.4],
+                                        [[(0.983,0.0012), (0.982,0.0028)],
+                                         [(0.995,0.0026), (0.995,0.0048)],
+                                         [(0.998,0.0041), (0.998,0.0006)]])
+     self._ele8TrgWeight  = PtEtaMap([30,50],[1.4],
+                                        [[(0.995,0.0012), (0.998,0.0012)],
+                                         [(0.998,0.0002), (0.999,0.0003)],
+                                         [(0.999,0.0003), (0.999,0.0004)]])
+     
+     ## CAVEAT: systematics due to TnP method still missing.
+     
+     self._muPidWeight  = PtEtaMap([],[0.9,2.1],
+                                   [[(0.995,0.001), (0.972,0.0012), (0.978,0.0041)]])
+     self._muIsoWeight  = PtEtaMap([],[0.9,2.1],
+                                   [[(0.9926,0.0008), (0.998,0.0008), (1.010,0.0027)]]) 
+     self._mu7TrgWeight = PtEtaMap([],[1.2],
+                                   [[(0.971,0.0018), (0.948,0.0031)]])
+     self._mu8Trg_Mu13Mu8_Weight = PtEtaMap([30,50],[1.2],
+                                   [[(0.968,0.0014), (0.935,0.0023)],
+                                    [(0.967,0.0007), (0.933,0.0012)],
+                                    [(0.968,0.0010), (0.939,0.0019)]])
+     self._mu13Trg_Mu13Mu8_Weight = PtEtaMap([30,50],[1.2],
+                                   [[(0.967,0.0015), (0.924,0.0025)],
+                                    [(0.967,0.0007), (0.927,0.0013)],
+                                    [(0.968,0.0010), (0.934,0.0019)]])
+
+     self._mu8Trg_Mu17Mu8_Weight = PtEtaMap([30,50],[1.2],
+                                   [[(0.962,0.0038), (0.919,0.0037)],
+                                    [(0.967,0.0010), (0.929,0.0019)],
+                                    [(0.967,0.0015), (0.930,0.0032)]])
+     self._mu17Trg_Mu17Mu8_Weight = PtEtaMap([30,50],[1.2],
+                                   [[(0.960,0.0023), (0.907,0.0036)],
+                                    [(0.965,0.0010), (0.919,0.0020)],
+                                    [(0.966,0.0014), (0.923,0.0033)]])
+    
  
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
      # particle id
-     pid_sf_run2011A = self._elePidWeight_A[(e1.pt(),e1.eta())][0]*self._elePidWeight_A[(e2.pt(),e2.eta())][0]
+     pid_sf_run2011 = self._elePidWeight[(e1.pt(),e1.eta())][0]*self._elePidWeight[(e2.pt(),e2.eta())][0]
      # isolation
-     iso_sf_run2011A = self._eleIsoWeight_A[(e1.pt(),e1.eta())][0]*self._eleIsoWeight_A[(e2.pt(),e2.eta())][0]
+     iso_sf_run2011 = self._eleIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIsoWeight[(e2.pt(),e2.eta())][0]
      # trigger
-     hlt_sf_run2011A1 = self._ele8TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A1 [(e2.pt(),e2.eta())][0]+ \
-                        self._ele17TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A1 [(e2.pt(),e2.eta())][0]- \
-                        self._ele17TrgWeight_A1[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A1[(e2.pt(),e2.eta())][0]
-     hlt_sf_run2011A2 = self._ele8TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2 [(e2.pt(),e2.eta())][0]+ \
-                        self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight_A2 [(e2.pt(),e2.eta())][0]- \
-                        self._ele17TrgWeight_A2[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight_A2[(e2.pt(),e2.eta())][0]
-     #lw = (0.5*pid_sf_run2011A1*iso_sf_run2011A1*hlt_sf_run2011A1)+(0.5*pid_sf_run2011A2*iso_sf_run2011A2*hlt_sf_run2011A2)
-     lw = (pid_sf_run2011A*iso_sf_run2011A*0.5*(hlt_sf_run2011A1+hlt_sf_run2011A2))
-     
+     hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
+                        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]- \
+                        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]
+
+     lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
+
      return lw
 
    def weight_mm(self,m1,m2):
@@ -133,11 +146,18 @@ class LeptonsReWeighting:
      lw *= self._muIsoWeight[(m1.pt(),m1.eta())][0]
      lw *= self._muIsoWeight[(m2.pt(),m2.eta())][0]
      # trigger
-     hlt_sf_run2011A1 = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
-     hlt_sf_run2011A2 = self._mu8TrgWeight [(m1.pt(),m1.eta())][0]*self._mu13TrgWeight[(m2.pt(),m2.eta())][0] + \
-                        self._mu13TrgWeight[(m1.pt(),m1.eta())][0]*self._mu8TrgWeight [(m2.pt(),m2.eta())][0] - \
-                        self._mu13TrgWeight[(m1.pt(),m1.eta())][0]*self._mu13TrgWeight[(m2.pt(),m2.eta())][0]
-     lw *= (0.11*hlt_sf_run2011A1+0.89*hlt_sf_run2011A2)
+     hlt_sf_run2011_a = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
+
+     hlt_sf_run2011_b = self._mu8Trg_Mu13Mu8_Weight [(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]
+
+     hlt_sf_run2011_c = self._mu8Trg_Mu17Mu8_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]
+
+     
+     lw *= (0.044*hlt_sf_run2011_a+0.802*hlt_sf_run2011_b+0.154* hlt_sf_run2011_c) ##percentage according to the lumi in which they were not prescaled.
      return lw
 
    #@print_timing
