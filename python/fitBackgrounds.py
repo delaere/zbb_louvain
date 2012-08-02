@@ -108,6 +108,9 @@ def getVariables(var,dataAndMCList) :
     x.setMin(60)
     x.setMax(120)
     x.setBins(30)
+
+    #todo: make this automatic for all variables
+    
     return x
     
 
@@ -143,46 +146,45 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
 
     return 
 
-def makeTtPdfList(dataAndMCList, ttMCNames, ttVar, ttPdfList, RDH_tt, RHP_tt ) :
-    print "*** dataAndMCList = "
-    print dataAndMCList
-    print "*** end dataAndMCList "
-    mcName=ttMCNames
-    ttVarName=ttVar.GetName()
-    name=mcName+ttVarName
+def makePdfList(dataAndMCList, mcName, var, RDH, RHP ) :
+    varName=var.GetName()
+    name=mcName+varName
 
-    print "ttMCName  = ", ttMCNames
-    print "ttVarName = ", ttVarName
     print "mcName    = ", mcName
+    print "varName   = ", varName
+    print "name      = ", name
 
+    print "**** before cut: number of entries = " , dataAndMCList[mcName].numEntries()
 
-    print "**** before cut: number of entries = " , dataAndMCList[ttMCNames].numEntries()
-
-    if ttVarName=="jetmetbjet1SVmass":
-        if ttMCNames=="Zl":
+    if varName=="jetmetbjet1SVmass":
+        if mcName=="Zl":
             print "Zl dataset, going to cut on udsgc flav"
-            dataAndMCList[ttMCNames] = dataAndMCList[ttMCNames].reduce("jetmetbjet1Flavor==1||jetmetbjet1Flavor==-1||jetmetbjet1Flavor==2||jetmetbjet1Flavor==-2||jetmetbjet1Flavor==3||jetmetbjet1Flavor==-3||jetmetbjet1Flavor==21")
-        if ttMCNames=="Zc":
+            dataAndMCList[name] = dataAndMCList[mcName].reduce("jetmetbjet1Flavor==1||jetmetbjet1Flavor==-1||jetmetbjet1Flavor==2||jetmetbjet1Flavor==-2||jetmetbjet1Flavor==3||jetmetbjet1Flavor==-3||jetmetbjet1Flavor==21")
+        if mcName=="Zc":
             print "Zc dataset, going to cut on c flav"
-            dataAndMCList[ttMCNames]=dataAndMCList[ttMCNames].reduce("jetmetbjet1Flavor==4||jetmetbjet1Flavor==-4")
-        if ttMCNames=="Zb":
+            dataAndMCList[name]=dataAndMCList[mcName].reduce("jetmetbjet1Flavor==4||jetmetbjet1Flavor==-4")
+        if mcName=="Zb":
             print "Zb dataset, going to cut on b flav"
-            dataAndMCList[ttMCNames]=dataAndMCList[ttMCNames].reduce("jetmetbjet1Flavor==5||jetmetbjet1Flavor==-5")
-        else:
-            print "DID NOT MATCH SAMPLE NAME"
+            dataAndMCList[name]=dataAndMCList[mcName].reduce("jetmetbjet1Flavor==5||jetmetbjet1Flavor==-5")
+    else:
+        dataAndMCList[name]=dataAndMCList[mcName]
+        print "DID NOT MATCH SAMPLE NAME"
 
-    print "**** after cut: number of entries = " , dataAndMCList[ttMCNames].numEntries()
+    print "**** after cut: number of entries = " , dataAndMCList[mcName].numEntries()
+    print "**** after cut: number of entries = " , dataAndMCList[name].numEntries()
         
+    # todo: something goes wrong here with the cut on the dataset. Somethow it is not given to the RooDataHist correctly
     
     if keys:
-        RKP_tt[name] = RooKeysPdf( "RKP_tt_"+name,"myRKP_tt_"+name, ttVar, dataAndMCs  )
+        RKP[name] = RooKeysPdf( "RKP_tt_"+name,"myRKP_tt_"+name, var, dataAndMCs  )
     else :    
-        RDH_tt[mcName] = RooDataHist("RDH_tt_"+name,"myRDH_tt_"+name, RooArgSet(ttVar), dataAndMCList[ttMCNames]   )
-        RHP_tt[mcName] = RooHistPdf( "RHP_tt_"+name,"myRHP_tt_"+name, RooArgSet(ttVar), RDH_tt[mcName] )
-        #ttPdfList.add(RHP_tt[name])
-    return
+        RDH[name] = RooDataHist("RDH_"+name,"RDH_"+name, RooArgSet(var), dataAndMCList[name]   )
+        RHP[name] = RooHistPdf( "RHP_"+name,"RHP_"+name, RooArgSet(var), RDH[name] )
     # else:    
     # parameterized?
+    return
+
+#############################################################################################################
 
 # def makeMsvPDF :
 
@@ -226,19 +228,21 @@ def main():
 
     if len(ttbarVarList):
         for ttVarName in ttbarVarList:
-            for ttMCNames in ttMCNameList :
-                makeTtPdfList(dataAndMCList, ttMCNames, vars[ttVarName], ttPdfList, RDH_tt, RHP_tt )
-                Ntt[ttMCNames]=RooRealVar("Ntt"+ttMCNames,"Ntt"+ttMCNames,0,dataAndMCList[ttMCNames].numEntries())
-                ttYieldList.add(Ntt[ttMCNames])
-                ttPdfList.add(RHP_tt[ttMCNames])
+            for ttMCName in ttMCNameList :
+                pdfName = ttMCName+vars[ttVarName].GetName() 
+                makePdfList(dataAndMCList, ttMCName, vars[ttVarName], RDH_tt, RHP_tt )
+                Ntt[ttMCName]=RooRealVar("Ntt"+ttMCName,"Ntt"+ttMCName,0,dataAndMCList[ttMCName].numEntries())
+                ttYieldList.add(Ntt[ttMCName])
+                ttPdfList.add(RHP_tt[pdfName])
 
     if len(mistagVarList):        
         for mistagVarName in mistagVarList :
-            for mistagMCNames in mistagMCNameList :
-                makeTtPdfList(dataAndMCList, mistagMCNames, vars[mistagVarName], mistagPdfList, RDH_mistag, RHP_mistag )
-                Nmistag[mistagMCNames]=RooRealVar("Nmistag"+mistagMCNames,"Nmistag"+mistagMCNames,0,dataAndMCList[mistagMCNames].numEntries())
-                mistagYieldList.add(Nmistag[mistagMCNames])#
-                mistagPdfList.add(RHP_mistag[mistagMCNames])
+            for mistagMCName in mistagMCNameList :
+                pdfName = mistagMCName+vars[mistagVarName].GetName() 
+                makePdfList(dataAndMCList, mistagMCName, vars[mistagVarName], RDH_mistag, RHP_mistag )
+                Nmistag[mistagMCName]=RooRealVar("Nmistag"+mistagMCName,"Nmistag"+mistagMCName,0,dataAndMCList[mistagMCName].numEntries())
+                mistagYieldList.add(Nmistag[mistagMCName])#
+                mistagPdfList.add(RHP_mistag[pdfName])
 
     if len(mistagVarList):
         mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
