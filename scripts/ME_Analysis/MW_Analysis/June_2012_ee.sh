@@ -11,7 +11,7 @@ echo  ttbar   Weights  : /home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight
 echo  zz C0 Weight   : /home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZZ_C0_ee_2505012/Events/JUNE_12_ $1 0/JUNE_12_$1 0_weights.out
 echo  zz C3 Weight   : /home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZZ_C3_ee_2505012/Events/JUNE_12_ $1 3/JUNE_12_$1 3_weights.out
 echo  zh C0 Weight   : /home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZH_C0_ee_2505012/Events/JUNE_12_ $1 0/JUNE_12_$1 0_weights.out
-echo  zh C3 Weight   :/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZH_ee_250512/Events/JUNE_12_ $1 3/JUNE_12_"$1 3_weights.out
+echo  zh C3 Weight   :/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZH_ee_250512/Events/JUNE_12_ $1 3/JUNE_12_$1 3_weights.out
 echo  twb Weight   : /home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/twb_ee_2505012/Events/JUNE_12_ $1 2/JUNE_12_$1 2_weights.out
 echo  LHCO file info   : /home/fynu/arnaudp/scratch/MW_5/inputFiles/JUNE_12/$2				
 echo  Event info       : /home/fynu/arnaudp/scratch/MW_5/inputFiles/JUNE_12/$3 									
@@ -46,8 +46,8 @@ TString file("$1")
 TString file2("$2")
 TString file3("$3")
 
-TString qq("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/gg_Zbb_ee_2505012/Events/JUNE_12_"+file+"0/JUNE_12_"+file+"0_weights.out");
-TString gg("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/qq_Zbb_ee_2505012/Events/JUNE_12_"+file+"0/JUNE_12_"+file+"0_weights.out");
+TString gg("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/gg_Zbb_ee_2505012/Events/JUNE_12_"+file+"0/JUNE_12_"+file+"0_weights.out");
+TString qq("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/qq_Zbb_ee_2505012/Events/JUNE_12_"+file+"0/JUNE_12_"+file+"0_weights.out");
 TString tt("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/tt_ee_2505012/Events/JUNE_12_"+file+"2/JUNE_12_"+file+"2_weights.out");
 TString zz_c0("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZZ_C0_ee_2505012/Events/JUNE_12_"+file+"0/JUNE_12_"+file+"0_weights.out");
 TString zz_c3("/home/fynu/arnaudp/scratch/MW_5/new_madweight/madweight/ZZ_C3_ee_2505012/Events/JUNE_12_"+file+"3/JUNE_12_"+file+"3_weights.out");
