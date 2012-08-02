@@ -55,7 +55,7 @@ binning   = 40
 # to adjust by user:
 
 mistagVarList = [ "msv1" ]
-ttbarVarList  = [ ]
+ttbarVarList  = [ "melel" ]
 
 totVarList = mistagVarList+ttbarVarList 
 
@@ -102,9 +102,12 @@ def getVariables(var,dataAndMCList) :
     print "ras = ", dataAndMCList["TT"].get()
     print "var = ", dataAndMCList["TT"].get()[var]
     x = dataAndMCList["TT"].get()[var]
-    x.setMin(0.1)
-    x.setMax(5.1)
-    x.setBins(50)
+    #x.setMin(0.1)
+    #x.setMax(5.1)
+    #x.setBins(75)
+    x.setMin(60)
+    x.setMax(120)
+    x.setBins(30)
     return x
     
 
@@ -199,10 +202,8 @@ def makeTtPdfList(dataAndMCList, ttMCNames, ttVar, ttPdfList, RDH_tt, RHP_tt ) :
 def main():
 
     dataAndMCList = {}
-    #dataAndMCs    = {}
     vars          = {}
 
-    #for dataAndMcs in dataAndMcList  : dataAndMCList[dataAndMcs] = getDataAndMC(dataAndMcs)
     getDataAndMC(dataAndMCNameList, dataAndMCList)
 
     for varName in totVarList       : vars[varName] = getVariables(varNamesList[varName],dataAndMCList)
@@ -223,64 +224,49 @@ def main():
     Ntt={}
     Nmistag={}
 
+    if len(ttbarVarList):
+        for ttVarName in ttbarVarList:
+            for ttMCNames in ttMCNameList :
+                makeTtPdfList(dataAndMCList, ttMCNames, vars[ttVarName], ttPdfList, RDH_tt, RHP_tt )
+                Ntt[ttMCNames]=RooRealVar("Ntt"+ttMCNames,"Ntt"+ttMCNames,0,dataAndMCList[ttMCNames].numEntries())
+                ttYieldList.add(Ntt[ttMCNames])
+                ttPdfList.add(RHP_tt[ttMCNames])
+
+    if len(mistagVarList):        
+        for mistagVarName in mistagVarList :
+            for mistagMCNames in mistagMCNameList :
+                makeTtPdfList(dataAndMCList, mistagMCNames, vars[mistagVarName], mistagPdfList, RDH_mistag, RHP_mistag )
+                Nmistag[mistagMCNames]=RooRealVar("Nmistag"+mistagMCNames,"Nmistag"+mistagMCNames,0,dataAndMCList[mistagMCNames].numEntries())
+                mistagYieldList.add(Nmistag[mistagMCNames])#
+                mistagPdfList.add(RHP_mistag[mistagMCNames])
+
+    if len(mistagVarList):
+        mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
+        mistagPdf.fitTo(dataAndMCList["El_Data"])
+        ## for vars in list
+        frame = vars[mistagVarName].frame()
+        dataAndMCList["El_Data"].plotOn(frame)
+        mistagPdf.plotOn(frame)
+        frame.Draw()
+
+    if len(ttbarVarList):
+        ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttYieldList)
+        
+        ttPdf.fitTo(dataAndMCList["El_Data"])
     
-    #for ttVarName in ttVarList   : ttPdfList[ttVarName] = makeTtPdfList(dataAndMCList, ttMCNameList, vars[ttVarName], ttPdfList )
+        frame = vars[ttVarName].frame()
+        dataAndMCList["El_Data"].plotOn(frame)
+        ttPdf.plotOn(frame)
+        frame.Draw()
 
-    #for ttVarName in ttbarVarList:
-    #    for ttMCNames in ttMCNameList :
-    #        makeTtPdfList(dataAndMCList, ttMCNames, vars[ttVarName], ttPdfList, RDH_tt, RHP_tt )
-    #       
-    #        Ntt[ttMCNames]=RooRealVar("Ntt"+ttMCNames,"Ntt"+ttMCNames,0,dataAndMCList[ttMCNames].numEntries())
-    #        ttYieldList.add(Ntt[ttMCNames])#
-    #
-    #        print "RHP_tt = ", RHP_tt
-    #        print "test = ", RHP_tt[ttMCNames]
-    #
-    #        ttPdfList.add(RHP_tt[ttMCNames])
+    #totPdfList = msvPdfList+ttPdfList    
 
-    for mistagVarName in mistagVarList :
-        for mistagMCNames in mistagMCNameList :
-            makeTtPdfList(dataAndMCList, mistagMCNames, vars[mistagVarName], mistagPdfList, RDH_mistag, RHP_mistag )
-           
-            Nmistag[mistagMCNames]=RooRealVar("Nmistag"+mistagMCNames,"Nmistag"+mistagMCNames,0,dataAndMCList[mistagMCNames].numEntries())
-            mistagYieldList.add(Nmistag[mistagMCNames])
-
-            print "RHP_mistag = ", RHP_mistag
-            print "test = ", RHP_mistag[mistagMCNames]
-
-            mistagPdfList.add(RHP_mistag[mistagMCNames])
-
-    mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
-    mistagPdf.fitTo(dataAndMCList["El_Data"])
-    # for vars in list
-    frame = vars[mistagVarName].frame()
-    dataAndMCList["El_Data"].plotOn(frame)
-    mistagPdf.plotOn(frame)
-    frame.Draw()
-
-    bla
-
-    ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttYieldList)
-
-    ttPdf.fitTo(dataAndMCList["El_Data"])
-    
-    frame = vars[ttVarName].frame()
-    dataAndMCList["El_Data"].plotOn(frame)
-    ttPdf.plotOn(frame)
-    frame.Draw()
-
-    bla
-
-    #for msvVarName in msvVarNameList : msvPdfList[msvVar] = makeMistagPdf(udsgcMCList, msvVar)
-
-    totPdfList = msvPdfList+ttPdfList    
-
-    if msvVars.len() >1 : msvPdf = makeSimMistagPdf(msvPdfs)
-    else                : msvPdf = msvPdf.at(0)
-    if allVars.len() >1 : totPdf = makeSimTotPdf(ttPdfList+msvPdfList)
-    else                : totPdf = msvPdf.at(0)
+    #if len(mistagVarList) >1 : msvPdf = makeSimMistagPdf(msvPdfs)
+    #else                     : msvPdf = msvPdf.at(0)
+    #if len(totVarList) >1    : totPdf = makeSimTotPdf(ttPdfList+msvPdfList)
+    #else                     : totPdf = msvPdf.at(0)
         
 
-    totPdf.fitTo(dataAndMc["DATA"])
+    #totPdf.fitTo(dataAndMc["DATA"])
 
-    plot(data,pdfs,componentList)
+    #plot(data,pdfs,componentList)
