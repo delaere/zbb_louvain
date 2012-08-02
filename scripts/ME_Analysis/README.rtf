@@ -1,0 +1,98 @@
+{\rtf1\ansi\ansicpg1252\cocoartf949\cocoasubrtf540
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fnil\fcharset0 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red28\green0\blue207;\red170\green13\blue145;\red196\green26\blue22;
+}
+\paperw110551\paperh144000\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+
+\f0\fs24 \cf0 ***********************************************************\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 ***********************************************************\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 \
+				MW Analysis\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 ***********************************************************\
+***********************************************************\
+\
+In inputFiles:\
+You must copy in this directory the lhco file and lhco converted to root file and the event info rootfile.\
+This directory will also contains the output of the MW_Analysis (which are input for the NN estimation code)\
+\
+***********************************************************\
+\
+In MW_Analysis:\
+\
+1. Untar and install ExRootAnalysis\
+\
+Code and script content :\
+1. "
+\f1 MW_analysis_All_Full_v4.C" called "MW_Analysis" code\
+For each dataset this macro create a tree (tree2) containing the (-log10) of the weight for the following hypothesis : gg, qq, tt, zzC0, zzC3, zhC0, zhC3, twb. \
+It contains also information as event and run number.\
+The macro is submitted with the June_2012.sh script.\
+Inputs are : location of the weights for all the hypothesis, lhco event file converted in root and the event info file provided at the same time as the rootfile.\
+The output is a root file with the tree2.\
+The output file is the entry of the NN code. It is also the file which must be merged at RDS level.\
+\
+2. "June_2012.sh"\
+script bash to submit the MW_Analysis.\
+PATH of the MadWeight output file for each instance must be specified.\
+PATH of the location of the lhco and event info file is specified.\
+\
+3. "include.h"\
+avoid to put all include line in each file\
+\
+
+\f0 ***********************************************************\
+
+\f1 \
+In MW_Analysis/NN_AN:\
+\
+1. "Generic_NN.C"\
+macro to train NN to distinguish signal and background. \
+To be use it for the Zbb Analysis (ZH analysis).\
+Inputs are the output of "MW_Analysis" code for each dataset (DY,tt,ZZ,ZH,twb,DATA).\
+Many option must be checked IN THE CODE :\
+You can specified IN THE CODE if a dataset must be considered as signal/background and if it must be used for the NN training.AS:\
+	
+\f2\fs20 \CocoaLigature0 Input(dy,N1,var1,sim,simu,\cf2 XX\cf0 ,\cf2 YY\cf0 );
+\f1\fs24 \CocoaLigature1 \
+	where XX (0 or 1) say if the dataset will be considered for the NN training.\
+	where YY (0 or 1) say if it's signal (1) or background (0).\
+You have to specified the NN struct and the input of the NN :\
+\pard\tx480\pardeftab480\ql\qnatural\pardirnatural
+
+\f2\fs20 \cf0 \CocoaLigature0 	TMultiLayerPerceptron *mlp =\cf3 new\cf0  TMultiLayerPerceptron(\cf4 "@gg_weight,@qq_weight,@tt_weight,@Met:5:type"\cf0 ,\cf4 "(type==0)/31029.+(type==1)/824."\cf0 ,simu,\cf4 "Entry$%2!=0"\cf0 ,\cf4 "Entry$%2==0"\cf0 );\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 (exemple for tt VS Zbb with 4 entries, 5 node in one intermediate layer)\
+Specified also the number of iteration.\
+the NN will be written both in c++ and in python in the "MW_Analysis/NN/" directory.\
+\
+By default it's configured for tt VS Zbb.\
+\
+2. "Generic_NN_higgs_test.C"\
+As previuos code but configured for a simple ZH VS Zbb analysis.\
+\
+3. "Read_input.h"\
+Small function used in the Generic_NN code.\
+\
+4. "NN_June.sh"\
+Bash script specifying the option to submit the Generic_NN code.\
+Argument needed : name of the inputfile for each dataset + name of the outputfile.\
+\
+5. "plot_NN_Full.C"  \
+Simple code using the MW_Analysis output and the NN function to get some distribution without any reweighting.\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 \
+\
+ }
