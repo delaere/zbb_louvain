@@ -1,3 +1,4 @@
+
 #########################################################
 #                                                       #
 # Script to estimate backgrounds for Z+b-jets analysis. #
@@ -41,10 +42,11 @@
 #########################################################
 
 from ROOT import *
-
+gROOT.SetStyle("Plain")
   
 ### settings you want to give from outside ###
 
+frac      = false
 WP        = "HE"
 extraCut  = ""
 keys      = False
@@ -55,7 +57,7 @@ binning   = 40
 # to adjust by user:
 
 mistagVarList = [ "msv1" ]
-ttbarVarList  = [ "mwnn" ]
+ttbarVarList  = [ "melel" ]
 
 totVarList = mistagVarList+ttbarVarList 
 
@@ -104,12 +106,12 @@ max = {"msv1" :    5,
        "mmumu":  120,
        "mwnn" :    1.2}
 
-bins = {"msv1" :   50,
-        "msv2" :   50,
-        "msv"  :   50,
-        "melel":   50,
-        "mmumu":   50,
-        "mwnn" :   50}
+bins = {"msv1" :   60,
+        "msv2" :   60,
+        "msv"  :   60,
+        "melel":   60,
+        "mmumu":   60,
+        "mwnn" :   60}
 
 color = {"msv1" : kRed,
          "msv2" : kRed,
@@ -176,7 +178,7 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
             myRDS[name] = ws[name].data("rds_zbb")
         else :   
             myRDS[name] = file[name].Get("rds_zbb")
-        myRDS[name] = myRDS[name].reduce(category[WP]+"_idx==1"+extraCut)
+        myRDS[name] = myRDS[name].reduce(category[WP]+"==1"+extraCut)
         myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
         print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name].numEntries() 
         print "after reweighting ...." 
@@ -261,52 +263,122 @@ def main():
     RDH_mistag={}
     RHP_mistag={}
 
-    Ntt={}
-    Nmistag={}
+    Ntt=[]
+    Nmistag=[]
+    ftt=[] 
+    fmistag=[] 
+    
 
     if len(ttbarVarList):
         for ttVarName in ttbarVarList:
             for ttMCName in ttMCNameList :
                 pdfName = ttMCName+vars[ttVarName].GetName() 
                 makePdfList(dataAndMCList, ttMCName, vars[ttVarName], RDH_tt, RHP_tt )
-                Ntt[ttMCName]=RooRealVar("Ntt"+ttMCName,"Ntt"+ttMCName,0,dataAndMCList[ttMCName].numEntries())
-                ttYieldList.add(Ntt[ttMCName])
                 ttPdfList.add(RHP_tt[pdfName])
+                Ntt.append(RooRealVar("N_"+ttMCName,"N_"+ttMCName,0,dataAndMCList[ttMCName].numEntries()))
+                ftt.append(RooRealVar("f_"+ttMCName,"f_{"+ttMCName+"}",0,1.))
+        for Ntts in Ntt: ttYieldList.add(Ntts)
+        ftt = ftt[:len(ftt)-1]
+        for ftts in ftt: ttFracList.add(ftts)
 
     if len(mistagVarList):        
         for mistagVarName in mistagVarList :
             for mistagMCName in mistagMCNameList :
                 pdfName = mistagMCName+vars[mistagVarName].GetName() 
                 makePdfList(dataAndMCList, mistagMCName, vars[mistagVarName], RDH_mistag, RHP_mistag )
-                Nmistag[mistagMCName]=RooRealVar("Nmistag"+mistagMCName,"Nmistag"+mistagMCName,0,dataAndMCList[mistagMCName].numEntries())
-                mistagYieldList.add(Nmistag[mistagMCName])#
                 mistagPdfList.add(RHP_mistag[pdfName])
 
+                Nmistag.append(RooRealVar("N_"+mistagMCName,"N_"+mistagMCName,0,dataAndMCList[mistagMCName].numEntries()))
+                fmistag.append(RooRealVar("f_"+mistagMCName,"f_{"+mistagMCName+"}",0,1.))
+
+        for Nmistags in Nmistag: mistagYieldList.add(Nmistags)
+        fmistag = fmistag[:len(fmistag)-1]
+        for fmistags in fmistag: mistagFracList.add(fmistags)
+                
+
     if len(mistagVarList):
-        mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
+        if frac : mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagFracList)
+        else    : mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
         mistagPdf.fitTo(dataAndMCList["El_Data"])
         ## for vars in list
         frame = vars[mistagVarName].frame()
         dataAndMCList["El_Data"].plotOn(frame)
         mistagPdf.plotOn(frame)
         for mistagVarName in mistagVarList:
-            for mistagMCName in mistagMCNameList:
-                mistagPdf.plotOn(frame,
-                                 RooFit.Components("RHP_"+mistagMCName+vars[mistagVarName].GetName()),
-                                 RooFit.LineColor(color[mistagVarName]))
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zb"+vars[mistagVarName].GetName()+",RHP_Zc"+vars[mistagVarName].GetName()+",RHP_Zl"+vars[mistagVarName].GetName()),
+                             RooFit.DrawOption("F"),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kBlue-7),
+                             RooFit.LineWidth(1)
+                             )
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zb"+vars[mistagVarName].GetName()+",RHP_Zc"+vars[mistagVarName].GetName()+",RHP_Zl"+vars[mistagVarName].GetName()),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kBlue-7),
+                             RooFit.LineWidth(1))
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zc"+vars[mistagVarName].GetName()+",RHP_Zb"+vars[mistagVarName].GetName()),
+                             RooFit.DrawOption("F"),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kGreen-7),
+                             RooFit.LineWidth(1))
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zc"+vars[mistagVarName].GetName()+",RHP_Zb"+vars[mistagVarName].GetName()),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kGreen-7),
+                             RooFit.LineWidth(1))
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zb"+vars[mistagVarName].GetName()),
+                             RooFit.DrawOption("F"),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kRed-7),
+                             RooFit.LineWidth(1))
+            mistagPdf.plotOn(frame,
+                             RooFit.Components("RHP_Zb"+vars[mistagVarName].GetName()),
+                             RooFit.LineColor(kBlack),
+                             RooFit.FillColor(kRed-7),
+                             RooFit.LineWidth(1))
+        dataAndMCList["El_Data"].plotOn(frame)
         mistagPdf.paramOn(frame,dataAndMCList["El_Data"])
         C["mistag"]=TCanvas("mistag","mistag")
         frame.Draw()
 
     if len(ttbarVarList):
-        ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttYieldList)
+        if frac : ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttFracList)
+        else    : ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttYieldList)
         
         ttPdf.fitTo(dataAndMCList["El_Data"])
     
         frame = vars[ttVarName].frame()
         dataAndMCList["El_Data"].plotOn(frame)
         ttPdf.plotOn(frame)
-        #ttPdf.plotOn()
+        for ttVarName in ttbarVarList:
+            ttPdf.plotOn(frame,
+                         RooFit.Components("RHP_DY"+vars[ttVarName].GetName()+",RHP_TT"+vars[ttVarName].GetName()),
+                         RooFit.DrawOption("F"),
+                         RooFit.LineColor(kBlack),
+                         RooFit.FillColor(kBlue-7),
+                         RooFit.LineWidth(1)
+                         )
+            ttPdf.plotOn(frame,
+                         RooFit.Components("RHP_DY"+vars[ttVarName].GetName()+",RHP_TT"+vars[ttVarName].GetName()),
+                         RooFit.LineColor(kBlack),
+                         RooFit.FillColor(kBlue-7),
+                         RooFit.LineWidth(1))
+            ttPdf.plotOn(frame,
+                         RooFit.Components("RHP_TT"+vars[ttVarName].GetName()),
+                         RooFit.DrawOption("F"),
+                         RooFit.LineColor(kBlack),
+                         RooFit.FillColor(kYellow-7),
+                         RooFit.LineWidth(1)
+                         )
+            ttPdf.plotOn(frame,
+                         RooFit.Components("RHP_TT"+vars[ttVarName].GetName()),
+                         RooFit.LineColor(kBlack),
+                         RooFit.FillColor(kYellow-7),
+                         RooFit.LineWidth(1))
+        dataAndMCList["El_Data"].plotOn(frame)
         ttPdf.paramOn(frame,dataAndMCList["El_Data"])
 
         C["tt"]=TCanvas("tt","tt")
