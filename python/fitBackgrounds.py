@@ -46,7 +46,7 @@ from ROOT import *
 ### settings you want to give from outside ###
 
 WP        = "HE"
-extraCuts = ""
+extraCut  = ""
 keys      = False
 binning   = 40
 
@@ -55,7 +55,7 @@ binning   = 40
 # to adjust by user:
 
 mistagVarList = [ "msv1" ]
-ttbarVarList  = [ "melel" ]
+ttbarVarList  = [ "mwnn" ]
 
 totVarList = mistagVarList+ttbarVarList 
 
@@ -69,10 +69,16 @@ mistagMCNameList = ["Zb","Zc","Zl"]
 dataNameList = ["El_Data"]
 dataAndMCNameList= ttMCNameList+mistagMCNameList+dataNameList
 
-category={"HE"   : "rc_eventSelection_5",
-          "HP"   : "rc_eventSelection_x",
-          "HEHE" : "rc_eventSelection_x",
-          "HPHP" : "rc_eventSelection_x",
+category={"HE"         : "rc_eventSelection_5",
+          "HP"         : "rc_eventSelection_6",
+          "HEMET"      : "rc_eventSelection_7",
+          "HPMET"      : "rc_eventSelection_8",
+          "HEHE"       : "rc_eventSelection_9",
+          "HPHP"       : "rc_eventSelection_11",
+          "HEMETsig"   : "rc_eventSelection_15",
+          "HPMETsig"   : "rc_eventSelection_16",
+          "HEHEMETsig" : "rc_eventSelection_17",
+          "HPHPMETsig" : "rc_eventSelection_19",
           }
 
 
@@ -81,14 +87,45 @@ varNamesList = { "msv1"  : "jetmetbjet1SVmass"          ,
                  "msv"   : "jetmetbjetSVmass"           ,
                  "melel" : "eventSelectionbestzmassEle" ,
                  "mmumu" : "eventSelectionbestzmassMu"  ,
-                 "mwnn"  : "xxx"
+                 "mwnn"  : "mlpZbbvsTT"
                 }
+
+min = {"msv1" :   0,
+       "msv2" :   0,
+       "msv"  :   0,
+       "melel":  60,
+       "mmumu":  60,
+       "mwnn" :-0.2}
+
+max = {"msv1" :    5,
+       "msv2" :    5,
+       "msv"  :    5,
+       "melel":  120,
+       "mmumu":  120,
+       "mwnn" :    1.2}
+
+bins = {"msv1" :   50,
+        "msv2" :   50,
+        "msv"  :   50,
+        "melel":   50,
+        "mmumu":   50,
+        "mwnn" :   50}
+
+color = {"msv1" : kRed,
+         "msv2" : kRed,
+         "msv"  : kRed,
+         "melel": kYellow,
+         "mmumu": kYellow,
+         }
+
+C={}
 
 path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/"
 
 fileNameList = { "El_Data" : path+"File_rds_zbb_ElA_DATA.root",
                  "Mu_Data" : path+"File_rds_zbb_MuA_DATA.root",
                  "DY"      : path+"File_rds_zbb_El_MC.root",
+                 #"TT"      : "/home/fynu/vizangarciaj/scratch/RDSME120802/RDS_rdsME_TT_El_MC.root",
                  "TT"      : path+"File_rds_zbb_TT_El_MC.root",
                  "Zb"      : path+"File_rds_zbb_El_MC.root",
                  "Zc"      : path+"File_rds_zbb_El_MC.root",
@@ -97,17 +134,15 @@ fileNameList = { "El_Data" : path+"File_rds_zbb_ElA_DATA.root",
 
 ##############################################
 
-def getVariables(var,dataAndMCList) :
+def getVariables(varNamesList,varName,dataAndMCList) :
+    var=varNamesList[varName]
     print "var = ", var
     print "ras = ", dataAndMCList["TT"].get()
     print "var = ", dataAndMCList["TT"].get()[var]
     x = dataAndMCList["TT"].get()[var]
-    #x.setMin(0.1)
-    #x.setMax(5.1)
-    #x.setBins(75)
-    x.setMin(60)
-    x.setMax(120)
-    x.setBins(30)
+    x.setMin(min[varName])
+    x.setMax(max[varName])
+    x.setBins(bins[varName])
 
     #todo: make this automatic for all variables
     
@@ -137,8 +172,11 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
         print "fileNameList[name] = ", fileNameList[name]
         file[name]  = TFile.Open(fileNameList[name])
         ws[name]    = file[name].Get("ws")
-        myRDS[name] = ws[name].data("rds_zbb")
-        myRDS[name] = myRDS[name].reduce(category[WP]+"==1")
+        if ws[name]:
+            myRDS[name] = ws[name].data("rds_zbb")
+        else :   
+            myRDS[name] = file[name].Get("rds_zbb")
+        myRDS[name] = myRDS[name].reduce(category[WP]+"_idx==1"+extraCut)
         myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
         print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name].numEntries() 
         print "after reweighting ...." 
@@ -208,7 +246,7 @@ def main():
 
     getDataAndMC(dataAndMCNameList, dataAndMCList)
 
-    for varName in totVarList       : vars[varName] = getVariables(varNamesList[varName],dataAndMCList)
+    for varName in totVarList       : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
 
     ttPdfList       = RooArgList()
     ttFracList      = RooArgList()
@@ -251,6 +289,13 @@ def main():
         frame = vars[mistagVarName].frame()
         dataAndMCList["El_Data"].plotOn(frame)
         mistagPdf.plotOn(frame)
+        for mistagVarName in mistagVarList:
+            for mistagMCName in mistagMCNameList:
+                mistagPdf.plotOn(frame,
+                                 RooFit.Components("RHP_"+mistagMCName+vars[mistagVarName].GetName()),
+                                 RooFit.LineColor(color[mistagVarName]))
+        mistagPdf.paramOn(frame,dataAndMCList["El_Data"])
+        C["mistag"]=TCanvas("mistag","mistag")
         frame.Draw()
 
     if len(ttbarVarList):
@@ -261,6 +306,10 @@ def main():
         frame = vars[ttVarName].frame()
         dataAndMCList["El_Data"].plotOn(frame)
         ttPdf.plotOn(frame)
+        #ttPdf.plotOn()
+        ttPdf.paramOn(frame,dataAndMCList["El_Data"])
+
+        C["tt"]=TCanvas("tt","tt")
         frame.Draw()
 
     #totPdfList = msvPdfList+ttPdfList    
