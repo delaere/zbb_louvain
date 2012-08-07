@@ -44,20 +44,22 @@
 from ROOT import *
 gROOT.SetStyle("Plain")
   
-### settings you want to give from outside ###
-
-frac      = false
-WP        = "HE"
-extraCut  = ""
-keys      = False
-binning   = 40
-
 ###############################################
 
+### settings you want to give from outside ###
 # to adjust by user:
 
+channel   = "Mu"
+dataLabel = "2011A"
+
+frac      = true
+WP        = "HEHE"
+extraCut  = ""
+keys      = False
+
 mistagVarList = [ "msv1" ]
-ttbarVarList  = [ "melel" ]
+if channel=="Mu": ttbarVarList  = [ "mmumu" ]
+if channel=="El": ttbarVarList  = [ "melel" ]
 
 totVarList = mistagVarList+ttbarVarList 
 
@@ -65,20 +67,25 @@ totVarList = mistagVarList+ttbarVarList
 
 # fixed definitions:
 
-ttMCNameList = ["TT","DY"]
+ttMCNameList = ["DY","TT"]
 # maybe different if using QCD:
 mistagMCNameList = ["Zb","Zc","Zl"]
-dataNameList = ["El_Data"]
-dataAndMCNameList= ttMCNameList+mistagMCNameList+dataNameList
+dataNameList = [dataLabel]
+MCNameList        = ttMCNameList+mistagMCNameList
+dataAndMCNameList = ttMCNameList+mistagMCNameList+dataNameList
+
+dataAndMCList = {}
 
 category={"HE"         : "rc_eventSelection_5",
           "HP"         : "rc_eventSelection_6",
           "HEMET"      : "rc_eventSelection_7",
           "HPMET"      : "rc_eventSelection_8",
-          "HEHE"       : "rc_eventSelection_9",
-          "HPHP"       : "rc_eventSelection_11",
           "HEMETsig"   : "rc_eventSelection_15",
           "HPMETsig"   : "rc_eventSelection_16",
+          "HEHE"       : "rc_eventSelection_9",
+          "HPHP"       : "rc_eventSelection_11",
+          "HEHEMET"    : "rc_eventSelection_12",
+          "HPHPMET"    : "rc_eventSelection_14",
           "HEHEMETsig" : "rc_eventSelection_17",
           "HPHPMETsig" : "rc_eventSelection_19",
           }
@@ -86,32 +93,59 @@ category={"HE"         : "rc_eventSelection_5",
 
 varNamesList = { "msv1"  : "jetmetbjet1SVmass"          ,
                  "msv2"  : "jetmetbjet2SVmass"          ,
-                 "msv"   : "jetmetbjetSVmass"           ,
+                 #"msv"   : "jetmetbjetSVmass"           ,
                  "melel" : "eventSelectionbestzmassEle" ,
                  "mmumu" : "eventSelectionbestzmassMu"  ,
-                 "mwnn"  : "mlpZbbvsTT"
+                 #"mwnn"  : "mlpZbbvsTT"                 ,
+                 "w_b_HE"    : "BtaggingReweightingHE"  ,
+                 "w_b_HP"    : "BtaggingReweightingHP"  ,
+                 "w_b_HEHE"  : "BtaggingReweightingHEHE",
+                 "w_b_HPHP"  : "BtaggingReweightingHPHP",
+                 "w_lep"     : "LeptonsReweightingweight",
+                 "w_lumi"    : "lumiReweightingLumiWeight",
                 }
 
-min = {"msv1" :   0,
-       "msv2" :   0,
-       "msv"  :   0,
-       "melel":  60,
-       "mmumu":  60,
-       "mwnn" :-0.2}
+min = {"msv1"   :   0,
+       "msv2"   :   0,
+       "msv"    :   0,
+       "melel"  :  73,
+       "mmumu"  :  73,
+       "mwnn"   :-0.2,
+       "w_b_HE"    : 0., 
+       "w_b_HP"    : 0.,
+       "w_b_HEHE"  : 0.,
+       "w_b_HPHP"  : 0.,
+       "w_lep"     : 0.,
+       "w_lumi"    : 0.
+       }
 
 max = {"msv1" :    5,
        "msv2" :    5,
        "msv"  :    5,
-       "melel":  120,
-       "mmumu":  120,
-       "mwnn" :    1.2}
+       "melel":  107,
+       "mmumu":  107,
+       "mwnn" :    1.2,
+       "w_b_HE"    : 2., 
+       "w_b_HP"    : 2.,
+       "w_b_HEHE"  : 2.,
+       "w_b_HPHP"  : 2.,
+       "w_lep"     : 2.,
+       "w_lumi"    : 2.
+       }
 
-bins = {"msv1" :   60,
-        "msv2" :   60,
-        "msv"  :   60,
-        "melel":   60,
-        "mmumu":   60,
-        "mwnn" :   60}
+bins = {"msv1" :   20,
+        "msv2" :   20,
+        "msv"  :   20,
+        "melel":   34,
+        "mmumu":   34,
+        "mwnn" :   60,
+       "w_b_HE"    : 100, 
+       "w_b_HP"    : 100,
+       "w_b_HEHE"  : 100,
+       "w_b_HPHP"  : 100,
+       "w_lep"     : 100,
+       "w_lumi"    : 100
+        }
 
 color = {"msv1" : kRed,
          "msv2" : kRed,
@@ -122,17 +156,21 @@ color = {"msv1" : kRed,
 
 C={}
 
-path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/"
+#path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/"
+path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
 
-fileNameList = { "El_Data" : path+"File_rds_zbb_ElA_DATA.root",
-                 "Mu_Data" : path+"File_rds_zbb_MuA_DATA.root",
-                 "DY"      : path+"File_rds_zbb_El_MC.root",
-                 #"TT"      : "/home/fynu/vizangarciaj/scratch/RDSME120802/RDS_rdsME_TT_El_MC.root",
-                 "TT"      : path+"File_rds_zbb_TT_El_MC.root",
-                 "Zb"      : path+"File_rds_zbb_El_MC.root",
-                 "Zc"      : path+"File_rds_zbb_El_MC.root",
-                 "Zl"      : path+"File_rds_zbb_El_MC.root",
+fileNameList = {}
+
+fileNameList = { "2011A"    : path+"File_rds_zbb_"+channel+"A_DATA.root",
+                 "2011B"    : path+"File_rds_zbb_"+channel+"B_DATA.root",
+                 "DY"       : path+"File_rds_zbb_"+channel+"_MC.root",
+                 "TT"       : path+"File_rds_zbb_TT_"+channel+"_MC.root",
+                 "Zb"       : path+"File_rds_zbb_"+channel+"_MC.root",
+                 "Zc"       : path+"File_rds_zbb_"+channel+"_MC.root",
+                 "Zl"       : path+"File_rds_zbb_"+channel+"_MC.root"
                  }
+
+#"TT"      : "/home/fynu/vizangarciaj/scratch/RDSME120802/RDS_rdsME_TT_El_MC.root",
 
 ##############################################
 
@@ -142,13 +180,12 @@ def getVariables(varNamesList,varName,dataAndMCList) :
     print "ras = ", dataAndMCList["TT"].get()
     print "var = ", dataAndMCList["TT"].get()[var]
     x = dataAndMCList["TT"].get()[var]
-    x.setMin(min[varName])
-    x.setMax(max[varName])
-    x.setBins(bins[varName])
-
-    #todo: make this automatic for all variables
-    
-    return x
+    if x :
+        x.setMin(min[varName])
+        x.setMax(max[varName])
+        x.setBins(bins[varName])
+        return x
+    else: return 0
     
 
 def getDataAndMC(dataAndMCNameList,dataAndMCList) :
@@ -160,14 +197,6 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
     ws   = {}
     myRDS = {}
 
-    #rrv_w_b = {"HE"    : ws[DYMC].var("BtaggingReweightingHE")  ,
-    #           "HP"    : ws[DYMC].var("BtaggingReweightingHP")  ,
-    #           "HEHE"  : ws[DYMC].var("BtaggingReweightingHEHE"),
-    #           "HPHP"  : ws[DYMC].var("BtaggingReweightingHPHP")
-    #           }
-    #rrv_w_lep  = ws[DYMC].var("LeptonsReweightingweight")
-    #rrv_w_lumi = ws[DYMC].var("lumiReweightingLumiWeight")
-    #w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 
     for name in dataAndMCNameList :
         print "name = ", name
@@ -175,16 +204,34 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
         file[name]  = TFile.Open(fileNameList[name])
         ws[name]    = file[name].Get("ws")
         if ws[name]:
+            print "getting RDS from RooWorkspace"
             myRDS[name] = ws[name].data("rds_zbb")
         else :   
+            print "No ws, getting RDS directly"
             myRDS[name] = file[name].Get("rds_zbb")
         myRDS[name] = myRDS[name].reduce(category[WP]+"==1"+extraCut)
-        myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
+        if channel=="El": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
+        if channel=="Mu": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassMu<120&eventSelectionbestzmassMu>60")
         print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name].numEntries() 
-        print "after reweighting ...." 
         dataAndMCList[name]=myRDS[name]
 
     return 
+
+def setWeights(dataAndMCList,MCNameList,w) :
+    for name in MCNameList :
+        print "***BEFORE numEntries() = ", dataAndMCList[name].numEntries()
+        dataAndMCList[name].addColumn(w)
+        dataAndMCList[name] = RooDataSet(dataAndMCList[name].GetName(),
+                                         dataAndMCList[name].GetName(),
+                                         dataAndMCList[name],
+                                         dataAndMCList[name].get(),
+                                         "",
+                                         w.GetName())
+        print "***AFTER numEntries() for sample ", name , " = ", dataAndMCList[name].numEntries()
+        print "sumEntries() = ", dataAndMCList[name].sumEntries()
+    return
+        
+
 
 def makePdfList(dataAndMCList, mcName, var, RDH, RHP ) :
     varName=var.GetName()
@@ -206,6 +253,16 @@ def makePdfList(dataAndMCList, mcName, var, RDH, RHP ) :
         if mcName=="Zb":
             print "Zb dataset, going to cut on b flav"
             dataAndMCList[name]=dataAndMCList[mcName].reduce("jetmetbjet1Flavor==5||jetmetbjet1Flavor==-5")
+    elif varName=="jetmetbjet2SVmass":
+        if mcName=="Zl":
+            print "Zl dataset, going to cut on udsgc flav"
+            dataAndMCList[name] = dataAndMCList[mcName].reduce("jetmetbjet2Flavor==1||jetmetbjet2Flavor==-1||jetmetbjet2Flavor==2||jetmetbjet2Flavor==-2||jetmetbjet2Flavor==3||jetmetbjet2Flavor==-3||jetmetbjet2Flavor==21")
+        if mcName=="Zc":
+            print "Zc dataset, going to cut on c flav"
+            dataAndMCList[name]=dataAndMCList[mcName].reduce("jetmetbjet2Flavor==4||jetmetbjet2Flavor==-4")
+        if mcName=="Zb":
+            print "Zb dataset, going to cut on b flav"
+            dataAndMCList[name]=dataAndMCList[mcName].reduce("jetmetbjet2Flavor==5||jetmetbjet2Flavor==-5")
     else:
         dataAndMCList[name]=dataAndMCList[mcName]
         print "DID NOT MATCH SAMPLE NAME"
@@ -243,12 +300,20 @@ def makePdfList(dataAndMCList, mcName, var, RDH, RHP ) :
     
 def main():
 
-    dataAndMCList = {}
     vars          = {}
 
     getDataAndMC(dataAndMCNameList, dataAndMCList)
 
-    for varName in totVarList       : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
+    #for varName in totVarList       : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
+    for varName in varNamesList      : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
+
+    print "1 = ", vars["w_lep"]
+    print "2 = ", vars["w_lumi"]
+    print "3 = ", vars["w_b_HEHE"]
+    w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(vars["w_lep"],vars["w_lumi"],vars["w_b_HEHE"]))
+    print "MCNameList = ", MCNameList
+    print "dataAndMCList = ", dataAndMCList
+    setWeights(dataAndMCList,MCNameList,w)
 
     ttPdfList       = RooArgList()
     ttFracList      = RooArgList()
@@ -299,10 +364,10 @@ def main():
     if len(mistagVarList):
         if frac : mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagFracList)
         else    : mistagPdf = RooAddPdf("mistagPdf","mistagPdf",mistagPdfList,mistagYieldList)
-        mistagPdf.fitTo(dataAndMCList["El_Data"])
+        mistagPdf.fitTo(dataAndMCList[dataLabel])
         ## for vars in list
         frame = vars[mistagVarName].frame()
-        dataAndMCList["El_Data"].plotOn(frame)
+        dataAndMCList[dataLabel].plotOn(frame)
         mistagPdf.plotOn(frame)
         for mistagVarName in mistagVarList:
             mistagPdf.plotOn(frame,
@@ -339,19 +404,28 @@ def main():
                              RooFit.LineColor(kBlack),
                              RooFit.FillColor(kRed-7),
                              RooFit.LineWidth(1))
-        dataAndMCList["El_Data"].plotOn(frame)
-        mistagPdf.paramOn(frame,dataAndMCList["El_Data"])
+        dataAndMCList[dataLabel].plotOn(frame)
+        mistagPdf.paramOn(frame,dataAndMCList[dataLabel])
         C["mistag"]=TCanvas("mistag","mistag")
         frame.Draw()
+        mystring  = channel+"_"+dataLabel+"_"+WP
+        mystring2 ="purity"+"_"+vars[mistagVarName].GetName()+"_"
+        print "mystring = ", mystring
+        lat=TLatex()
+        lat.SetTextSize(0.04)
+        lat.DrawLatex(2.8,0.8*frame.GetMaximum(),mystring)
+
+            
+        C["mistag"].SaveAs("~/backgroundPlots/"+mystring2+mystring+".pdf")
 
     if len(ttbarVarList):
         if frac : ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttFracList)
         else    : ttPdf = RooAddPdf("ttPdf","ttPdf",ttPdfList,ttYieldList)
         
-        ttPdf.fitTo(dataAndMCList["El_Data"])
+        ttPdf.fitTo(dataAndMCList[dataLabel])
     
         frame = vars[ttVarName].frame()
-        dataAndMCList["El_Data"].plotOn(frame)
+        dataAndMCList[dataLabel].plotOn(frame)
         ttPdf.plotOn(frame)
         for ttVarName in ttbarVarList:
             ttPdf.plotOn(frame,
@@ -378,11 +452,18 @@ def main():
                          RooFit.LineColor(kBlack),
                          RooFit.FillColor(kYellow-7),
                          RooFit.LineWidth(1))
-        dataAndMCList["El_Data"].plotOn(frame)
-        ttPdf.paramOn(frame,dataAndMCList["El_Data"])
+        dataAndMCList[dataLabel].plotOn(frame)
+        ttPdf.paramOn(frame,dataAndMCList[dataLabel])
 
         C["tt"]=TCanvas("tt","tt")
         frame.Draw()
+        mystring  = channel+"_"+dataLabel+"_"+WP
+        mystring2 ="ttbar"+"_"+vars[mistagVarName].GetName()+"_"
+        print "mystring = ", mystring
+        lat=TLatex()
+        lat.SetTextSize(0.04)
+        lat.DrawLatex(95,0.8*frame.GetMaximum(),mystring)
+        C["tt"].SaveAs("~/backgroundPlots/"+mystring2+mystring+".pdf")
 
     #totPdfList = msvPdfList+ttPdfList    
 
