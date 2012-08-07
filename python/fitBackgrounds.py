@@ -49,11 +49,11 @@ gROOT.SetStyle("Plain")
 ### settings you want to give from outside ###
 # to adjust by user:
 
-channel   = "Mu"
-dataLabel = "2011A"
+channel   = "El"
+dataLabel = "2011B"
 
 frac      = true
-WP        = "HEHE"
+WP        = "HEHEMETsig"
 extraCut  = ""
 keys      = False
 
@@ -67,10 +67,10 @@ totVarList = mistagVarList+ttbarVarList
 
 # fixed definitions:
 
-ttMCNameList = ["DY","TT"]
+ttMCNameList = ["TT","DY"]
 # maybe different if using QCD:
-mistagMCNameList = ["Zb","Zc","Zl"]
-dataNameList = [dataLabel]
+mistagMCNameList  = ["Zb","Zc","Zl"]
+dataNameList      = [dataLabel]
 MCNameList        = ttMCNameList+mistagMCNameList
 dataAndMCNameList = ttMCNameList+mistagMCNameList+dataNameList
 
@@ -100,6 +100,8 @@ varNamesList = { "msv1"  : "jetmetbjet1SVmass"          ,
                  "w_b_HE"    : "BtaggingReweightingHE"  ,
                  "w_b_HP"    : "BtaggingReweightingHP"  ,
                  "w_b_HEHE"  : "BtaggingReweightingHEHE",
+                 "w_b_HEHEMET"  : "BtaggingReweightingHEHE",
+                 "w_b_HEHEMETsig"  : "BtaggingReweightingHEHE",
                  "w_b_HPHP"  : "BtaggingReweightingHPHP",
                  "w_lep"     : "LeptonsReweightingweight",
                  "w_lumi"    : "lumiReweightingLumiWeight",
@@ -114,6 +116,8 @@ min = {"msv1"   :   0,
        "w_b_HE"    : 0., 
        "w_b_HP"    : 0.,
        "w_b_HEHE"  : 0.,
+       "w_b_HEHEMET"  : 0.,
+       "w_b_HEHEMETsig"  : 0.,
        "w_b_HPHP"  : 0.,
        "w_lep"     : 0.,
        "w_lumi"    : 0.
@@ -128,6 +132,8 @@ max = {"msv1" :    5,
        "w_b_HE"    : 2., 
        "w_b_HP"    : 2.,
        "w_b_HEHE"  : 2.,
+       "w_b_HEHEMET"  : 2.,
+       "w_b_HEHEMETsig"  : 2.,
        "w_b_HPHP"  : 2.,
        "w_lep"     : 2.,
        "w_lumi"    : 2.
@@ -142,6 +148,8 @@ bins = {"msv1" :   20,
        "w_b_HE"    : 100, 
        "w_b_HP"    : 100,
        "w_b_HEHE"  : 100,
+       "w_b_HEHEMET"  : 100,
+       "w_b_HEHEMETsig"  : 100,
        "w_b_HPHP"  : 100,
        "w_lep"     : 100,
        "w_lumi"    : 100
@@ -156,7 +164,6 @@ color = {"msv1" : kRed,
 
 C={}
 
-#path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmaker/outputs/"
 path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
 
 fileNameList = {}
@@ -170,16 +177,16 @@ fileNameList = { "2011A"    : path+"File_rds_zbb_"+channel+"A_DATA.root",
                  "Zl"       : path+"File_rds_zbb_"+channel+"_MC.root"
                  }
 
-#"TT"      : "/home/fynu/vizangarciaj/scratch/RDSME120802/RDS_rdsME_TT_El_MC.root",
 
 ##############################################
 
 def getVariables(varNamesList,varName,dataAndMCList) :
     var=varNamesList[varName]
+    y=dataAndMCList["Zb"]
     print "var = ", var
-    print "ras = ", dataAndMCList["TT"].get()
-    print "var = ", dataAndMCList["TT"].get()[var]
-    x = dataAndMCList["TT"].get()[var]
+    print "ras = ", y.get()
+    print "var = ", y.get()[var]
+    x = y.get()[var]
     if x :
         x.setMin(min[varName])
         x.setMax(max[varName])
@@ -221,6 +228,7 @@ def setWeights(dataAndMCList,MCNameList,w) :
     for name in MCNameList :
         print "***BEFORE numEntries() = ", dataAndMCList[name].numEntries()
         dataAndMCList[name].addColumn(w)
+    for name in MCNameList :
         dataAndMCList[name] = RooDataSet(dataAndMCList[name].GetName(),
                                          dataAndMCList[name].GetName(),
                                          dataAndMCList[name],
@@ -229,6 +237,7 @@ def setWeights(dataAndMCList,MCNameList,w) :
                                          w.GetName())
         print "***AFTER numEntries() for sample ", name , " = ", dataAndMCList[name].numEntries()
         print "sumEntries() = ", dataAndMCList[name].sumEntries()
+
     return
         
 
@@ -304,16 +313,10 @@ def main():
 
     getDataAndMC(dataAndMCNameList, dataAndMCList)
 
-    #for varName in totVarList       : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
     for varName in varNamesList      : vars[varName] = getVariables(varNamesList,varName,dataAndMCList)
 
-    print "1 = ", vars["w_lep"]
-    print "2 = ", vars["w_lumi"]
-    print "3 = ", vars["w_b_HEHE"]
-    w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(vars["w_lep"],vars["w_lumi"],vars["w_b_HEHE"]))
-    print "MCNameList = ", MCNameList
-    print "dataAndMCList = ", dataAndMCList
-    setWeights(dataAndMCList,MCNameList,w)
+    weight = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(vars["w_lep"],vars["w_lumi"],vars["w_b_"+WP]))
+    setWeights(dataAndMCList,MCNameList,weight)
 
     ttPdfList       = RooArgList()
     ttFracList      = RooArgList()
