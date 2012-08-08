@@ -644,6 +644,10 @@ else:
 from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
 
+# for MET systematics: adds ~10 variants of type1-corrected MET
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+runMEtUncertainties(process)
+     
 # MET sequence
 process.producePatPFMETobjectWithCorrections = cms.Sequence(
     process.patPFMet
