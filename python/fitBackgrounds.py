@@ -207,15 +207,29 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
 
     for name in dataAndMCNameList :
         print "name = ", name
-        print "fileNameList[name] = ", fileNameList[name]
-        file[name]  = TFile.Open(fileNameList[name])
-        ws[name]    = file[name].Get("ws")
-        if ws[name]:
-            print "getting RDS from RooWorkspace"
-            myRDS[name] = ws[name].data("rds_zbb")
-        else :   
-            print "No ws, getting RDS directly"
-            myRDS[name] = file[name].Get("rds_zbb")
+        if name=="2011":
+            print "making 2011 dataset"
+            file["2011A"]  = TFile.Open(fileNameList["2011A"])
+            myRDS["2011A"] = file["2011A"].Get("rds_zbb")
+            print "A.numEntries() = ", myRDS["2011A"].numEntries()
+            file["2011B"]  = TFile.Open(fileNameList["2011B"])
+            myRDS["2011B"] = file["2011B"].Get("rds_zbb")
+            print "B.numEntries() = ", myRDS["2011B"].numEntries()
+            myRDS["2011"]=myRDS["2011A"]
+            print "2011.numEntries() = ", myRDS["2011"].numEntries()
+            myRDS["2011"].append(myRDS["2011B"])
+            print "2011.numEntries() = ", myRDS["2011"].numEntries()
+        else :
+            print "fileNameList[name] = ", fileNameList[name]
+            file[name]  = TFile.Open(fileNameList[name])
+            ws[name]    = file[name].Get("ws")
+            if ws[name]:
+                print "getting RDS from RooWorkspace"
+                myRDS[name] = ws[name].data("rds_zbb")
+            else :   
+                print "No ws, getting RDS directly"
+                myRDS[name] = file[name].Get("rds_zbb")
+        print "*** Going to reduce RDS ", name        
         myRDS[name] = myRDS[name].reduce(category[WP]+"==1"+extraCut)
         if channel=="El": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
         if channel=="Mu": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassMu<120&eventSelectionbestzmassMu>60")
