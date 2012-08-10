@@ -527,17 +527,21 @@ def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21
     except ZeroDivisionError:
         print "A_l_1 or A_l_2 is empty"
         return None
+    print al_mat
     er_mat = np.matrix([[er_11 + er_01*rfact, er_21 + er_01*rfact],[er_12 + er_02*rfact, er_22 + er_02*rfact]]).getI()
+    print er_mat
     try:
         el_mat = np.matrix([[1/el_1, 0],[0, 1/el_2]])
     except ZeroDivisionError:
         print "e_l_1 or e_l_2 is empty"
         return None
+    print el_mat
     try:
         eb_mat = np.matrix([[1/eb_11, -eb_21/(eb_22*eb_11)],[0, 1/eb_22]]) 
     except ZeroDivisionError:
         print "e_b_11 or e_b_22 is empty"
         return None
+    print eb_mat
     final_mat = al_mat*er_mat*el_mat*eb_mat
     return final_mat
 
@@ -633,20 +637,16 @@ def compare_matrices():
     print compute_fullmatrix(**vals_imp_mu)
 
 
-def main(num = 100):
+def main(num = 100000):
     startup = ["weights"]
     steps = ["event_weight","a_l", "e_r", "e_l", "e_b"]
     finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
     # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets/PATskim-Zjets_2619_1_jGj.root", steps, startup, finish, False)
     # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4", steps, startup, finish, True)
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish, None)
+    testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish, True)
     # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets", steps, startup, finish, False)
-    testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish, None)
+    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish, None)
     testu.run(num)
 
-# if __name__ == '__main__':
-#     main()
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish)
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish)
-    # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets/PATskim-Zjets_2619_1_jGj.root", steps, startup, finish)
-    # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets", steps, startup, finish)
+ if __name__ == '__main__':
+     main()
