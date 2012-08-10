@@ -1,7 +1,9 @@
-# jdf 20120724
-# apptempting to get basic unfolding 
-# all variables related to one event should be put in a "event" container which should be cleaned after each use.
-# this way one can test the lits of members at the beginning of a step and see if the mandatory ones are filled
+# to run this:
+# go to the main() function, and define an object by copying the aother "testu" lines
+# arguments go as follows:
+# testu = unfolder(**dataset_path**, steps, startup, finish, **muchannel**)
+# it will write results in a file which name is based on the current minute -> start different runs on different minutes 
+# number of events to process is the argument of the main() function 
 
 import ROOT
 import sys
@@ -637,15 +639,15 @@ def compare_matrices():
     print compute_fullmatrix(**vals_imp_mu)
 
 
-def main(num = 100000):
+def main(num = -1):
     startup = ["weights"]
     steps = ["event_weight","a_l", "e_r", "e_l", "e_b"]
     finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
     # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets/PATskim-Zjets_2619_1_jGj.root", steps, startup, finish, False)
     # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4", steps, startup, finish, True)
-    testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish, True)
+    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish, True)
     # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets", steps, startup, finish, False)
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish, None)
+    testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish, True)
     testu.run(num)
 
 if __name__ == '__main__':
