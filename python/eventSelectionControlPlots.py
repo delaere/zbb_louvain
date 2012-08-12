@@ -24,7 +24,7 @@ class EventSelectionControlPlots(BaseControlPlots):
     def beginJob(self, metlabel=zbblabel.metlabel, jetlabel=zbblabel.jetlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, triggerlabel=zbblabel.triggerlabel, btagging="SSV", vertexlabel=zbblabel.vertexlabel):
       self.btagging = btagging
       # declare histograms
-      self.add("run","Run number",15000,160000,190000)
+      self.add("run","Run number",30000,160000,190000)
       self.add("event","Event number",1000,0,5e9)
       self.add("ls","Lumi section",2000,0,2000)
       #self.add("lumi","Lumi versus run",2000,0,2000,)
