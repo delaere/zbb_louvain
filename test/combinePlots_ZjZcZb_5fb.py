@@ -335,6 +335,12 @@ process.CombinePlots = cms.PSet(
       labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
+      name = cms.string('drll'),
+      rebin = cms.untracked.uint32(10),
+      labelx = cms.untracked.string("#DeltaR(l^{1}l^{2})"),
+      labely = cms.untracked.string("Events/0.5")
+    ),
+    cms.PSet(
       name = cms.string('ZbbM'),
       rebin = cms.untracked.uint32(50),
       labelx = cms.untracked.string("M_{Zbb} (GeV)"),
