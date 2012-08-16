@@ -1,4 +1,9 @@
 
+#include "../NN/MLP_Higgs_vs_Zbb_EE_TIGHT.cxx"
+#include "../NN/MLP_Higgs_vs_tt_EE_TIGHT.cxx"
+#include "../NN/MLP_Higgs_vs_ZZ3_EE_TIGHT.cxx"
+
+
 class nn_vars {
   public:
   int N;
@@ -73,7 +78,7 @@ double gg_weight;
 };
 
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig)
+void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig,int typ2)
 {
 
 // input file : read ttree
@@ -121,6 +126,27 @@ double Ej1,Ej2,Ptj1,Ptj2;
  tree->SetBranchAddress("Pt_j1",&Ptj1);
 
 
+ // NN declaration -------------------------------------
+ !gROOT->GetClass("MLP_Higgs_vs_Zbb_EE_TIGHT");
+ MLP_Higgs_vs_Zbb_EE_TIGHT *HZbb=new MLP_Higgs_vs_Zbb_EE_TIGHT();
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {
+   gSystem->Load("libMLP");
+ }
+
+ !gROOT->GetClass("MLP_Higgs_vs_tt_EE_TIGHT");
+ MLP_Higgs_vs_tt_EE_TIGHT *HTT=new MLP_Higgs_vs_tt_EE_TIGHT();
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {
+   gSystem->Load("libMLP");
+ }
+
+ !gROOT->GetClass("MLP_Higgs_vs_ZZ3_EE_TIGHT");
+ MLP_Higgs_vs_ZZ3_EE_TIGHT *HZZ=new MLP_Higgs_vs_ZZ3_EE_TIGHT();
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {
+   gSystem->Load("libMLP");
+ }
+ // ----------------------------------------------------
+
+
   double entryy=0.0;
 
  for (int i=0;i<N1; ++i){	
@@ -150,6 +176,12 @@ double Ej1,Ej2,Ptj1,Ptj2;
    sim->zz3_weight=Wzz3;
    sim->hi_weight=Whi;
    sim->hi3_weight=Whi3;
+   sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
+   sim->HvsTT=HTT->Value(0,Whi,Whi3,Wtt);
+   sim->HvsZZ=HZZ->Value(0,Whi,Whi3,Wzz,Wzz3);
+   var->hzbb[i] = sim->HvsZbb;
+   var->htt[i] = sim->HvsTT;
+   var->hzz[i] = sim->HvsZZ;
    if(sim->gg_weight>300.0){sim->gg_weight=666;}
    if(sim->qq_weight>300.0){sim->qq_weight=666;}
    if(sim->tt_weight>300.0){sim->tt_weight=666;}

@@ -8,7 +8,7 @@
  */
 
 #include "include.h"
-#include "Read_input.h"
+#include "Read_input_NN_inputs.h"
 
 void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,const char *zh,const char *dat,int N1,int N2,int N3,int N4,int N5,int N6,TString name)
 {
@@ -17,7 +17,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	}
 
 	// output file : control of the NN
-        TFile file("../NN/NN_TT_vs_Zbb_multi"+name+".root","RECREATE");
+        TFile file("../NN/NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -25,9 +25,11 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	simu->Branch("gg_weight",&sim->gg_weight,"gg_weight/D");
 	simu->Branch("qq_weight",&sim->qq_weight,"qq_weight/D");
 	simu->Branch("zz_weight",&sim->zz_weight,"zz_weight/D");
-        simu->Branch("hi_weight",&sim->hi_weight,"hi_weight/D");
+        simu->Branch("zz3_weight",&sim->zz3_weight,"zz3_weight/D");
+	simu->Branch("hi_weight",&sim->hi_weight,"hi_weight/D");
         simu->Branch("hi3_weight",&sim->hi3_weight,"hi3_weight/D");
-	simu->Branch("type",&sim->type,"type/D");
+	simu->Branch("type",&sim->type,"type/I");
+        simu->Branch("type2",&sim->type2,"type2/I");
 	simu->Branch("tt_weight",&sim->tt_weight,"tt_weight/D");
 	simu->Branch("deta",&sim->deta,"deta/D");
 	simu->Branch("dphi",&sim->dphi,"dphi/D");
@@ -36,34 +38,37 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	simu->Branch("Met",&sim->Met,"Met/D");
 	simu->Branch("Mll",&sim->Mll,"Mll/D");
 	simu->Branch("Mbb",&sim->Mbb,"Mbb/D");
-        simu->Branch("Multi",&sim->Multi,"Multi/I");
-        simu->Branch("metsig",&sim->metsig,"metsig/D");
+
+        simu->Branch("HvsZbb",&sim->HvsZbb,"HvsZbb/D");
+        simu->Branch("HvsTT",&sim->HvsTT,"HvsTT/D");
+        simu->Branch("HvsZZ",&sim->HvsZZ,"HvsZZ/D");
+
+
 
 	nn_vars *var1 = new nn_vars(N1);
-	Input(dy,N1,var1,sim,simu,1,1);
+	Input(dy,N1,var1,sim,simu,1,0,1);
 	nn_vars *var2 = new nn_vars(N2);
-	Input(tt,N2,var2,sim,simu,1,0);
+	Input(tt,N2,var2,sim,simu,1,0,2);
 	nn_vars *var3 = new nn_vars(N3);
-	Input(zz,N3,var3,sim,simu,0,0);
+	Input(zz,N3,var3,sim,simu,1,0,3);
 
 	nn_vars *var4 = new nn_vars(N4);
-        Input(twb,N4,var4,sim,simu,0,0);
-        nn_vars *var5 = new nn_vars(N5);
-        Input(zh,N5,var5,sim,simu,0,0);
-        nn_vars *var6 = new nn_vars(N6);
-        Input(dat,N6,var6,sim,simu,0,0);
+	Input(twb,N4,var4,sim,simu,0,0,4);
+	nn_vars *var5 = new nn_vars(N5);
+	Input(zh,N5,var5,sim,simu,1,1,5);
+	nn_vars *var6 = new nn_vars(N6);
+	Input(dat,N6,var6,sim,simu,0,0,6);
 
 	simu->Write();
 	// Tree SIMU for NN training filled
 
 	// Declaration of multiplayer perceptron object. input variable = branch of simu tree. Not all at the same time. To add a branch as input add @branchname. then : intermediate layer node, put : to add new layer. Ended by : @type mean that outup is 1 or 0. Then we specify the number of entries for training and test samples.
 
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@tt_weight,@Multi:6:4:2:type","(type==0)/5000.+(type==1)/777.",simu,"Entry$%2!=0","Entry$%2==0");
-	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	mlp->Train(200, "text,graph,update=50");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:6:4:2:type","(type2==1)*(2.5/777.)+(type2==2)*(1./5092.)+(type2==3)*(1.5/1507.)+(type2==5)*(5B./1129)",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	mlp->Train(500, "text,graph,update=100");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("../NN/MLP_Zbb_tt_multi_"+name,"python");
-	mlp->Export("../NN/MLP_Zbb_tt_multi_"+name,"c++");
+	mlp->Export("../NN/MLP_Higgs_vs_bkg_"+name,"python");
+	mlp->Export("../NN/MLP_Higgs_vs_bkg_"+name,"c++");
 	mlp->Write();
 
 
@@ -100,39 +105,45 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	tth->SetDirectory(0);
 	twbh->SetDirectory(0);
 	dath->SetDirectory(0);
-	Double_t params[4]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
+	Double_t params[3]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
 	int zbb=0;
 
 	//-------------------------------------------------------------------------
 	// FOR Zbb
 	for (int i=0;i<N1; ++i) {
-	  if(var1->Metsig[i]<10. && var1->Mll[i]>76. && var1->Mll[i]<106.){
+	  if(var1-> Mll[i]>75. && var1-> Mll[i]<107.){
 	  zbb=zbb+1;
 	  //params[0] =var1-> Mll[i];
 	  //params[1] = var1->Mbb[i];
 	  //params[2] = var1->dphi[i];
-	  params[0] = var1->gg[i];
-	  params[1] = var1->qq[i];
-	  params[2] = var1->tt[i];
-	  params[3] = var1->multi[i];
+	  //params[0] = var1->gg[i];
+	  //params[1] = var1->qq[i];
+	  params[2] = var1->htt[i];
+          //params[3] = var1->zz3[i];
+	  params[0] = var1->hzbb[i];
+	  params[1] = var1->hzz[i];
+	  //params[5] = var1->met[i];
 	  //params[2] = var1->hi[i];
 	  //params[3] = var1->ptZ[i];
-          //params[4] = var1->deta[i];
-          //params[4] = var1->ptbb[i];
+	  //params[4] = var1->deta[i];
+	  //params[4] = var1->ptbb[i];
 	  zbbh->Fill(mlp->Evaluate(0, params));
 	  }
 	}
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	for (int i=0;i<N2; ++i) {
-	  if(var2->Metsig[i]<10. && var2->Mll[i]>76. && var2->Mll[i]<106.){
+	  if(var2-> Mll[i]>75. && var2-> Mll[i]<107.){
 	  //params[0] =var2-> Mll[i];
 	  //params[1] = var2->Mbb[i];
 	  //params[2] = var2->dphi[i];
-	  params[0] = var2->gg[i];
-	  params[1] = var2->qq[i];
-	  params[2] = var2->tt[i];
-	  params[3] = var2->multi[i];
+	  //params[0] = var2->gg[i];
+	  //params[1] = var2->qq[i];
+	  params[2] = var2->htt[i];
+          //params[3] = var2->zz3[i];
+	  params[0] = var2->hzbb[i];
+	  params[1] = var2->hzz[i];
+	  //params[5] = var2->met[i];
 	  //params[3] = var2->ptZ[i];
           //params[4] = var2->deta[i];
           //params[4] = var2->ptbb[i];
@@ -142,80 +153,95 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //-------------------------------------------------------------------------        
 	// FOR ZZ
         for (int i=0;i<N3; ++i) {
-          //if(ptZ_3[i]>100. && ptbb_3[i]>100.){   
+          if(var3-> Mll[i]>75. && var3-> Mll[i]<107.){
 	  //params[0] =var2-> Mll[i];
 	  //params[1] = var3->Mbb[i];
 	  //params[2] = var3->dphi[i];
-	  params[0] = var3->gg[i];
-	  params[1] = var3->qq[i];
-	  params[2] = var3->tt[i];
-	  params[3] = var3->multi[i];
+	  //params[0] = var3->gg[i];
+	  //params[1] = var3->qq[i];
+	  params[2] = var3->htt[i];
+          //params[3] = var3->zz3[i];
+	  params[0] = var3->hzbb[i];
+	  params[1] = var3->hzz[i];
+	  //params[5] = var3->met[i];
 	  //params[3] = var3->ptZ[i];
 	  //params[4] = var3->deta[i];
 	  //params[4] = var3->ptbb[i];                                          
 	  zzh->Fill(mlp->Evaluate(0,params));
-	    //}
+	  }
         }
         //-------------------------------------------------------------------------
 	// FOR ZH
         for (int i=0;i<N5; ++i) {
-          //params[0] =var5-> Mll[i];                                                                                                                                                                           
+	  if(var5-> Mll[i]>75. && var5-> Mll[i]<107.){
+	  //params[0] =var5-> Mll[i];                                                                                                                                                                           
           //params[1] = var5->Mbb[i];                                                                                                                                                                 
           //params[2] = var5->dphi[i];                                                                                                                                                                   
-          params[0] = var5->gg[i];
-          params[1] = var5->qq[i];
-          params[2] = var5->tt[i];                                                                                                                                                              
-          params[3] = var5->multi[i];
+          //params[0] = var5->gg[i];
+          //params[1] = var5->qq[i];
+          params[2] = var5->htt[i];
+          //params[3] = var5->zz3[i];
+	  params[0] = var5->hzbb[i];
+          params[1] = var5->hzz[i];                                                                                                                                                              
+          //params[5] = var5->met[i];
           //params[3] = var5->ptZ[i];                                                                                                                                                               
           //params[4] = var5->deta[i];                                                                                                                                  
           //params[4] = var5->ptbb[i];
           zhh->Fill(mlp->Evaluate(0, params));
+	  }
         }
 
 
         //-------------------------------------------------------------------------
         // FOR TWb
         for (int i=0;i<N4; ++i) {
+          if(var4-> Mll[i]>75. && var4-> Mll[i]<107.){
           //params[0] =var4-> Mll[i];                                                                                                          
           //params[1] = var4->Mbb[i];                                                                                                                                     
           //params[2] = var4->dphi[i];                                                                                                                                  
-          params[0] = var4->gg[i];
-          params[1] = var4->qq[i];
-          params[2] = var4->tt[i];                                                                                                                   
-          params[3] = var4->multi[i];
+          //params[0] = var4->gg[i];
+          //params[1] = var4->qq[i];
+          params[2] = var4->htt[i];
+	  params[0] = var4->hzbb[i];
+          params[1] = var4->hzz[i];                                                                                                                   
+          //params[5] = var4->met[i];
           //params[3] = var4->ptZ[i];                                                                                                              
           //params[4] = var4->deta[i];                                                                                                               
           //params[4] = var4->ptbb[i];                                                                                                                         
           twbh->Fill(mlp->Evaluate(0, params));
         }
+	}
 
         //------------------------------------------------------------------------- 
         // FOR dat
         for (int i=0;i<N6; ++i) {
-	  if(var6->Metsig[i]<10. && var6->Mll[i]>76. && var6->Mll[i]<106.){
+          if(var6-> Mll[i]>75. && var6-> Mll[i]<107.){
           //params[0] =var6-> Mll[i];   
           //params[1] = var6->Mbb[i];    
           //params[2] = var6->dphi[i];      
-          params[0] = var6->gg[i];
-          params[1] = var6->qq[i];
-          params[2] = var6->tt[i];                                                                              
-	  params[3] = var6->multi[i];
+          //params[0] = var6->gg[i];
+          //params[1] = var6->qq[i];
+          params[2] = var6->htt[i];                                                                              
+          //params[3] = var6->zz3[i];
+          params[0] = var6->hzbb[i];
+          params[1] = var6->hzz[i];
+          //params[5] = var6->met[i];
           //params[3] = var6->ptZ[i];                                  
           //params[4] = var6->deta[i];                                                                                          
           //params[4] = var6->ptbb[i]; 
           dath->Fill(mlp->Evaluate(0, params));
-	}
         }
+	}
 //-------------------------------------------------------------------------                                                                                             
 
 
 
 	cout<<"  Zbb  ALL "<<zbbh->Integral()<<endl;
-        cout<<"  TT   ALL "<<tth->Integral()<<endl;
+	cout<<"  TT   ALL "<<tth->Integral()<<endl;
 	cout<<"  ZZ   ALL "<<zzh->Integral()<<endl;
-        cout<<"  Twb  ALL "<<twbh->Integral()<<endl;
-        cout<<"  ZH   ALL "<<zhh->Integral()<<endl;
-        cout<<"  data ALL "<<dath->Integral()<<endl;
+	cout<<"  Twb  ALL "<<twbh->Integral()<<endl;
+	cout<<"  ZH   ALL "<<zhh->Integral()<<endl;
+	cout<<"  data ALL "<<dath->Integral()<<endl;
 
 //------------------------------------------------------------------------- 
 //-------------------Normalisation and plot ------------------------------------------------------
@@ -234,10 +260,14 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 
 	// normalisation
 	
-	double tt_norm=(157.5*5051./(59244088.));//*(73436./41029);
-        double zz_norm=6.206*5051./4191045.;  
+	double tt_norm=157.5*5051./(59244088.);
+	//double tt_norm=1./31029.;
+	double zz_norm=6.206*5051./4191045.;  
+	//double zz_norm=1.0/1374;
+	//double zbb_norm=1.0/824;
 	double zbb_norm=3048.*5051./35907791.;
-	double higgs_norm=0.0;
+	//double higgs_norm=0.0189*5051.*(30579./1200.)/30579.;
+	double higgs_norm = 2.13 / zhh->Integral();
 	double twb_norm=0.0;
 	
 	tth->Scale(tt_norm);
@@ -251,11 +281,12 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	THStack *hs=new THStack("hs","test stacked histograms");
 	hs->Add(zbbh);
 	hs->Add(tth);
-	//hs->Add(zzh);
+	hs->Add(zzh);
 	//hs->Add(twbh);
 	hs->Draw();
-	//zhh->Draw("same");	
-	dath->Draw("same");
+	//tth->Draw("same");
+	zhh->Draw("same");	
+	//dath->Draw("same");
 	TLegend *legend = new TLegend(.75, .80, .95, .95);
 	legend->AddEntry(zbbh, " Zbb ");
 	legend->AddEntry(tth, "t#bar{t}");
@@ -272,13 +303,17 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	double efficiency_bg[25];
 	for(int b=1;b<26;b++){
 	  //bg_eff->SetBinContent(b,(bg->Integral(b,26)/bg->Integral())); // Old line
-	  bg_eff->SetBinContent(b,((tth->Integral(b,26)+twbh->Integral(b,26)+zzh->Integral(b,26))/(tth->Integral()+twbh->Integral()+zzh->Integral())));
-	  sig_eff->SetBinContent(b,(zbbh->Integral(b,26)/zbbh->Integral())); // here signal is zbb
+	  //bg_eff->SetBinContent(b,((zzh->Integral(b,26))/(zzh->Integral())));
+	  //bg_eff->SetBinContent(b,((zbbh->Integral(b,26))/(zbbh->Integral())));
+	  bg_eff->SetBinContent(b,((zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))/(zbbh->Integral()+tth->Integral()+zzh->Integral())));
+	  sig_eff->SetBinContent(b,(zhh->Integral(b,26)/zhh->Integral())); // here signal is zbb
 	  
 	  
-	  efficiency_sig[b-1]=(zbbh->Integral(b,26)/zbbh->Integral());
-	  efficiency_bg[b-1]=(tth->Integral(b,26)/tth->Integral());
-	  cout<<"S/sqrt(B) "<<zbbh->Integral(b,26)/sqrt(tth->Integral(b,26))<<endl;
+	  efficiency_sig[b-1]=(zhh->Integral(b,26)/zhh->Integral());
+          efficiency_bg[b-1]=((zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))/(zbbh->Integral()+tth->Integral()+zzh->Integral()));
+	  //efficiency_bg[b-1]=(zzh->Integral(b,26)/zzh->Integral());
+	  //efficiency_bg[b-1]=(zbbh->Integral(b,26)/zbbh->Integral());
+	  cout<<"S/sqrt(B) "<<zhh->Integral(b,26)/sqrt(zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))<<endl;
 	}
 	bg_eff->SetLineColor(kBlue);
 	sig_eff->SetLineColor(kRed);
