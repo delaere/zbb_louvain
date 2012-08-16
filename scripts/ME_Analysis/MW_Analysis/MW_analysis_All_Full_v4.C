@@ -48,9 +48,7 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
   //  tagg_zbb       : Run on DY events ? Yes: 1, No: 0
   //  tagg_lep       : Choose your lepton:  Muons: 1, Electrons: 0
   
-
-	 cout << "Thanks ! May the force be with you..." << endl;	 
-  
+ 
         // init and read file
 	int var;
 	int card_num = 1;
@@ -156,7 +154,8 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         int isZb,isZc,isZl;
 	double btag_j1,btag_j2,Met_sig,noPUcorrMeT,noPUcorrMeT_phi,noPUcorrMeT_sig;
 	double llM,bbM,Pile_up;
-	int runNumber,eventNumber,nbr_PV;
+	int nbr_PV,nJets;
+	Long64_t runNumber,eventNumber;
 
 	tree->SetBranchAddress("runNumber",&runNumber);
 	tree->SetBranchAddress("eventNumber",&eventNumber);
@@ -168,6 +167,7 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         tree->SetBranchAddress("Met_sig",&Met_sig);
         tree->SetBranchAddress("llM",&llM);
         tree->SetBranchAddress("bbM",&bbM);
+        tree->SetBranchAddress("nJets",&nJets);
 	tree->SetBranchAddress("nbr_PV",&nbr_PV);
 	tree->SetBranchAddress("Pile_up",&Pile_up);
 	tree->SetBranchAddress("noPUcorrMeT_sig",&noPUcorrMeT_sig);
@@ -203,7 +203,7 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	double Wtt,Wgg,Wqq,Wzz0,Whi0,Wzz3,Whi3,Wtwb;
 	double Pt_j1,Pt_j2,Eta_j1,Eta_j2,Phi_j1,Phi_j2,E_j1,E_j2;
 	double MeTPhi, Met_signi, Met_signi_noC, MeTPhi_noC, MeT_noC,PileUp;
-	int flavour,btagj1,btagj2,nbrPV;
+	int flavour,btagj1,btagj2,nbrPV, multiplicity;
 
 	tree2->Branch("Pt_elplus",&Pt_elplus,"Pt_elplus/D");
 	tree2->Branch("Pt_elminus",&Pt_elminus,"Pt_elminus/D");
@@ -242,19 +242,21 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         tree2->Branch("dPhiJ1Met",&dPhiJ1Met,"dPhiJ1Met/D");
         tree2->Branch("dPhiJ2Met",&dPhiJ2Met,"dPhiJ2Met/D");
 
-		tree2->Branch("Inv_Mass_bb",&Inv_Mass_bb,"Inv_Mass_bb/D");
+	tree2->Branch("Inv_Mass_bb",&Inv_Mass_bb,"Inv_Mass_bb/D");
         tree2->Branch("Inv_Mass_lept",&Inv_Mass_lept,"Inv_Mass_lept/D");
         tree2->Branch("DR_jets",&DR_jets,"DR_jets/D");
         tree2->Branch("flavour",&flavour,"flavour/I");
 
-		tree2->Branch("nbrPV",&nbrPV,"nbrPV/I");
+	tree2->Branch("nbrPV",&nbrPV,"nbrPV/I");
         tree2->Branch("PileUp",&PileUp,"PileUp/D");
+        tree2->Branch("multiplicity",&multiplicity,"multiplicity/I");
 
-        tree2->Branch("eventNumber",&eventNumber,"eventNumber/I");
-        tree2->Branch("runNumber",&runNumber,"runNumber/I");
+
+        tree2->Branch("eventNumber",&eventNumber,"eventNumber/l");
+        tree2->Branch("runNumber",&runNumber,"runNumber/l");
 
         tree2->Branch("Wgg",&Wgg,"Wgg/D");
-		tree2->Branch("Wqq",&Wqq,"Wqq/D");
+	tree2->Branch("Wqq",&Wqq,"Wqq/D");
         tree2->Branch("Wtt",&Wtt,"Wtt/D");
         tree2->Branch("Wtwb",&Wtwb,"Wtwb/D");
         tree2->Branch("Wzz3",&Wzz3,"Wzz3/D");
@@ -365,21 +367,20 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	      if(isZl==1 && isZc==0 && isZb==0)flav=0;
 	    }          
 	    
-		
-			if(ordonnee_1[entry]>0.0){Wgg=-log10(ordonnee_1[entry]);}
+	    if(ordonnee_1[entry]>0.0){Wgg=-log10(ordonnee_1[entry]);}
             if(ordonnee_2[entry]>0.0){Wqq=-log10(ordonnee_2[entry]);}
-			if(ordonnee_3[entry]>0.0){Wtt=-log10(ordonnee_3[entry]);}
-			if(ordonnee_4[entry]>0.0){Wtwb=-log10(ordonnee_4[entry]);}
-			if(ordonnee_5[entry]>0.0){Wzz3=-log10(ordonnee_5[entry]);}
+	    if(ordonnee_3[entry]>0.0){Wtt=-log10(ordonnee_3[entry]);}
+	    if(ordonnee_4[entry]>0.0){Wtwb=-log10(ordonnee_4[entry]);}
+	    if(ordonnee_5[entry]>0.0){Wzz3=-log10(ordonnee_5[entry]);}
             if(ordonnee_6[entry]>0.0){Wzz0=-log10(ordonnee_6[entry]);}
             if(ordonnee_7[entry]>0.0){Whi3=-log10(ordonnee_7[entry]);}
             if(ordonnee_8[entry]>0.0){Whi0=-log10(ordonnee_8[entry]);}
-			
-			if(ordonnee_1[entry]==0.0){Wgg=-1;}
+	    
+	    if(ordonnee_1[entry]==0.0){Wgg=-1;}
             if(ordonnee_2[entry]==0.0){Wqq=-1;}
-			if(ordonnee_3[entry]==0.0){Wtt=-1;}
-			if(ordonnee_4[entry]==0.0){Wtwb=-1;}
-			if(ordonnee_5[entry]==0.0){Wzz3=-1;}
+	    if(ordonnee_3[entry]==0.0){Wtt=-1;}
+	    if(ordonnee_4[entry]==0.0){Wtwb=-1;}
+	    if(ordonnee_5[entry]==0.0){Wzz3=-1;}
             if(ordonnee_6[entry]==0.0){Wzz0=-1;}
             if(ordonnee_7[entry]==0.0){Whi3=-1;}
             if(ordonnee_8[entry]==0.0){Whi0=-1;}
@@ -413,9 +414,9 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	    dPhiJ2Met=dPhi_Met_Jet2;
 	    btagj1=btag_j1;
 	    btagj2=btag_j2;
+	    multiplicity=nJets;
 	    PileUp=Pile_up;
 	    nbrPV=nbr_PV;
-
 
 	    tree2->Fill();
 	  }
