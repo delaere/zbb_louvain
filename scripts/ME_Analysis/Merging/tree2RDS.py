@@ -2,7 +2,7 @@ from ROOT import *
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
 
   
-  f  = TFile("Tree_rdsME_" + InputFile + ".root")
+  f  = TFile("testsMergeRDSnoWS120721/Tree_rdsME_" + InputFile + ".root")
   t  = f.Get("rds_zbb")
 
   file_data  = TFile("File_ws_ZZ_Mu_MC.root")
@@ -30,10 +30,16 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myWhi3RRV = RooRealVar("Whi3", "Whi3", 0, 300)
   myWhi0RRV = RooRealVar("Whi0", "Whi0", 0, 300)
   myMeTRRV = RooRealVar("MeT", "MeT", 0, 600)#met to check the matching
-  mymlpZH125vsZbbRRV = RooRealVar("mlpZH125vsZbb", "mlpZH125vsZbb", -10000, 600)#met to check the matching
+  mymlphiggsvszbbRRV = RooRealVar("mlphiggsvszbb", "mlphiggsvszbb", -10000, 600)#met to check the matching
+  mymlphiggsvszzRRV = RooRealVar("mlphiggsvszz", "mlphiggsvszz", -10000, 600)#met to check the matching
+  mymlphiggsvsttRRV = RooRealVar("mlphiggsvstt", "mlphiggsvstt", -10000, 600)#met to check the matching
+  mymlphiggsvsbkgRRV = RooRealVar("mlphiggsvsbkg", "mlphiggsvsbkg", -10000, 600)#met to check the matching
+  mymlphiggsvsbkgfulllRRV = RooRealVar("mlphiggsvsbkg_fulll", "mlphiggsvsbkg_fulll", -10000, 600)#met to check the matching
   mymlpZbbvsTTRRV = RooRealVar("mlpZbbvsTT", "mlpZbbvsTT", -10000, 600)#met to check the matching
   mymlpZbbvsTTtightRRV = RooRealVar("mlpZbbvsTTtight", "mlpZbbvsTTtight", -10000, 600)#met to check the matching
-
+  mymlpZbbvsTT_tight_Wmet_RRV = RooRealVar("mlpZbbvsTT_tight_Wmet", "mlpZbbvsTT_tight_Wmet", -10000, 600)#met to check the matching
+  mymlpzbbvstt_multi_EE_tight_RRV = RooRealVar("mlpzbbvstt_multi_EE_tight", "mlpzbbvstt_multi_EE_tight", -10000, 600)#met to check the matching
+  
 #
 #
   myRDSRAS.add(myWttRRV)
@@ -43,9 +49,15 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(myWhi3RRV)
   myRDSRAS.add(myWhi0RRV)
   myRDSRAS.add(myMeTRRV)
-  myRDSRAS.add(mymlpZH125vsZbbRRV)
+  myRDSRAS.add(mymlphiggsvszbbRRV)
+  myRDSRAS.add(mymlphiggsvszzRRV)
+  myRDSRAS.add(mymlphiggsvsttRRV)
+  myRDSRAS.add(mymlphiggsvsbkgRRV)
+  myRDSRAS.add(mymlphiggsvsbkgfulllRRV)
   myRDSRAS.add(mymlpZbbvsTTRRV)
   myRDSRAS.add(mymlpZbbvsTTtightRRV)
+  myRDSRAS.add(mymlpZbbvsTT_tight_Wmet_RRV)
+  myRDSRAS.add(mymlpzbbvstt_multi_EE_tight_RRV)  
   if "Mu" in InputFile:
     myRDSRAS.add(myWtwbRRV)
     myRDSRAS.add(myWzz3RRV)

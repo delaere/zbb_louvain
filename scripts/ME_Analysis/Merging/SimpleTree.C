@@ -1,4 +1,6 @@
-// Use minimal-brain-usage approach 2 merge llbb tree (frome now on
+
+
+//Use minimal-brain-usage approach 2 merge llbb tree (frome now on
 //rds_bb tree) with ME tree
 
 // Idea is 2 create with MakeClass skeletons for rds_zbb and ME trees
@@ -22,10 +24,17 @@
 
 #include "rds_zbb.C"
 #include "tree2.C"
-#include "MLP_ZH125vsZbb.cxx"
+#include "MLP_Higgs_vs_Zbb_EE_TIGHT.cxx"
 #include "MLP_Zbb_tt_EE.cxx"
 #include "MLP_Zbb_tt_Comb_EE_TIGHT.cxx"
+#include "MLP_Zbb_tt_Comb_met_EE.cxx"
+#include "MLP_Zbb_tt_multi_EE_TIGHT.cxx"
 
+#include "MLP_Higgs_vs_ZZ3_EE_TIGHT.cxx"
+#include "MLP_Higgs_vs_tt_EE_TIGHT.cxx"
+
+#include "MLP_Higgs_vs_bkg_EE_TIGHT.cxx"
+#include "MLP_Higgs_vs_bkg_EE_FULLL.cxx"
 
 #include <iostream>
 #include <map>
@@ -275,13 +284,29 @@
    Double_t mcSelectionantibottomEn;
    
    //Here extra variables
-   MLP_ZH125vsZbb* MLP = 0;
+   MLP_Higgs_vs_Zbb_EE_TIGHT *MLP_higgs_vs_zbb = 0;
+   MLP_Higgs_vs_ZZ3_EE_TIGHT *MLP_higgs_vs_zz = 0;
+   MLP_Higgs_vs_tt_EE_TIGHT *MLP_higgs_vs_tt = 0;
+
+   MLP_Higgs_vs_bkg_EE_TIGHT *MLP_higgs_vs_bkg =0;
+   MLP_Higgs_vs_bkg_EE_FULLL *MLP_higgs_vs_bkg_fulll =0;
+
    MLP_Zbb_tt_EE* MLP_zbbvstt = 0;
    MLP_Zbb_tt_Comb_EE_TIGHT* MLP_zbbvstttight = 0;
-   
-   Double_t mlpZH125vsZbb;
+   MLP_Zbb_tt_Comb_met_EE* MLP_zbbvstt_tight_Wmet = 0;
+   MLP_Zbb_tt_multi_EE_TIGHT* MLP_zbbvstt_multi_EE_tight =0;
+
+   Double_t mlphiggsvszbb;
+   Double_t mlphiggsvszz;
+   Double_t mlphiggsvstt;
+   Double_t mlphiggsvsbkg;
+   Double_t mlphiggsvsbkg_fulll;
+
+
    Double_t mlpZbbvsTT;
    Double_t mlpZbbvsTTtight;
+   Double_t mlpZbbvsTT_tight_Wmet;
+   Double_t mlpzbbvstt_multi_EE_tight;
 
 
    
@@ -340,14 +365,22 @@ void CreateParentTree(TString InputFile) {
   
    //sanitycut += " && " + conflictrunsRDS;
    
-   MLP = new MLP_ZH125vsZbb();
+   MLP_higgs_vs_zbb = new MLP_Higgs_vs_Zbb_EE_TIGHT();
+   MLP_higgs_vs_zz = new MLP_Higgs_vs_ZZ3_EE_TIGHT();
+   MLP_higgs_vs_tt = new MLP_Higgs_vs_tt_EE_TIGHT();
+   MLP_higgs_vs_bkg = new MLP_Higgs_vs_bkg_EE_TIGHT();
+   MLP_higgs_vs_bkg_fulll = new MLP_Higgs_vs_bkg_EE_FULLL();
+
+
    MLP_zbbvstt = new MLP_Zbb_tt_EE();
    MLP_zbbvstttight = new MLP_Zbb_tt_Comb_EE_TIGHT();
+   MLP_zbbvstt_tight_Wmet = new MLP_Zbb_tt_Comb_met_EE();
+   MLP_zbbvstt_multi_EE_tight = new MLP_Zbb_tt_multi_EE_TIGHT();
 
-   TFile* f_RDS  = new TFile("Tree_File_rds_zbb_" + InputFile + ".root");
+   TFile* f_RDS  = new TFile("testsMergeRDSnoWS120721/Tree_File_rds_zbb_" + InputFile + ".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
 
-   TString mename = "ME_zbb_" + InputFile + ".root";
+   TString mename = "testsMergeRDSnoWS120721/ME_zbb_" + InputFile + ".root";
    mename.ReplaceAll("A_DATA", "_DATA");
    mename.ReplaceAll("B_DATA", "_DATA");
 
@@ -358,7 +391,7 @@ void CreateParentTree(TString InputFile) {
 
 
    
-   TFile *f_RDSME = new TFile("Tree_rdsME_" +InputFile + ".root", "RECREATE");
+   TFile *f_RDSME = new TFile("testsMergeRDSnoWS120721/Tree_rdsME_" +InputFile + ".root", "RECREATE");
    TTree *t_RDSME = new TTree("rds_zbb", "merged zbb-ME tree");
 
 
@@ -599,21 +632,21 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mcSelectionantibottomEn" , &mcSelectionantibottomEn,"mcSelectionantibottomEn/D");
 
    //Here extra variables
-   t_RDSME->Branch("mlpZH125vsZbb" , &mlpZH125vsZbb,"mlpZH125vsZbb/D");
+   t_RDSME->Branch("mlphiggsvszbb" , &mlphiggsvszbb,"mlphiggsvszbb/D");
+   t_RDSME->Branch("mlphiggsvstt" , &mlphiggsvstt,"mlphiggsvstt/D");
+   t_RDSME->Branch("mlphiggsvszz" , &mlphiggsvszz,"mlphiggsvszz/D");
+   t_RDSME->Branch("mlphiggsvsbkg" , &mlphiggsvsbkg,"mlphiggsvsbkg/D");
+   t_RDSME->Branch("mlphiggsvsbkg_fulll" , &mlphiggsvsbkg_fulll,"mlphiggsvsbkg_fulll/D");
    t_RDSME->Branch("mlpZbbvsTT" , &mlpZbbvsTT,"mlpZbbvsTT/D");
    t_RDSME->Branch("mlpZbbvsTTtight" , &mlpZbbvsTTtight,"mlpZbbvsTTtight/D");
-
+   t_RDSME->Branch("mlpZbbvsTT_tight_Wmet" , &mlpZbbvsTT_tight_Wmet,"mlpZbbvsTT_tight_Wmet/D");
+   t_RDSME->Branch("mlpzbbvstt_multi_EE_tight",&mlpzbbvstt_multi_EE_tight,"mlpzbbvstt_multi_EE_tight/D");
 
    //t_RDS->BuildIndex("eventSelectionrun","eventSelectionevent");
    //t_RDS->AddFriend(t_ME);
 
-   
-   
-   
    rds_zbb* mc_RDS = new rds_zbb(t_RDS);
    tree2* mc_ME = new tree2(t_ME);
-   
-  
 
 
    bool IsDATA = InputFile.Contains("DATA");
@@ -653,7 +686,6 @@ void CreateParentTree(TString InputFile) {
       if (!isMuChannel && mc_RDS->eventSelectionbestzmassEle < 0.01 ) continue;
       
       
-      jetmetMET = mc_RDS->jetmetMET;
       
       rc_eventSelection_1_idx = mc_RDS->rc_eventSelection_1_idx;
       rc_eventSelection_2_idx = mc_RDS->rc_eventSelection_2_idx;
@@ -683,6 +715,7 @@ void CreateParentTree(TString InputFile) {
       eventSelectionZbM = mc_RDS->eventSelectionZbM;
       jetmetMETsignificance = mc_RDS->jetmetMETsignificance;
       jetmetMET = mc_RDS->jetmetMET;
+      jetmetnj = mc_RDS->jetmetnj;
 
 
       BtaggingReweightingHE = mc_RDS->BtaggingReweightingHE;
@@ -771,34 +804,42 @@ void CreateParentTree(TString InputFile) {
 	//NN  output here
 	mlpZbbvsTT = MLP_zbbvstt->Value(0, Wgg, Wqq, Wtt, MeT);
 	mlpZbbvsTTtight = MLP_zbbvstttight->Value(0, Wgg, Wqq, Wtt);
-	
-	double MLPout = MLP->Value(0, Wgg, Wqq, Whi3);
-        if (InputFile.Contains("DATA") && MLPout > 0.5)
- 	  mlpZH125vsZbb = -999.;
-	else
- 	  mlpZH125vsZbb = MLPout;
-	
+        mlpZbbvsTT_tight_Wmet = MLP_zbbvstt_tight_Wmet->Value(0, Wgg, Wqq, Wtt,MeT);
+	if(jetmetnj > 2){mlpzbbvstt_multi_EE_tight = MLP_zbbvstt_multi_EE_tight->Value(0, Wgg, Wqq, Wtt,1);}
+	if(jetmetnj < 3){mlpzbbvstt_multi_EE_tight = MLP_zbbvstt_multi_EE_tight->Value(0, Wgg, Wqq, Wtt,0);}
 
-        t_RDSME->Fill();
-      } //else std:: cout << "MEentry not found for " << mc_RDS->eventSelectionrun << ", " << mc_RDS->eventSelectionevent << "]= " << MEentry << std::endl;
-   }
+	mlphiggsvszbb = MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3);
+	mlphiggsvstt = MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt);
+        mlphiggsvszz = MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3);   
+        mlphiggsvsbkg = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb  , mlphiggsvszz , mlphiggsvstt);
+        mlphiggsvsbkg_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0,Whi3);
 
 
-   f_RDSME->cd();
-   t_RDSME->Write();
+	if (InputFile.Contains("DATA")){
+	      if( MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3)>0.5){mlphiggsvszbb=-999.;}
+	      if( MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt)>0.5){mlphiggsvstt=-999.;}
+	      if( MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3)>0.5){mlphiggsvszz=-999.;}
+	      if( MLP_higgs_vs_bkg->Value(0, MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3), MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3) ,MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt) ) > 0.5 ){mlphiggsvsbkg=-999.;}
+	}
+             t_RDSME->Fill();
+     } //else std:: cout << "MEentry not found for " << mc_RDS->eventSelectionrun << ", " << mc_RDS->eventSelectionevent << "]= " << MEentry << std::endl;
+      }
+
+
+      f_RDSME->cd();
+      t_RDSME->Write();
    
-   delete mc_RDS;
-   delete mc_ME;
+      delete mc_RDS;
+      delete mc_ME;
 
-   //delete f_RDSME;
-   //delete t_RDSME;
+      //delete f_RDSME;
+      //delete t_RDSME;
  
-   //delete f_ME;
-   //delete t_ME;
+      //delete f_ME;
+      //delete t_ME;
  
-   //delete f_RDS;
-   //delete t_RDS;
-   
+      //delete f_RDS;
+      //delete t_RDS;
 
 }
 
