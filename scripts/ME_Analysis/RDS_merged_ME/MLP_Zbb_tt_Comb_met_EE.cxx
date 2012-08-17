@@ -1,4 +1,4 @@
-#include "../NN/MLP_Zbb_tt_Comb_met_EE.h"
+#include "MLP_Zbb_tt_Comb_met_EE.h"
 #include <cmath>
 
 double MLP_Zbb_tt_Comb_met_EE::Value(int index,double in0,double in1,double in2,double in3) {
