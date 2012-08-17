@@ -53,8 +53,8 @@ public :
    Int_t           flavour;
    Int_t           nbrPV;
    Double_t        PileUp;
-   Int_t           eventNumber;
-   Int_t           runNumber;
+   Long64_t           eventNumber;
+   Long64_t           runNumber;
    Double_t        Wgg;
    Double_t        Wqq;
    Double_t        Wtt;
