@@ -493,26 +493,28 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
   return (jets[jetList[0]],jets[jetList[1]])
 
 categoryNames = [ 
-  "All", 
   "Trigger", 
-  "di-lepton", 
-  "Z", 
+  "Z (wide)", 
+  "Z (narrow)", 
   "Z+jet", 
+  "Z+b (HE) wide", 
+  "Z+b (HP) wide", 
   "Z+b (HE)", 
   "Z+b (HP)", 
-  "Z+b (HE+MET)", 
-  "Z+b (HP+MET)", 
+  "Z+b (HE+MET significance)", 
+  "Z+b (HP+MET significance)",
+  "Z+bb (HEHE) wide", 
+  "Z+bb (HEHP) wide", 
+  "Z+bb (HPHP) wide", 
   "Z+bb (HEHE)", 
   "Z+bb (HEHP)", 
   "Z+bb (HPHP)", 
   "Z+bb (HEHE+MET)", 
   "Z+bb (HEHP+MET)", 
   "Z+bb (HPHP+MET)", 
-  "Z+b (HE+MET_significance)", 
-  "Z+b (HP+MET_significance)",
-  "Z+bb (HEHE+MET_significance)", 
-  "Z+bb (HEHP+MET_significance)", 
-  "Z+bb (HPHP+MET_significance)",
+  "Z+bb (HEHE+MET significance)", 
+  "Z+bb (HEHP+MET significance)", 
+  "Z+bb (HPHP+MET significance)",
 ]
 
 def eventCategories(): return len(categoryNames)
@@ -524,74 +526,68 @@ def categoryName(category):
 
 def isInCategory(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
-  # category 0: All
+  # category 0: Trigger
   if category==0:
-    return categoryTuple[0]!= -1
-  # category 1: Trigger
-  elif category==1:
     return categoryTuple[0]==1
-  # category 2: di-lepton
+  # category 1: Z candidate (wide mass window)
+  elif category==1:
+    return isInCategory( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<30.
+  # category 2: Z candidate (narrow mass window)
   elif category==2:
-    return isInCategory( 1, categoryTuple) and categoryTuple[1]==1
-  # category 3: mass cut
+    return isInCategory( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<15.
+  # category 3: Z+jet
   elif category==3:
-    return isInCategory( 2, categoryTuple) and categoryTuple[2]==1
-  # category 4: Z+jet
+    return isInCategory( 2, categoryTuple) and categoryTuple[3]>0
+  # category 4:  Z+b (HE), wide mass window
   elif category==4:
-    return isInCategory( 3, categoryTuple) and categoryTuple[3]>0
-  # category 5:  Z+b (HE)
+    return isInCategory( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[4]>0
+  # category 5:  Z+b (HP), wide mass window
   elif category==5:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]>0
-  # category 6:  Z+b (HP)
+    return isInCategory( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[5]>0
+  # category 6:  Z+b (HE)
   elif category==6:
-    return isInCategory( 4, categoryTuple) and categoryTuple[5]>0
-  # category 7:  Z+b (HE+MET)
+    return isInCategory( 3, categoryTuple) and categoryTuple[4]>0
+  # category 7:  Z+b (HP)
   elif category==7:
-    return isInCategory( 5, categoryTuple) and categoryTuple[7]>0
-  # category 8:  Z+b (HP+MET)
+    return isInCategory( 3, categoryTuple) and categoryTuple[5]>0
+  # category 8:  Z+b (HE+MET_significance)
   elif category==8:
-    return isInCategory( 6, categoryTuple) and categoryTuple[7]>0
-  # categoty 9:  Z+bb (HEHE)
-  elif category==9:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]>1
-  # categoty 10: Z+bb (HEHP)
-  elif category==10:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1 and categoryTuple[5] > 0
-  # categoty 11: Z+bb (HPHP)
-  elif category==11:
-    return isInCategory( 4, categoryTuple) and categoryTuple[5]>1
-  # categoty 12: Z+bb (HEHE+MET)
-  elif category==12:
-    return isInCategory( 9, categoryTuple) and categoryTuple[7]>0
-  # categoty 13: Z+bb (HEHP+MET)
-  elif category==13:
-    return isInCategory(10, categoryTuple) and categoryTuple[7]>0
-  # categoty 14: Z+bb (HPHP+MET)
-  elif category==14:
-    return isInCategory(11, categoryTuple) and categoryTuple[7]>0
-
-  # category 15:  Z+b (HE+MET_significance)
-  elif category==15:
-    return isInCategory( 5, categoryTuple) and categoryTuple[8]>0
-  # category 16:  Z+b (HP+MET_significance)
-  elif category==16:
     return isInCategory( 6, categoryTuple) and categoryTuple[8]>0
-  # categoty 17: Z+bb (HEHE+MET_significance)
+  # category 9:  Z+b (HP+MET_significance)
+  elif category==9:
+    return isInCategory( 7, categoryTuple) and categoryTuple[8]>0
+  # categoty 10: Z+bb (HEHE), wide mass window
+  elif category==10:
+    return isInCategory( 4, categoryTuple) and categoryTuple[4]>1
+  # categoty 11: Z+bb (HEHP), wide mass window
+  elif category==11:
+    return isInCategory( 5, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1
+  # categoty 12: Z+bb (HPHP), wide mass window
+  elif category==12:
+    return isInCategory( 5, categoryTuple) and categoryTuple[5]>1
+  # categoty 13: Z+bb (HEHE)
+  elif category==13:
+    return isInCategory( 3, categoryTuple) and categoryTuple[4]>1
+  # categoty 14: Z+bb (HEHP)
+  elif category==14:
+    return isInCategory( 3, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1 and categoryTuple[5] > 0
+  # categoty 15: Z+bb (HPHP)
+  elif category==15:
+    return isInCategory( 3, categoryTuple) and categoryTuple[5]>1
+  # categoty 16: Z+bb (HEHE+MET_significance)
+  elif category==16:
+    return isInCategory(13, categoryTuple) and categoryTuple[8]>0
+  # categoty 17: Z+bb (HEHP+MET_significance)
   elif category==17:
-    return isInCategory( 9, categoryTuple) and categoryTuple[8]>0
-  # categoty 18: Z+bb (HEHP+MET_significance)
+    return isInCategory(14, categoryTuple) and categoryTuple[8]>0
+  # categoty 18: Z+bb (HPHP+MET_significance)
   elif category==18:
-    return isInCategory(10, categoryTuple) and categoryTuple[8]>0
-  # categoty 19: Z+bb (HPHP+MET_significance)
-  elif category==19:
-    return isInCategory(11, categoryTuple) and categoryTuple[8]>0
-
-
+    return isInCategory(15, categoryTuple) and categoryTuple[8]>0
   # other does not exist
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15., lumi_section=0):
+def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", lumi_section=0):
   """Check analysis requirements for various steps."""
   output = []
   if vertices.size()>0 :
@@ -612,12 +608,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
     output.append(0)
   else: 
     output.append(1)
-    if abs(bestZcandidate.mass()-91)< massWindow: #76-106 GeV
-    #if abs(bestZcandidate.mass()-90)< massWindow: #to comply with the others
-#    if abs(bestZcandidate.mass()-91.1876)<massWindow:
-      output.append(1)
-    else:
-      output.append(0)
+    output.append(abs(bestZcandidate.mass()-91))
   # output[3] -> output[6] : (b)jets
   nJets = 0
   nBjetsHE = 0
@@ -645,7 +636,6 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
     output.append(1)
   else: 
     output.append(0)
-    
   # additional quantities. For now, put the floats... might become cuts later on.
   # output[9] : Z Pt
   if bestZcandidate is None:
