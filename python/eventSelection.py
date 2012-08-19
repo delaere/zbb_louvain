@@ -261,7 +261,7 @@ def isGoodJet(jet, Z = None):
   """Perform additional checks that define a good jet"""
   # restrict in eta
   outcome = abs(jet.eta())<2.1
-  outcome = outcome and jet.pt()>25
+  outcome = outcome and jet.pt()>20
   # overlap checking
   # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
   #  if jet.hasOverlaps("muons"): return False
