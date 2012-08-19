@@ -30,6 +30,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
     else:
       print "Event not found."
     return
+  runNumber= fwevent.eventAuxiliary().run()
   # in case a fwevent is provided, use it
   PrintEvent(fwevent)
   # load objects
@@ -60,8 +61,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #rawjet = jet.correctedJet("Uncorrected")
 
   # category
-  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15.)
-  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=False, btagging="SSV", massWindow=15.)
+  catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV")
+  catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=False, btagging="SSV")
   print "Event category info in muon channel:",catMu
   print "Event category info in electron channel:",catEle
 

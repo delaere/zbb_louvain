@@ -65,8 +65,8 @@ def main(cat=12 , path="/home/fynu/lceard/store/Prod_data_2011A_V2/Aug05ReReco/E
       #rawjet = jet.correctedJet("Uncorrected")
       run = fwevent.eventAuxiliary().run()
       # category
-      #catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run, muChannel=True, btagging="SSV", massWindow=15.)
-      catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run, muChannel=False, btagging="SSV", massWindow=15.)
+      #catMu = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run, muChannel=True, btagging="SSV")
+      catEle = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, jets, met, run, muChannel=False, btagging="SSV")
       #print "Event category info in muon channel:",catMu
       #print "Event category info in electron channel:",catEle
       

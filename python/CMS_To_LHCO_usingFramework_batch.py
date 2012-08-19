@@ -366,7 +366,7 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
 # Start procedure selection
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
+    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel)
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
         
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
