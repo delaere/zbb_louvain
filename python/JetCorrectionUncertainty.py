@@ -1,7 +1,7 @@
 import os
 import ROOT
 from math import sqrt
-from zbbCommons import zbbfile
+from zbbCommons import zbbfile, zbblabel
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
@@ -21,11 +21,25 @@ class JetCorrectionUncertaintyProxy:
     self._engine.setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
     self._engine.setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
     unc = self._engine.getUncertainty(1)
+    return unc
 
-    if 0 <abs(jet.eta())< 1.5 : unc_dep_eta=0.02
-    if 1.5 <=abs(jet.eta())< 3.0  : unc_dep_eta=0.06
-    if 3.0 <=abs(jet.eta()) : unc_dep_eta=0.20
+  def jetPt(self,jet):
+    jetpt = jet.pt()
+    # smear to reproduce resolution measured in data
+    # apply JetMet recommendation:  pT->max[0.,pTgen+c*(pT-pTgen)] 
+    ptgen = jet.genJet().pt()
+    jersf = (jerCorrectionFactor(jet)-1.) * zbblabel.JERfactor
+    jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
+    # take into account JEC uncertainty
+    jesunc = unc_tot_jet(jet) * zbblabel.JESfactor
+    jetpt = jetpt + jesunc
+    # return the jet pt, including all of the above
+    return jetpt
 
-    unc_tot=sqrt(pow(unc,2)+pow(0.015,2)+pow((0.2*0.8*2.2*1/jet.pt()),2)+pow(unc_dep_eta,2))
-    return unc_tot
-
+  def jerCorrectionFactor(self,jet)
+    eta = abs(jet.eta())
+    if eta<0.5: return 1.052
+    elif eta<1.1: return 1.057
+    elif eta<1.7: return 1.096
+    elif eta<2.3: return 1.134
+    else return 1.288 # valid up to 5.0
