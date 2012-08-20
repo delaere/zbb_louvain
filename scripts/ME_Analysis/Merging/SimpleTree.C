@@ -1,5 +1,4 @@
 
-
 //Use minimal-brain-usage approach 2 merge llbb tree (frome now on
 //rds_bb tree) with ME tree
 
@@ -716,7 +715,8 @@ void CreateParentTree(TString InputFile) {
       jetmetMETsignificance = mc_RDS->jetmetMETsignificance;
       jetmetMET = mc_RDS->jetmetMET;
       jetmetnj = mc_RDS->jetmetnj;
-
+      jetmetbjet1pt = mc_RDS->jetmetbjet1pt;
+      jetmetbjet2pt = mc_RDS->jetmetbjet2pt;
 
       BtaggingReweightingHE = mc_RDS->BtaggingReweightingHE;
       BtaggingReweightingHP = mc_RDS->BtaggingReweightingHP;
@@ -820,6 +820,7 @@ void CreateParentTree(TString InputFile) {
 	      if( MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt)>0.5){mlphiggsvstt=-999.;}
 	      if( MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3)>0.5){mlphiggsvszz=-999.;}
 	      if( MLP_higgs_vs_bkg->Value(0, MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3), MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3) ,MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt) ) > 0.5 ){mlphiggsvsbkg=-999.;}
+	      if(MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0,Whi3)>0.5){mlphiggsvsbkg_fulll = -999;}
 	}
              t_RDSME->Fill();
      } //else std:: cout << "MEentry not found for " << mc_RDS->eventSelectionrun << ", " << mc_RDS->eventSelectionevent << "]= " << MEentry << std::endl;
