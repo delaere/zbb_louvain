@@ -1,6 +1,7 @@
 import os
 import ROOT
 from math import sqrt
+from random import gauss
 from zbbCommons import zbbfile,zbbsystematics
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
@@ -30,7 +31,7 @@ class JetCorrectionUncertaintyProxy:
     try:
       ptgen = jet.genJet().pt()
     except:
-      ptgen = jetpt # here, we could do something more clever. The official recipe involves randomly sampling the measured resolution.
+      ptgen = gauss(jetpt,self.jetEnergyResolution(jet))
     jersf = (self.jerCorrectionFactor(jet)-1.) * zbbsystematics.JERfactor
     jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
     # take into account JEC uncertainty
@@ -47,3 +48,30 @@ class JetCorrectionUncertaintyProxy:
     elif eta<2.3: return 1.134
     else :        return 1.288 # valid up to 5.0
 
+  def jetEnergyResolution(self,jet):
+    """Simplified version of the CMSSW method. Implements sigma
+       as in CondFormats/JetMETObjects/data/Spring10_PtResolution_AK5PF.txt
+       (ERA: Spring10  ALG: ak5pfl2l3  TYPE: JetEta) """
+    jeteta = abs(jet.eta())
+    jetpt = jet.pt()
+    if jeteta<0.5 :
+      a = -0.349206
+      b = 0.297831
+      d = 0.471121
+    elif jeteta<1.0:
+      a = -0.499735
+      b = 0.336391
+      d = 0.430689
+    elif jeteta<1.5:
+      a = -0.561649
+      b = 0.420293
+      d = 0.392398
+    elif jeteta<2.0:
+      a = -1.12329
+      b = 0.657891
+      d = 0.139595
+    else:
+      a = 1.04792
+      b = 0.466763
+      d = 0.193137
+    return sqrt(((cmp(a,0)*(a/jetpt)**2)+(b**2*(pow(jetpt,(d-1))))))
