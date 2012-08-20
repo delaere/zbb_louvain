@@ -6,7 +6,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
 from DataFormats.FWLite import Events, Handle
-from zbbCommons import zbblabel,zbbfile
+from zbbCommons import zbblabel,zbbfile,zbbsystematics
 #from myFuncTimer import print_timing
 
 class btaggingWeight:
@@ -17,7 +17,7 @@ class btaggingWeight:
     self.jetHandle = Handle ("vector<pat::Jet>")
     self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
     self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-    self.myJetSet = ROOT.JetSet(zbblabel.SF_running_mode,file)
+    self.myJetSet = ROOT.JetSet(zbbsystematics.SF_running_mode,file)
     self.vertexHandle = Handle ("vector<reco::Vertex>")
 
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
@@ -80,7 +80,7 @@ class btaggingWeight:
           if jet.et() > 100. : print "WARNING : SSVHE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
-      self.myJetSet.addJet(zbblabel.SF_uncert, flavor,jet.et(),jet.eta())
+      self.myJetSet.addJet(zbbsystematics.SF_uncert, flavor,jet.et(),jet.eta())
     if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 SSVHP tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
     if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 SSVHE tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
     return self.getWeight(self.myJetSet,ntagsHE,ntagsHP)
