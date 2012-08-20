@@ -81,8 +81,8 @@
    Double_t        Inv_Mass_lept;
    Double_t        DR_jets;
    Int_t           flavour;
-   Long64_t           eventNumber;
-   Long64_t           runNumber;
+   long int           eventNumber;
+   long int           runNumber;
    Double_t        Wgg;
    Double_t        Wqq;
    Double_t        Wtt;
@@ -91,8 +91,8 @@
    Double_t        Wzz0;
    Double_t        Whi3;
    Double_t        Whi0;
-   Long64_t        eventSelectionrun;
-   Long64_t        eventSelectionevent;
+   Double_t        eventSelectionrun;
+   Double_t        eventSelectionevent;
    Double_t        eventSelectionls;
    Double_t        eventSelectiontriggerSelection;
    Double_t        eventSelectiontriggerBits;
@@ -438,8 +438,8 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("Wzz0", &Wzz0, "Wzz0/D");
    t_RDSME->Branch("Whi3", &Whi3, "Whi3/D");
    t_RDSME->Branch("Whi0", &Whi0, "Whi0/D");
-   t_RDSME->Branch("eventSelectionrun", &eventSelectionrun, "eventSelectionrun/l");
-   t_RDSME->Branch("eventSelectionevent", &eventSelectionevent, "eventSelectionevent/l");
+   t_RDSME->Branch("eventSelectionrun", &eventSelectionrun, "eventSelectionrun/D");
+   t_RDSME->Branch("eventSelectionevent", &eventSelectionevent, "eventSelectionevent/D");
    t_RDSME->Branch("eventSelectionls", &eventSelectionls, "eventSelectionls/D");
    t_RDSME->Branch("eventSelectiontriggerSelection", &eventSelectiontriggerSelection, "eventSelectiontriggerSelection/D");
    t_RDSME->Branch("eventSelectiontriggerBits", &eventSelectiontriggerBits, "eventSelectiontriggerBits/D");
@@ -705,6 +705,10 @@ void CreateParentTree(TString InputFile) {
       rc_eventSelection_17_idx = mc_RDS->rc_eventSelection_17_idx;
       rc_eventSelection_18_idx = mc_RDS->rc_eventSelection_18_idx;
       rc_eventSelection_19_idx = mc_RDS->rc_eventSelection_19_idx;
+      
+      
+      eventSelectionrun = mc_RDS->eventSelectionrun;
+      eventSelectionevent = mc_RDS->eventSelectionevent;
       eventSelectiondrZbb = mc_RDS->eventSelectiondrZbb;
       eventSelectiondijetM = mc_RDS->eventSelectiondijetM;
 
