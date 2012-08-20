@@ -82,8 +82,8 @@
    Double_t        Inv_Mass_lept;
    Double_t        DR_jets;
    Int_t           flavour;
-   Int_t           eventNumber;
-   Int_t           runNumber;
+   Long64_t           eventNumber;
+   Long64_t           runNumber;
    Double_t        Wgg;
    Double_t        Wqq;
    Double_t        Wtt;
@@ -92,8 +92,8 @@
    Double_t        Wzz0;
    Double_t        Whi3;
    Double_t        Whi0;
-   Double_t        eventSelectionrun;
-   Double_t        eventSelectionevent;
+   Long64_t        eventSelectionrun;
+   Long64_t        eventSelectionevent;
    Double_t        eventSelectionls;
    Double_t        eventSelectiontriggerSelection;
    Double_t        eventSelectiontriggerBits;
@@ -429,8 +429,8 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("Inv_Mass_lept", &Inv_Mass_lept, "Inv_Mass_lept/D");
    t_RDSME->Branch("DR_jets", &DR_jets, "DR_jets/D");
    t_RDSME->Branch("flavour", &flavour, "flavour/I");
-   t_RDSME->Branch("eventNumber", &eventNumber, "eventNumber/I");
-   t_RDSME->Branch("runNumber", &runNumber, "runNumber/I");
+   t_RDSME->Branch("eventNumber", &eventNumber, "eventNumber/l");
+   t_RDSME->Branch("runNumber", &runNumber, "runNumber/l");
    t_RDSME->Branch("Wgg", &Wgg, "Wgg/D");
    t_RDSME->Branch("Wqq", &Wqq, "Wqq/D");
    t_RDSME->Branch("Wtt", &Wtt, "Wtt/D");
@@ -439,8 +439,8 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("Wzz0", &Wzz0, "Wzz0/D");
    t_RDSME->Branch("Whi3", &Whi3, "Whi3/D");
    t_RDSME->Branch("Whi0", &Whi0, "Whi0/D");
-   t_RDSME->Branch("eventSelectionrun", &eventSelectionrun, "eventSelectionrun/I");
-   t_RDSME->Branch("eventSelectionevent", &eventSelectionevent, "eventSelectionevent/I");
+   t_RDSME->Branch("eventSelectionrun", &eventSelectionrun, "eventSelectionrun/l");
+   t_RDSME->Branch("eventSelectionevent", &eventSelectionevent, "eventSelectionevent/l");
    t_RDSME->Branch("eventSelectionls", &eventSelectionls, "eventSelectionls/D");
    t_RDSME->Branch("eventSelectiontriggerSelection", &eventSelectiontriggerSelection, "eventSelectiontriggerSelection/D");
    t_RDSME->Branch("eventSelectiontriggerBits", &eventSelectiontriggerBits, "eventSelectiontriggerBits/D");
@@ -665,9 +665,9 @@ void CreateParentTree(TString InputFile) {
       //std::cout << "iME=" << iME << " run= " << mc_ME->runNumber << " event= "<< mc_ME->eventNumber << std::endl;
       //I sum 1 to the entry because 0 is the code when the entry is not found but it is also a valid index
       if (IsDATA)
-        map_runevent[pair<long int, long int>(long(mc_ME->runNumber), int(mc_ME->eventNumber))] = iME + 1;
+        map_runevent[pair<Long64_t, Long64_t>(Long64_t(mc_ME->runNumber), Long64_t(mc_ME->eventNumber))] = iME + 1;
       else
-        map_runevent[pair<long int, long int>(1, int(mc_ME->eventNumber))] = iME + 1;
+        map_runevent[pair<Long64_t, Long64_t>(1, Long64_t(mc_ME->eventNumber))] = iME + 1;
 
       //std::cout << map_runevent.size() << std::endl;
    }
@@ -681,7 +681,7 @@ void CreateParentTree(TString InputFile) {
       if (ientry < 0 ) break;
       nbRDS = mc_RDS->GetEntry(iRDS);   nbytesRDS += nbRDS;
       //if (mc_RDS->rc_eventSelection_12_idx == 0) continue;
-      if (mc_RDS->rc_eventSelection_9_idx == 0) continue;
+      //if (mc_RDS->rc_eventSelection_9_idx == 0) continue;
       if (isMuChannel && mc_RDS->eventSelectionbestzmassMu < 0.01 ) continue;
       if (!isMuChannel && mc_RDS->eventSelectionbestzmassEle < 0.01 ) continue;
       
@@ -754,7 +754,7 @@ void CreateParentTree(TString InputFile) {
 
       
       int MEentry = -1; 
-      if (IsDATA) MEentry = map_runevent[pair<long int, long int>(int(mc_RDS->eventSelectionrun), int(mc_RDS->eventSelectionevent))];
+      if (IsDATA) MEentry = map_runevent[pair<Long64_t, Long64_t>(Long64_t(mc_RDS->eventSelectionrun), Long64_t(mc_RDS->eventSelectionevent))];
       else  MEentry = map_runevent[pair<long int, long int>(1, int(mc_RDS->eventSelectionevent))];
       
       if (MEentry==0) {
