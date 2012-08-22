@@ -23,7 +23,7 @@ class zbbsystematics:
   SF_uncert="mean" ## choose among min/max/mean
   #SF_running_mode= "hardcoded" ## choose between hardcoded/database
   SF_running_mode= "database" ## choose between hardcoded/database
-  JERfactor = 0. # 1 = recommended smearing
+  JERfactor = 1. # 1 = recommended smearing
   JESfactor = 0. # 1 = +1sigma
 
 class zbbfile:
