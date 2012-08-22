@@ -18,6 +18,7 @@ class JetCorrectionUncertaintyProxy:
       self._engine = ROOT.JetCorrectionUncertainty(ROOT.JetCorrectorParameters(file, "Total"))
 
   def unc_tot_jet(self,jet):
+    """Total (relative) JES uncertainty"""
     if self._engine is None: return 0
     self._engine.setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
     self._engine.setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
@@ -25,6 +26,7 @@ class JetCorrectionUncertaintyProxy:
     return unc
 
   def jetPt(self,jet):
+    """Jet Pt, optionally varied for JES and JER"""
     jetpt = jet.pt()
     # smear to reproduce resolution measured in data
     # apply JetMet recommendation:  pT->max[0.,pTgen+c*(pT-pTgen)] 
@@ -40,7 +42,16 @@ class JetCorrectionUncertaintyProxy:
     # return the jet pt, including all of the above
     return jetpt
 
+  def jet(self,jet):
+    """4-momentum of the jet, after variation of JES and JER.
+       Pt is rescaled, while eta, phi and mass are fixed."""
+    jetmomentum = ROOT.TLorentzVector()
+    jetmomentum.SetPtEtaPhiM(self.jetPt(jet),jet.eta(),jet.phi(),jet.mass())
+    return jetmomentum
+
   def jerCorrectionFactor(self,jet):
+    """Scale factor to reproduce in MC the JER measured in data.
+       Taken from https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution r29"""
     eta = abs(jet.eta())
     if   eta<0.5: return 1.052
     elif eta<1.1: return 1.057

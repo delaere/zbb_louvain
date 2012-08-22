@@ -378,7 +378,8 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
       for jet in jets:
-        jetPt = jet.pt()
+        #jetPt = jet.pt()
+        jetPt = self._JECuncertainty.jetPt(jet)
         if isGoodJet(jet,bestZcandidate):
         #if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
           rawjet = jet.correctedJet("Uncorrected")
