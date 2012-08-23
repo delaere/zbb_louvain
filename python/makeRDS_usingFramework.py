@@ -245,7 +245,7 @@ jmcp.beginJob()
 vacp.beginJob()             
 if channel[-2:] == "MC":
   mscp.beginJob(genlabel=zbblabel.genlabel)
-  prcp.beginJob(MonteCarloPUFileName, DataPUFileName, MonteCarloHistName="pileup", DataHistName="pileup", vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
+  prcp.beginJob(MonteCarloPUFileName, DataPUFileName, vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
 
 ntuple = getArgSet([escp
 #                   , mscp
