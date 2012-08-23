@@ -303,16 +303,17 @@ def isBJet(jet,workingPoint,algo="SSV"):
     else:
       print "Error: unforeseen working point for b-tagging. Use HE or HP"
       return False
-  elif algo=="TC":
+  elif algo=="CSV":
+    #HE is Medium WP and HP is Tight WP valid both for 2011 and 2012
     if workingPoint=="HE":
-      return jet.bDiscriminator("trackCountingHighEffBJetTags")>3.3
+      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.679
     elif workingPoint=="HP":
-      return jet.bDiscriminator("trackCountingHighPurBJetTags")>3.41
+      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.898
     else:
       print "Error: unforeseen working point for b-tagging. Use HE or HP"
       return False
   else:
-    print "Error: unforeseen algo for b-tagging. Use SSV or TC"
+    print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
 
 
