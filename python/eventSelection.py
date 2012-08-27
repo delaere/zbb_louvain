@@ -25,8 +25,8 @@ ourtriggers.murunMap[165121:167044] = ("HLT_Mu13_Mu8_v2","HLT_Mu13_Mu8_v3",)
 ourtriggers.murunMap[167078:170249] = ("HLT_Mu13_Mu8_v4",)
 ourtriggers.murunMap[170249:173199] = ("HLT_Mu13_Mu8_v6",)
 ourtriggers.murunMap[173236:178381] = ("HLT_Mu13_Mu8_v7",)
-ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10","HLT_Mu17_tkMu8_v3")
-ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11","HLT_Mu17_tkMu8_v4")
+ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10",)#"HLT_Mu17_tkMu8_v3")
+ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11",)#"HLT_Mu17_tkMu8_v4")
 ### data 2012
 ourtriggers.murunMap[180253:]       = ("HLT_Mu17_Mu8_v16",)     ##"HLT_Mu17_tkMu8_v9"
 
@@ -401,12 +401,12 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
       #print "l1.triggerObjectMatchesByFilter(hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17) size",(l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size())      
       #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,0).size())
       #print "l2 hltDiMuonL3p5PreFiltered8 size = ",  l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0)       or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3Mu17FromDiMuonFiltered17").size()> 0 ):
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0)       : #or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3Mu17FromDiMuonFiltered17").size()> 0 ):
         return True
 
 ### data 2012
     if runNumber >= 180253 :  
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0)     or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size()>0 ) :
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0)     : #or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size()>0 ) :
         return True
       
       
