@@ -17,12 +17,26 @@
 
 from ROOT import *
 from zbbCommons import zbbnorm
+from eventSelection import categoryNames
 
 #####################################################
 ### sample/wp/selection of interest
 #####################################################
 
-WP       = "17"  
+btagWP = "HEHE" #choose between HE, HP, HEHE, HEHP, HPHP
+llMassWP = "" #"" or "wide"
+metWP = "MET" #"MET" or "", MET means met significance
+
+wp = 0
+for cat in categoryNames:
+    if cat.find(btagWP)>-1:
+        if (llMassWP=="" and cat.find("wide")==-1) or (llMassWP=="wide" and cat.find(btagWP)>-1):
+            if (metWP=="" and cat.find("MET")==-1)  or (metWP=="MET" and cat.find("significance")>-1):
+                break
+    wp+=1
+
+WP=str(wp)
+
 channels  = [
     "EEChannel",
     "MuMuChannel",
@@ -30,49 +44,12 @@ channels  = [
 
 #choose you set of cuts
 extraCuts = [
-    #"jetmetbjet1pt>50",#no effect
-    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)",
-    #"eventSelectiondphidijetMET<1.",
-    #"eventSelectiondphiZbb>2.25",
-    #"eventSelectiondijetM>95&eventSelectiondijetM<155",
-    #"eventSelectionZbbM>176&eventSelectionZbbM<256",
-    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25",
-    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25&eventSelectiondijetM>95&eventSelectiondijetM<155",
-    #"eventSelectiondphiZbb>2.25&eventSelectiondijetM>95&eventSelectiondijetM<155",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphiZbb>2.5",
-    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectiondijetdR>1.5&eventSelectiondijetdR<3.",
-    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectionZbPt<150",
-    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&eventSelectiondphiZbb>2.5",
-    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&((eventSelectionbestzmassEle>82.&eventSelectionbestzmassEle<100.)||(eventSelectionbestzmassMu>82.&eventSelectionbestzmassMu<100.))",
-    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&jetmetbjet1pt>52",
-    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondphiZbb>2.25",
-    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
-    #"eventSelectiondphiZbb>2.25&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
-    #"eventSelectiondphiZbb>2.25&jetmetbjet1pt>54",
-    #"jetmetMETSignificance<15",
-    "eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
-    "eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85"
-    ]
-
-titleCuts = [
-    "stage_"+WP,
-    "mass bb+dPhi(Z,bb)",
-    "mass bb+mass Z",
-    "dPhi(Z,bb)",
-    "bb mass",
-    "zbb mass",
-    "dPhi(bb,MET)+dPhi(Z,bb)",
-    "dPhi(bb,MET)+dPhi(Z,bb)+bb mass",
-    #"dPhi(Z,bb)+bb mass",
+    ""
     ]
 
 extraCutsLep = {
-    "EEChannel"     : "(eventSelectionbestzmassEle>82.&eventSelectionbestzmassEle<100.)",
-    "MuMuChannel"   : "(eventSelectionbestzmassMu>82.&eventSelectionbestzmassMu<100.)"
+    "EEChannel"     : "(eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.)",
+    "MuMuChannel"   : "(eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.)"
     }
 
 stringCut = {}
@@ -87,11 +64,11 @@ for i in range(0,len(extraCuts)) :
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+MCsampleList   = ["Zb","Zc","Zl","TT","ZZ",]#"ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
-NSMMCsampleList= ["ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-sampleList     = ["DATA","DY","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]
+NSMMCsampleList= ["ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+sampleList     = ["DATA","DY","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]
 
 lumi = { "DATA"   : zbbnorm.lumi_tot2011,
          "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
@@ -123,28 +100,28 @@ myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {}
 
-filename_el = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElA_DATA.root",
-               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElB_DATA.root",
-               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_El_MC.root",
-               "DY"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
-               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_El_MC.root",
-               "ZH115"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH115_El_MC.root",
-               "ZH120"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH120_El_MC.root",
-               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_El_MC.root",
-               "ZH130"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH130_El_MC.root",
-               "ZH135"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH135_El_MC.root"
+filename_el = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_ElA_DATA.root",
+               "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_ElB_DATA.root",
+               "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_El_MC.root",
+               "DY"     : "condorRDSmaker/outputs/File_rds_zbb_El_MC.root",
+               "ZZ"     : "condorRDSmaker/outputs/File_rds_zbb_ZZ_El_MC.root",
+               "ZH115"  : "condorRDSmaker/outputs/File_rds_zbb_ZH115_El_MC.root",
+               "ZH120"  : "condorRDSmaker/outputs/File_rds_zbb_ZH120_El_MC.root",
+               "ZH125"  : "condorRDSmaker/outputs/File_rds_zbb_ZH125_El_MC.root",
+               "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_El_MC.root",
+               "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_El_MC.root"
                }
 
-filename_mu = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuA_DATA.root",
-               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuB_DATA.root",
-               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_Mu_MC.root",
-               "DY"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
-               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_Mu_MC.root",
-               "ZH115"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH115_Mu_MC.root",
-               "ZH120"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH120_Mu_MC.root",
-               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_Mu_MC.root",
-               "ZH130"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH130_Mu_MC.root",
-               "ZH135"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH135_Mu_MC.root"
+filename_mu = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_MuA_DATA.root",
+               "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_MuB_DATA.root",
+               "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_Mu_MC.root",
+               "DY"     : "condorRDSmaker/outputs/File_rds_zbb_Mu_MC.root",
+               "ZZ"     : "condorRDSmaker/outputs/File_rds_zbb_ZZ_Mu_MC.root",
+               "ZH115"  : "condorRDSmaker/outputs/File_rds_zbb_ZH115_Mu_MC.root",
+               "ZH120"  : "condorRDSmaker/outputs/File_rds_zbb_ZH120_Mu_MC.root",
+               "ZH125"  : "condorRDSmaker/outputs/File_rds_zbb_ZH125_Mu_MC.root",
+               "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_Mu_MC.root",
+               "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_Mu_MC.root"
                }
 
 
@@ -199,28 +176,22 @@ tmp=myRDS["EEChannelZc"].reduce("mcSelectioneventType==1")
 ras_zbb = tmp.get()
 tmp=0
 
-rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHE"]  ,
-           "6"  : ras_zbb["BtaggingReweightingHP"]  ,
-           "7"  : ras_zbb["BtaggingReweightingHE"]  ,
-           "8"  : ras_zbb["BtaggingReweightingHP"]  ,
-           "9"  : ras_zbb["BtaggingReweightingHEHE"],
-           "10" : ras_zbb["BtaggingReweightingHEHP"],
-           "11" : ras_zbb["BtaggingReweightingHPHP"],
-           "12" : ras_zbb["BtaggingReweightingHEHE"],
-           "13" : ras_zbb["BtaggingReweightingHEHP"],
-           "14" : ras_zbb["BtaggingReweightingHPHP"],
-           "15" : ras_zbb["BtaggingReweightingHE"]  ,
-           "16" : ras_zbb["BtaggingReweightingHP"]  ,
-           "17" : ras_zbb["BtaggingReweightingHEHE"],
-           "18" : ras_zbb["BtaggingReweightingHEHP"],
-           "19" : ras_zbb["BtaggingReweightingHPHP"],
+btagRew = [
+    "BtaggingReweightingHE"  ,
+    "BtaggingReweightingHP"  ,
+    "BtaggingReweightingHEHE",
+    "BtaggingReweightingHEHP",
+    "BtaggingReweightingHPHP",
+    ]
 
-           }
-
+for b in btagRew:
+    if b.find()>-1 : 
+        rrv_w_b=ras_zbb[b]
+        break
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
 rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
 
-w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
+w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
 
 #############
 ### PLOTS ###
@@ -379,7 +350,8 @@ for channel in channels :
     for sample in totsampleList :
         print "sample ... ", sample
         for cut in extraCuts :
-            iCut=cut+"&"+extraCutsLep[channel]
+            if cut=="" : iCut=extraCutsLep[channel]
+            else : iCut=cut+"&"+extraCutsLep[channel]
             print "cuts ... ", iCut
             
             myRDS_red = myRDS[channel+sample]
@@ -512,7 +484,7 @@ for sample in totsampleList:
         if channel=="Combined" : continue
         chDir=file[sample].mkdir(channel,channel)
         for cut in extraCuts:
-            chDir.mkdir(stringCut[cut],titleCut[cut])
+            chDir.mkdir(stringCut[cut],stringCut[cut])
             chDir.cd(stringCut[cut])
             for name in namePlotList:
                 if channel=="EEChannel" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
