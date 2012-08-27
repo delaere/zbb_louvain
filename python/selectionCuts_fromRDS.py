@@ -224,8 +224,8 @@ namePlotList = [
     "eventSelectionZbbM"         ,
     "eventSelectionZbbPt"        ,
     "eventSelectionZbM"          ,
-    "eventSelectiondrMuMu"       , 
-    "eventSelectiondrEleEle"     
+    "eventSelectiondrllMu"       , 
+    "eventSelectiondrllEle"     
     ]
 
 ################
@@ -256,8 +256,8 @@ min = {
     "jetmetjet1SSVHEdisc"       :    0 ,
     "jetmetjet1SSVHPdisc"       :    0 ,
     "jetmetjet1SVmass"          :    0 ,
-    "eventSelectiondrMuMu"      :    0 ,
-    "eventSelectiondrEleEle"    :    0 
+    "eventSelectiondrllMu"      :    0 ,
+    "eventSelectiondrllEle"    :    0 
     }
 
 ################
@@ -289,8 +289,8 @@ max = {
     "jetmetjet1SSVHEdisc"       :    8 ,
     "jetmetjet1SSVHPdisc"       :    8 ,
     "jetmetjet1SVmass"          :    5 ,
-    "eventSelectiondrMuMu"      :    5 ,
-    "eventSelectiondrEleEle"    :    5 
+    "eventSelectiondrllMu"      :    5 ,
+    "eventSelectiondrllEle"    :    5 
     }
 
 ################
@@ -322,8 +322,8 @@ binning = {
     "jetmetjet1SSVHEdisc"       :   16 , #0.5
     "jetmetjet1SSVHPdisc"       :   16 ,
     "jetmetjet1SVmass"          :   20 , #0.25GeV
-    "eventSelectiondrMuMu"      :   10 , #0.5
-    "eventSelectiondrEleEle"    :   10 
+    "eventSelectiondrllMu"      :   10 , #0.5
+    "eventSelectiondrllEle"    :   10 
     }
 
 var = {}
@@ -332,7 +332,7 @@ for name in namePlotList:
     var[name] = ras_zbb[name]
     var[name].setMin(min[name])
     var[name].setMax(max[name])
-    var[name].setBins(5*binning[name])
+    var[name].setBins(binning[name])
 
 th1 = {}
 
