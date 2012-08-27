@@ -53,18 +53,18 @@ extraCutsLep = {
     }
 
 stringCut = {}
-titleCut = {}
+#titleCut = {}
 
 for i in range(0,len(extraCuts)) :
     stringCut[extraCuts[i]]="Cut"+str(i+1)
-    if titleCuts[i] : titleCut[extraCuts[i]]=titleCuts[i]
-    titleCut[extraCuts[i]]=""
+    #if titleCuts[i] : titleCut[extraCuts[i]]=titleCuts[i]
+    #titleCut[extraCuts[i]]=""
 
 #####################################################
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ",]#"ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
 NSMMCsampleList= ["ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
@@ -185,7 +185,7 @@ btagRew = [
     ]
 
 for b in btagRew:
-    if b.find()>-1 : 
+    if b.find(btagWP)>-1 : 
         rrv_w_b=ras_zbb[b]
         break
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
@@ -479,7 +479,7 @@ print " "
 file={}
 #her you could choose the root ouput filenames
 for sample in totsampleList:
-    file[sample]=TFile("Higgs3bin/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
+    file[sample]=TFile("Yields/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
     for channel in channels:
         if channel=="Combined" : continue
         chDir=file[sample].mkdir(channel,channel)
