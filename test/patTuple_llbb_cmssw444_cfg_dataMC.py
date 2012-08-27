@@ -294,7 +294,6 @@ if isMC:
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5 &'
-                                                  'triggerObjectMatches.size > 0' # trigger match           
                                                   )
 else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
@@ -431,22 +430,40 @@ process.tightMuons = selectedPatMuons.clone(
                     'abs(eta) < 2.4')
    )
 
-process.matchedMuons = selectedPatMuons.clone(
-    src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-    cut = cms.string('isGlobalMuon & isTrackerMuon &'
-                     'innerTrack.hitPattern.trackerLayersWithMeasurement>8 &'  ## new requirement in 44X due to changes in tracking
-                     'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation   
-                     'abs(dB) < 0.02 &' 
-                     'normChi2 < 10 &'
-                     'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
-                     'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
-                     'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
-                     'pt>20 &'
-                     'abs(eta) < 2.4 &'
-                     #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
-                     #' trackIso < 3 &'                                      # VBTF choice
-                     'triggerObjectMatches.size > 0')
-    )
+if isMC :
+    process.matchedMuons = selectedPatMuons.clone(
+        src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+        cut = cms.string('isGlobalMuon & isTrackerMuon &'
+                         'innerTrack.hitPattern.trackerLayersWithMeasurement>8 &'  ## new requirement in 44X due to changes in tracking
+                         'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation   
+                         'abs(dB) < 0.02 &' 
+                         'normChi2 < 10 &'
+                         'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                         'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
+                         'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
+                         'pt>20 &'
+                         'abs(eta) < 2.4 &'
+                         #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
+                         #' trackIso < 3 &'                                      # VBTF choice
+                         )
+        )
+else :
+    process.matchedMuons = selectedPatMuons.clone(
+        src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+        cut = cms.string('isGlobalMuon & isTrackerMuon &'
+                         'innerTrack.hitPattern.trackerLayersWithMeasurement>8 &'  ## new requirement in 44X due to changes in tracking
+                         'userFloat("RelativePFIsolationDBetaCorr") < 0.2 &' # PF isolation   
+                         'abs(dB) < 0.02 &' 
+                         'normChi2 < 10 &'
+                         'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                         'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
+                         'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
+                         'pt>20 &'
+                         'abs(eta) < 2.4 &'
+                         #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
+                         #' trackIso < 3 &'                                      # VBTF choice
+                         'triggerObjectMatches.size > 0')
+        )
 
 
 #################################
