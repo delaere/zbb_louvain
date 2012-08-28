@@ -128,7 +128,8 @@ readFiles.extend([
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root',
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/DCAE2B35-8B82-E111-A830-00215AEDFCCC.root'
       #'/store/relval/CMSSW_5_2_3_patch3/RelValTTbar/GEN-SIM-RECO/START52_V9_special_120410-v1/0122/4C156E86-1183-E111-BED9-003048FFCBF0.root'
-        'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
+        #'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
+        'file:/storage/data/cms/store/data/Run2012B/SingleMu/AOD/13Jul2012-v1/0000/06FBAF11-AED3-E111-8C52-90E6BA0D09BB.root'
     ])
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -151,7 +152,7 @@ process.load('CommonTools.ParticleFlow.pfParticleSelection_cff')
 ## Standard Modules  ###
 ########################
 ## Load standard Reco modules
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 
@@ -184,7 +185,7 @@ process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
 ###remove MC matching for DATA and use the good collection for muons for MC
-isMC = True
+isMC = False
 if not isMC : removeMCMatching(process, ['All'])
 else : process.muonMatch.src = "pfIsolatedMuons"
 
@@ -193,9 +194,9 @@ process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
                                      )
 
 if isMC :
-    process.GlobalTag.globaltag = 'START52_V9::All'
+    process.GlobalTag.globaltag = 'START53_V7A::All'
 else :    
-    process.GlobalTag.globaltag = 'GR_R_52_V7::All'
+    process.GlobalTag.globaltag = 'FT_53_V6_AN1::All'
 
 #import FWCore.PythonUtilities.LumiList as LumiList
 #import FWCore.ParameterSet.Types as CfgTypes
@@ -337,7 +338,7 @@ if isMC:
                                                   '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
-                                                  'abs(eta) < 2.5 &'
+                                                  'abs(eta) < 2.5'
                                                   )
 else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
@@ -647,12 +648,16 @@ addPfMET(process, 'PF')
 
 # for MET systematics: adds ~10 variants of type1-corrected MET
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-runMEtUncertainties(process)
+if isMC : runMEtUncertainties(process)
 
 process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
 process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
 process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
 process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
+process.patType1p2CorrectedPFMet.srcType1Corrections = cms.VInputTag(    
+    cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
+    cms.InputTag('patPFMETtype0Corr')             
+)
 
 # this is to add the various corrections to the MET that we use.
 process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
@@ -684,7 +689,7 @@ process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
 # MET sequence
 process.producePatPFMETobjectWithCorrections = cms.Sequence(
     process.patPFMet
-    process.type0PFMEtCorrection
+    * process.type0PFMEtCorrection
     * process.patPFMETtype0Corr
     * process.pfMEtSysShiftCorrSequence
     * process.selectedPatJetsForMETtype1p2Corr
@@ -717,6 +722,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
 process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
 process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
+process.patDefaultSequence.replace(process.patPFMet,process.producePatPFMETobjectWithCorrections)
 
 process.PFLeptons = cms.Sequence(
     process.TotalEventCounter*
@@ -735,7 +741,7 @@ process.PFLeptons = cms.Sequence(
     (process.preMuonSequence * process.preElectronSequence)*
     process.patPF2PATSequence *
     # this is to add the various corrections to the MET that we use.
-    process.producePatPFMETobjectWithCorrections *
+    #process.producePatPFMETobjectWithCorrections *
     process.bjets*                                             ## our b jets
     process.CSVbjets*
     process.JPbjets* 
