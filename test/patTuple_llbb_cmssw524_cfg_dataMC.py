@@ -15,33 +15,27 @@ process = cms.Process("ZplusJets")
 #packages for 52X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X
 #444pat : https://twiki.cern.ch/twiki/bin/view/CMSPublic/LeptonSelectionVjets2011
 
-#packages are for 526, no recipe for 53X : working except for met correction 0 
+#packages are for 532patch4, should work also in 533patch2 
 #--- Tag ---    -------- Package --------
-#V00-02-05      CMGTools/External
-#V00-03-15      CommonTools/ParticleFlow
-#V00-00-12      CommonTools/RecoUtils
-#V15-03-02      DataFormats/ParticleFlowCandidate
-#V06-05-01      DataFormats/PatCandidates
+#V00-02-09      CMGTools/External
+#V00-03-16      CommonTools/ParticleFlow
+#V00-03-23      CommonTools/RecoAlgos
+#V00-00-13      CommonTools/RecoUtils
+#V02-06-05      DataFormats/HLTReco
+#V15-03-03      DataFormats/ParticleFlowCandidate
+#V00-02-14      DataFormats/StdDictionaries
+#V10-02-02      DataFormats/TrackReco
+#V02-00-04      DataFormats/VertexReco
 #V00-00-18      EGamma/EGammaAnalysisTools
 #V04-06-09      JetMETCorrections/Type1MET
-#V08-09-21      PhysicsTools/PatAlgos
+#V08-09-23      PhysicsTools/PatAlgos
 #V03-09-23      PhysicsTools/PatUtils
-#V01-08-00      RecoBTag/SecondaryVertex
-#V02-02-00      RecoVertex/AdaptiveVertexFinder
 #NoTag          UserCode/zbb_louvain
 #NoTag          ZbbAnalysis/AnalysisStep
 #NoTag          ZbbAnalysis/Tools
+#---------------------------------------
 
-#changes from 444
-#vertex : modules define like in JEC twiki and in patSequence collection of PV replaced by goodPV
-#electrons : EGamma package changed, check Effective Areas (rho already present in AOD) , use of NoPFIdPFIso , vetoes for endcap not yet in cmssw
-#muons : 'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &' and fabs(recoMu.innerTrack()->dz(vertex->position())) < 0.5 probably to be applied offline , use also Effective Areas (to be checked also), a delta beta isolation also possible but need to be implemented for electron before to use it , trigger it's also possible use of HLT_Mu17_TkMu8_v*
-#electrons and muons abs(db)>0.2 or 0.02 ? twiki confusing
-#Jets : no changes
-#bjets : no changes, keep IVF infos ?
-#MET : no modifications, add examples from the twiki (possibility to create reco met with corection, but seems easier to do with pat), porblem for correction 0 due to missing class in the packages, should be fixed 
-#combined objects : no changes
-
+#leptons : check triggers prescaled
 
 ###############################
 ##### Loading what we need ####
@@ -104,6 +98,7 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       'keep *_*bjets*_*_*',
                                                                       'keep *_simpleSecondaryVertex*BJetTags*_*_PAT',
                                                                       'keep *_combinedSecondaryVertexBJetTags*_*_PAT',
+                                                                      'keep *_combinedInclusiveSecondaryVertexBJetTags*_*_PAT',
                                                                       'keep *_jetProbabilityBJetTags*_*_PAT',
                                                                       ### rho corrections saved ---------------------------------------------------------------
                                                                       'keep *_kt6PFJets*_*_*',
@@ -133,7 +128,7 @@ readFiles.extend([
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root',
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/DCAE2B35-8B82-E111-A830-00215AEDFCCC.root'
       #'/store/relval/CMSSW_5_2_3_patch3/RelValTTbar/GEN-SIM-RECO/START52_V9_special_120410-v1/0122/4C156E86-1183-E111-BED9-003048FFCBF0.root'
-        'file:/storage/data/cms/store/mc/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S7_START52_V9-v2/0000/ACEB2F43-F396-E111-A7E3-002481E150DA.root'
+        'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
     ])
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -234,14 +229,6 @@ else:
 #### VERTEX FILTER ###
 ######################
 
-#from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi import *
-#process.goodPV= offlinePrimaryVertices.clone()
-#process.goodPV.cut=cms.string('ndof > 4&'
-#                              'abs(z) <24&'
-#                              '!isFake &'
-#                              ' position.Rho <2 '
-#                             )
-
 #from https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2012V2
 from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 process.goodPV = cms.EDFilter(
@@ -263,16 +250,12 @@ process.muIsoSequence = setupPFMuonIso(process, 'muons')
 ###########################
 #### ELECTRON selection ###
 ###########################
-#25 may 2012
-#addpkg  CommonTools/ParticleFlow V00-03-13  
-#addpkg  RecoParticleFlow/PFProducer V15-01-11 
 #cvs co -r V00-00-18 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 
 ################################
 #### ELECTRON IDENTIFICATION ###
 ################################
 
-#To change ? not clear
 process.patElectrons.addElectronID = cms.bool(True)
 process.patElectrons.electronIDSources = cms.PSet(
     simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
@@ -355,7 +338,6 @@ if isMC:
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5 &'
-                                                  'triggerObjectMatches.size > 0' # trigger match           
                                                   )
 else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
@@ -446,8 +428,7 @@ process.pfIsolatedMuons.isolationCut = 0.5
 ### MUON Trigger matching #######
 #################################
 #https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT#2012_Runs
-#http://fwyzard.web.cern.ch/fwyzard/hlt/summary
-#In 2012A introduced a dz cut in double muon triggers; was removed in 2012B (except for Mu17_TkMu8, where it was fixed)
+#Selection OK : need only to check if trigger became prescaled
 pathTriggerMu = 'path("HLT_Mu17_Mu8_v*",0,1)'# || path("HLT_Mu17_TkMu8_v*",0,1)'
 
 process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
@@ -480,7 +461,7 @@ process.allMuons = selectedPatMuons.clone(
 
 process.tightMuons = selectedPatMuons.clone(
    src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-   cut = cms.string('isGlobalMuon & isTrackerMuon &'
+   cut = cms.string('isGlobalMuon &'
                     'isPFMuon &'
                     'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &'
                     #fabs(recoMu.innerTrack()->dz(vertex->position())) < 0.5  # to be applied offline ?
@@ -494,10 +475,16 @@ process.tightMuons = selectedPatMuons.clone(
                     'abs(eta) < 2.4')
    )
 
-process.matchedMuons = process.tightMuons.clone(
-    src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-    cut = cms.string('triggerObjectMatches.size > 0')
-    )
+if not isMC:
+    process.matchedMuons = process.tightMuons.clone(
+        src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+        cut = cms.string('triggerObjectMatches.size > 0')
+        )
+else:
+    process.matchedMuons = process.tightMuons.clone(
+        src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+        )
+
 
 #################################
 ### Z muon candidates ###########
@@ -655,33 +642,12 @@ process.offlinePrimaryVertexFromZ =  zvertexproducer.clone(
 #################################################
 ###### MET ######################################
 #################################################
-#addpkg JetMETCorrections/Type1MET V04-06-09
-#addpkg PhysicsTools/PatUtils V03-09-22
-#addpkg CommonTools/RecoUtils V00-00-09
-
-#from the twiki
-#if isMC : process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3")
-#else : process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
-
-#process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-#process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-#    cms.InputTag('pfMETcorrType0'), #to be fixed
-#    cms.InputTag('pfJetMETcorr', 'type1')        
-#)
-
-#if not isMC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-# use for Spring'12 MC : means for summer12 ?
-#else : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
-
-#process.pfType1p2CorrectedMet.srcType1Corrections = cms.VInputTag(
-#    cms.InputTag('pfJetMETcorr', 'type1') ,
-    #cms.InputTag('pfMEtSysShiftCorr')       
-#)
-
-#from config file in 444
-# standard (raw) MET
 from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
+
+# for MET systematics: adds ~10 variants of type1-corrected MET
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+runMEtUncertainties(process)
 
 process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
 process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
@@ -696,7 +662,7 @@ process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
 process.patType01CorrectedPFMet = process.patType1CorrectedPFMet.clone(
    srcType1Corrections = cms.VInputTag(
      cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
-     #cms.InputTag('patPFMETtype0Corr'),               #type0
+     cms.InputTag('patPFMETtype0Corr'),               #type0
    )
 )
 
@@ -710,7 +676,7 @@ process.patType1SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
 process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
    srcType1Corrections = cms.VInputTag(
      cms.InputTag('patPFJetMETtype1p2Corr', 'type1'), #type1
-     #cms.InputTag('patPFMETtype0Corr'),               #type0
+     cms.InputTag('patPFMETtype0Corr'),               #type0
      cms.InputTag('pfMEtSysShiftCorr')                #sysShift
    )
 )
@@ -718,8 +684,8 @@ process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone(
 # MET sequence
 process.producePatPFMETobjectWithCorrections = cms.Sequence(
     process.patPFMet
-    #process.type0PFMEtCorrection
-    #* process.patPFMETtype0Corr
+    process.type0PFMEtCorrection
+    * process.patPFMETtype0Corr
     * process.pfMEtSysShiftCorrSequence
     * process.selectedPatJetsForMETtype1p2Corr
     * process.patPFJetMETtype1p2Corr
@@ -770,10 +736,6 @@ process.PFLeptons = cms.Sequence(
     process.patPF2PATSequence *
     # this is to add the various corrections to the MET that we use.
     process.producePatPFMETobjectWithCorrections *
-    #process.type0PFMEtCorrection * #missing class, seems not yet tagged : edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Vertex>,std::vector<reco::Track>,float,unsigned int> > >
-    #process.pfType1CorrectedMet *
-    #process.pfMEtSysShiftCorrSequence * 
-    #process.pfType1p2CorrectedMet * #producePFMETCorrections *
     process.bjets*                                             ## our b jets
     process.CSVbjets*
     process.JPbjets* 
