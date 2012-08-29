@@ -58,7 +58,7 @@ process.AfterJetsCounter = cms.EDProducer("EventCountProducer")
 #####################################
 
 process.out = cms.OutputModule("PoolOutputModule",
-                               fileName = cms.untracked.string('MC_summer2012.root'),
+                               fileName = cms.untracked.string('pat_8TeV2012.root'),
                                                               # save only events passing the full path
                                SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p1','p2') ),
                                                               # save PAT Layer 1 output; you need a '*' to
@@ -128,13 +128,13 @@ readFiles.extend([
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/F0D69742-8A82-E111-ABDE-BCAEC518FF30.root',
        #'/store/data/Run2012A/DoubleMu/RECO/PromptReco-v1/000/190/645/DCAE2B35-8B82-E111-A830-00215AEDFCCC.root'
       #'/store/relval/CMSSW_5_2_3_patch3/RelValTTbar/GEN-SIM-RECO/START52_V9_special_120410-v1/0122/4C156E86-1183-E111-BED9-003048FFCBF0.root'
-        #'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
-        'file:/storage/data/cms/store/data/Run2012B/SingleMu/AOD/13Jul2012-v1/0000/06FBAF11-AED3-E111-8C52-90E6BA0D09BB.root'
+        'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
+        #'file:/storage/data/cms/store/data/Run2012B/SingleMu/AOD/13Jul2012-v1/0000/06FBAF11-AED3-E111-8C52-90E6BA0D09BB.root'
     ])
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(reportEvery = cms.untracked.int32(15))
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
+process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(reportEvery = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -184,8 +184,20 @@ process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
 ##------------------------------------------------------------------------
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
+#######Option MC or DATA
+import FWCore.ParameterSet.VarParsing as VarParsing
+options = VarParsing.VarParsing ()
+# setup any defaults you want
+options.register('boolMC',
+                 0, # default value
+                 VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                 VarParsing.VarParsing.varType.int,         # string, int, or float
+                 "MC flag")
+
+options.parseArguments()
+isMC = bool(options.boolMC)
+
 ###remove MC matching for DATA and use the good collection for muons for MC
-isMC = False
 if not isMC : removeMCMatching(process, ['All'])
 else : process.muonMatch.src = "pfIsolatedMuons"
 
