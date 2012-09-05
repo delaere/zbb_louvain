@@ -91,11 +91,11 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
   fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
   fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
-  fwevent.getByLabel(zbblabel.vertexlabel,self.vertexHandle_)
+  fwevent.getByLabel(zbblabel.vertexlabel,self.vertexHandle)
   dijets = dijetHandle.product()
   zeebbs = zeebbHandle.product()
   zmmbbs = zmmbbHandle.product()
-  vertices = self.vertexHandle_.product()
+  vertices = vertexHandle.product()
   if vertices.size()>0 :
     vertex = vertices[0]
   else:
