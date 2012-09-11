@@ -1,9 +1,5 @@
 # to run this:
-# go to the main() function, and define an object by copying the aother "testu" lines
-# arguments go as follows:
-# testu = unfolder(**dataset_path**, steps, startup, finish, **muchannel**)
-# it will write results in a file which name is based on the current minute -> start different runs on different minutes 
-# number of events to process is the argument of the main() function 
+# use "-h" option to get help
 
 import ROOT
 import sys
@@ -639,16 +635,39 @@ def compare_matrices():
     print compute_fullmatrix(**vals_imp_mu)
 
 
-def main(num = -1):
+def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1):
     startup = ["weights"]
     steps = ["event_weight","a_l", "e_r", "e_l", "e_b"]
     finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
-    # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets/PATskim-Zjets_2619_1_jGj.root", steps, startup, finish, False)
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4", steps, startup, finish, True)
-    # testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/PATprod-MC_1432_1_f5u.root", steps, startup, finish, True)
-    # testu = unfolder("/storage/data/cms/users/llbb/production2012_44X/Fall11_DYJets", steps, startup, finish, False)
-    testu = unfolder("/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", steps, startup, finish, True)
+    testu = unfolder(dataset, steps, startup, finish, muchannel)
     testu.run(num)
 
 if __name__ == '__main__':
-     main()
+    from optparse import OptionParser
+    parser = OptionParser(description="Compute unfolding matrices from MC dataset")
+    parser.add_option("-d", "--dataset", type="string", dest="dataset", help="Path to root file or directory containing root files")
+    parser.add_option("-m", action="store_const", const=True,  dest="muchannel", help="Muon channel", default=None)
+    parser.add_option("-e", action="store_const", const=False, dest="muchannel", help="Electron channel")
+    parser.add_option("-b", action="store_const", const=None,  dest="muchannel", help="Both lepton channels (default)")
+    parser.add_option("-n", type="int", dest="num", help="Number of events to process, defaults to all", default=-1)
+    (options, args) = parser.parse_args()
+    if not options.dataset:
+        print
+        print "ERROR: You should specify a dataset"
+        print
+        parser.print_help()
+        exit(-1)
+
+    print "Running on:", options.dataset
+    if options.num > 0: 
+        print "Running on", options.num, "first events"
+    else:
+        print "Running on all events"
+    if options.muchannel == None:
+        print "For both electrons and muons"
+    elif options.muchannel == True:
+        print "For muons only"
+    elif options.muchannel == False:
+        print "For electrons only"
+
+    main(options.dataset, options.muchannel, options.num)
