@@ -35,6 +35,9 @@
 #include "MLP_Higgs_vs_bkg_EE_TIGHT.cxx"
 #include "MLP_Higgs_vs_bkg_EE_FULLL.cxx"
 
+#include "MLP_Zbb_tt_Mll_MeTtest_Mll_MET.cxx"
+#include "MLP_Zbb_tt_Mll_test_Mll_deta.cxx"
+
 #include <iostream>
 #include <map>
 
@@ -295,12 +298,16 @@
    MLP_Zbb_tt_Comb_met_EE* MLP_zbbvstt_tight_Wmet = 0;
    MLP_Zbb_tt_multi_EE_TIGHT* MLP_zbbvstt_multi_EE_tight =0;
 
+   MLP_Zbb_tt_Mll_MeTtest_Mll_MET* MLP_Zbb_tt_Mll_MeTtest_Mll_met=0;
+   MLP_Zbb_tt_Mll_test_Mll_deta* MLP_Zbb_tt_Mll_test_Mll=0;
+
    Double_t mlphiggsvszbb;
    Double_t mlphiggsvszz;
    Double_t mlphiggsvstt;
    Double_t mlphiggsvsbkg;
    Double_t mlphiggsvsbkg_fulll;
-
+   Double_t mlpzbbttmmll_MeTtest_mll_met;
+   Double_t mlpzbbttmlltest_mll;
 
    Double_t mlpZbbvsTT;
    Double_t mlpZbbvsTTtight;
@@ -375,6 +382,8 @@ void CreateParentTree(TString InputFile) {
    MLP_zbbvstttight = new MLP_Zbb_tt_Comb_EE_TIGHT();
    MLP_zbbvstt_tight_Wmet = new MLP_Zbb_tt_Comb_met_EE();
    MLP_zbbvstt_multi_EE_tight = new MLP_Zbb_tt_multi_EE_TIGHT();
+   MLP_Zbb_tt_Mll_MeTtest_Mll_met= new MLP_Zbb_tt_Mll_MeTtest_Mll_MET();
+   MLP_Zbb_tt_Mll_test_Mll= new MLP_Zbb_tt_Mll_test_Mll_deta();
 
    TFile* f_RDS  = new TFile("testsMergeRDSnoWS120721/Tree_File_rds_zbb_" + InputFile + ".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
@@ -640,7 +649,8 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mlpZbbvsTTtight" , &mlpZbbvsTTtight,"mlpZbbvsTTtight/D");
    t_RDSME->Branch("mlpZbbvsTT_tight_Wmet" , &mlpZbbvsTT_tight_Wmet,"mlpZbbvsTT_tight_Wmet/D");
    t_RDSME->Branch("mlpzbbvstt_multi_EE_tight",&mlpzbbvstt_multi_EE_tight,"mlpzbbvstt_multi_EE_tight/D");
-
+   t_RDSME->Branch("mlpzbbttmmll_MeTtest_mll_met",&mlpzbbttmmll_MeTtest_mll_met,"mlpzbbttmmll_MeTtest_mll_met/D");
+   t_RDSME->Branch("mlpzbbttmlltest_mll",&mlpzbbttmlltest_mll,"mlpzbbttmlltest_mll/D");
    //t_RDS->BuildIndex("eventSelectionrun","eventSelectionevent");
    //t_RDS->AddFriend(t_ME);
 
@@ -721,6 +731,12 @@ void CreateParentTree(TString InputFile) {
       jetmetnj = mc_RDS->jetmetnj;
       jetmetbjet1pt = mc_RDS->jetmetbjet1pt;
       jetmetbjet2pt = mc_RDS->jetmetbjet2pt;
+      eventSelectionmu1pt = mc_RDS->eventSelectionmu1pt;
+      eventSelectionmu2pt = mc_RDS->eventSelectionmu2pt;
+      eventSelectionmu1eta = mc_RDS->eventSelectionmu1eta;
+      eventSelectionmu2eta = mc_RDS->eventSelectionmu2eta;
+      eventSelectionbestzptEle = mc_RDS->eventSelectionbestzptEle;
+      eventSelectionbestzptMu = mc_RDS->eventSelectionbestzptMu;
 
       BtaggingReweightingHE = mc_RDS->BtaggingReweightingHE;
       BtaggingReweightingHP = mc_RDS->BtaggingReweightingHP;
@@ -755,7 +771,6 @@ void CreateParentTree(TString InputFile) {
       mcSelectionantibottomPy = mc_RDS->mcSelectionAntibottomPy;
       mcSelectionantibottomPz = mc_RDS->mcSelectionAntibottomPz;
       mcSelectionantibottomEn = mc_RDS->mcSelectionAntibottomEn;
-
       
       int MEentry = -1; 
       if (IsDATA) MEentry = map_runevent[pair<Long64_t, Long64_t>(Long64_t(mc_RDS->eventSelectionrun), Long64_t(mc_RDS->eventSelectionevent))];
@@ -806,6 +821,8 @@ void CreateParentTree(TString InputFile) {
         Inv_Mass_lept = mc_ME->Inv_Mass_lept;
 	
 	//NN  output here
+	mlpzbbttmlltest_mll=MLP_Zbb_tt_Mll_test_Mll->Value(0,Inv_Mass_lept);
+	mlpzbbttmmll_MeTtest_mll_met = MLP_Zbb_tt_Mll_MeTtest_Mll_met->Value(0,Inv_Mass_lept,MeT);
 	mlpZbbvsTT = MLP_zbbvstt->Value(0, Wgg, Wqq, Wtt, MeT);
 	mlpZbbvsTTtight = MLP_zbbvstttight->Value(0, Wgg, Wqq, Wtt);
         mlpZbbvsTT_tight_Wmet = MLP_zbbvstt_tight_Wmet->Value(0, Wgg, Wqq, Wtt,MeT);
