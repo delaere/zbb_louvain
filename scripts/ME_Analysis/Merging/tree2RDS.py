@@ -41,6 +41,8 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlpzbbvstt_multi_EE_tight_RRV = RooRealVar("mlpzbbvstt_multi_EE_tight", "mlpzbbvstt_multi_EE_tight", -10000, 600)#met to check the matching
   mymlpzbbttmmll_MeTtest_mll_met_RRV = RooRealVar("mlpzbbttmmll_MeTtest_mll_met","mlpzbbttmmll_MeTtest_mll_met",-10000,600)
   mymlpzbbttmlltest_mll_RRV = RooRealVar("mlpzbbttmlltest_mll","mlpzbbttmlltest_mll",-10000,600)
+  myZbbReweight_dijetdR_RRV = RooRealVar("ZbbReweight_dijetdR","ZbbReweight_dijetdR",-10000,600)
+  myZbbReweight_bestzpt_RRV = RooRealVar("ZbbReweight_bestzpt","ZbbReweight_bestzpt",-10000,600)
 #
 #
   myRDSRAS.add(myWttRRV)
@@ -62,6 +64,8 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlpZbbvsTT_tight_Wmet_RRV)
   myRDSRAS.add(mymlpzbbvstt_multi_EE_tight_RRV)  
   myRDSRAS.add(mymlpzbbttmmll_MeTtest_mll_met_RRV)
+  myRDSRAS.add(myZbbReweight_dijetdR_RRV)
+  myRDSRAS.add(myZbbReweight_bestzpt_RRV)
   if "Mu" in InputFile:
     myRDSRAS.add(myWtwbRRV)
     myRDSRAS.add(myWzz3RRV)

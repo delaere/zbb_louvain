@@ -49,6 +49,16 @@
 //using namespace RooFit ;
 //using namespace RooStats ;
 
+//Switch to turn on or of the ZbbReweight
+void InitZbbReweight();
+double Compute1DReweight(TH1D*, double);
+
+bool useZbbReweight = true;
+TFile* file_reweight = 0;
+TH1D* hZbbReweight_dijetdR_Mu = 0;
+TH1D* hZbbReweight_bestzpt_Mu = 0;
+TH1D* hZbbReweight_dijetdR_El = 0;
+TH1D* hZbbReweight_bestzpt_El = 0;
 
  
  
@@ -285,7 +295,7 @@
    Double_t mcSelectionantibottomPz;
    Double_t mcSelectionantibottomEn;
    
-   //Here extra variables
+   //Extra variables MLP's
    MLP_Higgs_vs_Zbb_EE_TIGHT *MLP_higgs_vs_zbb = 0;
    MLP_Higgs_vs_ZZ3_EE_TIGHT *MLP_higgs_vs_zz = 0;
    MLP_Higgs_vs_tt_EE_TIGHT *MLP_higgs_vs_tt = 0;
@@ -314,6 +324,10 @@
    Double_t mlpZbbvsTT_tight_Wmet;
    Double_t mlpzbbvstt_multi_EE_tight;
 
+   //Extra variables for reweighting stuff
+   Double_t ZbbReweight_dijetdR;
+   Double_t ZbbReweight_bestzpt;
+   
 
    
 void CreateParentTree(TString InputFile) {
@@ -403,7 +417,10 @@ void CreateParentTree(TString InputFile) {
    TTree *t_RDSME = new TTree("rds_zbb", "merged zbb-ME tree");
 
 
-
+   //Initialize histograms for reweighting
+   if (useZbbReweight){
+     InitZbbReweight();
+   }
 
 //b) Define branches
    t_RDSME->Branch("Pt_elplus", &Pt_elplus, "Pt_elplus/D");
@@ -639,7 +656,7 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mcSelectionantibottomPz" , &mcSelectionantibottomPz,"mcSelectionantibottomPz/D");
    t_RDSME->Branch("mcSelectionantibottomEn" , &mcSelectionantibottomEn,"mcSelectionantibottomEn/D");
 
-   //Here extra variables
+   //Extra variables MLP's
    t_RDSME->Branch("mlphiggsvszbb" , &mlphiggsvszbb,"mlphiggsvszbb/D");
    t_RDSME->Branch("mlphiggsvstt" , &mlphiggsvstt,"mlphiggsvstt/D");
    t_RDSME->Branch("mlphiggsvszz" , &mlphiggsvszz,"mlphiggsvszz/D");
@@ -651,6 +668,11 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mlpzbbvstt_multi_EE_tight",&mlpzbbvstt_multi_EE_tight,"mlpzbbvstt_multi_EE_tight/D");
    t_RDSME->Branch("mlpzbbttmmll_MeTtest_mll_met",&mlpzbbttmmll_MeTtest_mll_met,"mlpzbbttmmll_MeTtest_mll_met/D");
    t_RDSME->Branch("mlpzbbttmlltest_mll",&mlpzbbttmlltest_mll,"mlpzbbttmlltest_mll/D");
+   
+   //Extra variables reweighting
+   t_RDSME->Branch("ZbbReweight_dijetdR",&ZbbReweight_dijetdR,"ZbbReweight_dijetdR/D");
+   t_RDSME->Branch("ZbbReweight_bestzpt",&ZbbReweight_bestzpt,"ZbbReweight_bestzpt/D");
+   
    //t_RDS->BuildIndex("eventSelectionrun","eventSelectionevent");
    //t_RDS->AddFriend(t_ME);
 
@@ -777,7 +799,7 @@ void CreateParentTree(TString InputFile) {
       else  MEentry = map_runevent[pair<long int, long int>(1, int(mc_RDS->eventSelectionevent))];
       
       if (MEentry==0) {
-        printf("Not Found [%i, %i]\n", int(mc_RDS->eventSelectionrun), int(mc_RDS->eventSelectionevent));
+        //printf("Not Found [%i, %i]\n", int(mc_RDS->eventSelectionrun), int(mc_RDS->eventSelectionevent));
         //std::cout << "Not Found [" << mc_RDS->eventSelectionrun << ":" << mc_RDS->eventSelectionevent << "]" << std::endl; 
       
       }
@@ -843,7 +865,27 @@ void CreateParentTree(TString InputFile) {
 	      if( MLP_higgs_vs_bkg->Value(0, MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3), MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3) ,MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt) ) > 0.5 ){mlphiggsvsbkg=-999.;}
 	      if(MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0,Whi3)>0.5){mlphiggsvsbkg_fulll = -999;}
 	}
-             t_RDSME->Fill();
+        
+	
+	//Reweighting stuff here:
+	ZbbReweight_dijetdR = 1.;
+	ZbbReweight_bestzpt = 1.;
+	
+	//std::cout << "hZbbReweight_dijetdR_Mu->Integral()=" << hZbbReweight_dijetdR_Mu->Integral() << std::endl;
+        if (useZbbReweight && (InputFile == "Mu_MC" || InputFile == "El_MC")){
+          if (InputFile == "Mu_MC") {
+	    ZbbReweight_dijetdR = Compute1DReweight(hZbbReweight_dijetdR_Mu, mc_RDS->eventSelectiondijetdR);
+	    ZbbReweight_bestzpt = Compute1DReweight(hZbbReweight_bestzpt_Mu, mc_RDS->eventSelectionbestzptMu);
+	  }
+        
+          if (InputFile == "El_MC") {
+	    ZbbReweight_dijetdR = Compute1DReweight(hZbbReweight_dijetdR_El, mc_RDS->eventSelectiondijetdR);
+	    ZbbReweight_bestzpt = Compute1DReweight(hZbbReweight_bestzpt_El, mc_RDS->eventSelectionbestzptEle);
+	  }
+        }
+	//mc_RDS->eventSelectionbestzptEle
+	
+	t_RDSME->Fill();
      } //else std:: cout << "MEentry not found for " << mc_RDS->eventSelectionrun << ", " << mc_RDS->eventSelectionevent << "]= " << MEentry << std::endl;
       }
 
@@ -865,6 +907,54 @@ void CreateParentTree(TString InputFile) {
 
 }
 
+
+//Functions for reweighting
+void InitZbbReweight() {
+
+  
+  //return if reweighting histograms already filled
+  if (file_reweight != 0) return;
+  if (hZbbReweight_dijetdR_Mu  != 0 && 
+      hZbbReweight_bestzpt_Mu  != 0 && 
+      hZbbReweight_dijetdR_El  != 0 && 
+      hZbbReweight_bestzpt_El  != 0) {return;}
+
+  file_reweight = TFile::Open("./ZbbReweightHistos.root");
+  hZbbReweight_dijetdR_Mu = (TH1D*)file_reweight->Get("eventSelectiondijetdR_Mu");
+  hZbbReweight_bestzpt_Mu = (TH1D*)file_reweight->Get("eventSelectionbestzptMu_Mu");
+
+  hZbbReweight_dijetdR_El = (TH1D*)file_reweight->Get("eventSelectiondijetdR_El");
+  hZbbReweight_bestzpt_El = (TH1D*)file_reweight->Get("eventSelectionbestzptEle_El");
+  
+  if (hZbbReweight_dijetdR_Mu  == 0) {std::cout << " hZbbReweight_dijetdR_Mu==0" << std::endl; exit(1);} 
+  if (hZbbReweight_bestzpt_Mu  == 0) {std::cout << " hZbbReweight_bestzpt_Mu==0" << std::endl; exit(1);} 
+  if (hZbbReweight_dijetdR_El  == 0) {std::cout << " hZbbReweight_dijetdR_El==0" << std::endl; exit(1);} 
+  if (hZbbReweight_bestzpt_El  == 0) {std::cout << " hZbbReweight_bestzpt_El==0" << std::endl; exit(1);}
+  
+  std::cout << "hZbbReweight_dijetdR_Mu->GetName()=" << hZbbReweight_dijetdR_Mu->GetName() << std::endl;
+  std::cout << "hZbbReweight_dijetdR_Mu->Integral()=" << hZbbReweight_dijetdR_Mu->Integral() << std::endl;
+  std::cout << "hZbbReweight_dijetdR_Mu->FindBin(3.)=" << hZbbReweight_dijetdR_Mu->FindBin(3.)<< std::endl;
+  
+  
+  
+ }
+
+double Compute1DReweight(TH1D* hRW, double value) {
+
+  
+  //cout << "before FindBin(" << value << ")" << endl;
+  const int bin = hRW->FindBin(value);
+  //cout << "after FindBin, bin=" << bin << endl;
+  
+  //reweighting hRWs not correct for under/overflow
+  if(bin<=0 || bin==hRW->GetNbinsX()+1) return 1.; 
+  const float content = hRW->GetBinContent(bin);
+  if(content <=0.) return 1.;
+  if (content > 5.)//prevent huge weights
+    return 5.;
+
+  return content;
+}
 
 //void SimpleTree(TString InputFile = "Mu_DATA") {
 //   CreateParentTree(InputFile);
