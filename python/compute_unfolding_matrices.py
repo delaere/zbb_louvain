@@ -406,32 +406,29 @@ class unfolder:
             self.mat_e_b_hp[ucont.n_hp][ucont.rec_zb] += ucont.rw*hpweight*ucont.el_weight
 
     def finish_print_e_b(self):
-        self.out += "--------------------------------------\n"
-        self.out += "                E_b                   \n"
-        self.out += "--------------------------------------\n"
-        self.out += "--------------------------------------\n"
-        self.out += "rec b:\t\t0\t1\t2\n"
-        self.out += "--------------------------------------\n"
-        # for i, row in enumerate(self.mat_e_b_he):
-        #     print "HE b: ", f_2(i), " :\t", "\t".join(["%.2f" % (el) for el in row])
-        # print "--------------------------------------"
-        self.e_b_he_norm = deepcopy(self.mat_e_b_he)
-        norms_he = norm_by_column(self.e_b_he_norm)
-        for i, row in enumerate(self.e_b_he_norm):
-            self.out += "HE b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
-        self.out += "--------------------------------------\n"
-        self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_he])+"\n"
-        self.out += "--------------------------------------\n"
-        # for i, row in enumerate(self.mat_e_b_hp):
-        #     print "HP b: ", f_2(i), " :\t", "\t".join(["%.2f" % (el) for el in row])
-        # print "--------------------------------------"
-        self.e_b_hp_norm = deepcopy(self.mat_e_b_hp)
-        norms_hp = norm_by_column(self.e_b_hp_norm)
-        for i, row in enumerate(self.e_b_hp_norm):
-            self.out += "HP b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
-        self.out += "--------------------------------------\n"
-        self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_hp])+"\n"
-        self.out += "--------------------------------------\n"
+        if not hasattr(self, mat_e_b_he) or not hasattr(self, mat_e_b_hp) :
+            self.out += "== e_b matrices are empty =="
+        else:
+            self.out += "--------------------------------------\n"
+            self.out += "                E_b                   \n"
+            self.out += "--------------------------------------\n"
+            self.out += "--------------------------------------\n"
+            self.out += "rec b:\t\t0\t1\t2\n"
+            self.out += "--------------------------------------\n"
+            self.e_b_he_norm = deepcopy(self.mat_e_b_he)
+            norms_he = norm_by_column(self.e_b_he_norm)
+            for i, row in enumerate(self.e_b_he_norm):
+                self.out += "HE b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
+            self.out += "--------------------------------------\n"
+            self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_he])+"\n"
+            self.out += "--------------------------------------\n"
+            self.e_b_hp_norm = deepcopy(self.mat_e_b_hp)
+            norms_hp = norm_by_column(self.e_b_hp_norm)
+            for i, row in enumerate(self.e_b_hp_norm):
+                self.out += "HP b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
+            self.out += "--------------------------------------\n"
+            self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_hp])+"\n"
+            self.out += "--------------------------------------\n"
 
     def finish_comparison(self):
         """ compares with values from imperial """
