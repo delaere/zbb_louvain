@@ -168,9 +168,13 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
+  print "roles" , role
   if string.find(role,"all")!=-1   : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
-  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
+  if string.find(role,"matched")!=-1:
+    return isMatchedMuon(muon)
+    print "role tight : " , role
+      
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
@@ -183,7 +187,8 @@ def isLooseElectron(electron):
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
 
-  return electron.eta()<2.4
+  return abs(electron.eta())<2.4
+  ##return electron.eta()<2.5
   #return True
 
 def isTightElectron(electron):
@@ -415,7 +420,7 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
     if electron_iswrongPS(l1, runNumber, lumi_section):
       return False
     else :
-
+      
     #print "Electrons :"
     #print "run number : ", runNumber
     #print "l1 path(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*,0,0)",l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()
