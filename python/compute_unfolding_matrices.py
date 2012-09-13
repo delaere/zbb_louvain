@@ -406,7 +406,7 @@ class unfolder:
             self.mat_e_b_hp[ucont.n_hp][ucont.rec_zb] += ucont.rw*hpweight*ucont.el_weight
 
     def finish_print_e_b(self):
-        if not hasattr(self, mat_e_b_he) or not hasattr(self, mat_e_b_hp) :
+        if not hasattr(self,"mat_e_b_he") or not hasattr(self,"mat_e_b_hp") :
             self.out += "== e_b matrices are empty =="
         else:
             self.out += "--------------------------------------\n"
