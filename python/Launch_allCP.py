@@ -21,11 +21,16 @@ samples = [
 
 MC = "Fall11"
 DATA = "2011"
-cpVersion = "V3"
+cpVersion = "V4"
+njobs = 400
 
 os.system('mkdir ControlPlots_'+cpVersion)
 for sample in samples :
-    os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample)
+    if sample=="ZH":
+        mass = [115,120,125,130,135]
+        for m in mass:
+            os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample+str(m))
+    else : os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample)
 
 FarmDirectory = "FARM_CP_"+cpVersion
 JobName = "ZbbAnalysis_All"
