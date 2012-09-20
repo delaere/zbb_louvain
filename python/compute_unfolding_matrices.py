@@ -229,12 +229,16 @@ class unfolder:
         gen_elec_eta = 2.4
         gen_muon_pt = 20.0 ##
         gen_muon_eta = 2.4
+        gen_mass_l = 60.0 
+        gen_mass_u = 120.0
         ucont.gen_z_kin_yes = False
         ucont.gen_zb = 0
         if ucont.flav == 13 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_muon_pt,gen_muon_eta)]) == 2 and (self.muchannel == True or self.muchannel == None):
-            ucont.gen_z_kin_yes = True
+            if gen_mass_l < (get_vec(ucont.gen_leptons[0]) + get_vec(ucont.gen_leptons[1])).M() < gen_mass_u:
+                ucont.gen_z_kin_yes = True
         elif ucont.flav == 11 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_elec_pt,gen_elec_eta)]) == 2 and (self.muchannel == False or self.muchannel == None):
-            ucont.gen_z_kin_yes = True
+            if gen_mass_l < (get_vec(ucont.gen_leptons[0]) + get_vec(ucont.gen_leptons[1])).M() < gen_mass_u:
+                ucont.gen_z_kin_yes = True
         # number of gen b-jets after acceptance cuts
         if ucont.gen_z_kin_yes: 
             ucont.gen_zb = ucont.gen_b
@@ -589,7 +593,7 @@ def is_equal(vec1,vec2):
     return False
 
 def get_vec(part):
-    return TLorentzVector(part.px(), part.py(), part.pz(), part.energy())
+    return ROOT.TLorentzVector(part.px(), part.py(), part.pz(), part.energy())
 
 def overlap(vec, collection, dr):
     for obj in collection:
