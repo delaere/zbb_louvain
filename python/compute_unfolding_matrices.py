@@ -32,7 +32,7 @@ class unfolder:
                              "goodmuons":     {"handle":"vector<pat::Muon>", "collection":zbblabel.muonlabel},
                              "electrons":     {"handle":"vector<pat::Electron>", "collection":zbblabel.allelectronslabel},
                              "goodelectrons": {"handle":"vector<pat::Electron>", "collection":zbblabel.electronlabel},
-                             "genjets":       {"handle":"vector<reco::GenJet>", "collection":"ak5GenJets"},
+                             "genjets":       {"handle":"vector<reco::GenJet>", "collection":"prunedJets"}, ## was ak5GenJets
                              "genparticles":  {"handle":"vector<reco::GenParticle>", "collection":zbblabel.genlabel},
                              "zee":           {"handle":"vector<reco::CompositeCandidate>", "collection":"zelAllelAll"},
                              "zmumu":         {"handle":"vector<reco::CompositeCandidate>", "collection":"zmuAllmuAll"},
@@ -177,10 +177,12 @@ class unfolder:
         # baseline leptons from Z
         #------------------------
         gen_elec_pt_base = 20.0
-        gen_elec_eta_base = 2.5
+        gen_elec_eta_base = 2.4
+        #2.5
         gen_muon_pt_base = 20.0
-        gen_muon_eta_base = 2.5
-        ucont.gen_z_yes = False
+        gen_muon_eta_base = 2.4
+        #2.5
+        ucont.gen_z_yes = False  ### True here to speed up
         ucont.flav = -1
         for particle in self.genparticles:
             if particle.pdgId() == 23:
@@ -223,10 +225,10 @@ class unfolder:
                 self.gen_baseline[ucont.gen_b] += ucont.rw
         # leptons in acceptance w/ correct reconstructed mass 
         # ---------------------------------------------------
-        gen_elec_pt = 25.0
-        gen_elec_eta = 2.5
-        gen_muon_pt = 20.0
-        gen_muon_eta = 2.1
+        gen_elec_pt = 20.0 ## check the values !
+        gen_elec_eta = 2.4
+        gen_muon_pt = 20.0 ##
+        gen_muon_eta = 2.4
         ucont.gen_z_kin_yes = False
         ucont.gen_zb = 0
         if ucont.flav == 13 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_muon_pt,gen_muon_eta)]) == 2 and (self.muchannel == True or self.muchannel == None):
@@ -277,12 +279,24 @@ class unfolder:
         zmumu_match = []
         if (self.muchannel == True or self.muchannel == None):
             for z in self.zmumu:
-                if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
+                if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2 \
+                    and z.daughter(0).pt()>20 \
+                    and math.fabs(z.daughter(0).eta())<2.4 \
+                    and z.daughter(1).pt()>20 \
+                    and math.fabs(z.daughter(1).eta())<2.4 ):  
+                #if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
                     zmumu_match.append(z) 
         zelel_match = []
         if (self.muchannel == False or self.muchannel == None):
             for z in self.zee:
-                if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
+                if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2 \
+                    and z.daughter(0).pt()>20 \
+                    and ((math.fabs(z.daughter(0).eta())< 1.442)or((1.566<(math.fabs(z.daughter(0).eta())))and((math.fabs(z.daughter(0).eta())<2.4)))) \
+                    and z.daughter(1).pt()>20 \
+                    and ((math.fabs(z.daughter(1).eta())< 1.442)or((1.566<(math.fabs(z.daughter(1).eta())))and((math.fabs(z.daughter(1).eta())<2.4)))) \
+                    and math.fabs(z.daughter(0).eta())<2.4 \
+                    and math.fabs(z.daughter(1).eta())<2.4 ):  
+                #if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2):
                     zelel_match.append(z) 
         ucont.reco_z = llbb.findBestCandidate(self.muchannel, None, zelel_match, zmumu_match)
         if ucont.reco_z:
@@ -344,13 +358,25 @@ class unfolder:
         zmumu_match = []
         if (self.muchannel == True or self.muchannel == None):
             for z in self.zmumugood:
-                if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
+                if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2 \
+                    and z.daughter(0).pt()>20 \
+                    and math.fabs(z.daughter(0).eta())<2.4 \
+                    and z.daughter(1).pt()>20 \
+                    and math.fabs(z.daughter(1).eta())<2.4):
+                #if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
                     zmumu_match.append(z) 
 
         zelel_match = []
         if (self.muchannel == False or self.muchannel == None):
             for z in self.zeegood:
-                if len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2:
+                if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2 \
+                    and z.daughter(0).pt()>20 \
+                    and ((math.fabs(z.daughter(0).eta())< 1.442)or((1.566<(math.fabs(z.daughter(0).eta())))and((math.fabs(z.daughter(0).eta())<2.4)))) \
+                    and z.daughter(1).pt()>20 \
+                    and ((math.fabs(z.daughter(1).eta())< 1.442)or((1.566<(math.fabs(z.daughter(1).eta())))and((math.fabs(z.daughter(1).eta())<2.4)))) \
+                    and math.fabs(z.daughter(0).eta())<2.4 \
+                    and math.fabs(z.daughter(1).eta())<2.4 ):
+                #if (len(match_obo([z.daughter(0), z.daughter(1)], ucont.gen_leptons, gen_lep_dr)) == 2):
                     zelel_match.append(z) 
 
         reco_z_good = llbb.findBestCandidate(self.muchannel, None, zelel_match, zmumu_match)
