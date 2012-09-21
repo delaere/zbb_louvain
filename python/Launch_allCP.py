@@ -9,19 +9,25 @@ import glob
 import os
 
 samples = [
-    #"TT",
-    #"Zl",
+    "TT",
+    "Zl",
     "Zc",
     "Zb",
     "ZZ",
     "ZH",
-    #"Ele",
-    #"Mu"
+    "Ele",
+    "Mu"
     ]
+
+listdata=[
+        "A"
+        "B",
+        ]
+
 
 MC = "Fall11"
 DATA = "2011"
-cpVersion = "V4"
+cpVersion = "V5"
 njobs = 400
 
 os.system('mkdir ControlPlots_'+cpVersion)
@@ -30,6 +36,9 @@ for sample in samples :
         mass = [115,120,125,130,135]
         for m in mass:
             os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample+str(m))
+    elif sample=="Ele" or sample=="Mu":
+        for l in listdata:
+            os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample+DATA+l)
     else : os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample)
 
 FarmDirectory = "FARM_CP_"+cpVersion
