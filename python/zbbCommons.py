@@ -2,13 +2,13 @@
 class zbblabel:
   """labels used in the PAT configuration"""
   allmuonslabel="allMuons"
-  muonlabel="matchedMuons"
+  muonlabel="tightMuons"
   allelectronslabel="allElectrons"
-  electronlabel="matchedElectrons"
+  electronlabel="tightElectrons"
   jetlabel="cleanPatJets"
-  zmumulabel="zmuMatchedmuMatched"
+  zmumulabel="zmuTightmuTight"
   #zmumulabel="zmuAllmuAll"
-  zelelabel="zelMatchedelMatched"
+  zelelabel="zelTightelTight"
   #zelelabel="zelAllelAll"
   vertexlabel="goodPV"
   pulabel="addPileupInfo"
@@ -39,7 +39,8 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-  lumi_tot2011=5.21 #in fb-1
+  lumi_totEle2011=5.217 #in fb-1
+  lumi_totMu2011=5.275
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
