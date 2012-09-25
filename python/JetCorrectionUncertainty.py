@@ -30,15 +30,17 @@ class JetCorrectionUncertaintyProxy:
     jetpt = jet.pt()
     # smear to reproduce resolution measured in data
     # apply JetMet recommendation:  pT->max[0.,pTgen+c*(pT-pTgen)] 
-    try:
-      ptgen = jet.genJet().pt()
-    except:
-      ptgen = gauss(jetpt,self.jetEnergyResolution(jet))
-    jersf = (self.jerCorrectionFactor(jet)-1.) * zbbsystematics.JERfactor
-    jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
+    if abs(zbbsystematics.JERfactor)>0.01 # non-zero
+      try:
+        ptgen = jet.genJet().pt()
+      except:
+        ptgen = gauss(jetpt,self.jetEnergyResolution(jet))
+      jersf = (self.jerCorrectionFactor(jet)-1.) * zbbsystematics.JERfactor
+      jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
     # take into account JEC uncertainty
-    jesunc = self.unc_tot_jet(jet) * zbbsystematics.JESfactor * jetpt
-    jetpt = max(0., jetpt + jesunc)
+    if abs(zbbsystematics.JESfactor)>0.01 # non-zero
+      jesunc = self.unc_tot_jet(jet) * zbbsystematics.JESfactor * jetpt
+      jetpt = max(0., jetpt + jesunc)
     # return the jet pt, including all of the above
     return jetpt
 
