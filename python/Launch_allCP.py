@@ -20,14 +20,14 @@ samples = [
     ]
 
 listdata=[
-        "A"
-        "B",
+        "A",
+        "B"
         ]
 
 
 MC = "Fall11"
 DATA = "2011"
-cpVersion = "V5"
+cpVersion = "V1"
 njobs = 400
 
 os.system('mkdir ControlPlots_'+cpVersion)
