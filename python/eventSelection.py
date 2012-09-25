@@ -168,13 +168,9 @@ def isMatchedMuon(muon):
 
 def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
-  print "roles" , role
-  if string.find(role,"all")!=-1   : return isLooseMuon(muon)
+  if string.find(role,"all")!=-1     : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
-  if string.find(role,"matched")!=-1:
-    return isMatchedMuon(muon)
-    print "role tight : " , role
-      
+  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)      
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
