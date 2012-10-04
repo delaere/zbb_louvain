@@ -28,7 +28,11 @@ ourtriggers.murunMap[173236:178381] = ("HLT_Mu13_Mu8_v7",)
 ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10",)#"HLT_Mu17_tkMu8_v3")
 ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11",)#"HLT_Mu17_tkMu8_v4")
 ### data 2012
-ourtriggers.murunMap[180253:]       = ("HLT_Mu17_Mu8_v16",)     ##"HLT_Mu17_tkMu8_v9"
+ourtriggers.murunMap[190455:193687] = ("HLT_Mu17_Mu8_v16",)     ##"HLT_Mu17_tkMu8_v9"
+ourtriggers.murunMap[193805:195961] = ("HLT_Mu17_Mu8_v17",)
+ourtriggers.murunMap[196045:196754] = ("HLT_Mu17_Mu8_v18",)
+ourtriggers.murunMap[197769:199632] = ("HLT_Mu17_Mu8_v19",)
+ourtriggers.murunMap[199695:] = ("HLT_Mu17_Mu8_v21",)
 
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
@@ -52,10 +56,10 @@ ourtriggers.elrunMap[173236:178381] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkI
 ourtriggers.elrunMap[178420:179890] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)
 ourtriggers.elrunMap[179959:180253] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v10",)
 ### data 2012
-ourtriggers.elrunMap[190456:190738] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15",)
-ourtriggers.elrunMap[190762:190892] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16",)
-ourtriggers.elrunMap[191512:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17",)
-
+ourtriggers.elrunMap[190455:190739] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15",)
+ourtriggers.elrunMap[190761:191427] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16",)
+ourtriggers.elrunMap[191511:196754] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17",)
+ourtriggers.elrunMap[197769:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18",)
 # merged lists of triggers
 ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
