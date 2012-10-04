@@ -661,6 +661,7 @@ addPfMET(process, 'PF')
 # for MET systematics: adds ~10 variants of type1-corrected MET
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 if isMC : runMEtUncertainties(process)
+else : process.patPFMet.addGenMET = cms.bool(False)
 
 process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
 process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
@@ -734,7 +735,8 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
 process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
 process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
-if not isMC : process.patDefaultSequence.replace(process.patMETsPF,process.patMETsPF*process.producePatPFMETobjectWithCorrections)
+if not isMC : process.patDefaultSequence.replace(process.patTrigger,process.patTrigger*process.producePatPFMETobjectWithCorrections)
+else : process.patDefaultSequence.replace(process.patPFMet,process.producePatPFMETobjectWithCorrections)
 
 process.PFLeptons = cms.Sequence(
     process.TotalEventCounter*
