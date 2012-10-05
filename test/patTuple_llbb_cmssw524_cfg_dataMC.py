@@ -312,7 +312,7 @@ process.selectedElectronsWithIsolationData = cms.EDProducer(
 ### ELECTRON trigger matching ###
 #################################
 #check trigger for 2012 : still ok, used by H->ZZ->4l : https://twiki.cern.ch/twiki/bin/view/CMS/HZZTriggers2012
-pathTriggerEle ='path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter")'
+pathTriggerEle ='path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0) && filter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter")'
 
 process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
                                              src     = cms.InputTag( "selectedElectronsWithIsolationData" ),
