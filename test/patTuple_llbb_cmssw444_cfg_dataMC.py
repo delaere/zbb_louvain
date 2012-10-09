@@ -482,7 +482,7 @@ if isMC :
                          'numberOfMatchedStations>1 &'                                   # segments matched in at least two muon stations 
                          'globalTrack.hitPattern.numberOfValidMuonHits > 0 &'    # one muon hit matched to the global fit
                          'pt>20 &'
-                         'abs(eta) < 2.4 &'
+                         'abs(eta) < 2.4'
                          #'(trackIso+caloIso)/pt < 0.15 &'                       # Z+jet choice
                          #' trackIso < 3 &'                                      # VBTF choice
                          )
