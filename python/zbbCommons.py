@@ -33,6 +33,9 @@ class zbbfile:
   pileupMC="../data/Fall11_PU_MC.root"
   jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
 
+  pileupData2012="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
+  pileupMC2012="../data/MCpileup_Summer12_S10.root"
+
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
 
