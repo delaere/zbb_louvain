@@ -595,9 +595,15 @@ def is_equal(vec1,vec2):
 def get_vec(part):
     return ROOT.TLorentzVector(part.px(), part.py(), part.pz(), part.energy())
 
+def delta_phi(phi1, phi2):
+    deltaphi = math.fabs(phi1 - phi2)
+    if delptaphi > math.pi:
+        return 2*math.pi - deltaphi
+    return deltaphi
+
 def overlap(vec, collection, dr):
     for obj in collection:
-        if math.hypot((vec.eta() - obj.eta()), (vec.phi() - obj.phi())) < dr: return True
+        if math.hypot((vec.eta() - obj.eta()), delta_phi(vec.phi(), obj.phi())) < dr: return True
     return False
 
 def match_obo(rec, gen, dr):
@@ -606,7 +612,7 @@ def match_obo(rec, gen, dr):
     for vec in rec:
         in_cone = []
         for part in gen2:
-            deltar = math.hypot((vec.eta() - part.eta()), (vec.phi() - part.phi()))
+            deltar = math.hypot((vec.eta() - part.eta()), delta_phi(vec.phi(), part.phi()))
             if deltar < dr: in_cone.append([deltar, part])
         if in_cone:
             bestmatch = min(in_cone)[1]
