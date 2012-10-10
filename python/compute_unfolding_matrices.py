@@ -208,7 +208,7 @@ class unfolder:
         gen_jet_lepton_dr = 0.5
         # match with b-hadrons
         # get final b-hadrons
-        bparts = [part for part in self.genparticles if (499 < part.pdgId() < 600) or (4999 < part.pdgId() < 6000)]
+        bparts = [part for part in self.genparticles if (499 < math.fabs(part.pdgId()) < 600) or (4999 < math.fabs(part.pdgId()) < 6000)]
         bhads = [part for part in bparts if is_final_bhad(part)]
         # bhads = [part for part in self.genparticles if is_final_bhad(part)]
         # list jets that match these by dr
@@ -644,7 +644,7 @@ def f_2(num):
     return "%.2f" % (num)
 
 def is_bhad(genpart):
-    pdgid = genpart.pdgId()
+    pdgid = math.fabs(genpart.pdgId())
     return (499 < pdgid < 600) or (4999 < pdgid < 6000)
 
 def is_final_bhad(genpart):
