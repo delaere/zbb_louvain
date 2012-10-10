@@ -33,7 +33,7 @@ class unfolder:
                              "electrons":     {"handle":"vector<pat::Electron>", "collection":zbblabel.allelectronslabel},
                              "goodelectrons": {"handle":"vector<pat::Electron>", "collection":zbblabel.electronlabel},
                              "genjets":       {"handle":"vector<reco::GenJet>", "collection":"prunedJets"}, ## was ak5GenJets
-                             "genparticles":  {"handle":"vector<reco::GenParticle>", "collection":zbblabel.genlabel},
+                             "genparticles":  {"handle":"vector<reco::GenParticle>", "collection":"prunedGen"}, ## was zbblabel.genlabel
                              "zee":           {"handle":"vector<reco::CompositeCandidate>", "collection":"zelAllelAll"},
                              "zmumu":         {"handle":"vector<reco::CompositeCandidate>", "collection":"zmuAllmuAll"},
                              "zeegood":       {"handle":"vector<reco::CompositeCandidate>", "collection":zbblabel.zelelabel},
@@ -120,9 +120,14 @@ class unfolder:
         print "============================"
         print "===     Finalization     ==="
         print "============================"
+        self.out = ""
         for fin in self.finish:
             finish_todo = getattr(self,"finish_"+fin)
             finish_todo()
+        outf = open(self.outfile, "w")
+        outf.write(self.out)
+        outf.write("last update: %s \n" % (str(datetime.datetime.now())))
+        outf.close()
         print "Results are in:", self.outfile
 
     def run_all(self):
@@ -528,9 +533,6 @@ class unfolder:
                 "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.
             }
         this_mat = compute_fullmatrix(**vals)
-        # this_mat = compute_fullmatrix(self.a_l[1], self.a_l[2], self.e_l[1], self.e_l[2], self.e_r_norm[1][0]/100., self.e_r_norm[2][0]/100., self.e_r_norm[1][1]/100.,
-        #     self.e_r_norm[2][1]/100., self.e_r_norm[1][2]/100., self.e_r_norm[2][2]/100., self.rfact, 
-        #     self.e_b_he_norm[1][1]/100., self.e_b_he_norm[1][2]/100., self.e_b_he_norm[2][2]/100.)
         print this_mat
       
         # the end
@@ -597,7 +599,7 @@ def get_vec(part):
 
 def delta_phi(phi1, phi2):
     deltaphi = math.fabs(phi1 - phi2)
-    if delptaphi > math.pi:
+    if deltaphi > math.pi:
         return 2*math.pi - deltaphi
     return deltaphi
 
