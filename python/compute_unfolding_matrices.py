@@ -604,12 +604,15 @@ def match_obo(rec, gen, dr):
     gen2 = deepcopy(gen)
     matching = []
     for vec in rec:
+        in_cone = []
         for part in gen2:
-            if math.hypot((vec.eta() - part.eta()), (vec.phi() - part.phi())) < dr:
-                matching.append(vec)
-                gen2.remove(part)
+            deltar = math.hypot((vec.eta() - part.eta()), (vec.phi() - part.phi()))
+            if deltar < dr: in_cone.append([deltar, part])
+        if in_cone:
+            bestmatch = min(in_cone)[1]
+            matching.append(vec)
+            gen2.remove(bestmatch)
     return matching
-      
 
 def norm_by_column(mat):
     """ only for matrices with positive values """
