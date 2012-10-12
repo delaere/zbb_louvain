@@ -190,17 +190,19 @@ class unfolder:
         gen_muon_pt_base = 20.0
         gen_muon_eta_base = 2.4
         #2.5
+        gen_mass_l_base = 76.0
+        gen_mass_u_base = 106.0
         ucont.gen_z_yes = False  ### True here to speed up
         ucont.flav = -1
         for particle in self.genparticles:
             if particle.pdgId() == 23:
                 ucont.gen_leptons = [particle.daughter(i) for i in range(particle.numberOfDaughters()) if particle.daughter(i).pdgId() != 23]
                 if ucont.gen_leptons:
-                    if math.fabs(ucont.gen_leptons[0].pdgId()) == 13 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_muon_pt_base,gen_muon_eta_base)])== 2:
+                    if math.fabs(ucont.gen_leptons[0].pdgId()) == 13 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_muon_pt_base,gen_muon_eta_base)])== 2 and gen_mass_l_base < (get_vec(ucont.gen_leptons[0]) + get_vec(ucont.gen_leptons[1])).M() < gen_mass_u_base:
                         ucont.flav = 13
                         if self.muchannel == True or self.muchannel == None:
                             ucont.gen_z_yes = True
-                    elif math.fabs(ucont.gen_leptons[0].pdgId()) == 11 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_elec_pt_base,gen_elec_eta_base)])== 2:
+                    elif math.fabs(ucont.gen_leptons[0].pdgId()) == 11 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_elec_pt_base,gen_elec_eta_base)])== 2 and gen_mass_l_base < (get_vec(ucont.gen_leptons[0]) + get_vec(ucont.gen_leptons[1])).M() < gen_mass_u_base:
                         ucont.flav = 11
                         if self.muchannel == False or self.muchannel == None:
                             ucont.gen_z_yes = True
@@ -237,8 +239,8 @@ class unfolder:
         gen_elec_eta = 2.4
         gen_muon_pt = 20.0 ##
         gen_muon_eta = 2.4
-        gen_mass_l = 60.0 
-        gen_mass_u = 120.0
+        gen_mass_l = 76.0 
+        gen_mass_u = 106.0
         ucont.gen_z_kin_yes = False
         ucont.gen_zb = 0
         if ucont.flav == 13 and len([lep for lep in ucont.gen_leptons if acc_pt_eta(lep,gen_muon_pt,gen_muon_eta)]) == 2 and (self.muchannel == True or self.muchannel == None):
@@ -724,6 +726,7 @@ def beanstalk_worker():
 
 
 def beanstalk_client(path_to_files):
+    ## this still needs a proper handling of errors, for instance if not all jobs come back
     # yaml and beanstalk are there, it is needed
     sys.path.append("/home/fynu/jdf")
     from beanstalk import beanstalkc
