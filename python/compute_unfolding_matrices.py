@@ -4,6 +4,7 @@
 import ROOT
 import sys
 import os
+import commands
 import itertools
 import time
 import glob
@@ -11,6 +12,7 @@ import math
 import datetime
 from copy import deepcopy
 import numpy as np
+import pickle
 
 from DataFormats.FWLite import Events, Handle
 import eventSelection as llbb
@@ -60,6 +62,7 @@ class unfolder:
         logf.write("Output file = %s \n" % self.outfile)
         # mu channel (True means muons)
         self.muchannel = muchannel
+        self.counts = {}
 
     class usercontent:
         def __init__(self):
@@ -267,6 +270,8 @@ class unfolder:
         self.out += "Baseline cuts :\t"+"\t".join([f_2(el) for el in self.gen_baseline])+"\n" 
         self.out += "Acceptance    :\t"+"\t".join([f_2(el) for el in self.gen_acc])+"\n" 
         self.out += "A_l           :\t"+"\t".join([f_2(el) for el in self.a_l])+"\n"
+        self.counts["All"] = self.total_events
+        self.counts["A_l"] = self.gen_acc
         
 
     def step_e_r(self, ucont):
@@ -358,6 +363,7 @@ class unfolder:
         self.rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
         self.out += "R-factor:"+str(self.rfact)+"\n"
         self.out += "--------------------------------------\n"
+        self.counts["e_r"] = self.mat_e_r
 
     def step_e_l(self, ucont):
         """ compute lepton efficiency for each rec_zb bin """
@@ -409,6 +415,7 @@ class unfolder:
             self.out += "basic Z + jet  : "+"\t".join([f_2(el) for el in self.rec_zb])+"\n"
             self.out += "Lepton iso/ID  : "+"\t".join([f_2(el) for el in self.lep_eff])+"\n"
             self.out += "E_l            : "+"\t".join([f_2(el) for el in self.e_l])+"\n"
+            self.counts["e_l"] = self.lep_eff
 
     def step_e_b(self, ucont):
         """ computes:
@@ -464,7 +471,10 @@ class unfolder:
             self.out += "--------------------------------------\n"
             self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_hp])+"\n"
             self.out += "--------------------------------------\n"
+            self.counts["e_b_he"] = self.mat_e_b_he
+            self.counts["e_b_hp"] = self.mat_e_b_hp
 
+ 
     def finish_comparison(self):
         """ compares with values from imperial """
         # for muons 
@@ -672,6 +682,146 @@ def compare_matrices():
     print "imperial, muons:"
     print compute_fullmatrix(**vals_imp_mu)
 
+def sum_scalvecmat(dict, dict2):
+    """ adds values from dict2 to dict1 keys. adds missing keys. works only to D=2 (no tensors) """
+    dict1 = deepcopy(dict)
+    for key, val in dict2.items():
+        if key in dict1:
+            # sum with previous value
+            if not type(val) == type([]):
+                # it's a scalar, easy
+                dict1[key] += val
+            elif not type(val[0]) == type([]):
+                # it's a vector (we hope)
+                dict1[key] = [x+y for x,y in zip(dict1[key],dict2[key])]
+            else:
+                # it's a matrix
+                for i, line in enumerate(dict1[key]):
+                    dict1[key][i] = [x+y for x,y in zip(line,dict2[key][i])]
+        else:
+            dict1[key] = val
+    return dict1
+    
+
+def beanstalk_worker():
+    sys.path.append("/home/fynu/jdf")
+    from beanstalk import beanstalkc
+    beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
+    jobqueue = "unfolding_queue"
+    resqueue = "unfolding_resqueue"
+    beanstalk.watch(jobqueue)
+    job = beanstalk.reserve(timeout=5)
+    if job:
+        hostname = os.uname()[1]
+        # output = job.body+" on "+hostname+" : done !\n"
+        output = {"host":hostname, "arg":job.body, "out":main(job.body)}
+        output = pickle.dumps(output)
+        job.delete()
+        beanstalk.use(resqueue)
+        beanstalk.put(output)
+    beanstalk.close()
+
+
+
+def beanstalk_client(path_to_files):
+    # yaml and beanstalk are there, it is needed
+    sys.path.append("/home/fynu/jdf")
+    from beanstalk import beanstalkc
+    beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
+    # queue names have to change as a function of user to avoid filling each other's queue
+    jobqueue = "unfolding_queue"
+    resqueue = "unfolding_resqueue"
+    beanstalk.use(jobqueue)
+    beanstalk.watch(resqueue)
+
+    files = glob.glob(os.path.join(path_to_files,"*"))
+    nfiles = len(files)
+
+    fill = True
+    submit = True
+    res_len = 0
+    # print beanstalk.stats_tube(jobqueue)
+    if beanstalk.stats_tube(resqueue)["current-jobs-ready"] > 0:
+        print "there are results waiting: no new jobs submitted, just fetching old results. Run again afterwards"
+        submit = False
+        fill = False
+        res_len = beanstalk.stats_tube(resqueue)["current-jobs-ready"]
+    elif beanstalk.stats_tube(jobqueue)["current-jobs-ready"] > 0:
+        print "there are %i data files in queue, using these instead of adding new ones" % (beanstalk.stats_tube(jobqueue)["current-jobs-ready"])
+        print "note that results could be meaningless !"
+        fill = False
+        nfiles = beanstalk.stats_tube(jobqueue)["current-jobs-ready"]
+        # note: would be better just to cleanup remaining data items...
+    elif beanstalk.stats_tube(jobqueue)["current-jobs-reserved"] > 0:
+        print "there are data files reserved, jobs are still running, quitting"
+        sys.exit(1)
+
+    if fill:
+        print "Filling the queue with %i jobs" % (nfiles)
+        for file in files:
+            beanstalk.put(file)
+
+    if submit:
+        # write condor cmd file
+        condfile = open("unfolding_worker.cmd","w")
+        text = """
+executable = unfolding_worker.sh
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+universe = vanilla
+requirements = (MADGRAPH =?= TRUE)
+output         = condor/beans.$(Cluster).$(Process).out
+error          = condor/beans.$(Cluster).$(Process).err
+log            = condor/beans.$(Cluster).$(Process).log
+"""
+        condfile.write(text)
+        condfile.write("queue %i" % (nfiles))
+        condfile.close()
+
+        # write condor sh file
+        thisdir = os.getcwd()
+        shfile = open("unfolding_worker.sh","w")
+        shfile.write("cd %s\n" % (thisdir))
+        text = """
+source /nfs/soft/cms/cmsset_default.sh
+eval `scramv1 runtime -sh`
+python compute_unfolding_matrices.py -w
+"""
+        shfile.write(text)
+        shfile.close()
+        os.chmod("unfolding_worker.sh",0755)
+
+        # submit condor jobs
+        print "Submitting condor jobs"
+        commands.getstatusoutput("condor_submit unfolding_worker.cmd")
+        print "Done"
+
+    outs = []
+    processed = 0
+    counts = {}
+    if res_len: nfiles=res_len
+    while processed < nfiles:
+        job = beanstalk.reserve()
+        out = pickle.loads(job.body)
+        outs.append(out["out"])
+        counts = sum_scalvecmat(counts, out["out"])
+        processed += 1
+        print "==================================="
+        print "got output from", out["host"], " on file:", out["arg"]
+        print "temp results:"
+        for key, value in counts.items():
+            print key,":", value
+        print "==================================="
+        job.delete()
+
+    beanstalk.close()
+
+    print "=== everybody's back ==="
+    for key, value in counts.items():
+        print key,":", value
+    print "===     details      ==="
+    print outs
+
 
 def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1):
     startup = ["weights"]
@@ -679,6 +829,7 @@ def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zb
     finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
     testu = unfolder(dataset, steps, startup, finish, muchannel)
     testu.run(num)
+    return testu.counts
 
 if __name__ == '__main__':
     from optparse import OptionParser
@@ -688,8 +839,11 @@ if __name__ == '__main__':
     parser.add_option("-e", action="store_const", const=False, dest="muchannel", help="Electron channel")
     parser.add_option("-b", action="store_const", const=None,  dest="muchannel", help="Both lepton channels (default)")
     parser.add_option("-n", type="int", dest="num", help="Number of events to process, defaults to all", default=-1)
+    parser.add_option("-c","--condor", action="store_const", const=True, dest="condor", help="create condor file, do not run anything", default=False)
+    parser.add_option("-i","--interactive", action="store_const", const=True, dest="beanstalk_c", help="run in semi-interactive mode", default=False)
+    parser.add_option("-w","--worker", action="store_const", const=True, dest="beanstalk_w", help="wait for jobs in queue, do not use", default=False)
     (options, args) = parser.parse_args()
-    if not options.dataset:
+    if not options.dataset and not options.beanstalk_w:
         print
         print "ERROR: You should specify a dataset"
         print
@@ -708,4 +862,36 @@ if __name__ == '__main__':
     elif options.muchannel == False:
         print "For electrons only"
 
-    main(options.dataset, options.muchannel, options.num)
+    if options.condor:
+        thisdir = os.getcwd() 
+        condfile = open("condor_unfolding.cmd","w")
+        infiles = os.path.isdir(options.dataset) and glob.glob(os.path.join(options.dataset,"*")) or [options.dataset]
+        condfile.write("executable = condor_unfolding.sh\n")
+        condfile.write("should_transfer_files = YES\n")
+        condfile.write("when_to_transfer_output = ON_EXIT\n")
+        condfile.write("universe = vanilla\n")
+        condfile.write("requirements = (CMSFARM =?= TRUE)\n\n")
+        for file in infiles:
+            condfile.write("arguments = %s\n" % (file))
+            file = os.path.basename(file)
+            file = os.path.splitext(file)[0]
+            condfile.write("output = condor/%s.out\n" % (file))
+            condfile.write("error  = condor/%s.err\n" % (file))
+            condfile.write("log    = condor/%s.log\n" % (file))
+            condfile.write("queue\n\n")
+        condfile.close()
+        shfile = open("condor_unfolding.sh","w")
+        shfile.write("cd %s\n" % (thisdir))
+        shfile.write("source /nfs/soft/cms/cmsset_default.sh\n")
+        shfile.write("eval `scramv1 runtime -sh`\n")
+        shfile.write("python compute_unfolding_matrices.py -m -d $1\n")
+        shfile.close()
+        os.chmod("condor_unfolding.sh",0755)
+    elif options.beanstalk_c:
+        beanstalk_client(options.dataset)
+    elif options.beanstalk_w:
+        beanstalk_worker()
+    else:
+        main(options.dataset, options.muchannel, options.num)
+
+
