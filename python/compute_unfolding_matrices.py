@@ -25,7 +25,7 @@ from btaggingWeight import btaggingWeight
 
 class unfolder:
     """ Class to compute unfolding "matrices" """
-    def __init__(self, infiles0 = "", whattodo = [], startup = [], finish = [], muchannel = None):
+    def __init__(self, infiles0 = "", whattodo = [], startup = [], finish = [], muchannel = None, save_output=True):
         """ Initialization: definition of all handles, etc ... """
         # allowing to use directories or filenames
         infiles = os.path.isdir(infiles0) and glob.glob(os.path.join(infiles0,"*")) or [infiles0]
@@ -54,13 +54,15 @@ class unfolder:
         self.finish = finish
         # creating tasks vector to avoid function lookup for each event
         self.funcs_todo = [getattr(self, "step_"+task) for task in self.whattodo]
+        self.save_output = save_output
         # format outfile and logfile:
-        self.outfile = "unfolding_"+datetime.datetime.strftime(datetime.datetime.now(),"%Y%d%m_%H%M")+".txt"
-        self.logfile = "unfolding_log_"+datetime.datetime.strftime(datetime.datetime.now(),"%Y%d%m_%H%M")+".txt"
-        logf = open(self.logfile, "w")
-        logf.write("Running on %s \n" % (infiles0))
-        logf.write("Muchannel = %s \n" % (str(muchannel)))
-        logf.write("Output file = %s \n" % self.outfile)
+        if self.save_output:
+            self.outfile = "unfolding_"+datetime.datetime.strftime(datetime.datetime.now(),"%Y%d%m_%H%M")+".txt"
+            self.logfile = "unfolding_log_"+datetime.datetime.strftime(datetime.datetime.now(),"%Y%d%m_%H%M")+".txt"
+            logf = open(self.logfile, "w")
+            logf.write("Running on %s \n" % (infiles0))
+            logf.write("Muchannel = %s \n" % (str(muchannel)))
+            logf.write("Output file = %s \n" % self.outfile)
         # mu channel (True means muons)
         self.muchannel = muchannel
         self.counts = {}
@@ -114,10 +116,11 @@ class unfolder:
                 for fin in self.finish:
                     finish_todo = getattr(self,"finish_"+fin)
                     finish_todo()
-                outf = open(self.outfile, "w")
-                outf.write(self.out)
-                outf.write("last update: %s \n" % (str(datetime.datetime.now())))
-                outf.close()
+                if self.save_output:
+                    outf = open(self.outfile, "w")
+                    outf.write(self.out)
+                    outf.write("last update: %s \n" % (str(datetime.datetime.now())))
+                    outf.close()
             self.step(event)
             num += 1
             if num > tot and tot > 0: break
@@ -128,11 +131,12 @@ class unfolder:
         for fin in self.finish:
             finish_todo = getattr(self,"finish_"+fin)
             finish_todo()
-        outf = open(self.outfile, "w")
-        outf.write(self.out)
-        outf.write("last update: %s \n" % (str(datetime.datetime.now())))
-        outf.close()
-        print "Results are in:", self.outfile
+        if self.save_output:
+            outf = open(self.outfile, "w")
+            outf.write(self.out)
+            outf.write("last update: %s \n" % (str(datetime.datetime.now())))
+            outf.close()
+            print "Results are in:", self.outfile
 
     def run_all(self):
         """ run list of tasks on all events in file(s) """
@@ -710,14 +714,21 @@ def beanstalk_worker(muchannel):
     sys.path.append("/home/fynu/jdf")
     from beanstalk import beanstalkc
     beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
+    if muchannel == None:
+        mu_options = "_b"
+    elif muchannel == True:
+        mu_options = "_m"
+    elif muchannel == False:
+        mu_options = "_e"
+
     user = get_username()
-    jobqueue = "unfolding_queue_%s" % (user)
-    resqueue = "unfolding_resqueue_%s" % (user)
+    jobqueue = "unfolding_queue_%s%s" % (user, mu_options)
+    resqueue = "unfolding_resqueue_%s%s" % (user, mu_options)
     beanstalk.watch(jobqueue)
     job = beanstalk.reserve(timeout=5)
     if job:
         hostname = os.uname()[1]
-        output = {"host":hostname, "arg":job.body, "out":main(dataset=job.body, muchannel=muchannel)}
+        output = {"host":hostname, "arg":job.body, "out":main(dataset=job.body, muchannel=muchannel, save_output=False)}
         output = pickle.dumps(output)
         job.delete()
         beanstalk.use(resqueue)
@@ -752,9 +763,15 @@ def beanstalk_client(path_to_files, muchannel):
     from beanstalk import beanstalkc
     beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
     # queue names have to change as a function of user to avoid filling each other's queue
+    if muchannel == None:
+        mu_options = "_b"
+    elif muchannel == True:
+        mu_options = "_m"
+    elif muchannel == False:
+        mu_options = "_e"
     user = get_username()
-    jobqueue = "unfolding_queue_%s" % (user)
-    resqueue = "unfolding_resqueue_%s" % (user)
+    jobqueue = "unfolding_queue_%s%s" % (user, mu_options)
+    resqueue = "unfolding_resqueue_%s%s" % (user, mu_options)
     beanstalk.use(jobqueue)
     beanstalk.watch(resqueue)
 
@@ -790,7 +807,7 @@ executable = unfolding_worker.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 universe = vanilla
-requirements = (MADGRAPH =?= TRUE)
+requirements = (CMSFARM =?= TRUE)
 output         = condor/beans.$(Cluster).$(Process).out
 error          = condor/beans.$(Cluster).$(Process).err
 log            = condor/beans.$(Cluster).$(Process).log
@@ -881,11 +898,11 @@ def counts_to_mats(counts_1):
     print compute_fullmatrix(**vals)
 
 
-def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1):
+def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1, save_output = True):
     startup = ["weights"]
     steps = ["event_weight","a_l", "e_r", "e_l", "e_b"]
     finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
-    testu = unfolder(dataset, steps, startup, finish, muchannel)
+    testu = unfolder(dataset, steps, startup, finish, muchannel, save_output)
     testu.run(num)
     return testu.counts
 
