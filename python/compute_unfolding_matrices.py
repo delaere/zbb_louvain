@@ -13,6 +13,7 @@ import datetime
 from copy import deepcopy
 import numpy as np
 import pickle
+import pwd
 
 from DataFormats.FWLite import Events, Handle
 import eventSelection as llbb
@@ -566,21 +567,21 @@ def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21
     except ZeroDivisionError:
         print "A_l_1 or A_l_2 is empty"
         return None
-    print al_mat
+    # print "A_l-1 :", al_mat
     er_mat = np.matrix([[er_11 + er_01*rfact, er_21 + er_01*rfact],[er_12 + er_02*rfact, er_22 + er_02*rfact]]).getI()
-    print er_mat
+    # print "e_r-1 :", er_mat
     try:
         el_mat = np.matrix([[1/el_1, 0],[0, 1/el_2]])
     except ZeroDivisionError:
         print "e_l_1 or e_l_2 is empty"
         return None
-    print el_mat
+    # print "e_l-1 :", el_mat
     try:
         eb_mat = np.matrix([[1/eb_11, -eb_21/(eb_22*eb_11)],[0, 1/eb_22]]) 
     except ZeroDivisionError:
         print "e_b_11 or e_b_22 is empty"
         return None
-    print eb_mat
+    # print "e_b-1 :", eb_mat
     final_mat = al_mat*er_mat*el_mat*eb_mat
     return final_mat
 
@@ -705,18 +706,18 @@ def sum_scalvecmat(dict, dict2):
     return dict1
     
 
-def beanstalk_worker():
+def beanstalk_worker(muchannel):
     sys.path.append("/home/fynu/jdf")
     from beanstalk import beanstalkc
     beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
-    jobqueue = "unfolding_queue"
-    resqueue = "unfolding_resqueue"
+    user = get_username()
+    jobqueue = "unfolding_queue_%s" % (user)
+    resqueue = "unfolding_resqueue_%s" % (user)
     beanstalk.watch(jobqueue)
     job = beanstalk.reserve(timeout=5)
     if job:
         hostname = os.uname()[1]
-        # output = job.body+" on "+hostname+" : done !\n"
-        output = {"host":hostname, "arg":job.body, "out":main(job.body)}
+        output = {"host":hostname, "arg":job.body, "out":main(dataset=job.body, muchannel=muchannel)}
         output = pickle.dumps(output)
         job.delete()
         beanstalk.use(resqueue)
@@ -724,16 +725,36 @@ def beanstalk_worker():
     beanstalk.close()
 
 
+def purge_queue(queue_name):
+    sys.path.append("/home/fynu/jdf")
+    from beanstalk import beanstalkc
+    beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
+    queue_to_purge = queue_name
+    beanstalk.watch(queue_to_purge)
+    while True:
+        job = beanstalk.reserve(timeout=0)
+        if job:
+            print job.body
+            job.delete()
+        else:
+            break
+    beanstalk.close()
 
-def beanstalk_client(path_to_files):
+
+def get_username():
+    return pwd.getpwuid(os.getuid())[0]
+
+
+def beanstalk_client(path_to_files, muchannel):
     ## this still needs a proper handling of errors, for instance if not all jobs come back
     # yaml and beanstalk are there, it is needed
     sys.path.append("/home/fynu/jdf")
     from beanstalk import beanstalkc
     beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
     # queue names have to change as a function of user to avoid filling each other's queue
-    jobqueue = "unfolding_queue"
-    resqueue = "unfolding_resqueue"
+    user = get_username()
+    jobqueue = "unfolding_queue_%s" % (user)
+    resqueue = "unfolding_resqueue_%s" % (user)
     beanstalk.use(jobqueue)
     beanstalk.watch(resqueue)
 
@@ -743,18 +764,15 @@ def beanstalk_client(path_to_files):
     fill = True
     submit = True
     res_len = 0
-    # print beanstalk.stats_tube(jobqueue)
     if beanstalk.stats_tube(resqueue)["current-jobs-ready"] > 0:
         print "there are results waiting: no new jobs submitted, just fetching old results. Run again afterwards"
         submit = False
         fill = False
         res_len = beanstalk.stats_tube(resqueue)["current-jobs-ready"]
     elif beanstalk.stats_tube(jobqueue)["current-jobs-ready"] > 0:
-        print "there are %i data files in queue, using these instead of adding new ones" % (beanstalk.stats_tube(jobqueue)["current-jobs-ready"])
-        print "note that results could be meaningless !"
-        fill = False
-        nfiles = beanstalk.stats_tube(jobqueue)["current-jobs-ready"]
-        # note: would be better just to cleanup remaining data items...
+        print "there are %i data files in queue, purging first" % (beanstalk.stats_tube(jobqueue)["current-jobs-ready"])
+        purge_queue(jobqueue)
+        print "Queue is now empty"
     elif beanstalk.stats_tube(jobqueue)["current-jobs-reserved"] > 0:
         print "there are data files reserved, jobs are still running, quitting"
         sys.exit(1)
@@ -781,6 +799,13 @@ log            = condor/beans.$(Cluster).$(Process).log
         condfile.write("queue %i" % (nfiles))
         condfile.close()
 
+        if options.muchannel == None:
+            mu_options = "-b"
+        elif options.muchannel == True:
+            mu_options = "-m"
+        elif options.muchannel == False:
+            mu_options = "-e"
+
         # write condor sh file
         thisdir = os.getcwd()
         shfile = open("unfolding_worker.sh","w")
@@ -788,8 +813,8 @@ log            = condor/beans.$(Cluster).$(Process).log
         text = """
 source /nfs/soft/cms/cmsset_default.sh
 eval `scramv1 runtime -sh`
-python compute_unfolding_matrices.py -w
-"""
+python compute_unfolding_matrices.py -w %s
+""" % (mu_options)
         shfile.write(text)
         shfile.close()
         os.chmod("unfolding_worker.sh",0755)
@@ -815,6 +840,8 @@ python compute_unfolding_matrices.py -w
         for key, value in counts.items():
             print key,":", value
         print "==================================="
+        counts_to_mats(counts)
+        print "==================================="
         job.delete()
 
     beanstalk.close()
@@ -822,8 +849,36 @@ python compute_unfolding_matrices.py -w
     print "=== everybody's back ==="
     for key, value in counts.items():
         print key,":", value
-    print "===     details      ==="
-    print outs
+    print "==================================="
+    counts_to_mats(counts)
+    # print "===     details      ==="
+    # print outs
+
+def counts_to_mats(counts_1):
+    counts = deepcopy(counts_1)
+    total = counts["All"]
+    e_r = counts["e_r"]
+    e_b = counts["e_b_he"]
+    e_b_hp = counts["e_b_hp"]
+    e_l = counts["e_l"]
+    norms_rec_er = [sum(line) for line in e_r]
+    norms = norm_by_column(e_r)
+    rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
+    norms_e_b = norm_by_column(e_b)
+    e_l = [x/y if y > 0 else 0 for x,y in zip(e_l,norms_rec_er)]
+    print "rfact:", rfact
+    print "e_r:", e_r
+    print "e_l:", e_l
+    print "e_b:", e_b
+    vals = {"al_1":1.0, "al_2":1.0,
+            "el_1":e_l[1], "el_2":e_l[2],
+            "er_01":e_r[1][0]/100., "er_02":e_r[2][0]/100.,
+            "er_11":e_r[1][1]/100., "er_12":e_r[2][1]/100.,
+            "er_21":e_r[1][2]/100., "er_22":e_r[2][2]/100.,
+            "rfact":rfact,
+            "eb_11":e_b[1][1]/100., "eb_21":e_b[1][2]/100., "eb_22":e_b[2][2]/100.
+        }
+    print compute_fullmatrix(**vals)
 
 
 def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1):
@@ -865,6 +920,7 @@ if __name__ == '__main__':
     elif options.muchannel == False:
         print "For electrons only"
 
+    # caution: muchannel is always True here !
     if options.condor:
         thisdir = os.getcwd() 
         condfile = open("condor_unfolding.cmd","w")
@@ -891,9 +947,9 @@ if __name__ == '__main__':
         shfile.close()
         os.chmod("condor_unfolding.sh",0755)
     elif options.beanstalk_c:
-        beanstalk_client(options.dataset)
+        beanstalk_client(options.dataset, options.muchannel)
     elif options.beanstalk_w:
-        beanstalk_worker()
+        beanstalk_worker(options.muchannel)
     else:
         main(options.dataset, options.muchannel, options.num)
 
