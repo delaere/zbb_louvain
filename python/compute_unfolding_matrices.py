@@ -278,6 +278,7 @@ class unfolder:
         self.out += "Acceptance    :\t"+"\t".join([f_2(el) for el in self.gen_acc])+"\n" 
         self.out += "A_l           :\t"+"\t".join([f_2(el) for el in self.a_l])+"\n"
         self.counts["All"] = self.total_events
+        self.counts["Base"] = self.gen_baseline
         self.counts["A_l"] = self.gen_acc
         
 
@@ -905,7 +906,7 @@ def counts_to_mats(counts_1):
     # here set which e_b matrix you want to use
     # e_b = counts["e_b_he"]
     e_b = counts["e_b_mixed"]
-    e_b_hp = counts["e_b_hp"]
+    # e_b_hp = counts["e_b_hp"]
     e_l = counts["e_l"]
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
