@@ -89,6 +89,6 @@ class zbbnorm:
   nev_ZZ_summer12       =  9799908 # 
   nev_ZH115_summer12    =  1090000 # not yet
   nev_ZH120_summer12    =  1090000 # not yet
-  nev_ZH125_summer12    =   # to check, all jobs succeed, no double file 
+  nev_ZH125_summer12    =   999462 # to check, all jobs succeed, no double file 
   nev_ZH130_summer12    =  1100000 # not yet 
   nev_ZH135_summer12    =  1096956 # not yet
