@@ -13,7 +13,7 @@ class zbblabel:
   vertexlabel="goodPV"
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
-  metlabel="patType01SCorrectedPFMet"
+  metlabel="patMETsPF"
   zmmbblabel="Zmmbb"
   zeebblabel="Zeebb"
   bblabel ="bbbar"
@@ -44,6 +44,8 @@ class zbbnorm:
   """information to be used for the MC sample normalization"""
   lumi_totEle2011=5.217 #in fb-1
   lumi_totMu2011=5.275
+
+  lumi_tot2012=0.809 #only A for the moment
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
@@ -68,7 +70,7 @@ class zbbnorm:
   xsec_tW_8TeV=11.1         #approx. NNLO inclusive
   xsec_tbarW_8TeV=11.1      #approx. NNLO inclusive
 
-  #number of events processed for the PATtuple production
+  # fall 11 number of events processed for the PATtuple production
   nev_DYjets_fall11       = 36264432 # updated
   nev_TTjets_fall11       = 59244088 # updated
   nev_ZZ_fall11       =  4191045 # updated
@@ -81,3 +83,12 @@ class zbbnorm:
   nev_tW_fall11       =   814390 # updated
   nev_tbarW_fall11    =   809984 # updated
   
+  #summer 12 number of events processed for the PATtuple production
+  nev_DYjets_summer12   = 29310189 # approximate number : 1472 jobs finished on 1527, 1472 to be check possible some finish after
+  nev_TTjets_summer12   =  3950000 # S8
+  nev_ZZ_summer12       =  9799908 # 
+  nev_ZH115_summer12    =  1090000 # not yet
+  nev_ZH120_summer12    =  1090000 # not yet
+  nev_ZH125_summer12    =   # to check, all jobs succeed, no double file 
+  nev_ZH130_summer12    =  1100000 # not yet 
+  nev_ZH135_summer12    =  1096956 # not yet
