@@ -435,9 +435,28 @@ class unfolder:
         if n_hp > 2: n_hp = 2
         ucont.n_he = n_he
         ucont.n_hp = n_hp
-        he_modes = [None, "HE", "HEHE"]
-        hp_modes = [None, "HP", "HPHP"]
+        he_modes = [None, "HEexcl", "HEHE"]
+        hp_modes = [None, "HPexcl", "HPHP"]
         heweight = 1
+        # working point HPexcl - HEHE does not preserve normalisation and thus requires additional steps
+        if n_hp == 1:
+            self.btag_engine.setMode("HPexcl")
+            mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            try:
+                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+            except:
+                self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
+                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+        if n_he >= 2:
+            self.btag_engine.setMode("HEHE")
+            mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            try:
+                self.mat_e_b_mixed[2][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+            except:
+                self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
+                self.mat_e_b_mixed[2][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+
+        # HEexcl - HEHE and HPexcl - HPHP are straightforward
         if he_modes[ucont.n_he]: 
             self.btag_engine.setMode(he_modes[ucont.n_he])
             heweight = self.btag_engine.weight(ucont.event,self.muchannel)
@@ -478,8 +497,16 @@ class unfolder:
             self.out += "--------------------------------------\n"
             self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_hp])+"\n"
             self.out += "--------------------------------------\n"
+            self.e_b_mixed_norm = deepcopy(self.mat_e_b_mixed)
+            norms_mixed = norm_by_column(self.e_b_mixed_norm)
+            for i, row in enumerate(self.e_b_mixed_norm):
+                self.out += "'mixed' b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
+            self.out += "--------------------------------------\n"
+            self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_mixed])+"\n"
+            self.out += "--------------------------------------\n"
             self.counts["e_b_he"] = self.mat_e_b_he
             self.counts["e_b_hp"] = self.mat_e_b_hp
+            self.counts["e_b_mixed"] = self.mat_e_b_mixed
 
  
     def finish_comparison(self):
@@ -875,7 +902,9 @@ def counts_to_mats(counts_1):
     counts = deepcopy(counts_1)
     total = counts["All"]
     e_r = counts["e_r"]
-    e_b = counts["e_b_he"]
+    # here set which e_b matrix you want to use
+    # e_b = counts["e_b_he"]
+    e_b = counts["e_b_mixed"]
     e_b_hp = counts["e_b_hp"]
     e_l = counts["e_l"]
     norms_rec_er = [sum(line) for line in e_r]
