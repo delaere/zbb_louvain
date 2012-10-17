@@ -25,6 +25,7 @@ class zbbsystematics:
   SF_running_mode= "database" ## choose between hardcoded/database
   JERfactor = 1. # 1 = recommended smearing
   JESfactor = 0. # 1 = +1sigma
+  LeptonTnPfactor = 0
 
 class zbbfile:
   """files containing calibrations and other data"""
