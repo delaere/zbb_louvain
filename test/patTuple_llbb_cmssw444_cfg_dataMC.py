@@ -152,47 +152,6 @@ readFiles.extend([
     #"file:/storage/data/cms/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0001/A4CE0883-D336-E111-AD3A-003048FFD740.root"
     #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A06A3717-C52B-E111-BFFA-00304867BEC0.root",
     #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A2A2AAA2-AA2B-E111-9DA6-002618943951.root",
-    #"file:/storage/data/cms/store/mc/Fall11/ZZ_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S6_START44_V9B-v1/0000/A41BD3D4-A22B-E111-B6D9-003048678AE2.root"
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_1.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_10.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_11.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_12.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_13.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_14.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_15.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_16.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_17.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_18.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_19.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_2.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_20.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_21.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_22.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_23.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_24.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_25.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_26.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_27.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_28.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_29.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_3.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_30.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_31.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_32.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_33.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_34.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_35.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_36.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_37.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_38.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_39.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_4.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_40.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_5.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_6.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_7.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_8.root",
-  "file:/storage/data/cms/store/user/acaudron/ZAsamples/A125_H0475/RECO_9.root",
 
     ])
 
@@ -205,7 +164,7 @@ process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True),
                                       makeTriggerResults=cms.untracked.bool(True),
                                     )
 
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(30000) )
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -702,8 +661,8 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 addPfMET(process, 'PF')
 
 # for MET systematics: adds ~10 variants of type1-corrected MET
-#from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-#runMEtUncertainties(process)
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+if isMC : runMEtUncertainties(process)
      
 # MET sequence
 process.producePatPFMETobjectWithCorrections = cms.Sequence(
@@ -737,7 +696,7 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 ##      OUTPUT      ##
 ######################
 
-process.out.fileName = cms.untracked.string('/storage/data/cms/store/user/acaudron/ZAsamples/pat2_A125_H0475/PATprod-MC.root')
+process.out.fileName = cms.untracked.string('PATprod-MC.root')
 
 process.out.outputCommands = cms.untracked.vstring( 'drop *' )
                                    ### vertex, incl. Torino's Z vertex producer and mergeable counter ----------------------
