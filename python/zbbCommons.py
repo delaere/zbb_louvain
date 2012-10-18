@@ -13,7 +13,7 @@ class zbblabel:
   vertexlabel="goodPV"
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
-  metlabel="patMETsPF"
+  metlabel="patType01SCorrectedPFMet"
   zmmbblabel="Zmmbb"
   zeebblabel="Zeebb"
   bblabel ="bbbar"
@@ -72,8 +72,8 @@ class zbbnorm:
   xsec_tbarW_8TeV=11.1      #approx. NNLO inclusive
 
   # fall 11 number of events processed for the PATtuple production
-  nev_DYjets_fall11       = 36264432 # updated
-  nev_TTjets_fall11       = 59244088 # updated
+  nev_DYjets_fall11   = 36264432 # updated
+  nev_TTjets_fall11   = 59244088 # updated
   nev_ZZ_fall11       =  4191045 # updated
   nev_ZH115_fall11    =  1090000 # updated
   nev_ZH120_fall11    =  1090000 # updated
