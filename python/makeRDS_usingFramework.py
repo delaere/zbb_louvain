@@ -35,8 +35,6 @@ from zbbCommons import zbbfile
 from eventSelection import eventCategories, eventCategory, isInCategory
 from optparse import OptionParser
 
-
-
 ###############
 ##  USAGE #####
 ################
@@ -98,38 +96,44 @@ muChannel = { "MuA_DATA"     : True ,
               "evtgen_MC"    : False,
               "herwig_MC"    : False,
               "pythia_MC"    : False,
+              "ZA_Mu_MC" : True,
+              "ZA_El_MC" : False
               }
 
 path = { 
-  "MuA_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Mu_DataA/" ,
-  "ElA_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/El_DataA/" ,
-  "MuB_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Mu_DataB/" ,
-  "ElB_DATA"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/El_DataB/" ,
-  "Mu_MC"        : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/DY_MC/"    ,
-  "El_MC"        : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/DY_MC/"    ,
-  "Zbb_Mu_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/"   ,
-  "Zbb_El_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/"   ,
-  "TT_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/TT_MC/"    ,
-  "TT_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/TT_MC/"    ,
-  "ZZ_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZZ_MC/"    ,
-  "ZZ_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZZ_MC/"    ,
-  "ZH115_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH125_MC/" ,
-  "ZH125_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH125_MC/" ,
-  "ZH130_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/ZH135_MC/" ,
-  "tW_Mu_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
-  "tW_El_MC"     : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tW_MC/"    ,
-  "tbarW_Mu_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
-  "tbarW_El_MC"  : "/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/tbarW_MC/" ,
+  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
+  "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "Zbb_El_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "TT_Mu_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "tW_Mu_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tW_El_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tbarW_Mu_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "tbarW_El_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
   "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
   "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
   "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
+  "ZA_Mu_MC" : "/nfs/user/acaudron/ZApat/",
+  "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
   }
 
 ###############################
@@ -211,6 +215,8 @@ checkTrigger = {
   "evtgen_MC"    : False,
   "herwig_MC"    : False,
   "pythia_MC"    : False,
+  "ZA_Mu_MC" : False,
+  "ZA_El_MC" : False
   }
 
 obsSet  = RooArgSet()
@@ -241,8 +247,9 @@ events = Events (files)
 escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
 brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
-jmcp.beginJob()             
-vacp.beginJob()             
+jmcp.beginJob()
+if muChannel[channel] : vacp.beginJob(zlabel=zbblabel.zmumulabel)
+else : vacp.beginJob(zlabel=zbblabel.zelelabel)
 if channel[-2:] == "MC":
   mscp.beginJob(genlabel=zbblabel.genlabel)
   prcp.beginJob(MonteCarloPUFileName, DataPUFileName, vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
@@ -328,7 +335,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     #ws.writeToFile("File_rds_zbb_"+channel+".root") 
     #gDirectory.Add(ws)
 
-    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
+    f=TFile("RDSwithVA/File_rds_zbb_"+channel+".root","RECREATE")
     rds_zbb.Write()
     f.Close()
 
