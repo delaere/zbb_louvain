@@ -52,14 +52,14 @@ public :
    Double_t        eventSelectionmu2eta;
    Double_t        eventSelectionmu1etapm;
    Double_t        eventSelectionmu2etapm;
-   Double_t        eventSelectiondrMuMu;
+   Double_t        eventSelectiondrllMu;
    Double_t        eventSelectionel1pt;
    Double_t        eventSelectionel2pt;
    Double_t        eventSelectionel1eta;
    Double_t        eventSelectionel2eta;
    Double_t        eventSelectionel1etapm;
    Double_t        eventSelectionel2etapm;
-   Double_t        eventSelectiondrEleEle;
+   Double_t        eventSelectiondrllEle;
    Double_t        BtaggingReweightingHE;
    Double_t        BtaggingReweightingHP;
    Double_t        BtaggingReweightingHEexcl;
@@ -219,6 +219,8 @@ public :
    Double_t        mcSelectionNBottom;
    Double_t        mcSelectionNAntibottom;
    Double_t        lumiReweightingLumiWeight;
+   Double_t        lumiReweightingLumiWeightUp;
+   Double_t        lumiReweightingLumiWeightDown;
    Double_t        lumiReweightingpu;
    Double_t        lumiReweightingpv;
    Int_t           rc_eventSelection_0_idx;
@@ -298,14 +300,14 @@ public :
    TBranch        *b_eventSelectionmu2eta;   //!
    TBranch        *b_eventSelectionmu1etapm;   //!
    TBranch        *b_eventSelectionmu2etapm;   //!
-   TBranch        *b_eventSelectiondrMuMu;   //!
+   TBranch        *b_eventSelectiondrllMu;   //!
    TBranch        *b_eventSelectionel1pt;   //!
    TBranch        *b_eventSelectionel2pt;   //!
    TBranch        *b_eventSelectionel1eta;   //!
    TBranch        *b_eventSelectionel2eta;   //!
    TBranch        *b_eventSelectionel1etapm;   //!
    TBranch        *b_eventSelectionel2etapm;   //!
-   TBranch        *b_eventSelectiondrEleEle;   //!
+   TBranch        *b_eventSelectiondrllEle;   //!
    TBranch        *b_BtaggingReweightingHE;   //!
    TBranch        *b_BtaggingReweightingHP;   //!
    TBranch        *b_BtaggingReweightingHEexcl;   //!
@@ -465,6 +467,8 @@ public :
    TBranch        *b_mcSelectionNBottom;   //!
    TBranch        *b_mcSelectionNAntibottom;   //!
    TBranch        *b_lumiReweightingLumiWeight;   //!
+   TBranch        *b_lumiReweightingLumiWeightUp;   //!
+   TBranch        *b_lumiReweightingLumiWeightDown;   //!
    TBranch        *b_lumiReweightingpu;   //!
    TBranch        *b_lumiReweightingpv;   //!
    TBranch        *b_rc_eventSelection_0_idx;   //!
@@ -632,14 +636,14 @@ void rds_zbb::Init(TTree *tree)
    fChain->SetBranchAddress("eventSelectionmu2eta", &eventSelectionmu2eta, &b_eventSelectionmu2eta);
    fChain->SetBranchAddress("eventSelectionmu1etapm", &eventSelectionmu1etapm, &b_eventSelectionmu1etapm);
    fChain->SetBranchAddress("eventSelectionmu2etapm", &eventSelectionmu2etapm, &b_eventSelectionmu2etapm);
-   fChain->SetBranchAddress("eventSelectiondrMuMu", &eventSelectiondrMuMu, &b_eventSelectiondrMuMu);
+   fChain->SetBranchAddress("eventSelectiondrllMu", &eventSelectiondrllMu, &b_eventSelectiondrllMu);
    fChain->SetBranchAddress("eventSelectionel1pt", &eventSelectionel1pt, &b_eventSelectionel1pt);
    fChain->SetBranchAddress("eventSelectionel2pt", &eventSelectionel2pt, &b_eventSelectionel2pt);
    fChain->SetBranchAddress("eventSelectionel1eta", &eventSelectionel1eta, &b_eventSelectionel1eta);
    fChain->SetBranchAddress("eventSelectionel2eta", &eventSelectionel2eta, &b_eventSelectionel2eta);
    fChain->SetBranchAddress("eventSelectionel1etapm", &eventSelectionel1etapm, &b_eventSelectionel1etapm);
    fChain->SetBranchAddress("eventSelectionel2etapm", &eventSelectionel2etapm, &b_eventSelectionel2etapm);
-   fChain->SetBranchAddress("eventSelectiondrEleEle", &eventSelectiondrEleEle, &b_eventSelectiondrEleEle);
+   fChain->SetBranchAddress("eventSelectiondrllEle", &eventSelectiondrllEle, &b_eventSelectiondrllEle);
    fChain->SetBranchAddress("BtaggingReweightingHE", &BtaggingReweightingHE, &b_BtaggingReweightingHE);
    fChain->SetBranchAddress("BtaggingReweightingHP", &BtaggingReweightingHP, &b_BtaggingReweightingHP);
    fChain->SetBranchAddress("BtaggingReweightingHEexcl", &BtaggingReweightingHEexcl, &b_BtaggingReweightingHEexcl);
@@ -799,6 +803,8 @@ void rds_zbb::Init(TTree *tree)
    fChain->SetBranchAddress("mcSelectionNBottom", &mcSelectionNBottom, &b_mcSelectionNBottom);
    fChain->SetBranchAddress("mcSelectionNAntibottom", &mcSelectionNAntibottom, &b_mcSelectionNAntibottom);
    fChain->SetBranchAddress("lumiReweightingLumiWeight", &lumiReweightingLumiWeight, &b_lumiReweightingLumiWeight);
+   fChain->SetBranchAddress("lumiReweightingLumiWeightUp", &lumiReweightingLumiWeightUp, &b_lumiReweightingLumiWeightUp);
+   fChain->SetBranchAddress("lumiReweightingLumiWeightDown", &lumiReweightingLumiWeightDown, &b_lumiReweightingLumiWeightDown);
    fChain->SetBranchAddress("lumiReweightingpu", &lumiReweightingpu, &b_lumiReweightingpu);
    fChain->SetBranchAddress("lumiReweightingpv", &lumiReweightingpv, &b_lumiReweightingpv);
    fChain->SetBranchAddress("rc_eventSelection_0_idx", &rc_eventSelection_0_idx, &b_rc_eventSelection_0_idx);
