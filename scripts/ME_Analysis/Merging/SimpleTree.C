@@ -38,6 +38,16 @@
 #include "MLP_Zbb_tt_Mll_MeTtest_Mll_MET.cxx"
 #include "MLP_Zbb_tt_Mll_test_Mll_deta.cxx"
 
+// Include NN trained on Muon
+
+#include "MLP_Zbb_tt_MU.cxx"
+#include "MLP_Higgs_vs_zbb_MU.cxx"
+#include "MLP_Higgs_vs_zz_MU.cxx"
+#include "MLP_Higgs_vs_tt_MU.cxx"
+#include "MLP_Higgs_vs_bkg_MU.cxx"
+//------------------------------------
+
+
 #include <iostream>
 #include <map>
 
@@ -311,6 +321,14 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    MLP_Zbb_tt_Mll_MeTtest_Mll_MET* MLP_Zbb_tt_Mll_MeTtest_Mll_met=0;
    MLP_Zbb_tt_Mll_test_Mll_deta* MLP_Zbb_tt_Mll_test_Mll=0;
 
+   MLP_Zbb_tt_MU *MLP_zbbvstt_mu;
+   MLP_Higgs_vs_zbb_MU *MLP_higgs_vs_zbb_mu =0;
+   MLP_Higgs_vs_zz_MU *MLP_higgs_vs_zz_mu = 0;  
+   MLP_Higgs_vs_tt_MU *MLP_higgs_vs_tt_mu = 0; 
+   MLP_Higgs_vs_bkg_MU *MLP_higgs_vs_bkg_mu =0;
+
+
+
    Double_t mlphiggsvszbb;
    Double_t mlphiggsvszz;
    Double_t mlphiggsvstt;
@@ -319,6 +337,14 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    Double_t mlpzbbttmmll_MeTtest_mll_met;
    Double_t mlpzbbttmlltest_mll;
 
+   // variable for NN trained on MU
+   Double_t mlphiggsvszbb_mu;
+   Double_t mlphiggsvszz_mu;
+   Double_t mlphiggsvstt_mu;
+   Double_t mlphiggsvsbkg_mu;
+   Double_t mlpZbbvsTT_mu;
+
+   //---------------------------
    Double_t mlpZbbvsTT;
    Double_t mlpZbbvsTTtight;
    Double_t mlpZbbvsTT_tight_Wmet;
@@ -398,6 +424,15 @@ void CreateParentTree(TString InputFile) {
    MLP_zbbvstt_multi_EE_tight = new MLP_Zbb_tt_multi_EE_TIGHT();
    MLP_Zbb_tt_Mll_MeTtest_Mll_met= new MLP_Zbb_tt_Mll_MeTtest_Mll_MET();
    MLP_Zbb_tt_Mll_test_Mll= new MLP_Zbb_tt_Mll_test_Mll_deta();
+   
+   // NN trained on MU
+   MLP_higgs_vs_zbb_mu = new MLP_Higgs_vs_zbb_MU();
+   MLP_higgs_vs_zz_mu = new MLP_Higgs_vs_zz_MU();
+   MLP_higgs_vs_tt_mu = new MLP_Higgs_vs_tt_MU();
+   MLP_higgs_vs_bkg_mu = new MLP_Higgs_vs_bkg_MU();
+   MLP_zbbvstt_mu = new MLP_Zbb_tt_MU();
+   //-----------------------
+
 
    TFile* f_RDS  = new TFile("testsMergeRDSnoWS120721/Tree_File_rds_zbb_" + InputFile + ".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
@@ -676,6 +711,13 @@ void CreateParentTree(TString InputFile) {
    //t_RDS->BuildIndex("eventSelectionrun","eventSelectionevent");
    //t_RDS->AddFriend(t_ME);
 
+   t_RDSME->Branch("mlphiggsvszbb_mu" , &mlphiggsvszbb_mu,"mlphiggsvszbb_mu/D");
+   t_RDSME->Branch("mlphiggsvstt_mu" , &mlphiggsvstt_mu,"mlphiggsvstt_mu/D");
+   t_RDSME->Branch("mlphiggsvszz_mu" , &mlphiggsvszz_mu,"mlphiggsvszz_mu/D");
+   t_RDSME->Branch("mlphiggsvsbkg_mu" , &mlphiggsvsbkg_mu,"mlphiggsvsbkg_mu/D");
+   t_RDSME->Branch("mlpZbbvsTT_mu" , &mlpZbbvsTT_mu,"mlpZbbvsTT_mu/D");
+
+
    rds_zbb* mc_RDS = new rds_zbb(t_RDS);
    tree2* mc_ME = new tree2(t_ME);
 
@@ -857,6 +899,14 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvsbkg = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb  , mlphiggsvszz , mlphiggsvstt);
         mlphiggsvsbkg_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0,Whi3);
 
+        mlpZbbvsTT_mu = MLP_zbbvstt_mu->Value(0, Wgg, Wqq, Wtt);
+        mlphiggsvszbb_mu = MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0 , Whi3);
+        mlphiggsvstt_mu = MLP_higgs_vs_tt_mu->Value(0, Wtt , Whi0 , Whi3);
+        mlphiggsvszz_mu = MLP_higgs_vs_zz_mu->Value(0, Wzz0 , Wzz3 , Whi0 , Whi3);
+        mlphiggsvsbkg_mu = MLP_higgs_vs_bkg_mu->Value(0, mlphiggsvszbb_mu  , mlphiggsvszz_mu , mlphiggsvstt_mu);
+        
+
+
 
 	if (InputFile.Contains("DATA")){
 	      if( MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3)>0.5){mlphiggsvszbb=-999.;}
@@ -864,6 +914,10 @@ void CreateParentTree(TString InputFile) {
 	      if( MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3)>0.5){mlphiggsvszz=-999.;}
 	      if( MLP_higgs_vs_bkg->Value(0, MLP_higgs_vs_zbb->Value(0, Wgg, Wqq, Whi0 , Whi3), MLP_higgs_vs_zz->Value(0, Whi0 , Whi3 , Wzz0 , Wzz3) ,MLP_higgs_vs_tt->Value(0, Whi0 , Whi3 , Wtt) ) > 0.5 ){mlphiggsvsbkg=-999.;}
 	      if(MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0,Whi3)>0.5){mlphiggsvsbkg_fulll = -999;}
+	      if( MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0 , Whi3)>0.5){mlphiggsvszbb_mu=-999.;}
+              if( MLP_higgs_vs_tt_mu->Value(0, Wtt, Whi0 , Whi3)>0.5){mlphiggsvstt_mu=-999.;}
+              if( MLP_higgs_vs_zz_mu->Value(0, Wzz0 , Wzz3 , Whi0 , Whi3)>0.5){mlphiggsvszz_mu=-999.;}
+              if( MLP_higgs_vs_bkg_mu->Value(0, MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0 , Whi3), MLP_higgs_vs_zz_mu->Value(0, Wzz0 , Wzz3 , Whi0 , Whi3) ,MLP_higgs_vs_tt_mu->Value(0, Wtt, Whi0 , Whi3) ) > 0.5 ){mlphiggsvsbkg_mu=-999.;}
 	}
         
 	
