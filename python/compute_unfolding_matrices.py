@@ -548,6 +548,7 @@ class unfolder:
 
                            
 
+    # do not use this as selections have chanegd too much for any of this to make sense anymore
     def finish_comparison(self):
         """ compares with values from imperial """
         # for muons 
@@ -581,35 +582,53 @@ class unfolder:
         al_1_e  = 84.4
         al_2_e  = 83.8
         # printing comparisons A_l:
-        self.out += "--------------------------------------\n"
-        self.out += "A_l comparison:\ta_l_1\ta_l_2\n"
-        self.out += "this study    :\t%.2f\t%.2f\n" % (self.a_l[1], self.a_l[2])
-        self.out += "imp, electrons:\t%.2f\t%.2f\n" % (al_1_e, al_2_e)
-        self.out += "imp, muons    :\t%.2f\t%.2f\n" % (al_1_m, al_2_m)
+        all_ok = True
+        if hasattr(self,"a_l"):
+            self.out += "--------------------------------------\n"
+            self.out += "A_l comparison:\ta_l_1\ta_l_2\n"
+            self.out += "this study    :\t%.2f\t%.2f\n" % (self.a_l[1], self.a_l[2])
+        else:
+            all_ok = False
+            print "no events in a_l"
+        # self.out += "imp, electrons:\t%.2f\t%.2f\n" % (al_1_e, al_2_e)
+        # self.out += "imp, muons    :\t%.2f\t%.2f\n" % (al_1_m, al_2_m)
         # E_r
-        self.out += "--------------------------------------\n"
-        self.out += "e_r comparison:\te_r_11\te_r_12\te_r_21\te_r_22\tR\n"
-        self.out += "this study    :\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (self.e_r_norm[1][1], self.e_r_norm[2][1], self.e_r_norm[1][2], self.e_r_norm[2][2], self.rfact)
-        self.out += "imp, electrons:\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (er_11_e, er_12_e, er_21_e, er_22_e, rfact_e)
-        self.out += "imp, muons    :\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (er_11_m, er_12_m, er_21_m, er_22_m, rfact_m)
+        if hasattr(self,"e_r_norm"):
+            self.out += "--------------------------------------\n"
+            self.out += "e_r comparison:\te_r_11\te_r_12\te_r_21\te_r_22\tR\n"
+            self.out += "this study    :\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (self.e_r_norm[1][1], self.e_r_norm[2][1], self.e_r_norm[1][2], self.e_r_norm[2][2], self.rfact)
+        else:
+            all_ok = False
+            print "no events in e_r"
+        # self.out += "imp, electrons:\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (er_11_e, er_12_e, er_21_e, er_22_e, rfact_e)
+        # self.out += "imp, muons    :\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n" % (er_11_m, er_12_m, er_21_m, er_22_m, rfact_m)
         # E_l
-        self.out += "--------------------------------------\n"
-        self.out += "e_l comparison:\te_l_1\te_l_2\n"
-        self.out += "this study    :\t%.2f\t%.2f\n" % (self.e_l[1], self.e_l[2])
-        self.out += "imp, electrons:\t%.2f\t%.2f\n" % (el_1_e, el_2_e)
-        self.out += "imp, muons    :\t%.2f\t%.2f\n" % (el_1_m, el_2_m)
+        if hasattr(self,"e_l"):
+            self.out += "--------------------------------------\n"
+            self.out += "e_l comparison:\te_l_1\te_l_2\n"
+            self.out += "this study    :\t%.2f\t%.2f\n" % (self.e_l[1], self.e_l[2])
+        else:
+            all_ok = False
+            print "no events in e_l"
+        # self.out += "imp, electrons:\t%.2f\t%.2f\n" % (el_1_e, el_2_e)
+        # self.out += "imp, muons    :\t%.2f\t%.2f\n" % (el_1_m, el_2_m)
         # E_b
-        self.out += "--------------------------------------\n"
-        self.out += "e_b comparison:\te_b_11\te_b_21\te_b_22\n"
-        self.out += "this study    :\t%.2f\t%.2f\t%.2f\n" % (self.e_b_he_norm[1][1], self.e_b_he_norm[1][2], self.e_b_he_norm[2][2])
-        self.out += "imp, electrons:\t%.2f\t%.2f\t%.2f\n" % (eb_11_e, eb_21_e, eb_22_e)
-        self.out += "imp, muons    :\t%.2f\t%.2f\t%.2f\n" % (eb_11_m, eb_21_m, eb_22_m)
+        if hasattr(self,"e_b_he_norm"):
+            self.out += "--------------------------------------\n"
+            self.out += "e_b comparison:\te_b_11\te_b_21\te_b_22\n"
+            self.out += "this study    :\t%.2f\t%.2f\t%.2f\n" % (self.e_b_he_norm[1][1], self.e_b_he_norm[1][2], self.e_b_he_norm[2][2])
+        else:
+            all_ok = False
+            print "no events in e_b"
+        # self.out += "imp, electrons:\t%.2f\t%.2f\t%.2f\n" % (eb_11_e, eb_21_e, eb_22_e)
+        # self.out += "imp, muons    :\t%.2f\t%.2f\t%.2f\n" % (eb_11_m, eb_21_m, eb_22_m)
         # full matrix comparison
         self.out += "--------------------------------------\n"
         print self.out
 
-        if not hasattr(self,"e_m"):self.e_m=0.
-        vals = {"al_1":self.a_l[1], "al_2":self.a_l[2],
+        if not hasattr(self,"e_m"): self.e_m = 0.
+        if all_ok:
+            vals = {"al_1":self.a_l[1], "al_2":self.a_l[2],
                 "el_1":self.e_l[1], "el_2":self.e_l[2],
                 "er_01":self.e_r_norm[1][0]/100., "er_02":self.e_r_norm[2][0]/100., 
                 "er_11":self.e_r_norm[1][1]/100., "er_12":self.e_r_norm[2][1]/100.,
@@ -617,9 +636,9 @@ class unfolder:
                 "rfact":self.rfact,
                 "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.,
                 "em_22":self.e_m
-            }
-        this_mat = compute_fullmatrix(**vals)
-        print this_mat
+                }
+            this_mat = compute_fullmatrix(**vals)
+            print this_mat
       
         # the end
         self.out += "--------------------------------------\n"
@@ -640,27 +659,27 @@ def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21
     except ZeroDivisionError:
         print "A_l_1 or A_l_2 is empty"
         return None
-    # print "A_l-1 :", al_mat
+    print "A_l-1 :", al_mat
     er_mat = np.matrix([[er_11 + er_01*rfact, er_21 + er_01*rfact],[er_12 + er_02*rfact, er_22 + er_02*rfact]]).getI()
-    # print "e_r-1 :", er_mat
+    print "e_r-1 :", er_mat
     try:
         el_mat = np.matrix([[1/el_1, 0],[0, 1/el_2]])
     except ZeroDivisionError:
         print "e_l_1 or e_l_2 is empty"
         return None
-    # print "e_l-1 :", el_mat
+    print "e_l-1 :", el_mat
     try:
         eb_mat = np.matrix([[1/eb_11, -eb_21/(eb_22*eb_11)],[0, 1/eb_22]]) 
     except ZeroDivisionError:
         print "e_b_11 or e_b_22 is empty"
         return None
-    # print "e_b-1 :", eb_mat
+    print "e_b-1 :", eb_mat
     try:
         em_mat = np.matrix([[1, 0],[0, 1/em_22]]) 
     except ZeroDivisionError:
         print "em_22 is empty"
         return None
-    # print "e_m-1 :", em_mat
+    print "e_m-1 :", em_mat
     final_mat = al_mat*er_mat*el_mat*eb_mat*em_mat
     return final_mat
 
@@ -954,17 +973,13 @@ def counts_to_mats(counts_1):
     print "==================================="     
         
     total = counts["All"]
-    e_r = counts["e_r"]
+    e_r = counts.get("e_r",[[0,0,0],[0,0,0],[0,0,0]])
     # here set which matrix you want to use
     # e_b = counts["e_b_he"]
-    e_b = counts["e_b_mixed"]
+    e_b = counts.get("e_b_mixed",[[0,0,0],[0,0,0],[0,0,0]])
     e_b_he = counts["e_b_he"]
-    e_l = counts["e_l"]
-    try:
-        e_m = counts["e_m"]
-    except KeyError:
-        e_m = 0.
-    #e_m = 0.
+    e_l = counts.get("e_l",[0,0,0])
+    e_m = counts.get("e_m",0.)
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
     rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
