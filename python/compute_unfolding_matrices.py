@@ -40,7 +40,8 @@ class unfolder:
                              "zee":           {"handle":"vector<reco::CompositeCandidate>", "collection":"zelAllelAll"},
                              "zmumu":         {"handle":"vector<reco::CompositeCandidate>", "collection":"zmuAllmuAll"},
                              "zeegood":       {"handle":"vector<reco::CompositeCandidate>", "collection":zbblabel.zelelabel},
-                             "zmumugood":     {"handle":"vector<reco::CompositeCandidate>", "collection":zbblabel.zmumulabel}
+                             "zmumugood":     {"handle":"vector<reco::CompositeCandidate>", "collection":zbblabel.zmumulabel},
+                             "met" :          {"handle":"vector<pat::MET>", "collection":zbblabel.metlabel}
                            }
         # defining all handles
         for key, value in self.collections.items():
@@ -90,7 +91,7 @@ class unfolder:
         del ucont
                
 
-    def run(self, tot = -1):
+    def run(self, tot = 1000):
         """ run on the first 'tot' events """
         num = 1
         dumpevery = 10000
@@ -509,7 +510,44 @@ class unfolder:
             self.counts["e_b_hp"] = self.mat_e_b_hp
             self.counts["e_b_mixed"] = self.mat_e_b_mixed
 
- 
+            
+
+###################### MET Matrix #################################
+    def step_e_m(self, ucont):
+        """ compute met efficiency for each rec_zb bin with at least two bjets HE """
+        # ucont.goodleps = [lep for lep in ucont.reco_leptons if (llbb.isGoodElectron(lep,'matched') or llbb.isGoodMuon(lep,'matched'))]
+        #ucont.reco_jets = [jet for jet in self.jets if llbb.isGoodJet(jet,ucont.reco_z)]
+        ucont.good_met =  [met for met in self.met if llbb.isGoodMet_Sig(met,cut=10)]      
+        print "ucont.n_he",ucont.n_he
+        if ucont.rec_z_yes and ucont.n_he>=2 and ucont.good_met :
+            #self.mat_e_b_mixed[2][2]
+            self.btag_engine.setMode("HEHE")
+            bweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            print "bweight HEHE", bweight
+            try: 
+                self.met_eff[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+            except AttributeError:
+                self.met_eff =[0,0,0] 
+                self.met_eff[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+        else:
+            ucont.stop = True
+
+                
+    def finish_print_e_m(self):
+        if not hasattr(self,"met_eff"):
+            self.out += "== No events passed the met selection =="
+        else:
+            print "float(self.e_b_he_norm[2][2])", float(self.mat_e_b_he[2][2])
+            print "self.met_eff[2]",self.met_eff[2] 
+            print "self.met_eff[1]",self.met_eff[1] 
+            print "self.met_eff[0]",self.met_eff[0] 
+            self.e_m = self.met_eff[2]/(float(self.mat_e_b_he[2][2])) if self.mat_e_b_he[2][2] else 0
+            self.out += "===             MET                ===\n"            
+            self.out += "MET            : "+"\t"+f_2(self.e_m)+"\n"
+            self.counts["e_m"] = self.met_eff[2]
+
+                           
+
     def finish_comparison(self):
         """ compares with values from imperial """
         # for muons 
@@ -569,13 +607,16 @@ class unfolder:
         # full matrix comparison
         self.out += "--------------------------------------\n"
         print self.out
+
+        if not hasattr(self,"e_m"):self.e_m=0.
         vals = {"al_1":self.a_l[1], "al_2":self.a_l[2],
                 "el_1":self.e_l[1], "el_2":self.e_l[2],
                 "er_01":self.e_r_norm[1][0]/100., "er_02":self.e_r_norm[2][0]/100., 
                 "er_11":self.e_r_norm[1][1]/100., "er_12":self.e_r_norm[2][1]/100.,
                 "er_21":self.e_r_norm[1][2]/100., "er_22":self.e_r_norm[2][2]/100.,
                 "rfact":self.rfact,
-                "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.
+                "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.,
+                "em_22":self.e_m
             }
         this_mat = compute_fullmatrix(**vals)
         print this_mat
@@ -591,7 +632,7 @@ class unfolder:
 
 # helper functions
 
-def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21, er_22, rfact, eb_11, eb_21, eb_22):
+def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21, er_22, rfact, eb_11, eb_21, eb_22, em_22):
     # arguments should be normalized to 1 (not 100)
     # making matrices:
     try:
@@ -614,7 +655,13 @@ def compute_fullmatrix(al_1, al_2, el_1, el_2, er_01, er_02, er_11, er_12, er_21
         print "e_b_11 or e_b_22 is empty"
         return None
     # print "e_b-1 :", eb_mat
-    final_mat = al_mat*er_mat*el_mat*eb_mat
+    try:
+        em_mat = np.matrix([[1, 0],[0, 1/em_22]]) 
+    except ZeroDivisionError:
+        print "em_22 is empty"
+        return None
+    # print "e_m-1 :", em_mat
+    final_mat = al_mat*er_mat*el_mat*eb_mat*em_mat
     return final_mat
 
 def acc_pt_eta(vec, ptcut, etacut):
@@ -901,13 +948,23 @@ python compute_unfolding_matrices.py -w %s
 
 def counts_to_mats(counts_1):
     counts = deepcopy(counts_1)
+    print "==================================="
+    for key, value in counts.items():
+        print key,":", value
+    print "==================================="     
+        
     total = counts["All"]
     e_r = counts["e_r"]
-    # here set which e_b matrix you want to use
+    # here set which matrix you want to use
     # e_b = counts["e_b_he"]
     e_b = counts["e_b_mixed"]
-    # e_b_hp = counts["e_b_hp"]
+    e_b_he = counts["e_b_he"]
     e_l = counts["e_l"]
+    try:
+        e_m = counts["e_m"]
+    except KeyError:
+        e_m = 0.
+    #e_m = 0.
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
     rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
@@ -917,21 +974,29 @@ def counts_to_mats(counts_1):
     print "e_r:", e_r
     print "e_l:", e_l
     print "e_b:", e_b
+    print "e_m:", e_m
+
+    try:
+        em_22 = e_m/(e_b_he[2][2])    
+    except ZeroDivisionError:
+        em_22 = 0.
+
     vals = {"al_1":1.0, "al_2":1.0,
             "el_1":e_l[1], "el_2":e_l[2],
             "er_01":e_r[1][0]/100., "er_02":e_r[2][0]/100.,
             "er_11":e_r[1][1]/100., "er_12":e_r[2][1]/100.,
             "er_21":e_r[1][2]/100., "er_22":e_r[2][2]/100.,
             "rfact":rfact,
-            "eb_11":e_b[1][1]/100., "eb_21":e_b[1][2]/100., "eb_22":e_b[2][2]/100.
+            "eb_11":e_b[1][1]/100., "eb_21":e_b[1][2]/100., "eb_22":e_b[2][2]/100.,
+            "em_22":em_22
         }
     print compute_fullmatrix(**vals)
 
 
 def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1, save_output = True):
     startup = ["weights"]
-    steps = ["event_weight","a_l", "e_r", "e_l", "e_b"]
-    finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "comparison"]
+    steps = ["event_weight","a_l", "e_r", "e_l", "e_b","e_m"]
+    finish = ["print_a_l", "print_e_r", "print_e_l", "print_e_b", "print_e_m", "comparison"]
     testu = unfolder(dataset, steps, startup, finish, muchannel, save_output)
     testu.run(num)
     return testu.counts
