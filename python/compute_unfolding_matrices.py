@@ -975,26 +975,28 @@ def counts_to_mats(counts_1):
     total = counts["All"]
     e_r = counts.get("e_r",[[0,0,0],[0,0,0],[0,0,0]])
     # here set which matrix you want to use
-    # e_b = counts["e_b_he"]
     e_b = counts.get("e_b_he",[[0,0,0],[0,0,0],[0,0,0]])
-    #e_b_he = counts["e_b_he"]
     e_l = counts.get("e_l",[0,0,0])
     e_m = counts.get("e_m",0.)
+
+    # normalization
+    # first normalize e_met, using the unnormalized e_b
+    try:
+        em_22 = e_m/(e_b[2][2])    
+    except ZeroDivisionError:
+        em_22 = 0.
+    # then normalize the rest    
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
     rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
     norms_e_b = norm_by_column(e_b)
     e_l = [x/y if y > 0 else 0 for x,y in zip(e_l,norms_rec_er)]
+
     print "rfact:", rfact
     print "e_r:", e_r
     print "e_l:", e_l
     print "e_b:", e_b
     print "e_m:", e_m
-
-    try:
-        em_22 = e_m/(e_b[2][2])    
-    except ZeroDivisionError:
-        em_22 = 0.
 
     vals = {"al_1":1.0, "al_2":1.0,
             "el_1":e_l[1], "el_2":e_l[2],
