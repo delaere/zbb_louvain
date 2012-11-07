@@ -976,8 +976,8 @@ def counts_to_mats(counts_1):
     e_r = counts.get("e_r",[[0,0,0],[0,0,0],[0,0,0]])
     # here set which matrix you want to use
     # e_b = counts["e_b_he"]
-    e_b = counts.get("e_b_mixed",[[0,0,0],[0,0,0],[0,0,0]])
-    e_b_he = counts["e_b_he"]
+    e_b = counts.get("e_b_he",[[0,0,0],[0,0,0],[0,0,0]])
+    #e_b_he = counts["e_b_he"]
     e_l = counts.get("e_l",[0,0,0])
     e_m = counts.get("e_m",0.)
     norms_rec_er = [sum(line) for line in e_r]
@@ -992,7 +992,7 @@ def counts_to_mats(counts_1):
     print "e_m:", e_m
 
     try:
-        em_22 = e_m/(e_b_he[2][2])    
+        em_22 = e_m/(e_b[2][2])    
     except ZeroDivisionError:
         em_22 = 0.
 
