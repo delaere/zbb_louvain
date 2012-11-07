@@ -518,12 +518,12 @@ class unfolder:
         # ucont.goodleps = [lep for lep in ucont.reco_leptons if (llbb.isGoodElectron(lep,'matched') or llbb.isGoodMuon(lep,'matched'))]
         #ucont.reco_jets = [jet for jet in self.jets if llbb.isGoodJet(jet,ucont.reco_z)]
         ucont.good_met =  [met for met in self.met if llbb.isGoodMet_Sig(met,cut=10)]      
-        print "ucont.n_he",ucont.n_he
+        # print "ucont.n_he",ucont.n_he
         if ucont.rec_z_yes and ucont.n_he>=2 and ucont.good_met :
             #self.mat_e_b_mixed[2][2]
             self.btag_engine.setMode("HEHE")
             bweight = self.btag_engine.weight(ucont.event,self.muchannel)
-            print "bweight HEHE", bweight
+            # print "bweight HEHE", bweight
             try: 
                 self.met_eff[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
             except AttributeError:
@@ -804,7 +804,7 @@ def sum_scalvecmat(dict, dict2):
     return dict1
     
 
-def beanstalk_worker(muchannel):
+def beanstalk_worker(muchannel, jobid):
     sys.path.append("/home/fynu/jdf")
     from beanstalk import beanstalkc
     beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
@@ -816,8 +816,8 @@ def beanstalk_worker(muchannel):
         mu_options = "_e"
 
     user = get_username()
-    jobqueue = "unfolding_queue_%s%s" % (user, mu_options)
-    resqueue = "unfolding_resqueue_%s%s" % (user, mu_options)
+    jobqueue = "unfolding_queue_%s%s_%s" % (user, mu_options, jobid)
+    resqueue = "unfolding_resqueue_%s%s_%s" % (user, mu_options, jobid)
     beanstalk.watch(jobqueue)
     job = beanstalk.reserve(timeout=5)
     if job:
@@ -850,7 +850,7 @@ def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
-def beanstalk_client(path_to_files, muchannel):
+def beanstalk_client(path_to_files, muchannel, jobid):
     ## this still needs a proper handling of errors, for instance if not all jobs come back
     # yaml and beanstalk are there, it is needed
     sys.path.append("/home/fynu/jdf")
@@ -864,8 +864,25 @@ def beanstalk_client(path_to_files, muchannel):
     elif muchannel == False:
         mu_options = "_e"
     user = get_username()
-    jobqueue = "unfolding_queue_%s%s" % (user, mu_options)
-    resqueue = "unfolding_resqueue_%s%s" % (user, mu_options)
+    if not jobid:
+        tubes = [tube for tube in beanstalk.tubes() if user in tube and "unfolding_queue" in tube]
+        if tubes:
+            print "I found previous queues:"
+            for tube in tubes:
+                restube = tube.replace("queue","resqueue",1)
+                waiting = beanstalk.stats_tube(tube)["current-jobs-ready"]
+                reserved = beanstalk.stats_tube(tube)["current-jobs-reserved"]
+                try:
+                    done = beanstalk.stats_tube(restube)["current-jobs-ready"]
+                except:
+                    done = 0
+                print tube, "waiting:",waiting,"reserved:",reserved,"done:",done
+        jobid = raw_input("Please enter desired job id (or nothing to abort):\n")
+        if not jobid:
+            print "No jobid, aborting"
+            sys.exit(1)
+    jobqueue = "unfolding_queue_%s%s_%s" % (user, mu_options, jobid)
+    resqueue = "unfolding_resqueue_%s%s_%s" % (user, mu_options, jobid)
     beanstalk.use(jobqueue)
     beanstalk.watch(resqueue)
 
@@ -876,16 +893,17 @@ def beanstalk_client(path_to_files, muchannel):
     submit = True
     res_len = 0
     if beanstalk.stats_tube(resqueue)["current-jobs-ready"] > 0:
-        print "there are results waiting: no new jobs submitted, just fetching old results. Run again afterwards"
+        print "There are results waiting: no new jobs submitted, just fetching results."
         submit = False
         fill = False
         res_len = beanstalk.stats_tube(resqueue)["current-jobs-ready"]
     elif beanstalk.stats_tube(jobqueue)["current-jobs-ready"] > 0:
-        print "there are %i data files in queue, purging first" % (beanstalk.stats_tube(jobqueue)["current-jobs-ready"])
+        print "There are %i data files in queue, purging" % (beanstalk.stats_tube(jobqueue)["current-jobs-ready"])
         purge_queue(jobqueue)
         print "Queue is now empty"
+        sys.exit(0)
     elif beanstalk.stats_tube(jobqueue)["current-jobs-reserved"] > 0:
-        print "there are data files reserved, jobs are still running, quitting"
+        print "There are data files reserved, jobs are still running, quitting"
         sys.exit(1)
 
     if fill:
@@ -895,9 +913,9 @@ def beanstalk_client(path_to_files, muchannel):
 
     if submit:
         # write condor cmd file
-        condfile = open("unfolding_worker.cmd","w")
+        condfile = open("unfolding_worker_%s.cmd" % (jobid),"w")
         text = """
-executable = unfolding_worker.sh
+executable = unfolding_worker_%s.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 universe = vanilla
@@ -905,7 +923,7 @@ requirements = (CMSFARM =?= TRUE)
 output         = condor/beans.$(Cluster).$(Process).out
 error          = condor/beans.$(Cluster).$(Process).err
 log            = condor/beans.$(Cluster).$(Process).log
-"""
+""" % (jobid)
         condfile.write(text)
         condfile.write("queue %i" % (nfiles))
         condfile.close()
@@ -919,21 +937,30 @@ log            = condor/beans.$(Cluster).$(Process).log
 
         # write condor sh file
         thisdir = os.getcwd()
-        shfile = open("unfolding_worker.sh","w")
+        shname  = "unfolding_worker_%s.sh" % (jobid)
+        submitcmd = "condor_submit unfolding_worker_%s.cmd" % (jobid) 
+        thisfile = os.path.basename(__file__)
+        shfile = open(shname,"w")
         shfile.write("cd %s\n" % (thisdir))
         text = """
 source /nfs/soft/cms/cmsset_default.sh
 eval `scramv1 runtime -sh`
-python compute_unfolding_matrices.py -w %s
-""" % (mu_options)
+python %s -w %s -j %s
+""" % (thisfile, mu_options, jobid)
         shfile.write(text)
         shfile.close()
-        os.chmod("unfolding_worker.sh",0755)
+        os.chmod(shname,0755)
 
         # submit condor jobs
         print "Submitting condor jobs"
-        commands.getstatusoutput("condor_submit unfolding_worker.cmd")
+        commands.getstatusoutput(submitcmd)
         print "Done"
+        cont = ""
+        while cont not in ["Y","y","N","n"]:
+            cont = raw_input("Do you want to wait for results (Y/N) ? ")
+        if cont in ["N","n"]:
+            print "Exiting. Run this script again when all jobs are done to get results"
+            sys.exit(0)
 
     outs = []
     processed = 0
@@ -951,7 +978,10 @@ python compute_unfolding_matrices.py -w %s
         for key, value in counts.items():
             print key,":", value
         print "==================================="
-        counts_to_mats(counts)
+        try:
+            counts_to_mats(counts)
+        except:
+            print "this job returned ill results, skipping"
         print "==================================="
         job.delete()
 
@@ -960,7 +990,9 @@ python compute_unfolding_matrices.py -w %s
     print "=== everybody's back ==="
     for key, value in counts.items():
         print key,":", value
-    print "==================================="
+    print "========================================"
+    print "Don't forget to condor_rm remaining jobs"
+    print "========================================"
     counts_to_mats(counts)
     # print "===     details      ==="
     # print outs
@@ -985,7 +1017,7 @@ def counts_to_mats(counts_1):
         em_22 = e_m/(e_b[2][2])    
     except ZeroDivisionError:
         em_22 = 0.
-    # then normalize the rest    
+    # then normalize the rest
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
     rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
@@ -997,6 +1029,7 @@ def counts_to_mats(counts_1):
     print "e_l:", e_l
     print "e_b:", e_b
     print "e_m:", e_m
+
 
     vals = {"al_1":1.0, "al_2":1.0,
             "el_1":e_l[1], "el_2":e_l[2],
@@ -1028,6 +1061,7 @@ if __name__ == '__main__':
     parser.add_option("-n", type="int", dest="num", help="Number of events to process, defaults to all", default=-1)
     parser.add_option("-c","--condor", action="store_const", const=True, dest="condor", help="create condor file, do not run anything", default=False)
     parser.add_option("-i","--interactive", action="store_const", const=True, dest="beanstalk_c", help="run in semi-interactive mode", default=False)
+    parser.add_option("-j", "--jobid", type="string", dest="jobid", help="job identifier, (no spaces or special chars please)", default = "")
     parser.add_option("-w","--worker", action="store_const", const=True, dest="beanstalk_w", help="wait for jobs in queue, do not use", default=False)
     (options, args) = parser.parse_args()
     if not options.dataset and not options.beanstalk_w:
@@ -1076,9 +1110,9 @@ if __name__ == '__main__':
         shfile.close()
         os.chmod("condor_unfolding.sh",0755)
     elif options.beanstalk_c:
-        beanstalk_client(options.dataset, options.muchannel)
+        beanstalk_client(options.dataset, options.muchannel, options.jobid)
     elif options.beanstalk_w:
-        beanstalk_worker(options.muchannel)
+        beanstalk_worker(options.muchannel, options.jobid)
     else:
         main(options.dataset, options.muchannel, options.num)
 
