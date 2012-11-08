@@ -637,8 +637,12 @@ class unfolder:
                 "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.,
                 "em_22":self.e_m
                 }
-            this_mat = compute_fullmatrix(**vals)
-            print this_mat
+            try: 
+                this_mat = compute_fullmatrix(**vals)
+            except:
+                print "Matrix is singular, most likely statistics is not high enough"
+            else:
+                print this_mat
       
         # the end
         self.out += "--------------------------------------\n"
@@ -822,6 +826,7 @@ def beanstalk_worker(muchannel, jobid):
     job = beanstalk.reserve(timeout=5)
     if job:
         hostname = os.uname()[1]
+        print "Running on", job.body
         output = {"host":hostname, "arg":job.body, "out":main(dataset=job.body, muchannel=muchannel, save_output=False)}
         output = pickle.dumps(output)
         job.delete()
@@ -886,7 +891,8 @@ def beanstalk_client(path_to_files, muchannel, jobid):
     beanstalk.use(jobqueue)
     beanstalk.watch(resqueue)
 
-    files = glob.glob(os.path.join(path_to_files,"*"))
+    files = os.path.isdir(path_to_files) and glob.glob(os.path.join(path_to_files,"*")) or [path_to_files]
+    # files = glob.glob(os.path.join(path_to_files,"*"))
     nfiles = len(files)
 
     fill = True
@@ -1004,7 +1010,7 @@ def counts_to_mats(counts_1):
         print key,":", value
     print "==================================="     
         
-    total = counts["All"]
+    total = counts.get("All",0)
     e_r = counts.get("e_r",[[0,0,0],[0,0,0],[0,0,0]])
     # here set which matrix you want to use
     e_b = counts.get("e_b_he",[[0,0,0],[0,0,0],[0,0,0]])
@@ -1040,7 +1046,10 @@ def counts_to_mats(counts_1):
             "eb_11":e_b[1][1]/100., "eb_21":e_b[1][2]/100., "eb_22":e_b[2][2]/100.,
             "em_22":em_22
         }
-    print compute_fullmatrix(**vals)
+    try:
+        print compute_fullmatrix(**vals)
+    except:
+        print "Could not compute matrices. Probably not enough statistics" 
 
 
 def main(dataset="/storage/data/cms/users/llbb/productionJune2012_444/ZbSkims/Zbb_MC/", muchannel = None, num = -1, save_output = True):
@@ -1070,18 +1079,19 @@ if __name__ == '__main__':
         print
         parser.print_help()
         exit(-1)
-
-    print "Running on:", options.dataset
-    if options.num > 0: 
-        print "Running on", options.num, "first events"
-    else:
-        print "Running on all events"
-    if options.muchannel == None:
-        print "For both electrons and muons"
-    elif options.muchannel == True:
-        print "For muons only"
-    elif options.muchannel == False:
-        print "For electrons only"
+    
+    if not options.beanstalk_w:
+        print "Running on:", options.dataset
+        if options.num > 0: 
+            print "Running on", options.num, "first events"
+        else:
+            print "Running on all events"
+        if options.muchannel == None:
+            print "For both electrons and muons"
+        elif options.muchannel == True:
+            print "For muons only"
+        elif options.muchannel == False:
+            print "For electrons only"
 
     # caution: muchannel is always True here !
     if options.condor:
