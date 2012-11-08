@@ -870,10 +870,11 @@ def beanstalk_client(path_to_files, muchannel, jobid):
         mu_options = "_e"
     user = get_username()
     if not jobid:
-        tubes = [tube for tube in beanstalk.tubes() if user in tube and "unfolding_queue" in tube]
-        if tubes:
-            print "I found previous queues:"
-            for tube in tubes:
+        qtubes = [tube for tube in beanstalk.tubes() if user in tube and "unfolding_queue" in tube]
+        rtubes = [tube for tube in beanstalk.tubes() if user in tube and "unfolding_resqueue" in tube]
+        if qtubes:
+            print "The following tubes have jobs queued/running:"
+            for tube in qtubes:
                 restube = tube.replace("queue","resqueue",1)
                 waiting = beanstalk.stats_tube(tube)["current-jobs-ready"]
                 reserved = beanstalk.stats_tube(tube)["current-jobs-reserved"]
@@ -881,7 +882,11 @@ def beanstalk_client(path_to_files, muchannel, jobid):
                     done = beanstalk.stats_tube(restube)["current-jobs-ready"]
                 except:
                     done = 0
-                print tube, "waiting:",waiting,"reserved:",reserved,"done:",done
+                print tube.split("_",4)[4], ", waiting:",waiting,"reserved:",reserved,"done:",done
+        if rtubes:
+            print "The following tubes have results ready:"
+            for tube in rtubes:
+                print tube.split("_",4)[4], ", done:",beanstalk.stats_tube(tube)["current-jobs-ready"]
         jobid = raw_input("Please enter desired job id (or nothing to abort):\n")
         if not jobid:
             print "No jobid, aborting"
@@ -892,7 +897,6 @@ def beanstalk_client(path_to_files, muchannel, jobid):
     beanstalk.watch(resqueue)
 
     files = os.path.isdir(path_to_files) and glob.glob(os.path.join(path_to_files,"*")) or [path_to_files]
-    # files = glob.glob(os.path.join(path_to_files,"*"))
     nfiles = len(files)
 
     fill = True
