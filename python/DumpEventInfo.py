@@ -42,8 +42,9 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   zmuHandle = Handle ("vector<reco::CompositeCandidate>")
   zeleHandle = Handle ("vector<reco::CompositeCandidate>")
   trigInfoHandle = Handle ("pat::TriggerEvent")
-  fwevent.getByLabel (zbblabel.electronlabel,electronHandle)
-  fwevent.getByLabel (zbblabel.muonlabel,muonHandle)
+  fwevent.getByLabel (zbblabel.allelectronslabel,electronHandle)
+  #fwevent.getByLabel (zbblabel.allmuonslabel,muonHandle)
+  fwevent.getByLabel ("tightMuons",muonHandle)
   fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
   fwevent.getByLabel (zbblabel.metlabel,metHandle)
   fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
@@ -88,6 +89,14 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   zeebbHandle  = Handle ("vector<reco::CompositeCandidate>")
   vertexHandle = Handle ("vector<reco::Vertex>")
 
+<<<<<<< DumpEventInfo.py
+  #fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
+  fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
+  fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
+  #dijets = dijetHandle.product()
+  zeebbs = zeebbHandle.product()
+  zmmbbs = zmmbbHandle.product()
+=======
   #fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
   #fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
   #fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
@@ -96,10 +105,19 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #zeebbs = zeebbHandle.product()
   #zmmbbs = zmmbbHandle.product()
   vertices = vertexHandle.product()
+>>>>>>> 1.15
   if vertices.size()>0 :
     vertex = vertices[0]
   else:
     vertex = None
+<<<<<<< DumpEventInfo.py
+  #for dijet in dijets:
+  #  PrintCandidate("dijet",dijet)
+  for zeebb in zeebbs:
+    PrintCandidate("Zbb",zeebb)
+  for zmmbb in zmmbbs: 
+    PrintCandidate("Zbb",zmmbb)
+=======
 
   #for dijet in dijets:
   #  PrintCandidate("dijet",dijet)
@@ -107,6 +125,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #  PrintCandidate("Zbb",zeebb)
   #for zmmbb in zmmbbs: 
   #  PrintCandidate("Zbb",zmmbb)
+>>>>>>> 1.15
   # handcrafted candidates: bb Zb Zbb
   bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
   if bestZcandidate is not None:
@@ -155,7 +174,7 @@ def PrintMuon(muon) :
   if muon.isTrackerMuon() and muon.isGlobalMuon():
     print "  Chi2:",muon.normChi2()
   print "  Isolation: (",muon.trackIso(),"+",muon.caloIso(),")/pt = ",(muon.trackIso()+muon.caloIso())/muon.pt()
-  print "  good muon: ", isGoodMuon(muon,"loose"),isGoodMuon(muon,"tight"),isGoodMuon(muon,"matched")
+  print "  good muon: ", isGoodMuon(muon,"all"),isGoodMuon(muon,"tight"),isGoodMuon(muon,"matched")
   print "-----------------------------------------------------------------"
 
 def PrintElectron(electron) :
@@ -180,7 +199,7 @@ def PrintElectron(electron) :
   else:
     print " => out of fiducial region"
   print "  trigger object matches:",electron.triggerObjectMatches().size()
-  print "  good electron: ", isGoodElectron(electron,"loose"),isGoodElectron(electron,"tight"),isGoodElectron(electron,"matched")
+  print "  good electron: ", isGoodElectron(electron,"all"),isGoodElectron(electron,"tight"),isGoodElectron(electron,"matched")
   print "-----------------------------------------------------------------"
 
 def PrintJet(jet) :
