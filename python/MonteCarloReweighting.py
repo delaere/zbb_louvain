@@ -69,11 +69,11 @@ class MonteCarloReWeighting:
                  0.00266683   * weightArgument**2 + 0.0646297   * weightArgument + 0.320127
      # final result
      if mode=="zpt" : 
-       return self._shift*zptweight
+       return 1+self._shift*(zptweight-1)
      if mode=="bpt" : 
-       return self._shift*bjetptweight
+       return 1+self._shift*(bjetptweight-1)
      if mode=="all" :
-       return self._shift*bjetptweight*zptweight
+       return 1+self._shift*(bjetptweight*zptweight-1)
      return 1.
 
    def _match_obo(self, rec, gen, dr):
