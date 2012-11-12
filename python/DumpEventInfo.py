@@ -89,14 +89,6 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   zeebbHandle  = Handle ("vector<reco::CompositeCandidate>")
   vertexHandle = Handle ("vector<reco::Vertex>")
 
-<<<<<<< DumpEventInfo.py
-  #fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
-  fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
-  fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
-  #dijets = dijetHandle.product()
-  zeebbs = zeebbHandle.product()
-  zmmbbs = zmmbbHandle.product()
-=======
   #fwevent.getByLabel (zbblabel.bblabel,dijetHandle)
   #fwevent.getByLabel (zbblabel.zeebblabel,zeebbHandle)
   #fwevent.getByLabel (zbblabel.zmmbblabel,zmmbbHandle)
@@ -105,27 +97,16 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   #zeebbs = zeebbHandle.product()
   #zmmbbs = zmmbbHandle.product()
   vertices = vertexHandle.product()
->>>>>>> 1.15
   if vertices.size()>0 :
     vertex = vertices[0]
   else:
     vertex = None
-<<<<<<< DumpEventInfo.py
-  #for dijet in dijets:
-  #  PrintCandidate("dijet",dijet)
-  for zeebb in zeebbs:
-    PrintCandidate("Zbb",zeebb)
-  for zmmbb in zmmbbs: 
-    PrintCandidate("Zbb",zmmbb)
-=======
-
   #for dijet in dijets:
   #  PrintCandidate("dijet",dijet)
   #for zeebb in zeebbs:
   #  PrintCandidate("Zbb",zeebb)
   #for zmmbb in zmmbbs: 
   #  PrintCandidate("Zbb",zmmbb)
->>>>>>> 1.15
   # handcrafted candidates: bb Zb Zbb
   bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
   if bestZcandidate is not None:
