@@ -2,6 +2,7 @@ from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from zbbCommons import zbblabel, zbbsystematics
 from math import sqrt
+
 #from myFuncTimer import print_timing
 
 class PtEtaMap:
@@ -184,9 +185,9 @@ class LeptonsReWeighting:
   
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
-     # particle id
+     # particle ID
      pid_sf_run2011 = self._elePidWeight[(e1.pt(),e1.eta())][0]*self._elePidWeight[(e2.pt(),e2.eta())][0]
-     # isolation
+     # isolation 
      iso_sf_run2011 = self._eleIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIsoWeight[(e2.pt(),e2.eta())][0]
      # trigger
      hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
@@ -203,39 +204,39 @@ class LeptonsReWeighting:
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     # particle id
-     unc =  (self._muPidWeight[(e1.pt(),e1.eta())][1]/self._muPidWeight[(e1.pt(),e1.eta())][0] +  \
-             self._muPidWeight[(e2.pt(),e2.eta())][1]/self._muPidWeight[(e2.pt(),e2.eta())][0])**2
+     # particle ID
+     unc =  (self._muPidWeight[(m1.pt(),m1.eta())][1]/self._muPidWeight[(m1.pt(),m1.eta())][0] +  \
+             self._muPidWeight[(m2.pt(),m2.eta())][1]/self._muPidWeight[(m2.pt(),m2.eta())][0])**2
      # isolation
-     unc += (self._muIsoWeight[(e1.pt(),e1.eta())][1]*self._muIsoWeight[(e1.pt(),e1.eta())][0] +  \
-             self._muIsoWeight[(e2.pt(),e2.eta())][1]*self._muIsoWeight[(e2.pt(),e2.eta())][0])**2
+     unc += (self._muIsoWeight[(m1.pt(),m1.eta())][1]*self._muIsoWeight[(m1.pt(),m1.eta())][0] +  \
+             self._muIsoWeight[(m2.pt(),m2.eta())][1]*self._muIsoWeight[(m2.pt(),m2.eta())][0])**2
      # trigger (approximate)
      hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
                              self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
-     hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][1]+  \
-                                 self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]-   \
-                                 self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]-  \
-                                 self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][1])/ \
-                             (self._mu8Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]+     \
-                              self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]-     \
-                              self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]))**2
-     hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]+     \
-                              self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][1])/     \
-                             (self._mu8Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]+      \
-                              self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]-      \
-                              self._mu13Trg_Mu13Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(e2.pt(),e2.eta())][0]))**2
-     hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][1]+  \
-                                 self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]-   \
-                                 self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]-  \
-                                 self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][1])/ \
-                             (self._mu8Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]+     \
-                              self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]-     \
-                              self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]))**2
-     hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]+     \
-                              self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][1])/     \
-                             (self._mu8Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]+      \
-                              self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]-      \
-                              self._mu17Trg_Mu17Mu8_Weight[(e1.pt(),e1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(e2.pt(),e2.eta())][0]))**2
+     hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+                             (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+     hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+                             (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+     hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+                             (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+     hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+                             (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
      unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
      #outcome
      return sqrt(unc)
