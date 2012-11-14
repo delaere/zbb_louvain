@@ -486,21 +486,24 @@ class unfolder:
             self.out += "rec b:\t\t0\t1\t2\n"
             self.out += "--------------------------------------\n"
             self.e_b_he_norm = deepcopy(self.mat_e_b_he)
-            norms_he = norm_by_column(self.e_b_he_norm)
+            # norms_he = norm_by_column(self.e_b_he_norm)
+            norms_he = norm_columns_from_vec(self.e_b_he_norm, self.lep_eff)
             for i, row in enumerate(self.e_b_he_norm):
                 self.out += "HE b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
             self.out += "--------------------------------------\n"
             self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_he])+"\n"
             self.out += "--------------------------------------\n"
             self.e_b_hp_norm = deepcopy(self.mat_e_b_hp)
-            norms_hp = norm_by_column(self.e_b_hp_norm)
+            # norms_hp = norm_by_column(self.e_b_hp_norm)
+            norms_hp = norm_columns_from_vec(self.e_b_hp_norm, self.lep_eff)
             for i, row in enumerate(self.e_b_hp_norm):
                 self.out += "HP b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
             self.out += "--------------------------------------\n"
             self.out += "norms:\t\t"+"\t".join([f_2(norm) for norm in norms_hp])+"\n"
             self.out += "--------------------------------------\n"
             self.e_b_mixed_norm = deepcopy(self.mat_e_b_mixed)
-            norms_mixed = norm_by_column(self.e_b_mixed_norm)
+            # norms_mixed = norm_by_column(self.e_b_mixed_norm)
+            norms_mixed = norm_columns_from_vec(self.e_b_mixed_norm, self.lep_eff)
             for i, row in enumerate(self.e_b_mixed_norm):
                 self.out += "'mixed' b: "+str(i)+" :\t"+"\t".join(["%.2f" % (el) for el in row])+"\n"
             self.out += "--------------------------------------\n"
@@ -749,6 +752,17 @@ def norm_by_column(mat):
             if norms[i]:
                 mat[j][i] = el/float(norms[i]) * 100
     return norms
+
+def norm_columns_from_vec(mat, vec):
+    """ normalise matrix elements using vector to define column sums"""
+    cols = len(mat[0])
+    if len(vec) != cols:
+        print "Vector has size",len(vec),"while matrix has",cols,"columns, aborting"
+        return 1
+    for j, row in enumerate(mat):
+        for i, el in enumerate(row):
+            mat[j][i] = vec[i] and el/float(vec[i]) * 100 or 0
+    return vec
 
 def norm_by_line(mat):
     for i, row in enumerate(mat):
