@@ -1045,7 +1045,7 @@ def counts_to_mats(counts_1):
     norms_rec_er = [sum(line) for line in e_r]
     norms = norm_by_column(e_r)
     rfact = (norms[1]+norms[2]) and norms[0]/float(norms[1]+norms[2]) or 0
-    norms_e_b = norm_by_column(e_b)
+    norms_e_b = norm_columns_from_vec(e_b,e_l)
     e_l = [x/y if y > 0 else 0 for x,y in zip(e_l,norms_rec_er)]
 
     print "rfact:", rfact
