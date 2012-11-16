@@ -14,6 +14,7 @@ from copy import deepcopy
 import numpy as np
 import pickle
 import pwd
+import shutil
 
 from DataFormats.FWLite import Events, Handle
 import eventSelection as llbb
@@ -838,12 +839,19 @@ def beanstalk_worker(muchannel, jobid):
     resqueue = "unfolding_resqueue_%s%s_%s" % (user, mu_options, jobid)
     beanstalk.watch(jobqueue)
     job = beanstalk.reserve(timeout=5)
+    scratch_dir = os.environ["_CONDOR_SCRATCH_DIR"]
+    input_file = os.path.join(scratch_dir,"input.root")
     if job:
         hostname = os.uname()[1]
         print "Running on", job.body
-        output = {"host":hostname, "arg":job.body, "out":main(dataset=job.body, muchannel=muchannel, save_output=False)}
-        output = pickle.dumps(output)
+        body = job.body
         job.delete()
+        beanstalk.close()
+        shutil.copy(body,input_file)
+        output = {"host":hostname, "arg":job.body, "out":main(dataset=input_file, muchannel=muchannel, save_output=False)}
+        os.remove(input_file)
+        output = pickle.dumps(output)
+        beanstalk = beanstalkc.Connection(host='10.1.1.21', port=11300)
         beanstalk.use(resqueue)
         beanstalk.put(output)
     beanstalk.close()
@@ -911,6 +919,7 @@ def beanstalk_client(path_to_files, muchannel, jobid):
     beanstalk.watch(resqueue)
 
     files = os.path.isdir(path_to_files) and glob.glob(os.path.join(path_to_files,"*")) or [path_to_files]
+    files = files[:10]
     nfiles = len(files)
 
     fill = True
