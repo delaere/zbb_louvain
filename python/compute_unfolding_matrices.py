@@ -919,7 +919,6 @@ def beanstalk_client(path_to_files, muchannel, jobid):
     beanstalk.watch(resqueue)
 
     files = os.path.isdir(path_to_files) and glob.glob(os.path.join(path_to_files,"*")) or [path_to_files]
-    files = files[:10]
     nfiles = len(files)
 
     fill = True
