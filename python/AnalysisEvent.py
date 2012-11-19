@@ -23,7 +23,7 @@ class AnalysisEvent(Events):
    def __init__(self, inputFiles = '', **kwargs):
      """Initialize the AnalysisEvent like a standard Event, plus additional features."""
      # initialization of base functionalities
-     Events.__init__(inputFiles,kwargs)
+     Events.__init__(self,inputFiles,**kwargs)
      # additional features:
      # 1. instrumentation for event weight
      self._weightCache = {}
@@ -63,7 +63,7 @@ class AnalysisEvent(Events):
          engineArgs = inspect.getargspec(engine.weight).args
          subargs = dict((k,v) for k,v in kwargs.iteritems if k in engineArgs)
          subargs["weightList"] = weightElement
-         w *= self._weightCache.setdefault(subargs,engine.weight(subargs))
+         w *= self._weightCache.setdefault(subargs,engine.weight(self,subargs))
        self._weightCache[kwargs] = w
      return self._weightCache[kwargs]
 
@@ -114,20 +114,36 @@ class AnalysisEvent(Events):
      if name in self.vardict:
        delattr(self,name)
 
-   def _next(self):
+   def _next (self):
      """(Internal) Iterator internals"""
-     # standard part of the iteration
-     Events._next()
-     # additional features
-     self.vardict.clear()
-     self._weightCache.clear()
+     # I was willing to call the super._next() with some additional stuff but I didn't find a way.
+     # So, I just duplicate the code with some modifications.
+     if self._veryFirstTime:
+       self._createFWLiteEvent()
+     if self._toBegin:
+       self._toBeginCode()
+     while not self._event.atEnd() :
+       self.vardict.clear() #added
+       self._weightCache.clear() #added
+       yield self
+       self._eventCounts += 1
+       if self._maxEvents > 0 and self._eventCounts >= self._maxEvents:
+         break
+       # Have we been asked to go to the first event?
+       if self._toBegin:
+         self._toBeginCode()
+       else:
+         # if not, lets go to the next event
+         self._event.__preinc__()
+
+   #def __iter__ (self):
+   #  return self._next()
 
    def __getattr__(self, attr):
      """Overloaded getter to handle properly:
           - volatile analysis objects
           - event collections
           - data producers"""
-     print self.__dict__
      if attr in self.__dict__["vardict"]:
        return self.vardict[attr]
      if attr in self._collections:
@@ -138,7 +154,7 @@ class AnalysisEvent(Events):
 
    def __setattr__(self, name, value):
      """Overloaded setter that puts any new attribute in the volatile dict."""
-     if name in self.__dict__  or not "vardict" in self.__dict__:
+     if name in self.__dict__  or not "vardict" in self.__dict__ or name[0]=='_':
        self.__dict__[name] = value
      else:
        if name in self._collections or name in self._producers:
