@@ -1,6 +1,7 @@
 from DataFormats.FWLite import Events, Handle
 from FWCore.ParameterSet.Types import InputTag
 import inspect
+from datetime import datetime
 
 class AnalysisEvent(Events):
    """A class that complements fwlite::Events with analysis facilities.
@@ -40,7 +41,7 @@ class AnalysisEvent(Events):
      """Declare a new class (engine) to compute the weights.
         weightClass must have a weight() method returning a float."""
      if name in self._weightEngines:
-       raise KeyError("%r weight engine is already declared", name)
+       raise KeyError("%s weight engine is already declared" % name)
      self._weightEngines[name] = weightClass
 
    def delWeight(self, name):
@@ -56,16 +57,16 @@ class AnalysisEvent(Events):
      # first check in the cache if the result is there already
      kwargs["weightList"] = weightList
      # compute the weight or use the cached value
-     if not kwargs in self._weightCache : 
+     myhash = self._dicthash(kwargs)
+     if not myhash in self._weightCache : 
        w = 1.
        for weightElement in weightList:
          engine = self._weightEngines[weightElement]
          engineArgs = inspect.getargspec(engine.weight).args
-         subargs = dict((k,v) for k,v in kwargs.iteritems if k in engineArgs)
-         subargs["weightList"] = weightElement
-         w *= self._weightCache.setdefault(subargs,engine.weight(self,subargs))
-       self._weightCache[kwargs] = w
-     return self._weightCache[kwargs]
+         subargs = dict((k,v) for k,v in kwargs.iteritems() if k in engineArgs)
+         w *= self._weightCache.setdefault("weightElement:%s # %s" %(weightElement,self._dicthash(subargs)),engine.weight(self,**subargs))
+       self._weightCache[myhash] = w
+     return self._weightCache[myhash]
 
    def addCollection(self, name, handle, inputTag):
      """Register an event collection as used by the analysis.
@@ -172,9 +173,12 @@ class AnalysisEvent(Events):
      else:
        raise AttributeError("%r object has no attribute %r" % (type(self).__name__, name))
 
+   def _dicthash(self,dict):
+     return (lambda d,j='=',s=';': s.join([j.join((str(k),str(v))) for k,v in d.iteritems()]))(dict)
+
    def __str__(self):
      """Event text dump."""
-     dictjoin = lambda d,j='\t=> ',s='\n': s.join([j.join((str(k),str(v))) for k,v in d.iteritems()])
+     dictjoin = lambda d,j=' => ',s='\n': s.join([j.join((str(k),str(v))) for k,v in d.iteritems()])
      mystring = "=================================================================\n"
      # general information
      mystring += "Run %d - Lumisection %d, Event %d\n" % (self.eventAuxiliary().run(), 
@@ -189,8 +193,9 @@ class AnalysisEvent(Events):
      else:
        mystring += "Weights:\n"
        mystring += dictjoin(self._weightCache)
-     mystring += "-----------------------------------------------------------------\n"
+     mystring += "\n-----------------------------------------------------------------\n"
      # list the collections
+     mystring += "Collections:\n"
      for colname in self._collections.keys():
        collection = self.getCollection(colname)
        handle = self._collections[name]["handle"]
