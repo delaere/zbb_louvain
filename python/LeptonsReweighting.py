@@ -184,7 +184,7 @@ class LeptonsReWeighting:
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw * (1+zbbsystematics.LeptonTnPfactor*self.uncertainty_ee(e1,e2))
+       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
 
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
@@ -251,7 +251,7 @@ class LeptonsReWeighting:
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw * (1+zbbsystematics.LeptonTnPfactor*self.uncertainty_mm(m1,m2))
+       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
    #@print_timing
    def weight( self, fwevent=None, electrons=None, muons=None, muChannel=True):
