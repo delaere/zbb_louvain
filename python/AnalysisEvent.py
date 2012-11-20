@@ -2,6 +2,7 @@ from DataFormats.FWLite import Events, Handle
 from FWCore.ParameterSet.Types import InputTag
 import inspect
 from datetime import datetime
+from math import sin
 
 class AnalysisEvent(Events):
    """A class that complements fwlite::Events with analysis facilities.
@@ -43,18 +44,23 @@ class AnalysisEvent(Events):
      if name in self._weightEngines:
        raise KeyError("%s weight engine is already declared" % name)
      self._weightEngines[name] = weightClass
+     self._weightCache.clear()
 
    def delWeight(self, name):
      """Remove one weight engine from the internal list."""
      # just to clean the dictionnary
      del self._weightEngines[name]
+     self._weightCache.clear()
 
-   def weight(self, weightList, **kwargs):
+   def weight(self, weightList=None, **kwargs):
      """Return the event weight. Arguments:
-         * weightList is the list of engines to use, as a list of strings.
+         * weightList is the list of engines to use, as a list of strings. 
+              Default: all defined engines.
          * the other named arguments are forwarded to the engines.
         The output is the product of the selected individual weights."""
      # first check in the cache if the result is there already
+     if weightList is None:
+       weightList=self._weightEngines.keys()
      kwargs["weightList"] = weightList
      # compute the weight or use the cached value
      myhash = self._dicthash(kwargs)
@@ -94,7 +100,7 @@ class AnalysisEvent(Events):
        raise AttributeError("%r object has no attribute %r" % name)
      if not name in self.vardict:
        self.getByLabel(self._collections[name]["collection"],self._collections[name]["handle"])
-       setattr(self,name,self._collections[name]["handle"].product())
+       self.vardict[name] = self._collections[name]["handle"].product()
      return getattr(self,name)
 
    def addProducer(self,name,producer):
@@ -136,9 +142,6 @@ class AnalysisEvent(Events):
        else:
          # if not, lets go to the next event
          self._event.__preinc__()
-
-   #def __iter__ (self):
-   #  return self._next()
 
    def __getattr__(self, attr):
      """Overloaded getter to handle properly:
@@ -188,8 +191,9 @@ class AnalysisEvent(Events):
      mystring += "-----------------------------------------------------------------\n"
      # weights
      if len(self._weightCache)==0: 
-       mystring += "No weight computed so far. Default weight is %f.\n" % self.weight(weightList=self._weightEngines.keys())
-       #TODO: if that "default weight" works, then implement the "default weight" in the weight method.
+       #mystring += "No weight computed so far. \n" 
+       #mystring += "No weight computed so far. Default weight is %f.\n" % self.weight(weightList=self._weightEngines.keys())
+       mystring += "No weight computed so far. Default weight is %f.\n" % self.weight()
      else:
        mystring += "Weights:\n"
        mystring += dictjoin(self._weightCache)
@@ -198,28 +202,28 @@ class AnalysisEvent(Events):
      mystring += "Collections:\n"
      for colname in self._collections.keys():
        collection = self.getCollection(colname)
-       handle = self._collections[name]["handle"]
+       handle = str(self._collections[colname]["handle"])
        try:
          mystring += "*** %s has %d elements\n" % (colname,len(collection))
+         if "reco::Vertex" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._vertexString,collection))
+         elif "pat::Electron" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._electronString,collection))
+         elif "pat::Muon" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._muonString,collection))
+         elif "pat::Jet" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._jetString,collection))
+         elif "pat::MET" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._metString,collection))
+         elif "reco::CompositeCandidate" in handle:
+           mystring += reduce(lambda a,b: a+b,map(self._candidateString,collection))
        except TypeError:
          pass
-       if "reco::Vertex" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._vertexString,collection))
-       elif "pat::Electron" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._electronString,collection))
-       elif "pat::Muon" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._muonString,collection))
-       elif "pat::Jet" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._jetString,collection))
-       elif "pat::MET" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._metString,collection))
-       elif "reco::CompositeCandidate" in colname:
-         mystring += reduce(lambda a,b: a+b,map(self._candidateString,collection))
-     mystring += "-----------------------------------------------------------------\n"
+     mystring += "\n-----------------------------------------------------------------\n"
      # list the registered producers
      mystring += "Producers:\n"
      mystring += dictjoin(self._producers)
-     mystring += "-----------------------------------------------------------------\n"
+     mystring += "\n-----------------------------------------------------------------\n"
      # list the content of vardict, excluding producers and collections
      mystring += "Content of the cache:\n"
      mystring += dictjoin(dict((k,v) for k, v in self.vardict.iteritems() if not (k in self._producers.keys() or k in self._collections.keys())))
@@ -295,21 +299,21 @@ class AnalysisEvent(Events):
      theString += "  d0: %f\n"   % abs(electron.dB())
      theString += "  supercluster eta: %f\n" % electron.superCluster().eta(),
      if superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 ):
-       print " => in fiducial region\n"
+       theString += " => in fiducial region\n"
      else:
-       print " => out of fiducial region\n"
+       theString += " => out of fiducial region\n"
      return theString
 
    def _muonString(self, muon):
      theString =  self._candidateString("muon",muon)
      if muon.isTrackerMuon():
-       print "  Number of hits (all, pixels, strips): %d,%d,%d\n" % (muon.innerTrack().numberOfValidHits(),
-                                                                     muon.innerTrack().hitPattern().numberOfValidPixelHits(),
-                                                                     muon.innerTrack().hitPattern().numberOfValidStripHits())
+       theString += "  Number of hits (all, pixels, strips): %d,%d,%d\n" % (muon.innerTrack().numberOfValidHits(),
+                                                                            muon.innerTrack().hitPattern().numberOfValidPixelHits(),
+                                                                            muon.innerTrack().hitPattern().numberOfValidStripHits())
      if muon.isGlobalMuon():
-       print "  Number of muon hits: %d\n" % muon.globalTrack().hitPattern().numberOfValidMuonHits()
+       theString += "  Number of muon hits: %d\n" % muon.globalTrack().hitPattern().numberOfValidMuonHits()
      if muon.isTrackerMuon() and muon.isGlobalMuon():
-       print "  Chi2: %f\n" % muon.normChi2()
-     print "  Isolation: (%f+%f)/pt = %f\n" % (muon.trackIso(),muon.caloIso(),(muon.trackIso()+muon.caloIso())/muon.pt())
+       theString += "  Chi2: %f\n" % muon.normChi2()
+     theString += "  Isolation: (%f+%f)/pt = %f\n" % (muon.trackIso(),muon.caloIso(),(muon.trackIso()+muon.caloIso())/muon.pt())
      return theString
 
