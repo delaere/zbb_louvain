@@ -79,21 +79,6 @@ class LeptonsReWeighting:
      self.vertexHandle_ = Handle ("vector<reco::Vertex>")
      #self.rhoHandle_ = Handle ("double")
      # the efficiency maps
-
-     ## OLD SF: coarse binning 
-     ##      self._elePidWeight = PtEtaMap([],[0.9, 1.44],
-     ##                                    [[(0.997,0.0036), (1.00,0.0045), (1.01,0.0055)]])
-     ##      self._eleIsoWeight = PtEtaMap([],[0.9, 1.44],
-     ##                                    [[(1.00,0.0041), (0.993,0.0055), (1.010,0.008)]])     
-     ##      self._ele17TrgWeight = PtEtaMap([30,50],[1.4],
-     ##                                         [[(0.983,0.0012), (0.982,0.0028)],
-     ##                                          [(0.995,0.0026), (0.995,0.0048)],
-     ##                                          [(0.998,0.0041), (0.998,0.0006)]])
-     ##      self._ele8TrgWeight  = PtEtaMap([30,50],[1.4],
-     ##                                         [[(0.995,0.0012), (0.998,0.0012)],
-     ##                                          [(0.998,0.0002), (0.999,0.0003)],
-     ##                                          [(0.999,0.0003), (0.999,0.0004)]])
-
    
      # ===================== ELECTRONS ========== 
      # NEW SF (13-11-2012): finer binning, Z inclusive, updated according to POG reccomendations
@@ -126,8 +111,8 @@ class LeptonsReWeighting:
                                     [(0.998,0.00029), (0.99,0.00024),  (1.00,0.00), (0.998,0.00032), (1.00,0.00011)],   # 40-50 GeV
                                     [(0.999,0.00035), (0.999,0.00048), (1.00,0.00), (0.99,0.00065), (0.999,0.00074)]])  # 50-200 GeV
      
-     ## Note1: trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
-     ## Note2: systematics for the trigger not included, asked to POG how to estimate 
+     ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
+     ## Note2: Systematics for the trigger not included, asked to POG how to estimate 
 
      # ===================== MUONS ========== 
      ## CAVEAT: systematics assumed to come only from background modelling and added in quadrature ( https://twiki.cern.ch/twiki/bin/view/CMS/MuonTagAndProbe#Systematic_uncertainties )
@@ -165,8 +150,8 @@ class LeptonsReWeighting:
      unc =  (self._elePidWeight[(e1.pt(),e1.eta())][1]/self._elePidWeight[(e1.pt(),e1.eta())][0] +  \
              self._elePidWeight[(e2.pt(),e2.eta())][1]/self._elePidWeight[(e2.pt(),e2.eta())][0])**2
      # isolation
-     unc += (self._eleIsoWeight[(e1.pt(),e1.eta())][1]*self._eleIsoWeight[(e1.pt(),e1.eta())][0] +  \
-             self._eleIsoWeight[(e2.pt(),e2.eta())][1]*self._eleIsoWeight[(e2.pt(),e2.eta())][0])**2
+     unc += (self._eleIsoWeight[(e1.pt(),e1.eta())][1]/self._eleIsoWeight[(e1.pt(),e1.eta())][0] +  \
+             self._eleIsoWeight[(e2.pt(),e2.eta())][1]/self._eleIsoWeight[(e2.pt(),e2.eta())][0])**2
      # trigger (approximate)
      unc += (abs(self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1]+  \
                 self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-   \
@@ -208,8 +193,8 @@ class LeptonsReWeighting:
      unc =  (self._muPidWeight[(m1.pt(),m1.eta())][1]/self._muPidWeight[(m1.pt(),m1.eta())][0] +  \
              self._muPidWeight[(m2.pt(),m2.eta())][1]/self._muPidWeight[(m2.pt(),m2.eta())][0])**2
      # isolation
-     unc += (self._muIsoWeight[(m1.pt(),m1.eta())][1]*self._muIsoWeight[(m1.pt(),m1.eta())][0] +  \
-             self._muIsoWeight[(m2.pt(),m2.eta())][1]*self._muIsoWeight[(m2.pt(),m2.eta())][0])**2
+     unc += (self._muIsoWeight[(m1.pt(),m1.eta())][1]/self._muIsoWeight[(m1.pt(),m1.eta())][0] +  \
+             self._muIsoWeight[(m2.pt(),m2.eta())][1]/self._muIsoWeight[(m2.pt(),m2.eta())][0])**2
      # trigger (approximate)
      hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
                              self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
