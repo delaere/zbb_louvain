@@ -440,8 +440,7 @@ class unfolder:
         ucont.n_hp = n_hp
         he_modes = [None, "HEexcl", "HEHE"]
         hp_modes = [None, "HPexcl", "HPHP"]
-        heweight = 1
-        # working point HPexcl - HEHE does not preserve normalisation and thus requires additional steps
+        # working point HPexcl - HPHE does not preserve normalisation and thus requires additional steps
         if n_hp == 1:
             self.btag_engine.setMode("HPexcl")
             mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
@@ -450,8 +449,8 @@ class unfolder:
             except:
                 self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
                 self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
-        if n_he >= 2:
-            self.btag_engine.setMode("HEHE")
+        if n_he >= 2 and n_hp == 1:
+            self.btag_engine.setMode("HEHP")
             mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
             try:
                 self.mat_e_b_mixed[2][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
@@ -460,6 +459,7 @@ class unfolder:
                 self.mat_e_b_mixed[2][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
 
         # HEexcl - HEHE and HPexcl - HPHP are straightforward
+        heweight = 1
         if he_modes[ucont.n_he]: 
             self.btag_engine.setMode(he_modes[ucont.n_he])
             heweight = self.btag_engine.weight(ucont.event,self.muchannel)
@@ -469,11 +469,13 @@ class unfolder:
             hpweight = self.btag_engine.weight(ucont.event,self.muchannel)
         try:
             self.mat_e_b_he[ucont.n_he][ucont.rec_zb] += ucont.rw*heweight*ucont.el_weight
-            self.mat_e_b_hp[ucont.n_hp][ucont.rec_zb] += ucont.rw*hpweight*ucont.el_weight
         except AttributeError:
             self.mat_e_b_he = [[0,0,0],[0,0,0],[0,0,0]]
-            self.mat_e_b_hp = [[0,0,0],[0,0,0],[0,0,0]]
             self.mat_e_b_he[ucont.n_he][ucont.rec_zb] += ucont.rw*heweight*ucont.el_weight
+        try:
+            self.mat_e_b_hp[ucont.n_hp][ucont.rec_zb] += ucont.rw*hpweight*ucont.el_weight
+        except AttributeError:
+            self.mat_e_b_hp = [[0,0,0],[0,0,0],[0,0,0]]
             self.mat_e_b_hp[ucont.n_hp][ucont.rec_zb] += ucont.rw*hpweight*ucont.el_weight
 
     def finish_print_e_b(self):
@@ -617,10 +619,12 @@ class unfolder:
         # self.out += "imp, electrons:\t%.2f\t%.2f\n" % (el_1_e, el_2_e)
         # self.out += "imp, muons    :\t%.2f\t%.2f\n" % (el_1_m, el_2_m)
         # E_b
-        if hasattr(self,"e_b_he_norm"):
+        if hasattr(self,"e_b_he_norm") and hasattr(self,"e_b_hp_norm") and hasattr(self,"e_b_mixed_norm"):
             self.out += "--------------------------------------\n"
             self.out += "e_b comparison:\te_b_11\te_b_21\te_b_22\n"
-            self.out += "this study    :\t%.2f\t%.2f\t%.2f\n" % (self.e_b_he_norm[1][1], self.e_b_he_norm[1][2], self.e_b_he_norm[2][2])
+            self.out += "this study(HE):\t%.2f\t%.2f\t%.2f\n" % (self.e_b_he_norm[1][1], self.e_b_he_norm[1][2], self.e_b_he_norm[2][2])
+            self.out += "this study(HP):\t%.2f\t%.2f\t%.2f\n" % (self.e_b_hp_norm[1][1], self.e_b_hp_norm[1][2], self.e_b_hp_norm[2][2])
+            self.out += "this study(MX):\t%.2f\t%.2f\t%.2f\n" % (self.e_b_mixed_norm[1][1], self.e_b_mixed_norm[1][2], self.e_b_mixed_norm[2][2])
         else:
             all_ok = False
             print "no events in e_b"
@@ -641,6 +645,27 @@ class unfolder:
                 "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.,
                 "em_22":self.e_m
                 }
+            print "=== HE ==="
+            try: 
+                this_mat = compute_fullmatrix(**vals)
+            except:
+                print "Matrix is singular, most likely statistics is not high enough"
+            else:
+                print this_mat
+            print "=== HP ==="
+            vals["eb_11"] = self.e_b_hp_norm[1][1]/100.
+            vals["eb_21"] = self.e_b_hp_norm[1][2]/100.
+            vals["eb_22"] = self.e_b_hp_norm[2][2]/100.
+            try: 
+                this_mat = compute_fullmatrix(**vals)
+            except:
+                print "Matrix is singular, most likely statistics is not high enough"
+            else:
+                print this_mat
+            print "=== MX ==="
+            vals["eb_11"] = self.e_b_mixed_norm[1][1]/100.
+            vals["eb_21"] = self.e_b_mixed_norm[1][2]/100.
+            vals["eb_22"] = self.e_b_mixed_norm[2][2]/100.
             try: 
                 this_mat = compute_fullmatrix(**vals)
             except:
@@ -877,7 +902,7 @@ def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
-def beanstalk_client(path_to_files, muchannel, jobid):
+def beanstalk_client(path_to_files, muchannel, jobid, num):
     ## this still needs a proper handling of errors, for instance if not all jobs come back
     # yaml and beanstalk are there, it is needed
     sys.path.append("/home/fynu/jdf")
@@ -919,6 +944,8 @@ def beanstalk_client(path_to_files, muchannel, jobid):
     beanstalk.watch(resqueue)
 
     files = os.path.isdir(path_to_files) and glob.glob(os.path.join(path_to_files,"*")) or [path_to_files]
+    if num > 0:
+        files = files[:num]
     nfiles = len(files)
 
     fill = True
@@ -1011,7 +1038,12 @@ python %s -w %s -j %s
             print key,":", value
         print "==================================="
         try:
-            counts_to_mats(counts)
+            print "=============  HE  ================"
+            counts_to_mats(counts,"he")
+            print "=============  HP  ================"
+            counts_to_mats(counts,"hp")
+            print "===========  Mixed  ==============="
+            counts_to_mats(counts,"mixed")
         except:
             print "this job returned ill results, skipping"
         print "==================================="
@@ -1025,11 +1057,19 @@ python %s -w %s -j %s
     print "========================================"
     print "Don't forget to condor_rm remaining jobs"
     print "========================================"
-    counts_to_mats(counts)
+    print "=============  HE  ================"
+    counts_to_mats(counts,"he")
+    print "=============  HP  ================"
+    counts_to_mats(counts,"hp")
+    print "===========  Mixed  ==============="
+    counts_to_mats(counts,"mixed")
     # print "===     details      ==="
     # print outs
 
-def counts_to_mats(counts_1):
+def counts_to_mats(counts_1, working_point = "he"):
+    """ Gets the "counts" dict and computes the matrices.
+        working points can be "he", "hp" and "mixed"
+    """
     counts = deepcopy(counts_1)
     print "==================================="
     for key, value in counts.items():
@@ -1039,7 +1079,11 @@ def counts_to_mats(counts_1):
     total = counts.get("All",0)
     e_r = counts.get("e_r",[[0,0,0],[0,0,0],[0,0,0]])
     # here set which matrix you want to use
-    e_b = counts.get("e_b_he",[[0,0,0],[0,0,0],[0,0,0]])
+    if working_point not in ["he", "hp", "mixed"]:
+        print "Working point",working_point,"is not defined, using 'he'"
+        working_point = "he"
+    mat_working_point = "e_b_%s" % (working_point)
+    e_b = counts.get(mat_working_point,[[0,0,0],[0,0,0],[0,0,0]])
     e_l = counts.get("e_l",[0,0,0])
     e_m = counts.get("e_m",0.)
 
@@ -1073,7 +1117,8 @@ def counts_to_mats(counts_1):
             "em_22":em_22
         }
     try:
-        print compute_fullmatrix(**vals)
+        themat =  compute_fullmatrix(**vals)
+        print "final matrix:", themat
     except:
         print "Could not compute matrices. Probably not enough statistics" 
 
@@ -1093,7 +1138,7 @@ if __name__ == '__main__':
     parser.add_option("-m", action="store_const", const=True,  dest="muchannel", help="Muon channel", default=None)
     parser.add_option("-e", action="store_const", const=False, dest="muchannel", help="Electron channel")
     parser.add_option("-b", action="store_const", const=None,  dest="muchannel", help="Both lepton channels (default)")
-    parser.add_option("-n", type="int", dest="num", help="Number of events to process, defaults to all", default=-1)
+    parser.add_option("-n", type="int", dest="num", help="Number of events (or files if -i) to process, defaults to all", default=-1)
     parser.add_option("-c","--condor", action="store_const", const=True, dest="condor", help="create condor file, do not run anything", default=False)
     parser.add_option("-i","--interactive", action="store_const", const=True, dest="beanstalk_c", help="run in semi-interactive mode", default=False)
     parser.add_option("-j", "--jobid", type="string", dest="jobid", help="job identifier, (no spaces or special chars please)", default = "")
@@ -1146,7 +1191,7 @@ if __name__ == '__main__':
         shfile.close()
         os.chmod("condor_unfolding.sh",0755)
     elif options.beanstalk_c:
-        beanstalk_client(options.dataset, options.muchannel, options.jobid)
+        beanstalk_client(options.dataset, options.muchannel, options.jobid, options.num)
     elif options.beanstalk_w:
         beanstalk_worker(options.muchannel, options.jobid)
     else:
