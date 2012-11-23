@@ -441,15 +441,7 @@ class unfolder:
         he_modes = [None, "HEexcl", "HEHE"]
         hp_modes = [None, "HPexcl", "HPHP"]
         # working point HPexcl - HPHE does not preserve normalisation and thus requires additional steps
-        if n_hp == 1:
-            self.btag_engine.setMode("HPexcl")
-            mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
-            try:
-                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
-            except:
-                self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
-                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
-        if n_he >= 2 and n_hp == 1:
+        if n_he >= 2 and n_hp >= 1:
             self.btag_engine.setMode("HEHP")
             mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
             try:
@@ -457,6 +449,14 @@ class unfolder:
             except:
                 self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
                 self.mat_e_b_mixed[2][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+        elif n_hp == 1:
+            self.btag_engine.setMode("HPexcl")
+            mixweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            try:
+                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
+            except:
+                self.mat_e_b_mixed = [[0,0,0],[0,0,0],[0,0,0]]
+                self.mat_e_b_mixed[1][ucont.rec_zb] += ucont.rw*mixweight*ucont.el_weight
 
         # HEexcl - HEHE and HPexcl - HPHP are straightforward
         heweight = 1
@@ -521,36 +521,56 @@ class unfolder:
 ###################### MET Matrix #################################
     def step_e_m(self, ucont):
         """ compute met efficiency for each rec_zb bin with at least two bjets HE """
-        # ucont.goodleps = [lep for lep in ucont.reco_leptons if (llbb.isGoodElectron(lep,'matched') or llbb.isGoodMuon(lep,'matched'))]
-        #ucont.reco_jets = [jet for jet in self.jets if llbb.isGoodJet(jet,ucont.reco_z)]
         ucont.good_met =  [met for met in self.met if llbb.isGoodMet_Sig(met,cut=10)]      
-        # print "ucont.n_he",ucont.n_he
         if ucont.rec_z_yes and ucont.n_he>=2 and ucont.good_met :
-            #self.mat_e_b_mixed[2][2]
             self.btag_engine.setMode("HEHE")
             bweight = self.btag_engine.weight(ucont.event,self.muchannel)
-            # print "bweight HEHE", bweight
             try: 
-                self.met_eff[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+                self.met_eff_hehe[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
             except AttributeError:
-                self.met_eff =[0,0,0] 
-                self.met_eff[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
-        else:
-            ucont.stop = True
+                self.met_eff_hehe = [0,0,0] 
+                self.met_eff_hehe[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+        if ucont.rec_z_yes and ucont.n_hp>=2 and ucont.good_met :
+            self.btag_engine.setMode("HPHP")
+            bweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            try: 
+                self.met_eff_hphp[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+            except AttributeError:
+                self.met_eff_hphp = [0,0,0] 
+                self.met_eff_hphp[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+        if ucont.rec_z_yes and ucont.n_he>=2 and ucont.n_hp >= 1 and ucont.good_met :
+            self.btag_engine.setMode("HEHP")
+            bweight = self.btag_engine.weight(ucont.event,self.muchannel)
+            try: 
+                self.met_eff_hehp[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
+            except AttributeError:
+                self.met_eff_hehp = [0,0,0] 
+                self.met_eff_hehp[ucont.rec_zb] += ucont.rw*bweight*ucont.el_weight
 
                 
     def finish_print_e_m(self):
-        if not hasattr(self,"met_eff"):
-            self.out += "== No events passed the met selection =="
+        self.out += "===             MET                ===\n"            
+        if not hasattr(self,"met_eff_hehe"):
+            self.out += "== No HEHE events passed the met selection =="
         else:
-            print "float(self.e_b_he_norm[2][2])", float(self.mat_e_b_he[2][2])
-            print "self.met_eff[2]",self.met_eff[2] 
-            print "self.met_eff[1]",self.met_eff[1] 
-            print "self.met_eff[0]",self.met_eff[0] 
-            self.e_m = self.met_eff[2]/(float(self.mat_e_b_he[2][2])) if self.mat_e_b_he[2][2] else 0
-            self.out += "===             MET                ===\n"            
-            self.out += "MET            : "+"\t"+f_2(self.e_m)+"\n"
-            self.counts["e_m"] = self.met_eff[2]
+            self.e_m_hehe = self.met_eff_hehe[2]/(float(self.mat_e_b_he[2][2]))    if self.mat_e_b_he[2][2]    else 0
+            self.out += "MET   HEHE     : "+"\t"+f_2(self.e_m_hehe)+"\n"
+            self.counts["e_m_he"]    = self.met_eff_hehe[2]
+
+        if not hasattr(self,"met_eff_hphp"):
+            self.out += "== No HPHP events passed the met selection =="
+        else:
+            self.e_m_hphp = self.met_eff_hphp[2]/(float(self.mat_e_b_hp[2][2]))    if self.mat_e_b_hp[2][2]    else 0
+            self.out += "MET   HPHP     : "+"\t"+f_2(self.e_m_hphp)+"\n"
+            self.counts["e_m_hp"]    = self.met_eff_hphp[2]
+
+        if not hasattr(self,"met_eff_hehp"):
+            self.out += "== No HEHP events passed the met selection =="
+        else:
+            self.e_m_hehp = self.met_eff_hehp[2]/(float(self.mat_e_b_mixed[2][2])) if self.mat_e_b_mixed[2][2] else 0
+            self.out += "MET   HEHP     : "+"\t"+f_2(self.e_m_hehp)+"\n"
+            self.counts["e_m_mixed"] = self.met_eff_hehp[2]
+
 
                            
 
@@ -634,7 +654,9 @@ class unfolder:
         self.out += "--------------------------------------\n"
         print self.out
 
-        if not hasattr(self,"e_m"): self.e_m = 0.
+        if not hasattr(self,"e_m_hehe"): self.e_m_hehe = 0.
+        if not hasattr(self,"e_m_hphp"): self.e_m_hphp = 0.
+        if not hasattr(self,"e_m_hehp"): self.e_m_hehp = 0.
         if all_ok:
             vals = {"al_1":self.a_l[1], "al_2":self.a_l[2],
                 "el_1":self.e_l[1], "el_2":self.e_l[2],
@@ -643,7 +665,7 @@ class unfolder:
                 "er_21":self.e_r_norm[1][2]/100., "er_22":self.e_r_norm[2][2]/100.,
                 "rfact":self.rfact,
                 "eb_11":self.e_b_he_norm[1][1]/100., "eb_21":self.e_b_he_norm[1][2]/100., "eb_22":self.e_b_he_norm[2][2]/100.,
-                "em_22":self.e_m
+                "em_22":self.e_m_hehe
                 }
             print "=== HE ==="
             try: 
@@ -656,6 +678,7 @@ class unfolder:
             vals["eb_11"] = self.e_b_hp_norm[1][1]/100.
             vals["eb_21"] = self.e_b_hp_norm[1][2]/100.
             vals["eb_22"] = self.e_b_hp_norm[2][2]/100.
+            vals["em_22"] = self.e_m_hphp
             try: 
                 this_mat = compute_fullmatrix(**vals)
             except:
@@ -666,6 +689,7 @@ class unfolder:
             vals["eb_11"] = self.e_b_mixed_norm[1][1]/100.
             vals["eb_21"] = self.e_b_mixed_norm[1][2]/100.
             vals["eb_22"] = self.e_b_mixed_norm[2][2]/100.
+            vals["em_22"] = self.e_m_hehp
             try: 
                 this_mat = compute_fullmatrix(**vals)
             except:
@@ -1083,9 +1107,10 @@ def counts_to_mats(counts_1, working_point = "he"):
         print "Working point",working_point,"is not defined, using 'he'"
         working_point = "he"
     mat_working_point = "e_b_%s" % (working_point)
+    met_working_point = "e_m_%s" % (working_point)
     e_b = counts.get(mat_working_point,[[0,0,0],[0,0,0],[0,0,0]])
     e_l = counts.get("e_l",[0,0,0])
-    e_m = counts.get("e_m",0.)
+    e_m = counts.get(met_working_point,0.)
 
     # normalization
     # first normalize e_met, using the unnormalized e_b
@@ -1153,10 +1178,12 @@ if __name__ == '__main__':
     
     if not options.beanstalk_w:
         print "Running on:", options.dataset
-        if options.num > 0: 
+        if options.num > 0 and not options.beanstalk_c: 
             print "Running on", options.num, "first events"
+        elif options.num > 0 and options.beanstalk_c:
+            print "Running on", options.num, "first files"
         else:
-            print "Running on all events"
+            print "Running on all events / files"
         if options.muchannel == None:
             print "For both electrons and muons"
         elif options.muchannel == True:
