@@ -1,8 +1,10 @@
 from DataFormats.FWLite import Events, Handle
 from FWCore.ParameterSet.Types import InputTag
-import inspect
+from inspect import getargspec
+from ROOT import TLorentzVector,TVector3
 from datetime import datetime
 from math import sin
+from collections import Iterable
 
 class AnalysisEvent(Events):
    """A class that complements fwlite::Events with analysis facilities.
@@ -68,7 +70,7 @@ class AnalysisEvent(Events):
        w = 1.
        for weightElement in weightList:
          engine = self._weightEngines[weightElement]
-         engineArgs = inspect.getargspec(engine.weight).args
+         engineArgs = getargspec(engine.weight).args
          subargs = dict((k,v) for k,v in kwargs.iteritems() if k in engineArgs)
          w *= self._weightCache.setdefault("weightElement:%s # %s" %(weightElement,self._dicthash(subargs)),engine.weight(self,**subargs))
        self._weightCache[myhash] = w
@@ -103,15 +105,20 @@ class AnalysisEvent(Events):
        self.vardict[name] = self._collections[name]["handle"].product()
      return getattr(self,name)
 
-   def addProducer(self,name,producer):
+   def addProducer(self,name,producer,**kwargs):
      """Register a producer to create new high-level analysis objects."""
+     # sanity checks
      if name in self._producers:
        raise KeyError("%r producer is already declared", name)
      if name in self._collections:
        raise KeyError("%r is already declared as a collection", name)
      if hasattr(self,name):
        raise AttributeError("%r object already has attribute %r" % (type(self).__name__, attr))
-     self._producers[name] = producer
+     # remove name and producer from kwargs
+     if "name" in kwargs: del kwargs["name"]
+     if "producer" in kwargs: del kwargs["producer"]
+     # store
+     self._producers[name] = (producer,kwargs)
 
    def removeProducer(self,name):
      """Forget about the producer.
@@ -120,6 +127,39 @@ class AnalysisEvent(Events):
      del self._producers[name]
      if name in self.vardict:
        delattr(self,name)
+
+   def run(self):
+     """Run number"""
+     return self.eventAuxiliary().run()
+
+   def event(self):
+     """Event number"""
+     return self.eventAuxiliary().id().event()
+
+   def lumi(self):
+     """Lumisection"""
+     return self.eventAuxiliary().luminosityBlock()
+
+   def to(self,run,event,lumi=None):
+     """Jump to some event,run,lumisection"""
+     if self._veryFirstTime:
+       self._createFWLiteEvent()
+     if lumi is None:
+       return self._event.to ( long(run), long(event) )
+     else:
+       return self._event.to ( long(run), long(lumi), long(event) )
+
+   def __getitem__(self,index):
+     """Jump to some event,run,(lumisection) or to a given event index"""
+     if len(index) == 3:
+       self.to(index[0],index[1],index[2])
+     elif len(index) == 2:
+       self.to(index[0],index[1])
+     elif len(index) == 1:
+       self.to(index[0])
+     else:
+       raise TypeError("Events must be indexed by run, event, (lumi) or by event index.")
+     return self
 
    def _next (self):
      """(Internal) Iterator internals"""
@@ -151,9 +191,9 @@ class AnalysisEvent(Events):
      if attr in self.__dict__["vardict"]:
        return self.vardict[attr]
      if attr in self._collections:
-       return getCollection(attr)
+       return self.getCollection(attr)
      if attr in self._producers:
-       return self.vardict.setdefault(attr, self._producers[attr](self))
+       return self.vardict.setdefault(attr, self._producers[attr][0](self, **self._producers[attr][1]))
      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
 
    def __setattr__(self, name, value):
@@ -191,8 +231,6 @@ class AnalysisEvent(Events):
      mystring += "-----------------------------------------------------------------\n"
      # weights
      if len(self._weightCache)==0: 
-       #mystring += "No weight computed so far. \n" 
-       #mystring += "No weight computed so far. Default weight is %f.\n" % self.weight(weightList=self._weightEngines.keys())
        mystring += "No weight computed so far. Default weight is %f.\n" % self.weight()
      else:
        mystring += "Weights:\n"
@@ -216,7 +254,7 @@ class AnalysisEvent(Events):
          elif "pat::MET" in handle:
            mystring += reduce(lambda a,b: a+b,map(self._metString,collection))
          elif "reco::CompositeCandidate" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._candidateString,collection))
+           mystring += reduce(lambda a,b: a+b,map(lambda x: self._candidateString(colname,x),collection))
        except TypeError:
          pass
      mystring += "\n-----------------------------------------------------------------\n"
@@ -224,22 +262,23 @@ class AnalysisEvent(Events):
      mystring += "Producers:\n"
      mystring += dictjoin(self._producers)
      mystring += "\n-----------------------------------------------------------------\n"
-     # list the content of vardict, excluding producers and collections
+     # list the content of vardict, excluding collections
      mystring += "Content of the cache:\n"
-     mystring += dictjoin(dict((k,v) for k, v in self.vardict.iteritems() if not (k in self._producers.keys() or k in self._collections.keys())))
+     for k, v in self.vardict.iteritems():
+       if not k in self._collections.keys() and isinstance(v,Iterable) and all(isinstance(n, TLorentzVector) for n in v):
+         try:
+           mystring += "%s => vector of %d Lorentz Vector(s)\n" % (k,len(v))
+         except:
+           pass
+         for vec in v: mystring += self._lorentzVectorString(vec)
+       elif isinstance(v,TLorentzVector): mystring += self._lorentzVectorString(k,v)
+     mystring += dictjoin(dict((k,v) for k, v in self.vardict.iteritems() if not k in self._collections.keys() and not (isinstance(v,Iterable) and all(isinstance(n, TLorentzVector) for n in v))))
      return mystring
 
    def _vertexString(self, vertex):
      theString =  "Vertex position: (%f,%f,%f) +/- (%f,%f,%f)\n" % (vertex.x(), vertex.y(),vertex.z(),vertex.xError(),vertex.yError(),vertex.zError())
      theString += "  Number of tracks: %d\n" % vertex.tracksSize()
      theString += "  chi2/ndof: %f/%d\n" % (vertex.chi2(),vertex.ndof())
-     return theString
-
-   def _lorentzVectorString(self, label, lorentzVector):
-     theString =  "%s candidate\n" % label
-     theString += "   (pt, eta, phi) = (%f,%f,%f)\n" % (lorentzVector.Pt(), lorentzVector.Eta(), lorentzVector.Phi())
-     theString += "   mass = %f GeV\n" % lorentzVector.M() 
-     theString += "   p = %f GeV; mt = %f GeV\n" % (lorentzVector.P(), lorentzVector.Mt())
      return theString
 
    def _candidateString(self, label, candidate):
@@ -271,8 +310,8 @@ class AnalysisEvent(Events):
        if not sv is None:
          distance = taginfo.flightDistance(0,True)
          dir = taginfo.flightDirection(0)
-         dirv = ROOT.TVector3(dir.x(),dir.y(),dir.z())
-         dirj = ROOT.TVector3(jet.px(),jet.py(),jet.pz())
+         dirv = TVector3(dir.x(),dir.y(),dir.z())
+         dirj = TVector3(jet.px(),jet.py(),jet.pz())
          theString += "     details about the secondary vertex:\n"
          theString += "     * number of tracks: %d\n" % sv.tracksSize()
          theString += "     * chi2: %f\n" % sv.chi2()
@@ -315,5 +354,11 @@ class AnalysisEvent(Events):
      if muon.isTrackerMuon() and muon.isGlobalMuon():
        theString += "  Chi2: %f\n" % muon.normChi2()
      theString += "  Isolation: (%f+%f)/pt = %f\n" % (muon.trackIso(),muon.caloIso(),(muon.trackIso()+muon.caloIso())/muon.pt())
+     return theString
+
+   def _lorentzVectorString(self, label, lorentzVector):
+     theString  = "%s candidate:\n" % str(label)
+     theString += "  (pt, eta, phi) = (%f,%f,%f)\n" % (lorentzVector.Pt(), lorentzVector.Eta(), lorentzVector.Phi())
+     theString += "  mass = %f, p = %f, mt = %f\n"  % (lorentzVector.M(), lorentzVector.P(), lorentzVector.Mt())
      return theString
 
