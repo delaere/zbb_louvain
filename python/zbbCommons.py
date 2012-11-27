@@ -86,10 +86,11 @@ class zbbnorm:
   
   #summer 12 number of events processed for the PATtuple production
   nev_DYjets_summer12   = 29310189 # approximate number : 1472 jobs finished on 1527, 1472 to be check possible some finish after
-  nev_TTjets_summer12   =  3950000 # S8
-  nev_ZZ_summer12       =  9799908 # 
+  nev_TTjets_summer12   =  6923750 # MassiveBinDecay S10, OK
+  nev_ZZ_summer12       =  9799908 # OK
   nev_ZH115_summer12    =  1090000 # not yet
   nev_ZH120_summer12    =  1090000 # not yet
-  nev_ZH125_summer12    =   999462 # to check, all jobs succeed, no double file 
-  nev_ZH130_summer12    =  1100000 # not yet 
+  nev_ZH125_summer12    =   999462 # OK
+  nev_ZH130_summer12    =  1100000 # not yet
   nev_ZH135_summer12    =  1096956 # not yet
+                  
