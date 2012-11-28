@@ -47,6 +47,8 @@ options.register ('slice',
 # get and parse the command line arguments
 options.parseArguments()
 
+
+
 ### define process
 
 process = cms.Process("PAT2")
@@ -99,7 +101,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.4 $'),
+    version = cms.untracked.string('$Revision: 1.5 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -157,12 +159,14 @@ process.CSVbFilter = cms.EDFilter("CandViewCountFilter",
                                   )
 
 process.zMuMuFilter = cms.EDFilter("CandViewCountFilter",
-                               src = cms.InputTag("zmuMatchedmuMatched"),
+                               src = cms.InputTag("zmuTightmuTight"),
+                               cut = cms.string('mass<120.&mass>60.'),
                                minNumber = cms.uint32(1),
                                )
 
 process.zElElFilter = cms.EDFilter("CandViewCountFilter",
-                               src = cms.InputTag("zelMatchedelMatched"),
+                               src = cms.InputTag("zelTightelTight"),
+                               cut = cms.string('mass<120.&mass>60.'),
                                minNumber = cms.uint32(1),
                                )
 
@@ -187,19 +191,13 @@ process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','
 
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
-### options ###
-sample = options.sample
-slice  = options.slice
-print "*** GOING TO LOOK AT ", sample 
-print "*** dataset slice #  ", slice 
-###############
 
 path = {"DY_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_DYjets_v4/" ,
         "TT_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_TTbar_v3/" ,
-        "Mu_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011A/50e19e0266f4f061bdccd79330eb70f3/" ,
-        "El_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011A/50e19e0266f4f061bdccd79330eb70f3/" ,
-        "Mu_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011B/50e19e0266f4f061bdccd79330eb70f3/" ,
-        "El_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011B/50e19e0266f4f061bdccd79330eb70f3/" ,
+        "Mu_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011A/files/" ,
+        "El_DataA" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011A/files/" ,
+        "Mu_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011B/files/" ,
+        "El_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011B/files/" ,
         "ZZ_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZZ_v2/" ,
         "ZH115_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_115/" ,
         "ZH120_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_120/" ,
@@ -210,6 +208,15 @@ path = {"DY_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwith
         "tW_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_T_tW_v3/" ,
         "tbarW_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_Tbar_tW_v3/" 
         }
+
+
+### options ###
+sample = options.sample
+slice  = options.slice
+print "*** GOING TO LOOK AT ", sample 
+print "*** dataset slice #  ", slice 
+###############
+
 
 pathname = "file:"+path[sample]
 
@@ -230,7 +237,7 @@ process.source.fileNames = files
 
 process.maxEvents.input = -1
 
-if slice : process.out.fileName = '/storage/data/cms/store/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
+if slice : process.out.fileName = 'file:/nfs/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
 else     : process.out.fileName = '/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/test/'+sample+'.root'
 
 #process.options.wantSummary = False
