@@ -380,7 +380,12 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
   Eta_lrp = n.zeros(1, dtype=float)
   DeltaEta_lm = n.zeros(1, dtype=float)
   DeltaEta_lp  = n.zeros(1, dtype=float)
-  
+
+  PtInv_lm      = n.zeros(1, dtype=float)
+  PtInv_lp      = n.zeros(1, dtype=float)
+  DeltaPtInv_lm = n.zeros(1, dtype=float)
+  DeltaPtInv_lp = n.zeros(1, dtype=float)
+
   tree1.Branch("runNumber", runNumber, "runNumber/l")
   tree1.Branch("eventNumber", eventNumber, "eventNumber/l")
 
@@ -480,6 +485,12 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
   tree2.Branch("Eta_lrp",Eta_lrp,"Eta_lrp/D");
   tree2.Branch("DeltaEta_lm",DeltaEta_lm,"DeltaEta_lm/D");
   tree2.Branch("DeltaEta_lp",DeltaEta_lp,"DeltaEta_lp/D");
+
+  tree2.Branch("PtInv_lp",     PtInv_lp,     "PtInv_lp/D");
+  tree2.Branch("PtInv_lm",     PtInv_lm,     "PtInv_lm/D");
+  tree2.Branch("DeltaPtInv_lp",DeltaPtInv_lp,"DeltaPtInv_lp/D");
+  tree2.Branch("DeltaPtInv_lm",DeltaPtInv_lm,"DeltaPtInv_lm/D");
+
   #----------------------------------------------------------------
 
   # read data
@@ -849,6 +860,12 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
               Eta_lrp[0]=lrecpos.eta()
               DeltaEta_lp[0]=lp[0].eta()-lrecpos.eta()
               DeltaEta_lm[0]=lm[0].eta()-lrecneg.eta()
+
+              PtInv_lp[0]=1./lp[0].pt()
+              PtInv_lm[0]=1./lm[0].pt()
+              DeltaPtInv_lp[0]=1./lp[0].pt()-1./lrecpos.pt()
+              DeltaPtInv_lm[0]=1./lm[0].pt()-1./lrecneg.pt()
+              
               tree2.Fill()
 
               
