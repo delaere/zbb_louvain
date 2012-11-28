@@ -1,33 +1,33 @@
 ####################################################################
 #                                                                  #
-# EstimateTF_fromPATs.py                                           #
+# *** EstimateTF_fromPATs.py ****                                  #
 #                                                                  #
 # Script to estimate distributions of Transfer Functions           #
 # (useful for e.g. MadWeight analyses)                             # 
-# for both leptons and muons                                       #
+# for both leptons and jets                                        #
 #                                                                  #
 # Output variables:                                                #
-# - E, eta, phi, pT, 1/pT                                          #
+# - E, eta, phi, pT, 1/pT (Reco and Partonic)                      #
 # - DeltaE, DeltaEta, DeltaPhi, DeltaPt, DeltaPtinv                #
-# Delta = Partonic - Reco                                          #
-# - Jet: partonic = b(bar) quark; Reco = b-jets                    #
-# - Lep: partonic = MG leptons;   Reco = selected Z daughters      #
+# (Delta = Partonic - Reco)                                        #
+# --> jet: Partonic = b(bar) quark; Reco = b-jets                  #
+# --> lep: Partonic = MG leptons;   Reco = selected Z daughters    #
+# Matching is done based on DeltaR (and charge for leptons)        #  
 #                                                                  #
 # To be run e.g. as:                                               #
-# >> python EstimateTF_fromPATs.py test2/ 0 9999 TEST_JET_LEP_2    #
+# >> python EstimateTF_fromPATs.py myDir/ 0 9999 myJobName         #
 # - First  argument: Directory with PAT-tuples                     #
 # - Second argument: First file in list                            #
 # - Third  argument: Number of files per job                       #
 # - Fourth argument: Name of job (used for naming of output files) #
 #                                                                  #
 # Outputs:                                                         #
-# - .lhco file                                                     #
 # - .root file containing trees for leptons and jets               #
+# - .lhco file                                                     #
 #                                                                  #
 # (c) CP3 llbb soldiers                                            #
 #                                                                  #
 ####################################################################
-
 
 #!/nfs/soft/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_7/external/slc5_amd64_gcc434/bin/python
 from itertools import combinations
@@ -381,8 +381,6 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
   DeltaEta_lm = n.zeros(1, dtype=float)
   DeltaEta_lp  = n.zeros(1, dtype=float)
   
-                                      
-
   tree1.Branch("runNumber", runNumber, "runNumber/l")
   tree1.Branch("eventNumber", eventNumber, "eventNumber/l")
 
@@ -483,10 +481,6 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
   tree2.Branch("DeltaEta_lm",DeltaEta_lm,"DeltaEta_lm/D");
   tree2.Branch("DeltaEta_lp",DeltaEta_lp,"DeltaEta_lp/D");
   #----------------------------------------------------------------
-
-
-                                          
-  
 
   # read data
   dirList=os.listdir(path)
@@ -857,8 +851,6 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
               DeltaEta_lm[0]=lm[0].eta()-lrecneg.eta()
               tree2.Fill()
 
-                                                                                                                                                                                                                                                                                                                                        
-        
               
   # close file
   out_file_INCL.close()
