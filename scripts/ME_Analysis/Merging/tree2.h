@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Jun 14 21:00:43 2012 by ROOT version 5.27/06b
+// Fri Nov 30 15:56:42 2012 by ROOT version 5.27/06b
 // from TChain tree2/
 //////////////////////////////////////////////////////////
 
@@ -51,18 +51,28 @@ public :
    Double_t        Inv_Mass_lept;
    Double_t        DR_jets;
    Int_t           flavour;
+   Int_t           DYprod;
    Int_t           nbrPV;
    Double_t        PileUp;
-   Long64_t           eventNumber;
-   Long64_t           runNumber;
+   Int_t           multiplicity;
+   ULong64_t       eventNumber;
+   ULong64_t       runNumber;
    Double_t        Wgg;
    Double_t        Wqq;
    Double_t        Wtt;
    Double_t        Wtwb;
    Double_t        Wzz3;
    Double_t        Wzz0;
-   Double_t        Whi3;
-   Double_t        Whi0;
+   Double_t        Whi3_115;
+   Double_t        Whi0_115;
+   Double_t        Whi3_120;
+   Double_t        Whi0_120;
+   Double_t        Whi3_125;
+   Double_t        Whi0_125;
+   Double_t        Whi3_130;
+   Double_t        Whi0_130;
+   Double_t        Whi3_135;
+   Double_t        Whi0_135;
 
    // List of branches
    TBranch        *b_Pt_elplus;   //!
@@ -99,8 +109,10 @@ public :
    TBranch        *b_Inv_Mass_lept;   //!
    TBranch        *b_DR_jets;   //!
    TBranch        *b_flavour;   //!
+   TBranch        *b_DYprod;   //!
    TBranch        *b_nbrPV;   //!
    TBranch        *b_PileUp;   //!
+   TBranch        *b_multiplicity;   //!
    TBranch        *b_eventNumber;   //!
    TBranch        *b_runNumber;   //!
    TBranch        *b_Wgg;   //!
@@ -109,8 +121,16 @@ public :
    TBranch        *b_Wtwb;   //!
    TBranch        *b_Wzz3;   //!
    TBranch        *b_Wzz0;   //!
-   TBranch        *b_Whi3;   //!
-   TBranch        *b_Whi0;   //!
+   TBranch        *b_Whi3_115;   //!
+   TBranch        *b_Whi0_115;   //!
+   TBranch        *b_Whi3_120;   //!
+   TBranch        *b_Whi0_120;   //!
+   TBranch        *b_Whi3_125;   //!
+   TBranch        *b_Whi0_125;   //!
+   TBranch        *b_Whi3_130;   //!
+   TBranch        *b_Whi0_130;   //!
+   TBranch        *b_Whi3_135;   //!
+   TBranch        *b_Whi0_135;   //!
 
    tree2(TTree *tree=0);
    virtual ~tree2();
@@ -147,7 +167,16 @@ tree2::tree2(TTree *tree)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("tree2","");
-      chain->Add("ZH_1200_S9_Mll30_Cor.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/DY_ee_824_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/DY_mm_1186_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/Data_ee_709_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/Data_mm_988_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/TT_ee_31029_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/TT_mm_10000_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZH_m125_ee_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZH_m125_mm_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZZ_ee_1374_TREE2.root/tree2");
+      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZZ_mm_2017_TREE2.root/tree2");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -232,8 +261,10 @@ void tree2::Init(TTree *tree)
    fChain->SetBranchAddress("Inv_Mass_lept", &Inv_Mass_lept, &b_Inv_Mass_lept);
    fChain->SetBranchAddress("DR_jets", &DR_jets, &b_DR_jets);
    fChain->SetBranchAddress("flavour", &flavour, &b_flavour);
+   fChain->SetBranchAddress("DYprod", &DYprod, &b_DYprod);
    fChain->SetBranchAddress("nbrPV", &nbrPV, &b_nbrPV);
    fChain->SetBranchAddress("PileUp", &PileUp, &b_PileUp);
+   fChain->SetBranchAddress("multiplicity", &multiplicity, &b_multiplicity);
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("Wgg", &Wgg, &b_Wgg);
@@ -242,8 +273,16 @@ void tree2::Init(TTree *tree)
    fChain->SetBranchAddress("Wtwb", &Wtwb, &b_Wtwb);
    fChain->SetBranchAddress("Wzz3", &Wzz3, &b_Wzz3);
    fChain->SetBranchAddress("Wzz0", &Wzz0, &b_Wzz0);
-   fChain->SetBranchAddress("Whi3", &Whi3, &b_Whi3);
-   fChain->SetBranchAddress("Whi0", &Whi0, &b_Whi0);
+   fChain->SetBranchAddress("Whi3_115", &Whi3_115, &b_Whi3_115);
+   fChain->SetBranchAddress("Whi0_115", &Whi0_115, &b_Whi0_115);
+   fChain->SetBranchAddress("Whi3_120", &Whi3_120, &b_Whi3_120);
+   fChain->SetBranchAddress("Whi0_120", &Whi0_120, &b_Whi0_120);
+   fChain->SetBranchAddress("Whi3_125", &Whi3_125, &b_Whi3_125);
+   fChain->SetBranchAddress("Whi0_125", &Whi0_125, &b_Whi0_125);
+   fChain->SetBranchAddress("Whi3_130", &Whi3_130, &b_Whi3_130);
+   fChain->SetBranchAddress("Whi0_130", &Whi0_130, &b_Whi0_130);
+   fChain->SetBranchAddress("Whi3_135", &Whi3_135, &b_Whi3_135);
+   fChain->SetBranchAddress("Whi0_135", &Whi0_135, &b_Whi0_135);
    Notify();
 }
 
