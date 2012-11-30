@@ -17,7 +17,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	}
 
 	// output file : control of the NN
-        TFile file("../NN/NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
+        TFile file("../NN/NN_Higgs_vs_Bkg_MU"+name+".root","RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -34,10 +34,12 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	simu->Branch("deta",&sim->deta,"deta/D");
 	simu->Branch("dphi",&sim->dphi,"dphi/D");
 	simu->Branch("ptZ",&sim->ptZ,"ptZ/D");
-	simu->Branch("ptbb",&sim->ptZ,"ptbb/D");
+	simu->Branch("ptbb",&sim->ptbb,"ptbb/D");
 	simu->Branch("Met",&sim->Met,"Met/D");
 	simu->Branch("Mll",&sim->Mll,"Mll/D");
 	simu->Branch("Mbb",&sim->Mbb,"Mbb/D");
+        simu->Branch("Multi",&sim->Multi,"Multi/I");
+        simu->Branch("metsig",&sim->metsig,"metsig/D");
 
         simu->Branch("HvsZbb",&sim->HvsZbb,"HvsZbb/D");
         simu->Branch("HvsTT",&sim->HvsTT,"HvsTT/D");
@@ -64,11 +66,12 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 
 	// Declaration of multiplayer perceptron object. input variable = branch of simu tree. Not all at the same time. To add a branch as input add @branchname. then : intermediate layer node, put : to add new layer. Ended by : @type mean that outup is 1 or 0. Then we specify the number of entries for training and test samples.
 
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:6:4:2:type","(type2==1)*(2.5/777.)+(type2==2)*(1./5092.)+(type2==3)*(1.5/1507.)+(type2==5)*(5B./1129)",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	mlp->Train(500, "text,graph,update=100");
+		TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:4:2:type","(type2==1)*(2.5/1120.)+(type2==2)*(1./1923.)+(type2==3)*(2.0/1885.)+(type2==5)*(5.5/1120)",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	//	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@tt_weight,@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:8:4:2:type","(type2==1)*(2.5/777.)+(type2==2)*(1./5092.)+(type2==3)*(2.0/1507.)+(type2==5)*(5.2/1129)",simu,"Entry$%2!=0","Entry$%2==0");
+	mlp->Train(1000, "text,graph,update=200");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("../NN/MLP_Higgs_vs_bkg_"+name,"python");
-	mlp->Export("../NN/MLP_Higgs_vs_bkg_"+name,"c++");
+	mlp->Export("../NN/MLP_Higgs_vs_bkg_MU"+name,"python");
+	mlp->Export("../NN/MLP_Higgs_vs_bkg_MU"+name,"c++");
 	mlp->Write();
 
 
@@ -111,20 +114,23 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	//-------------------------------------------------------------------------
 	// FOR Zbb
 	for (int i=0;i<N1; ++i) {
-	  if(var1-> Mll[i]>75. && var1-> Mll[i]<107.){
+	  if(var1-> Mll[i]>76. && var1-> Mll[i]<106.){
 	  zbb=zbb+1;
 	  //params[0] =var1-> Mll[i];
 	  //params[1] = var1->Mbb[i];
 	  //params[2] = var1->dphi[i];
 	  //params[0] = var1->gg[i];
 	  //params[1] = var1->qq[i];
-	  params[2] = var1->htt[i];
-          //params[3] = var1->zz3[i];
-	  params[0] = var1->hzbb[i];
-	  params[1] = var1->hzz[i];
-	  //params[5] = var1->met[i];
+	  //params[2] = var1->tt[i];
+          //params[3] = var1->zz[i];
+	  //params[4] = var1->zz3[i];
+	  //params[5] = var1->hi[i];
+	  //params[6] = var1->hi3[i];
 	  //params[2] = var1->hi[i];
-	  //params[3] = var1->ptZ[i];
+          params[0] = var1->hzbb[i];
+          params[2] = var1->htt[i];
+          params[1] = var1->hzz[i];
+	  //params[3] = var1->multi[i];
 	  //params[4] = var1->deta[i];
 	  //params[4] = var1->ptbb[i];
 	  zbbh->Fill(mlp->Evaluate(0, params));
@@ -133,18 +139,28 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	for (int i=0;i<N2; ++i) {
-	  if(var2-> Mll[i]>75. && var2-> Mll[i]<107.){
+	  if(var2-> Mll[i]>76. && var2-> Mll[i]<106.){
 	  //params[0] =var2-> Mll[i];
 	  //params[1] = var2->Mbb[i];
 	  //params[2] = var2->dphi[i];
-	  //params[0] = var2->gg[i];
+	  //params[3] = var2->gg[i];
 	  //params[1] = var2->qq[i];
-	  params[2] = var2->htt[i];
+	  //params[2] = var2->htt[i];
           //params[3] = var2->zz3[i];
-	  params[0] = var2->hzbb[i];
-	  params[1] = var2->hzz[i];
+	  //  params[0] = var2->gg[i];
+	    params[0] = var2->hzbb[i];
+	    params[2] = var2->htt[i];
+	    params[1] = var2->hzz[i];
+	    // params[1] = var2->qq[i];
+	    //params[2] = var2->tt[i];
+	    //params[3] = var2->zz[i];
+	    //params[4] = var2->zz3[i];
+	    //params[5] = var2->hi[i];
+	    //params[6] = var2->hi3[i];
+	    //params[0] = var2->hzbb[i];
+	  //params[1] = var2->hzz[i];
 	  //params[5] = var2->met[i];
-	  //params[3] = var2->ptZ[i];
+	  //params[3] = var2->multi[i];
           //params[4] = var2->deta[i];
           //params[4] = var2->ptbb[i];
 	  tth->Fill(mlp->Evaluate(0, params));
@@ -153,18 +169,26 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //-------------------------------------------------------------------------        
 	// FOR ZZ
         for (int i=0;i<N3; ++i) {
-          if(var3-> Mll[i]>75. && var3-> Mll[i]<107.){
+          if(var3-> Mll[i]>76. && var3-> Mll[i]<106.){
 	  //params[0] =var2-> Mll[i];
 	  //params[1] = var3->Mbb[i];
 	  //params[2] = var3->dphi[i];
-	  //params[0] = var3->gg[i];
+	  //params[3] = var3->gg[i];
 	  //params[1] = var3->qq[i];
-	  params[2] = var3->htt[i];
+	  //params[2] = var3->htt[i];
           //params[3] = var3->zz3[i];
 	  params[0] = var3->hzbb[i];
-	  params[1] = var3->hzz[i];
+          params[2] = var3->htt[i];
+          params[1] = var3->hzz[i];
+	  //  params[0] = var3->gg[i];
+	  //  params[1] = var3->qq[i];
+	  //  params[2] = var3->tt[i];
+	  //  params[3] = var3->zz[i];
+	  //  params[4] = var3->zz3[i];
+	  //  params[5] = var3->hi[i];
+	  //  params[6] = var3->hi3[i];
 	  //params[5] = var3->met[i];
-	  //params[3] = var3->ptZ[i];
+	  //params[3] = var3->multi[i];
 	  //params[4] = var3->deta[i];
 	  //params[4] = var3->ptbb[i];                                          
 	  zzh->Fill(mlp->Evaluate(0,params));
@@ -173,18 +197,28 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //-------------------------------------------------------------------------
 	// FOR ZH
         for (int i=0;i<N5; ++i) {
-	  if(var5-> Mll[i]>75. && var5-> Mll[i]<107.){
+	  if(var5-> Mll[i]>76. && var5-> Mll[i]<106.){
 	  //params[0] =var5-> Mll[i];                                                                                                                                                                           
           //params[1] = var5->Mbb[i];                                                                                                                                                                 
           //params[2] = var5->dphi[i];                                                                                                                                                                   
-          //params[0] = var5->gg[i];
+          //params[3] = var5->gg[i];
           //params[1] = var5->qq[i];
-          params[2] = var5->htt[i];
+          //params[2] = var5->htt[i];
           //params[3] = var5->zz3[i];
-	  params[0] = var5->hzbb[i];
-          params[1] = var5->hzz[i];                                                                                                                                                              
+	    params[0] = var5->hzbb[i];
+	    params[2] = var5->htt[i];
+	    params[1] = var5->hzz[i];
+	    //	    params[0] = var5->gg[i];
+	    //params[1] = var5->qq[i];
+	    //params[2] = var5->tt[i];
+	    //params[3] = var5->zz[i];
+	    //params[4] = var5->zz3[i];
+	    //params[5] = var5->hi[i];
+	    //params[6] = var5->hi3[i];
+//params[0] = var5->hzbb[i];
+          //params[1] = var5->hzz[i];                                                                                                                                            
           //params[5] = var5->met[i];
-          //params[3] = var5->ptZ[i];                                                                                                                                                               
+          //params[3] = var5->multi[i];                                                                                                       
           //params[4] = var5->deta[i];                                                                                                                                  
           //params[4] = var5->ptbb[i];
           zhh->Fill(mlp->Evaluate(0, params));
@@ -195,17 +229,27 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //-------------------------------------------------------------------------
         // FOR TWb
         for (int i=0;i<N4; ++i) {
-          if(var4-> Mll[i]>75. && var4-> Mll[i]<107.){
+          if(var4-> Mll[i]>76. && var4-> Mll[i]<106.){
           //params[0] =var4-> Mll[i];                                                                                                          
           //params[1] = var4->Mbb[i];                                                                                                                                     
           //params[2] = var4->dphi[i];                                                                                                                                  
-          //params[0] = var4->gg[i];
+          //params[3] = var4->gg[i];
           //params[1] = var4->qq[i];
-          params[2] = var4->htt[i];
-	  params[0] = var4->hzbb[i];
-          params[1] = var4->hzz[i];                                                                                                                   
+          //params[2] = var4->htt[i];
+	  //params[0] = var4->hzbb[i];
+	    params[0] = var4->hzbb[i];
+	    params[2] = var4->htt[i];
+	    params[1] = var4->hzz[i];
+	    //params[0] = var4->gg[i];
+	    //params[1] = var4->qq[i];
+	    //params[2] = var4->tt[i];
+	    //params[3] = var4-z[i];
+	    //params[4] = var4->zz3[i];
+	    //params[5] = var4->hi[i];
+	    //params[6] = var4->hi3[i];          
+//params[1] = var4->hzz[i];                                                                                                                   
           //params[5] = var4->met[i];
-          //params[3] = var4->ptZ[i];                                                                                                              
+          //params[3] = var4->multi[i];                                                                                                              
           //params[4] = var4->deta[i];                                                                                                               
           //params[4] = var4->ptbb[i];                                                                                                                         
           twbh->Fill(mlp->Evaluate(0, params));
@@ -215,18 +259,28 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
         //------------------------------------------------------------------------- 
         // FOR dat
         for (int i=0;i<N6; ++i) {
-          if(var6-> Mll[i]>75. && var6-> Mll[i]<107.){
+          if(var6-> Mll[i]>76. && var6-> Mll[i]<106.){
           //params[0] =var6-> Mll[i];   
           //params[1] = var6->Mbb[i];    
           //params[2] = var6->dphi[i];      
-          //params[0] = var6->gg[i];
+          //params[3] = var6->gg[i];
           //params[1] = var6->qq[i];
-          params[2] = var6->htt[i];                                                                              
+          //params[2] = var6->htt[i];                                                                              
           //params[3] = var6->zz3[i];
-          params[0] = var6->hzbb[i];
-          params[1] = var6->hzz[i];
+	    params[0] = var6->hzbb[i];
+	    params[2] = var6->htt[i];
+	    params[1] = var6->hzz[i];
+	    //  params[0] = var6->gg[i];
+	    //params[1] = var6->qq[i];
+	    // params[2] = var6->tt[i];
+	    //params[3] = var6->zz[i];
+	    //params[4] = var6->zz3[i];
+	    //params[5] = var6->hi[i];
+	    //params[6] = var6->hi3[i];
+//params[0] = var6->hzbb[i];
+          //params[1] = var6->hzz[i];
           //params[5] = var6->met[i];
-          //params[3] = var6->ptZ[i];                                  
+          //params[3] = var6->multi[i];                                  
           //params[4] = var6->deta[i];                                                                                          
           //params[4] = var6->ptbb[i]; 
           dath->Fill(mlp->Evaluate(0, params));
@@ -267,7 +321,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *twb,c
 	//double zbb_norm=1.0/824;
 	double zbb_norm=3048.*5051./35907791.;
 	//double higgs_norm=0.0189*5051.*(30579./1200.)/30579.;
-	double higgs_norm = 2.13 / zhh->Integral();
+	double higgs_norm = 100.*2.13 / zhh->Integral();
 	double twb_norm=0.0;
 	
 	tth->Scale(tt_norm);

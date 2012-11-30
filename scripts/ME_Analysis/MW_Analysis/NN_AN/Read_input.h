@@ -64,16 +64,16 @@ double gg_weight;
 	double deta;
 	double dphi;
 	double ptZ,ptbb;
-	int type;
+	int type1;
+	int type2;
 	double HvsZbb;
 	double HvsTT;
 	double HvsZZ;
 	int Multi;
-	int type2;
 };
 
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig)
+void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2)
 {
 
 // input file : read ttree
@@ -138,7 +138,9 @@ double Ej1,Ej2,Ptj1,Ptj2;
    if(Pt_lep2plus>0.0 && Pt_lep2minus>0.0){l2.SetPtEtaPhiM(Pt_lep2minus,Eta_lep2minus,Phi_lep2minus,0.105);}
    b1.SetPtEtaPhiE(Ptj1,Eta_j1,Phi_j1,Ej1);
    b2.SetPtEtaPhiE(Ptj2,Eta_j2,Phi_j2,Ej2);
+
    if(MeTsig<10. && ((l1+l2).M())>76. && ((l1+l2).M())<106.){
+
    sim->gg_weight=Wgg;
    sim->qq_weight=Wqq;
    //if(sig==0){sim->gg_weight=Wgg;}
@@ -164,10 +166,10 @@ double Ej1,Ej2,Ptj1,Ptj2;
    var->hi[i]=sim->hi_weight;
    var->hi3[i]=sim->hi3_weight;
    var->tt[i]=sim->tt_weight;
-   sim->type=sig;
-   sim->type2=typ2;
-   sim->deta = fabs(Eta_j1-Eta_j2);
-   var->deta[i]=fabs(Eta_j1-Eta_j2);
+   sim->type1=sig1;
+   sim->type2=sig2;
+   sim->deta = 10./(pow((pow(((l1+l2).M()),2) - pow(91.,2)),2)+10);//fabs(Eta_j1-Eta_j2);
+   var->deta[i]=10./(pow((pow(((l1+l2).M()),2) - pow(91.,2)),2)+10);//fabs(Eta_j1-Eta_j2);
    sim-> ptZ=(l1+l2).Pt();
    sim->ptbb=(b1+b2).Pt();
    sim->Mll=(l1+l2).M();

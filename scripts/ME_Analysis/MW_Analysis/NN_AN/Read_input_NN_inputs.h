@@ -1,7 +1,11 @@
 
-#include "../NN/MLP_Higgs_vs_Zbb_EE_TIGHT.cxx"
-#include "../NN/MLP_Higgs_vs_tt_EE_TIGHT.cxx"
-#include "../NN/MLP_Higgs_vs_ZZ3_EE_TIGHT.cxx"
+//#include "../NN/MLP_Higgs_vs_Zbb_ee.cxx"
+//#include "../NN/MLP_Higgs_vs_tt_EE_TIGHT.cxx"
+//#include "../NN/MLP_Higgs_vs_ZZ3_EE_TIGHT.cxx"
+
+#include "../NN/MLP_Higgs_vs_tt_MuMu_C.cxx"
+#include "../NN/MLP_Higgs_vs_Zbb_MuMu_C.cxx"
+#include "../NN/MLP_Higgs_vs_ZZ_MuMu_C.cxx"
 
 
 class nn_vars {
@@ -127,8 +131,9 @@ double Ej1,Ej2,Ptj1,Ptj2;
 
 
  // NN declaration -------------------------------------
- !gROOT->GetClass("MLP_Higgs_vs_Zbb_EE_TIGHT");
- MLP_Higgs_vs_Zbb_EE_TIGHT *HZbb=new MLP_Higgs_vs_Zbb_EE_TIGHT();
+ /*
+ !gROOT->GetClass("MLP_Higgs_vs_Zbb_ee");
+ MLP_Higgs_vs_Zbb_ee *HZbb=new MLP_Higgs_vs_Zbb_ee();
  if (!gROOT->GetClass("TMultiLayerPerceptron")) {
    gSystem->Load("libMLP");
  }
@@ -144,6 +149,25 @@ double Ej1,Ej2,Ptj1,Ptj2;
  if (!gROOT->GetClass("TMultiLayerPerceptron")) {
    gSystem->Load("libMLP");
  }
+*/
+ !gROOT->GetClass("MLP_Higgs_vs_Zbb_MuMu_C");                                                                                                                                
+ MLP_Higgs_vs_Zbb_MuMu_C *HZbb=new MLP_Higgs_vs_Zbb_MuMu_C();                                                                                                                        
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
+   gSystem->Load("libMLP");                                                                                                                                                                                      
+ }                                                                                                                                                                                                              
+                                                                                                                                                                                                                 
+ !gROOT->GetClass("MLP_Higgs_vs_tt_MuMu_C");                                                                                                                                                                   
+ MLP_Higgs_vs_tt_MuMu_C *HTT=new MLP_Higgs_vs_tt_MuMu_C();                                                                                                                                                   
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
+   gSystem->Load("libMLP");                                                                                                                                                                                      
+ }                                                                                                                                                                                                               
+                                                                                                                                                                                                                
+ !gROOT->GetClass("MLP_Higgs_vs_ZZ_MuMu_C");
+ MLP_Higgs_vs_ZZ_MuMu_C *HZZ=new MLP_Higgs_vs_ZZ_MuMu_C();                                                                                                                                                 
+ if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                            
+   gSystem->Load("libMLP");                                                                                                                          
+ }          
+
  // ----------------------------------------------------
 
 
@@ -177,8 +201,10 @@ double Ej1,Ej2,Ptj1,Ptj2;
    sim->hi_weight=Whi;
    sim->hi3_weight=Whi3;
    sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
-   sim->HvsTT=HTT->Value(0,Whi,Whi3,Wtt);
-   sim->HvsZZ=HZZ->Value(0,Whi,Whi3,Wzz,Wzz3);
+   //   sim->HvsTT=HTT->Value(0,Whi,Whi3,Wtt);
+   //   sim->HvsZZ=HZZ->Value(0,Whi,Whi3,Wzz,Wzz3);
+   sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
+   sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
    var->hzbb[i] = sim->HvsZbb;
    var->htt[i] = sim->HvsTT;
    var->hzz[i] = sim->HvsZZ;
@@ -200,7 +226,7 @@ double Ej1,Ej2,Ptj1,Ptj2;
    sim->type2=typ2;
    sim->deta = fabs(Eta_j1-Eta_j2);
    var->deta[i]=fabs(Eta_j1-Eta_j2);
-   sim-> ptZ=(l1+l2).Pt();
+   sim->ptZ=(l1+l2).Pt();
    sim->ptbb=(b1+b2).Pt();
    sim->Mll=(l1+l2).M();
    sim->Mbb=(b1+b2).M();
