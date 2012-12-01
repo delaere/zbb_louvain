@@ -444,9 +444,9 @@ void CreateParentTree(TString InputFile) {
    MLP_zbbvstt_mu = new MLP_Zbb_tt_MU();
    //-----------------------
 
-   TString folder = "testsSMP-12-003_v0_121114_JER0_allHmass/";
-
-   TFile* f_RDS  = new TFile(folder+"Tree_File_rds_zbb_" + InputFile + ".root");
+   TString folder = "testsMergeRDS/";
+   TString folder2 = "/storage/data/cms/users/vizangarciaj/RDS/SMP-12-003_v0_121114/PlainTrees/";
+   TFile* f_RDS  = new TFile(folder2+"Tree_File_rds_zbb_" + InputFile + ".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
 
    TString mename = folder+"ME_zbb_" + InputFile + ".root";
