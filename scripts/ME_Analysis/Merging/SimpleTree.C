@@ -319,7 +319,6 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    MLP_Higgs_vs_Zbb_EE_TIGHT *MLP_higgs_vs_zbb = 0;
    MLP_Higgs_vs_ZZ3_EE_TIGHT *MLP_higgs_vs_zz = 0;
    MLP_Higgs_vs_tt_EE_TIGHT *MLP_higgs_vs_tt = 0;
-
    MLP_Higgs_vs_bkg_EE_TIGHT *MLP_higgs_vs_bkg =0;
    MLP_Higgs_vs_bkg_EE_FULLL *MLP_higgs_vs_bkg_fulll =0;
 
@@ -1016,6 +1015,17 @@ void CreateParentTree(TString InputFile) {
         Wtwb = 0;
         Wzz3 = 0;
         Wzz0 = 0;
+        Whi3_115 = 0;
+        Whi0_115 = 0;
+        Whi3_120 = 0;
+        Whi0_120 = 0;
+        Whi3_125 = 0;
+        Whi0_125 = 0;
+        Whi3_130 = 0;
+        Whi0_130 = 0;
+        Whi3_135 = 0;
+        Whi0_135 = 0;
+
 
         Inv_Mass_bb = 0;
         Inv_Mass_lept = 0;
@@ -1073,7 +1083,7 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_115 = MLP_higgs_vs_zz->Value(0, Whi0_115 , Whi3_115 , Wzz0 , Wzz3);
         mlphiggsvsbkg_115 = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb_115  , mlphiggsvszz_115 , mlphiggsvstt_115);
         mlphiggsvsbkg_115_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0_115,Whi3_115);
-        // For H 115                                                                                                                                                                                             
+        // For H 115                                                                                                                                      
         mlpZbbvsTT_115_mu = MLP_zbbvstt_mu->Value(0, Wgg, Wqq, Wtt);
         mlphiggsvszbb_115_mu = MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0_115 , Whi3_115);
         mlphiggsvstt_115_mu = MLP_higgs_vs_tt_mu->Value(0, Wtt , Whi0_115 , Whi3_115);
@@ -1085,7 +1095,7 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_120 = MLP_higgs_vs_zz->Value(0, Whi0_120 , Whi3_120 , Wzz0 , Wzz3);
         mlphiggsvsbkg_120 = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb_120  , mlphiggsvszz_120 , mlphiggsvstt_120);
         mlphiggsvsbkg_120_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0_120,Whi3_120);
-        // For H 120                                                                                                                                                                                             
+        // For H 120                                                                                                                         
         mlpZbbvsTT_120_mu = MLP_zbbvstt_mu->Value(0, Wgg, Wqq, Wtt);
         mlphiggsvszbb_120_mu = MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0_120 , Whi3_120);
         mlphiggsvstt_120_mu = MLP_higgs_vs_tt_mu->Value(0, Wtt , Whi0_120 , Whi3_120);
@@ -1097,7 +1107,7 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_130 = MLP_higgs_vs_zz->Value(0, Whi0_130 , Whi3_130 , Wzz0 , Wzz3);
         mlphiggsvsbkg_130 = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb_130  , mlphiggsvszz_130 , mlphiggsvstt_130);
         mlphiggsvsbkg_130_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0_130,Whi3_130);
-        // For H 130                                                                                                                                                                                             
+        // For H 130                                                                                                                                       
         mlpZbbvsTT_130_mu = MLP_zbbvstt_mu->Value(0, Wgg, Wqq, Wtt);
         mlphiggsvszbb_130_mu = MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0_130 , Whi3_130);
         mlphiggsvstt_130_mu = MLP_higgs_vs_tt_mu->Value(0, Wtt , Whi0_130 , Whi3_130);
@@ -1109,7 +1119,7 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_135 = MLP_higgs_vs_zz->Value(0, Whi0_135 , Whi3_135 , Wzz0 , Wzz3);
         mlphiggsvsbkg_135 = MLP_higgs_vs_bkg->Value(0, mlphiggsvszbb_135  , mlphiggsvszz_135 , mlphiggsvstt_135);
         mlphiggsvsbkg_135_fulll = MLP_higgs_vs_bkg_fulll->Value(0, Wgg,Wqq,Wtt,Wzz0,Wzz3,Whi0_135,Whi3_135);
-        // For H 135                                                                                                                                                                                             
+        // For H 135                                                                                                                                  
         mlpZbbvsTT_135_mu = MLP_zbbvstt_mu->Value(0, Wgg, Wqq, Wtt);
         mlphiggsvszbb_135_mu = MLP_higgs_vs_zbb_mu->Value(0, Wgg, Wqq, Whi0_135 , Whi3_135);
         mlphiggsvstt_135_mu = MLP_higgs_vs_tt_mu->Value(0, Wtt , Whi0_135 , Whi3_135);
@@ -1283,14 +1293,14 @@ void SimpleTree() {
    CreateParentTree("ZZ_El_MC");
    CreateParentTree("ZH125_Mu_MC");
    CreateParentTree("ZH125_El_MC");
-   //CreateParentTree("ZH115_Mu_MC");
-   //CreateParentTree("ZH115_El_MC");
-   //CreateParentTree("ZH120_Mu_MC");
-   //CreateParentTree("ZH120_El_MC");
-   //CreateParentTree("ZH130_Mu_MC");
-   //CreateParentTree("ZH130_El_MC");
-   //CreateParentTree("ZH135_Mu_MC");
-   //CreateParentTree("ZH135_El_MC");
+   CreateParentTree("ZH115_Mu_MC");
+   CreateParentTree("ZH115_El_MC");
+   CreateParentTree("ZH120_Mu_MC");
+   CreateParentTree("ZH120_El_MC");
+   CreateParentTree("ZH130_Mu_MC");
+   CreateParentTree("ZH130_El_MC");
+   CreateParentTree("ZH135_Mu_MC");
+   CreateParentTree("ZH135_El_MC");
 }
 
 //mergeOneSample(InputFile = "Mu_DATA")

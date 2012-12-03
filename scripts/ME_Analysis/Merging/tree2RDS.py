@@ -2,7 +2,7 @@ from ROOT import *
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
 
   print "inputfile", InputFile  
-  f  = TFile("testsMergeRDSnoWS120721/Tree_rdsME_" + InputFile + ".root")
+  f  = TFile("testsMergeRDS/Tree_rdsME_" + InputFile + ".root")
   t  = f.Get("rds_zbb")
 
   file_data  = TFile("File_ws_ZZ_Mu_MC.root")
