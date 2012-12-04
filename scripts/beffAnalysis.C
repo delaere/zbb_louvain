@@ -25,6 +25,14 @@ void beffAnalysis(const char* input, const char* output) {
   new(algorithms[0]) TCut("SSVHEM","ssvhe>1.74");
   new(algorithms[1]) TCut("SSVHPT","ssvhp>2.0");
 
+  //uncomment this line to extract the csv efficiencies from the tree
+  /*
+  TClonesArray algorithms("TCut",2);
+  new(algorithms[0]) TCut("CSVL","csv>0.244");
+  new(algorithms[1]) TCut("CSVM","csv>0.679");
+  new(algorithms[2]) TCut("CSVT","csv>0.898");
+  */
+
   TClonesArray etaRegions("TCut",2);
   new(etaRegions[0]) TCut("Barrel","abs(eta)<=1.2");
   new(etaRegions[1]) TCut("Endcaps","abs(eta)>1.2");
