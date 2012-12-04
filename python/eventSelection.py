@@ -269,8 +269,8 @@ def jetId(jet,level="loose"):
 def isGoodJet(jet, Z = None):
   """Perform additional checks that define a good jet"""
   # restrict in eta
-  outcome = abs(jet.eta())<2.1
-  outcome = outcome and JECuncertaintyProxy.jetPt(jet)>25.
+  outcome = abs(jet.eta())<2.4
+  outcome = outcome and JECuncertaintyProxy.jetPt(jet)>20.
   # overlap checking
   # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
   #  if jet.hasOverlaps("muons"): return False
@@ -299,13 +299,13 @@ def isGoodMet_Sig(met,cut=10):
   else :
     return False
 
-def isBJet(jet,workingPoint,algo="SSV"):
+def isBJet(jet,workingPoint,algo="CSV"):
   """Perform b-tagging"""
   if algo=="SSV":
     if workingPoint=="HE":
-      return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.74
+      return jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>1.74 and jet.eta()<2.1
     elif workingPoint=="HP":
-      return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0
+      return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0 and jet.eta()<2.1
     else:
       print "Error: unforeseen working point for b-tagging. Use HE or HP"
       return False
@@ -455,10 +455,10 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
 
        if runNumber >= 190455 :
        #print "run number > 165121"
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size() 
+           print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size() 
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
-       #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,1).size())
-       #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
+           print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,0).size())
+           print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
            if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size())) :
              return True
 
