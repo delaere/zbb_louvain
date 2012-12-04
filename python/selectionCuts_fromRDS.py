@@ -44,7 +44,48 @@ channels  = [
 
 #choose you set of cuts
 extraCuts = [
+<<<<<<< selectionCuts_fromRDS.py
+    "jetmetbjet1pt>25&jetmetbjet2pt>25",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)",
+    #"eventSelectiondphidijetMET<1.",
+    #"eventSelectiondphiZbb>2.25",
+    #"eventSelectiondijetM>95&eventSelectiondijetM<155",
+    #"eventSelectionZbbM>176&eventSelectionZbbM<256",
+    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25",
+    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.25&eventSelectiondijetM>95&eventSelectiondijetM<155",
+    #"eventSelectiondphiZbb>2.25&eventSelectiondijetM>95&eventSelectiondijetM<155",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphiZbb>2.5",
+    #"eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectiondijetdR>1.5&eventSelectiondijetdR<3.",
+    #"(eventSelectionbestzptEle>20.||eventSelectionbestzptMu>20.)&eventSelectiondphidijetMET<1.&eventSelectiondphiZbb>2.5&eventSelectionZbPt<150",
+    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&eventSelectiondphiZbb>2.5",
+    #"eventSelectiondijetM>95.&eventSelectiondijetM<155.&((eventSelectionbestzmassEle>82.&eventSelectionbestzmassEle<100.)||(eventSelectionbestzmassMu>82.&eventSelectionbestzmassMu<100.))",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&jetmetbjet1pt>52",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondphiZbb>2.25",
+    #"((eventSelectionbestzmassEle>80.45&eventSelectionbestzmassEle<101.55)||(eventSelectionbestzmassMu>80.45&eventSelectionbestzmassMu<101.55))&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    #"eventSelectiondphiZbb>2.25&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    #"eventSelectiondphiZbb>2.25&jetmetbjet1pt>54",
+    #"jetmetMETSignificance<150"
+    #"eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85&eventSelectiondijetM>100.&eventSelectiondijetM<150.",
+    #"eventSelectiondphiZbb>2.25&jetmetbjet1pt>55.&jetmetMETsignificance<8.65&eventSelectiondijetdR<2.85"
+    ]
+
+titleCuts = [
+    "stage_"+WP,
+    "mass bb+dPhi(Z,bb)",
+    "mass bb+mass Z",
+    "dPhi(Z,bb)",
+    "bb mass",
+    "zbb mass",
+    "dPhi(bb,MET)+dPhi(Z,bb)",
+    "dPhi(bb,MET)+dPhi(Z,bb)+bb mass",
+    #"dPhi(Z,bb)+bb mass",
+=======
     ""
+>>>>>>> 1.6
     ]
 
 extraCutsLep = {
@@ -100,6 +141,14 @@ myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {}
 
+<<<<<<< selectionCuts_fromRDS.py
+filename_el = {"DATA_A" : "testsMergeRDSnoWS120721/RDS_rdsME_ElA_DATA.root",
+               "DATA_B" : "testsMergeRDSnoWS120721/RDS_rdsME_ElB_DATA.root",
+               "TT"     : "testsMergeRDSnoWS120721/RDS_rdsME_TT_El_MC.root",
+               "DY"     : "testsMergeRDSnoWS120721/RDS_rdsME_El_MC.root",
+               "ZZ"     : "testsMergeRDSnoWS120721/RDS_rdsME_ZZ_El_MC.root",
+               "ZH125"  : "testsMergeRDSnoWS120721/RDS_rdsME_ZH125_El_MC.root"
+=======
 filename_el = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_ElA_DATA.root",
                "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_ElB_DATA.root",
                "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_El_MC.root",
@@ -110,8 +159,42 @@ filename_el = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_ElA_DATA.root",
                "ZH125"  : "condorRDSmaker/outputs/File_rds_zbb_ZH125_El_MC.root",
                "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_El_MC.root",
                "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_El_MC.root"
+>>>>>>> 1.6
+               }
+filename_mu = {"DATA_A" : "testsMergeRDSnoWS120721/RDS_rdsME_MuA_DATA.root",
+               "DATA_B" : "testsMergeRDSnoWS120721/RDS_rdsME_MuB_DATA.root",
+               "TT"     : "testsMergeRDSnoWS120721/RDS_rdsME_TT_Mu_MC.root",
+               "DY"     : "testsMergeRDSnoWS120721/RDS_rdsME_Mu_MC.root",
+               "ZZ"     : "testsMergeRDSnoWS120721/RDS_rdsME_ZZ_Mu_MC.root",
+               "ZH125"  : "testsMergeRDSnoWS120721/RDS_rdsME_ZH125_Mu_MC.root"
                }
 
+
+<<<<<<< selectionCuts_fromRDS.py
+#filename_el = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElA_DATA.root",
+#               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_ElB_DATA.root",
+#               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_El_MC.root",
+#               "DY"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_El_MC.root",
+#               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_El_MC.root",
+#               "ZH115"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH115_El_MC.root",
+#               "ZH120"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH120_El_MC.root",
+#               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_El_MC.root",
+#               "ZH130"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH130_El_MC.root",
+#               "ZH135"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH135_El_MC.root"
+#               }
+
+#filename_mu = {"DATA_A" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuA_DATA.root",
+#               "DATA_B" : "condorRDSmakerNoWS/outputs/File_rds_zbb_MuB_DATA.root",
+#               "TT"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_TT_Mu_MC.root",
+#               "DY"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_Mu_MC.root",
+#               "ZZ"     : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZZ_Mu_MC.root",
+#               "ZH115"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH115_Mu_MC.root",
+#               "ZH120"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH120_Mu_MC.root",
+#               "ZH125"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH125_Mu_MC.root",
+#               "ZH130"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH130_Mu_MC.root",
+#               "ZH135"  : "condorRDSmakerNoWS/outputs/File_rds_zbb_ZH135_Mu_MC.root"
+#               }
+=======
 filename_mu = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_MuA_DATA.root",
                "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_MuB_DATA.root",
                "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_Mu_MC.root",
@@ -123,6 +206,7 @@ filename_mu = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_MuA_DATA.root",
                "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_Mu_MC.root",
                "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_Mu_MC.root"
                }
+>>>>>>> 1.6
 
 
 for sample in sampleList :
@@ -191,8 +275,30 @@ for b in btagRew:
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
 rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
 
-w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
+<<<<<<< selectionCuts_fromRDS.py
+if channel=="EEChannel" :
+    rrv_w_ptz = ras_zbb["eventSelectionbestzptEle"]
+    print " pass 11111111111111 "
+if channel=="MuMuChannel" :rrv_w_ptz = ras_zbb["eventSelectionbestzptMu"]
 
+#(419.86/414.71)
+w2 = RooFormulaVar("w2","w2", "@0*@1*@2*((419.86/414.71)*(-1.84241e-12 * min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 1.41919e-09 * min(@3*@3*@3*@3*@3,1.64130859375000000e+11) - 3.89175e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 4.77903e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.00266683*min(@3*@3,3.06250000000000000e+04) + 0.0646297*min(@3,175.) +0.320127))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*((419.86/627.81)*(-1.84241e-12 *2* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 1.41919e-09 *2* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) - 3.89175e-07 *2* min(@3*@3*@3*@3,9.37890625000000000e+08) + 4.77903e-05 *2*min(@3*@3*@3,5.35937500000000000e+06) -0.00266683*2*min(@3*@3,3.06250000000000000e+04) + 0.0646297*2*min(@3,175.) +0.320127/2))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(392.86/400.05)*(-9.25908e-13* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.0011533 *min(@3*@3,3.06250000000000000e+04) + 0.0264567 *min(@3,175.) +0.687981))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(392.86/394.68)*(-9.25908e-13*2* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10*2* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 *2* min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *2* min(@3*@3*@3,5.35937500000000000e+06) -0.0011533 *2* min(@3*@3,3.06250000000000000e+04) + 0.0264567 *2* min(@3,175.) +0.687981/2.))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+=======
+w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
+>>>>>>> 1.6
+
+
+
+
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*((357.15/402.1)*(-0.00000000000104* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 0.000000000755* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) - 0.0000002* min(@3*@3*@3*@3,9.37890625000000000e+08) + 0.000024*min(@3*@3*@3,5.35937500000000000e+06) -0.00124*min(@3*@3,3.06250000000000000e+04) + 0.0233*min(@3,175.) +.863))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+w1 = RooFormulaVar("w1","w1", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 #############
 ### PLOTS ###
 #############
@@ -224,8 +330,20 @@ namePlotList = [
     "eventSelectionZbbM"         ,
     "eventSelectionZbbPt"        ,
     "eventSelectionZbM"          ,
+<<<<<<< selectionCuts_fromRDS.py
+    "eventSelectiondrMuMu"       , 
+    "eventSelectiondrEleEle"     ,
+    "mlphiggsvsbkg",
+    "mlphiggsvsbkg_mu",
+    "mlphiggsvsbkg_fulll",
+    "mlphiggsvszbb",
+    "mlpZbbvsTTtight",
+    "mlpZbbvsTT_tight_Wmet",
+    "Whi3"
+=======
     "eventSelectiondrllMu"       , 
     "eventSelectiondrllEle"     
+>>>>>>> 1.6
     ]
 
 ################
@@ -256,8 +374,21 @@ min = {
     "jetmetjet1SSVHEdisc"       :    0 ,
     "jetmetjet1SSVHPdisc"       :    0 ,
     "jetmetjet1SVmass"          :    0 ,
+<<<<<<< selectionCuts_fromRDS.py
+    "eventSelectiondrMuMu"      :    0 ,
+    "eventSelectiondrEleEle"    :    0 ,
+    "mlphiggsvsbkg"             :    -0.2,
+    "mlphiggsvsbkg_mu"          :    -0.2,
+    "mlphiggsvsbkg_fulll"        :    -0.2, 
+    "mlphiggsvszbb"             :    -0.2,
+    "mlpZbbvsTTtight"           :-0.2,
+    "mlpZbbvsTT_tight_Wmet"     : -0.2,
+    "Whi3"                      :10
+  
+=======
     "eventSelectiondrllMu"      :    0 ,
     "eventSelectiondrllEle"    :    0 
+>>>>>>> 1.6
     }
 
 ################
@@ -280,7 +411,7 @@ max = {
     "eventSelectiondrZbj1"      :    5 ,
     "eventSelectiondrZbb"       :    5 ,
     "eventSelectionscaldptZbj1" :  250 ,
-    "eventSelectiondijetM"      :  600 ,
+    "eventSelectiondijetM"      :  250 ,
     "eventSelectiondijetdR"     :    5 ,
     "eventSelectiondijetSVdR"   :    5 ,
     "eventSelectionZbbM"        : 1000 ,
@@ -289,8 +420,20 @@ max = {
     "jetmetjet1SSVHEdisc"       :    8 ,
     "jetmetjet1SSVHPdisc"       :    8 ,
     "jetmetjet1SVmass"          :    5 ,
+<<<<<<< selectionCuts_fromRDS.py
+    "eventSelectiondrMuMu"      :    5 ,
+    "eventSelectiondrEleEle"    :    5 ,
+    "mlphiggsvsbkg"           :     1.2,
+    "mlphiggsvsbkg_mu"          :    1.2,
+    "mlphiggsvsbkg_fulll"            :    1.2,
+    "mlphiggsvszbb"           :     1.2,
+    "mlpZbbvsTTtight"         :1.2,
+    "mlpZbbvsTT_tight_Wmet"    : 1.2,
+    "Whi3"                     :22
+=======
     "eventSelectiondrllMu"      :    5 ,
     "eventSelectiondrllEle"    :    5 
+>>>>>>> 1.6
     }
 
 ################
@@ -313,7 +456,7 @@ binning = {
     "eventSelectiondrZbj1"      :   10 , #0.5
     "eventSelectiondrZbb"       :   10 , #0.5
     "eventSelectionscaldptZbj1" :   50 , #10GeV
-    "eventSelectiondijetM"      :   12 , #50GeV
+    "eventSelectiondijetM"      :   125 , #50GeV
     "eventSelectiondijetdR"     :   10 , #0.5
     "eventSelectiondijetSVdR"   :   10 ,
     "eventSelectionZbbM"        :   20 , #50GeV
@@ -322,8 +465,20 @@ binning = {
     "jetmetjet1SSVHEdisc"       :   16 , #0.5
     "jetmetjet1SSVHPdisc"       :   16 ,
     "jetmetjet1SVmass"          :   20 , #0.25GeV
+<<<<<<< selectionCuts_fromRDS.py
+    "eventSelectiondrMuMu"      :   10 , #0.5
+    "eventSelectiondrEleEle"    :   10 ,
+    "mlphiggsvsbkg"           :     30,
+    "mlphiggsvsbkg_mu"          :    30,
+    "mlphiggsvsbkg_fulll"             :   20,
+    "mlphiggsvszbb"           :     20,
+    "mlpZbbvsTTtight"         :20,
+    "mlpZbbvsTT_tight_Wmet"    : 20,
+    "Whi3"                     : 96
+=======
     "eventSelectiondrllMu"      :   10 , #0.5
     "eventSelectiondrllEle"    :   10 
+>>>>>>> 1.6
     }
 
 var = {}
@@ -332,7 +487,13 @@ for name in namePlotList:
     var[name] = ras_zbb[name]
     var[name].setMin(min[name])
     var[name].setMax(max[name])
+<<<<<<< selectionCuts_fromRDS.py
     var[name].setBins(binning[name])
+#    var[name].setBins(5*binning[name])
+
+=======
+    var[name].setBins(binning[name])
+>>>>>>> 1.6
 
 th1 = {}
 
@@ -350,17 +511,29 @@ for channel in channels :
     for sample in totsampleList :
         print "sample ... ", sample
         for cut in extraCuts :
+<<<<<<< selectionCuts_fromRDS.py
+            iCut=extraCutsLep[channel]
+            #iCut=cut#+"&extraCutsLep[channel]
+=======
             if cut=="" : iCut=extraCutsLep[channel]
             else : iCut=cut+"&"+extraCutsLep[channel]
+>>>>>>> 1.6
             print "cuts ... ", iCut
             
             myRDS_red = myRDS[channel+sample]
 
             if iCut : myRDS_red = myRDS_red.reduce(iCut)
             
-            if sample != "DATA": myRDS_red.addColumn(w)
+            if sample != "DATA":# myRDS_red.addColumn(w)
+                if sample == "Zb" :myRDS_red.addColumn(w2)
+                if sample != "Zb" :myRDS_red.addColumn(w1)
                 
-            if sample != "DATA": myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get(),"","w")
+            if sample != "DATA":# myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get(),"","w")
+                if sample == "Zb" : myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get(),"","w2")
+                if sample != "Zb" : myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get(),"","w1")
+        
+
+
             else               : myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get())
 
             nevts["pure"+sample+channel+cut]     = myRDS_red_w.numEntries()

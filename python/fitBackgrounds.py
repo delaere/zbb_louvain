@@ -49,17 +49,19 @@ gROOT.SetStyle("Plain")
 ### settings you want to give from outside ###
 # to adjust by user:
 
-channel   = "El"
-dataLabel = "2011B"
+channel   = "Mu"
+dataLabel = "2011"
 
-frac      = true
+frac      = false
 WP        = "HEHEMETsig"
-extraCut  = ""
+extraCut  = "&eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.&jetmetbjet1pt>25&jetmetbjet2pt>25&jetmetMETsignificance<10&mlphiggsvszbb<0.5&mlphiggsvszbb>-0.5"
+#extraCut  = "&eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
 keys      = False
 
-mistagVarList = [ "msv1" ]
-if channel=="Mu": ttbarVarList  = [ "mmumu" ]
-if channel=="El": ttbarVarList  = [ "melel" ]
+ttbarVarList  = [ "mwnn_1"]
+mistagVarList = [ ]
+##if channel=="Mu": ttbarVarList  = [ "mmumu" ]
+#if channel=="El": ttbarVarList  = [ "melel" ]
 
 totVarList = mistagVarList+ttbarVarList 
 
@@ -67,7 +69,7 @@ totVarList = mistagVarList+ttbarVarList
 
 # fixed definitions:
 
-ttMCNameList = ["TT","DY"]
+ttMCNameList = ["TT","DY","ZZ"]
 # maybe different if using QCD:
 mistagMCNameList  = ["Zb","Zc","Zl"]
 dataNameList      = [dataLabel]
@@ -96,14 +98,22 @@ varNamesList = { "msv1"  : "jetmetbjet1SVmass"          ,
                  #"msv"   : "jetmetbjetSVmass"           ,
                  "melel" : "eventSelectionbestzmassEle" ,
                  "mmumu" : "eventSelectionbestzmassMu"  ,
-                 #"mwnn"  : "mlpZbbvsTT"                 ,
+                 #"mwnn"  : "mlpzbbvstt_multi_EE_tight"   ,
+                 "mwnn"  : "mlpZbbvsTTtight"            ,
+                 #"mwnn"  : "mlpZbbvsTT_mu"            ,
+                 "mwnn_1"  : "mlphiggsvszbb"            ,
+                 "mwnn_2"  : "mlphiggsvstt"            ,
+                 #"mwnn"  : "mlpzbbttmmll_MeTtest_mll_met",
+                 #"mwnn"  : "mlpzbbttmlltest_mll",
                  "w_b_HE"    : "BtaggingReweightingHE"  ,
                  "w_b_HP"    : "BtaggingReweightingHP"  ,
                  "w_b_HEHE"  : "BtaggingReweightingHEHE",
                  "w_b_HEHEMET"  : "BtaggingReweightingHEHE",
                  "w_b_HEHEMETsig"  : "BtaggingReweightingHEHE",
                  "w_b_HPHP"  : "BtaggingReweightingHPHP",
+                 "w_b_HPHPMETsig"  : "BtaggingReweightingHPHP",
                  "w_lep"     : "LeptonsReweightingweight",
+                 "jmul"      : "jetmetnj",
                  "w_lumi"    : "lumiReweightingLumiWeight",
                 }
 
@@ -111,48 +121,60 @@ min = {"msv1"   :   0,
        "msv2"   :   0,
        "msv"    :   0,
        "melel"  :  73,
-       "mmumu"  :  73,
-       "mwnn"   :-0.2,
-       "w_b_HE"    : 0., 
+       "mmumu"  :  76,
+       "mwnn"   : 0.0,
+       "mwnn_1"   :-0.2,
+       "mwnn_2"   : 0.,
+       "w_b_HE" : 0. , 
        "w_b_HP"    : 0.,
        "w_b_HEHE"  : 0.,
        "w_b_HEHEMET"  : 0.,
        "w_b_HEHEMETsig"  : 0.,
+       "w_b_HPHPMETsig"  : 0.,
        "w_b_HPHP"  : 0.,
        "w_lep"     : 0.,
-       "w_lumi"    : 0.
+       "w_lumi"    : 0.,
+       "jmul"      :2.
        }
 
 max = {"msv1" :    5,
        "msv2" :    5,
        "msv"  :    5,
        "melel":  107,
-       "mmumu":  107,
-       "mwnn" :    1.2,
+       "mmumu":  106,
+       "mwnn" :    1,
+       "mwnn_1"   : 0.5,
+       "mwnn_2"   : 0.5,
        "w_b_HE"    : 2., 
        "w_b_HP"    : 2.,
        "w_b_HEHE"  : 2.,
        "w_b_HEHEMET"  : 2.,
        "w_b_HEHEMETsig"  : 2.,
+       "w_b_HPHPMETsig"  : 2.,
        "w_b_HPHP"  : 2.,
        "w_lep"     : 2.,
-       "w_lumi"    : 2.
+       "w_lumi"    : 2.,
+       "jmul"      : 8. 
        }
 
 bins = {"msv1" :   20,
         "msv2" :   20,
         "msv"  :   20,
         "melel":   34,
-        "mmumu":   34,
-        "mwnn" :   60,
-       "w_b_HE"    : 100, 
-       "w_b_HP"    : 100,
-       "w_b_HEHE"  : 100,
-       "w_b_HEHEMET"  : 100,
-       "w_b_HEHEMETsig"  : 100,
-       "w_b_HPHP"  : 100,
-       "w_lep"     : 100,
-       "w_lumi"    : 100
+        "mmumu":   30,
+        "mwnn" :   36,
+        "mwnn_1"   : 20,
+        "mwnn_2"   : 16,
+        "w_b_HE"    : 100, 
+        "w_b_HP"    : 100,
+        "w_b_HEHE"  : 100,
+        "w_b_HEHEMET"  : 100,
+        "w_b_HEHEMETsig"  : 100,
+        "w_b_HPHPMETsig"  : 100,
+        "w_b_HPHP"  : 100,
+        "w_lep"     : 100,
+        "w_lumi"    : 100,
+        "jmul"      : 6, 
         }
 
 color = {"msv1" : kRed,
@@ -160,29 +182,44 @@ color = {"msv1" : kRed,
          "msv"  : kRed,
          "melel": kYellow,
          "mmumu": kYellow,
+         "mwnn_1" :kYellow,
          }
 
 C={}
 
-path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
+#path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
+path = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/testsMergeRDSnoWS120721/"
 
 fileNameList = {}
 
-fileNameList = { "2011A"    : path+"File_rds_zbb_"+channel+"A_DATA.root",
-                 "2011B"    : path+"File_rds_zbb_"+channel+"B_DATA.root",
-                 "DY"       : path+"File_rds_zbb_"+channel+"_MC.root",
-                 "TT"       : path+"File_rds_zbb_TT_"+channel+"_MC.root",
-                 "Zb"       : path+"File_rds_zbb_"+channel+"_MC.root",
-                 "Zc"       : path+"File_rds_zbb_"+channel+"_MC.root",
-                 "Zl"       : path+"File_rds_zbb_"+channel+"_MC.root"
+
+fileNameList = { "2011A"   : path+"RDS_rdsME_"+channel+"A_DATA.root",
+                 "2011B"   : path+"RDS_rdsME_"+channel+"B_DATA.root",
+                 "DY"      : path+"RDS_rdsME_"+channel+"_MC.root",
+                 "TT"      : path+"RDS_rdsME_TT_"+channel+"_MC.root",
+                 "Zb"      : path+"RDS_rdsME_"+channel+"_MC.root",
+                 "Zc"      : path+"RDS_rdsME_"+channel+"_MC.root",
+                 "Zl"      : path+"RDS_rdsME_"+channel+"_MC.root",
+                 "ZZ"      : path+"RDS_rdsME_ZZ_"+channel+"_MC.root",
                  }
+
+
+
+#fileNameList = { "2011A"    : path+"File_rds_zbb_"+channel+"A_DATA.root",
+#                 "2011B"    : path+"File_rds_zbb_"+channel+"B_DATA.root",
+#                 "DY"       : path+"File_rds_zbb_"+channel+"_MC.root",
+#                 "TT"       : path+"File_rds_zbb_TT_"+channel+"_MC.root",
+#                 "Zb"       : path+"File_rds_zbb_"+channel+"_MC.root",
+#                 "Zc"       : path+"File_rds_zbb_"+channel+"_MC.root",
+#                 "Zl"       : path+"File_rds_zbb_"+channel+"_MC.root"
+#                 }
 
 
 ##############################################
 
 def getVariables(varNamesList,varName,dataAndMCList) :
     var=varNamesList[varName]
-    y=dataAndMCList["Zb"]
+    y=dataAndMCList["Zl"]
     print "var = ", var
     print "ras = ", y.get()
     print "var = ", y.get()[var]
@@ -231,8 +268,8 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList) :
                 myRDS[name] = file[name].Get("rds_zbb")
         print "*** Going to reduce RDS ", name        
         myRDS[name] = myRDS[name].reduce(category[WP]+"==1"+extraCut)
-        if channel=="El": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<120&eventSelectionbestzmassEle>60")
-        if channel=="Mu": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassMu<120&eventSelectionbestzmassMu>60")
+        if channel=="El": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassEle<106&eventSelectionbestzmassEle>76")
+        if channel=="Mu": myRDS[name] = myRDS[name].reduce("eventSelectionbestzmassMu<106&eventSelectionbestzmassMu>76")
         print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name].numEntries() 
         dataAndMCList[name]=myRDS[name]
 
@@ -357,7 +394,9 @@ def main():
                 pdfName = ttMCName+vars[ttVarName].GetName() 
                 makePdfList(dataAndMCList, ttMCName, vars[ttVarName], RDH_tt, RHP_tt )
                 ttPdfList.add(RHP_tt[pdfName])
-                Ntt.append(RooRealVar("N_"+ttMCName,"N_"+ttMCName,0,dataAndMCList[ttMCName].numEntries()))
+                if ttMCName=="TT":Ntt.append(RooRealVar("N_"+ttMCName,"N_"+ttMCName,0,75))#dataAndMCList[ttMCName].numEntries()))
+                elif ttMCName=="ZZ": Ntt.append(RooRealVar("N_"+ttMCName,"N_"+ttMCName,0,8))#dataAndMCList[ttMCName].numEntries()))
+                else : Ntt.append(RooRealVar("N_"+ttMCName,"N_"+ttMCName,0,dataAndMCList[ttMCName].numEntries()))
                 ftt.append(RooRealVar("f_"+ttMCName,"f_{"+ttMCName+"}",0,1.))
         for Ntts in Ntt: ttYieldList.add(Ntts)
         ftt = ftt[:len(ftt)-1]

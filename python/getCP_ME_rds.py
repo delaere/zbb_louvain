@@ -32,7 +32,7 @@ def RemoveErrorsHisto(h):
 ### sample/wp/selection of interest
 #####################################################
 
-WP       = "17"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+WP       = "16"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
 channel  = "Mu"    #"El","Mu"
 #extraCut = "eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
 extraCut = "eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
@@ -181,8 +181,7 @@ rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHE"]  ,
            "13" : ras_zbb["BtaggingReweightingHEHP"],
            "14" : ras_zbb["BtaggingReweightingHPHP"],
            "15" : ras_zbb["BtaggingReweightingHE"]  ,
-           "16" : ras_zbb["BtaggingReweightingHP"]  ,
-           "17" : ras_zbb["BtaggingReweightingHEHE"], 
+           "16" : ras_zbb["BtaggingReweightingHEHE"], 
            "18" : ras_zbb["BtaggingReweightingHEHP"],
            "19" : ras_zbb["BtaggingReweightingHPHP"],
            
