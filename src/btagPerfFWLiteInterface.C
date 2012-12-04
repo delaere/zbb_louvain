@@ -29,46 +29,55 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   es_->syncTo(edm::EventID(1001,0,0),edm::Timestamp());
   //std::cout << "btagPerfFWLiteInterface: Got record ID " << testRecID << es_->get(testRecID).startSyncValue().eventID()<<std::endl;
 
-  es_->get(testRecID).get(plHandleBTAGSSVHEM_,"MUJETSWPBTAGSSVHEM");
-  es_->get(testRecID).get(wpHandleBTAGSSVHEM_,"MUJETSWPBTAGSSVHEM");
+  //if the file contain csv, we guess that the good algo to use is CSV otherwise SSV is used by default
+  std::string heWP ="SSVHEM";
+  std::string hpWP ="SSVHPT";
+  std::string sinputfile = inputfile;
+  if(sinputfile.find("csv")!=std::string::npos){
+    heWP ="CSVL";
+    hpWP ="CSVM";
+  }
+
+  es_->get(testRecID).get(plHandleBTAGSSVHEM_, ("MUJETSWPBTAG"+heWP).c_str());
+  es_->get(testRecID).get(wpHandleBTAGSSVHEM_, ("MUJETSWPBTAG"+heWP).c_str() );
   if ( plHandleBTAGSSVHEM_.isValid() && wpHandleBTAGSSVHEM_.isValid() ) 
     perfBTAGSSVHEM_ = new BtagPerformance(*plHandleBTAGSSVHEM_, *wpHandleBTAGSSVHEM_);
   else 
     perfBTAGSSVHEM_ = NULL;
 
-  es_->get(testRecID).get(plHandleMISTAGSSVHEM_,"MISTAGSSVHEM"); 
-  es_->get(testRecID).get(wpHandleMISTAGSSVHEM_,"MISTAGSSVHEM");
+  es_->get(testRecID).get(plHandleMISTAGSSVHEM_, ("MISTAGS"+heWP).c_str() ); 
+  es_->get(testRecID).get(wpHandleMISTAGSSVHEM_, ("MISTAG"+heWP).c_str() );
   if ( plHandleMISTAGSSVHEM_.isValid() && wpHandleMISTAGSSVHEM_.isValid() ) 
     perfMISTAGSSVHEM_ = new BtagPerformance(*plHandleMISTAGSSVHEM_, *wpHandleMISTAGSSVHEM_);
   else 
     perfMISTAGSSVHEM_ = NULL;
 
-  es_->get(testRecID).get(plHandleBTAGSSVHPT_,"MUJETSWPBTAGSSVHPT"); 
-  es_->get(testRecID).get(wpHandleBTAGSSVHPT_,"MUJETSWPBTAGSSVHPT");
+  es_->get(testRecID).get(plHandleBTAGSSVHPT_, ("MUJETSWPBTAG"+hpWP).c_str() ); 
+  es_->get(testRecID).get(wpHandleBTAGSSVHPT_, ("MUJETSWPBTAG"+hpWP).c_str() );
   if ( plHandleBTAGSSVHPT_.isValid() && wpHandleBTAGSSVHPT_.isValid() ) 
     perfBTAGSSVHPT_ = new BtagPerformance(*plHandleBTAGSSVHPT_, *wpHandleBTAGSSVHPT_);
   else 
     perfBTAGSSVHPT_ = NULL;
 
-  es_->get(testRecID).get(plHandleMISTAGSSVHPT_,"MISTAGSSVHPT");
-  es_->get(testRecID).get(wpHandleMISTAGSSVHPT_,"MISTAGSSVHPT");
+  es_->get(testRecID).get(plHandleMISTAGSSVHPT_, ("MISTAG"+hpWP).c_str() );
+  es_->get(testRecID).get(wpHandleMISTAGSSVHPT_, ("MISTAG"+hpWP).c_str() );
   if ( plHandleMISTAGSSVHPT_.isValid() && wpHandleMISTAGSSVHPT_.isValid() ) 
     perfMISTAGSSVHPT_ = new BtagPerformance(*plHandleMISTAGSSVHPT_, *wpHandleMISTAGSSVHPT_);
   else 
     perfMISTAGSSVHPT_ = NULL;
   // load data for the efficiency curves
-  h_eff_ssvhem_b_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb_Barrel");
-  h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptb_Endcaps");
-  h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Barrel");
-  h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptc_Endcaps");
-  h_eff_ssvhem_l_brl_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptl_Barrel");
-  h_eff_ssvhem_l_fwd_ = (TH1F*)esdata_->Get("SSVHEM/h_eff_bTagOverGoodJet_ptl_Endcaps");
-  h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Barrel");
-  h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptb_Endcaps");
-  h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Barrel");
-  h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptc_Endcaps");
-  h_eff_ssvhpt_l_brl_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptl_Barrel");
-  h_eff_ssvhpt_l_fwd_ = (TH1F*)esdata_->Get("SSVHPT/h_eff_bTagOverGoodJet_ptl_Endcaps");
+  h_eff_ssvhem_b_brl_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptb_Barrel").c_str()  );
+  h_eff_ssvhem_b_fwd_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptb_Endcaps").c_str() );
+  h_eff_ssvhem_c_brl_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptc_Barrel").c_str()  );
+  h_eff_ssvhem_c_fwd_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptc_Endcaps").c_str() );
+  h_eff_ssvhem_l_brl_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptl_Barrel").c_str()  );
+  h_eff_ssvhem_l_fwd_ = (TH1F*)esdata_->Get( (heWP+"/h_eff_bTagOverGoodJet_ptl_Endcaps").c_str() );
+  h_eff_ssvhpt_b_brl_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptb_Barrel").c_str()  );
+  h_eff_ssvhpt_b_fwd_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptb_Endcaps").c_str() );
+  h_eff_ssvhpt_c_brl_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptc_Barrel").c_str()  );
+  h_eff_ssvhpt_c_fwd_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptc_Endcaps").c_str() );
+  h_eff_ssvhpt_l_brl_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptl_Barrel").c_str()  );
+  h_eff_ssvhpt_l_fwd_ = (TH1F*)esdata_->Get( (hpWP+"/h_eff_bTagOverGoodJet_ptl_Endcaps").c_str() );
 }
 
 btagPerfFWLiteInterface::~btagPerfFWLiteInterface() {
