@@ -63,6 +63,9 @@ MonteCarloPUFileName=zbbfile.pileupMC
 DataPUFileName=zbbfile.pileupData
 btagPerfData=zbbfile.ssvperfData
 
+btagAlgo=btagAlgo
+
+
 ############
 ### Maps ###
 ############
@@ -244,7 +247,7 @@ events = Events (files)
 
 ### booking
 
-escp.beginJob(btagging="SSV", zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
+escp.beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
 brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
 jmcp.beginJob()
@@ -286,7 +289,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
-      categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo="SSV")
+      categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo=btagAlgo)
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
       escp.processEvent(event)
