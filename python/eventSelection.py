@@ -312,9 +312,9 @@ def isBJet(jet,workingPoint,algo="SSV"):
   elif algo=="CSV":
     #HE is Medium WP and HP is Tight WP valid both for 2011 and 2012
     if workingPoint=="HE":
-      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.679
+      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.244
     elif workingPoint=="HP":
-      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.898
+      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.679
     else:
       print "Error: unforeseen working point for b-tagging. Use HE or HP"
       return False
