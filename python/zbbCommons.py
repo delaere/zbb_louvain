@@ -1,5 +1,3 @@
-
-
  
 class zbblabel:
   """labels used in the PAT configuration"""
@@ -46,32 +44,20 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-<<<<<<< zbbCommons.py
-#  lumi_tot2011=5.23 #in fb-1
-  lumi_tot2011=5.28 #in fb-1
-
-  #lumi_tot2011=2.1 #in fb-1
- 
-=======
   lumi_totEle2011=5.217 #in fb-1
   lumi_totMu2011=5.275
 
   lumi_tot2012=0.809 #only A for the moment
   
->>>>>>> 1.37
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
-  xsec_DYjets_7TeV= 3048. *1.16     #Ml+l->50, NNLO for Z->ll
-  #xsec_TTjets_7TeV=  157.5    #NLO inclusive
-  xsec_TTjets_7TeV=  157.5*0.74*42407.0/10000.0    ##for Mu ME
+  xsec_DYjets_7TeV= 3048.     #Ml+l->50, NNLO for Z->ll
+  xsec_TTjets_7TeV=  157.5    #NLO inclusive
   xsec_TTlept_7TeV=   16.7    #ttbar->llvvbb_
-  xsec_ZZ_7TeV    =    6.206*2.6  #cms measurement EWK-11-010 (2011)
+  xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
   xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
   xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
-  #xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
-  
-  #xsec_ZH125_7TeV =    100.*0.0189*22409./1200. #for El ME 
-  xsec_ZH125_7TeV =    100.*0.0189*30579./1200. #for Mu ME 
+  xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
   xsec_ZH130_7TeV =    0.0143 #ZHxsec"0.2778", BR(H->bb)"0.494" 
   xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404" 
   xsec_tW_7TeV    =    5.3    #NLO inclusive

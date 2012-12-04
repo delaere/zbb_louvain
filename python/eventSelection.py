@@ -606,15 +606,7 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-<<<<<<< eventSelection.py
-<<<<<<< eventSelection.py
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, rho, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=30.):
-=======
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", massWindow=15., lumi_section=0):
->>>>>>> 1.85
-=======
 def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", lumi_section=0):
->>>>>>> 1.97
   """Check analysis requirements for various steps."""
   output = []
   if vertices.size()>0 :
