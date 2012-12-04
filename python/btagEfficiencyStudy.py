@@ -16,13 +16,14 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
      Int_t       flavor;\
      Float_t     ssvhe;\
      Float_t     ssvhp;\
+     Float_t     csv;\
      Float_t     eventWeight;\
   };" )
   from ROOT import MyStruct
   mystruct = MyStruct()
   f = ROOT.TFile( 'mybtagEfftree.root', 'RECREATE' )
   tree = ROOT.TTree( 'btagEff', 'btag efficiency' )
-  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:eventWeight/F' )
+  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:csv/F:eventWeight/F' )
   # input
   dirList=os.listdir(path) 
   files=[]
@@ -79,6 +80,7 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
         mystruct.flavor = jet.partonFlavour()
         mystruct.ssvhe = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
         mystruct.ssvhp = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+        mystruct.csv = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
         tree.Fill()
   f.Write()
   f.Close()
