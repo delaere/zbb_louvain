@@ -64,7 +64,7 @@ MonteCarloPUFileName=zbbfile.pileupMC
 DataPUFileName=zbbfile.pileupData
 btagPerfData=zbbfile.ssvperfData
 
-btagAlgo=btagAlgo
+btagAlgo="SSV"
 
 
 ############
