@@ -23,8 +23,8 @@ parser.add_option("--onlyEle",action="store_true",dest="onlyEle",
                   help="Fill only the electron channel plots.")
 parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl",
                   help="Jet flavor filter. Examples: --jetFlavor b or --jetFlavor cl")
-parser.add_option("--trigger",action="store_true",dest="checkTrigger",
-                  help="Check the trigger at the early stage of the .")
+parser.add_option("--trigger",action="store_true",dest="checkTrigger", default=False, 
+                  help="Check the trigger at the early stage of the event selection.")
 parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
                   help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
 parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default=zbbfile.pileupData,
@@ -53,8 +53,8 @@ import ROOT
 import os
 import itertools
 import time
-from DataFormats.FWLite import Events, Handle
-from FWCore.ParameterSet.Types import InputTag
+from AnalysisEvent import AnalysisEvent
+from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent
 from LumiReWeighting import LumiReWeighting
 from LeptonsReweighting import LeptonsReWeighting
 from btaggingWeight import btaggingWeight
@@ -64,67 +64,39 @@ from vertexAssociationControlPlots import *
 from LumiReWeightingControlPlots import *
 from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
-from eventSelection import eventCategories, eventCategory, isInCategory
-from monteCarloSelection import isZbEvent, isZcEvent
+from MonteCarloReweighting import *
 from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
 
-jetHandle = Handle ("vector<pat::Jet>")
-metHandle = Handle ("vector<pat::MET>")
-zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-trigInfoHandle = Handle ("pat::TriggerEvent")
-genHandle = Handle ("vector<reco::GenParticle>")
-genInfoHandle = Handle("GenEventInfoProduct")
-vertexHandle = Handle("vector<reco::Vertex>")
-#rhoHandle = Handle("double")
-
-#@print_timing
-def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
-  """Compute the event category for histogramming"""
-  if not ZjetFilter=="bcl":
-    event.getByLabel (zbblabel.genlabel,genHandle)
-    genParticles = genHandle.product()
-    if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
-    if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
-    if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
-  event.getByLabel(zbblabel.jetlabel,jetHandle)
-  event.getByLabel(zbblabel.metlabel,metHandle)
-  event.getByLabel(zbblabel.zmumulabel,zmuHandle)
-  event.getByLabel(zbblabel.zelelabel,zeleHandle)
-  event.getByLabel(zbblabel.vertexlabel,vertexHandle)
-  #event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
-  #event.getByLabel("ak5PFJets","rho",rhoHandle)
-
-  #event.getByLabel("elPFIsoValueCharged03PFIso",chargedIsoHandle)
-  #event.getByLabel("elPFIsoValueGamma03PFIso",gammaIsoHandle)
-  #event.getByLabel("elPFIsoValueNeutral03PFIso",neutralIsoHandle)
-  jets = jetHandle.product()
-  met = metHandle.product()
-  zCandidatesMu = zmuHandle.product()
-  zCandidatesEle = zeleHandle.product()
-  vertices = vertexHandle.product()
-  #rho = rhoHandle.product()
-
-  if checkTrigger:
-    event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
-    triggerInfo = trigInfoHandle.product()
-  else:
-    triggerInfo = None
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo)
-
-
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
-  # output file
-  output = ROOT.TFile(outputname, "RECREATE")
-
-  # for the PU
+  # Summary flags for the PU and btag reweighting
   handlePU = not (PUDataFileName is None or PUMonteCarloFileName is None)
-
-  # for the btag reweighting
   handleBT = not (BtagEffDataFileName is None)
 
+  # inputs
+  dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
+  files=[]
+  for fname in dirList:
+    files.append(path+"/"+fname)
+
+  # output
+  output = ROOT.TFile(outputname, "RECREATE")
+
+  # events iterator, plus configuration of standard collections and producers
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,btagging=btagAlgo,ZjetFilter=ZjetFilter,checkTrigger=checkTrigger)
+
+  # the reweighting codes
+  if handlePU: 
+    events.addWeight("PileUp",LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, systematicShift=0))
+  if handleBT: 
+    events.addWeight("Btagging",btaggingWeight(0,999,0,999,file=BtagEffDataFileName))
+  if handleLeptonEff: 
+    events.addWeight("Leptons",LeptonsReWeighting())
+  if NLOWeight: 
+    events.addWeight("MonteCarlo",MonteCarloReWeighting())
+  
   # prepare the plots
   allmuonsPlots=[]
   tightmuonsPlots=[]
@@ -136,7 +108,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
   lumiReWeightingPlots=[]
   btagReWeightingPlots=[]
   leptonsReWeightingPlots=[]
-  #nloReWeightingPlots=[]
   for muChannel in [True, False]:
     if muChannel:
       channelDir = output.mkdir("MuMuChannel")
@@ -157,15 +128,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel))
       if handleLeptonEff:
         leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
-      #if NLOWeight:
-      #  nloReWeightingPlots.append(NloReweightingControlPlots(levelDir.mkdir("nloReWeighting"),muChannel))
-
-  # inputs
-  dirList=list(itertools.islice(os.listdir(path), jobNumber, None, Njobs))
-  files=[]
-  for fname in dirList:
-    files.append(path+"/"+fname)
-  events = Events (files)
 
   # book histograms
   for muChannel in [True, False]:
@@ -176,47 +138,32 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       plots = map(lambda x: x+eventCategories(),levels)
       zlabel= zbblabel.zelelabel
     for level in plots:
-      allmuonsPlots[level].beginJob(muonlabel=zbblabel.allmuonslabel, muonType="none")
-      tightmuonsPlots[level].beginJob(muonlabel=zbblabel.muonlabel, muonType="tight")
-      allelectronsPlots[level].beginJob(electronlabel=zbblabel.allelectronslabel, electronType="none")
-      tightelectronsPlots[level].beginJob(electronlabel=zbblabel.electronlabel, electronType="tight")
-      jetmetAK5PFPlots[level].beginJob(jetlabel=zbblabel.jetlabel,vertexlabel=zbblabel.vertexlabel,btagging=btagAlgo)
-      vertexPlots[level].beginJob(zlabel=zlabel)
-      selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
-      if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName)
-      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName,btagging=btagAlgo)
+      allmuonsPlots[level].beginJob(muonList = "allmuons", muonType="none")
+      tightmuonsPlots[level].beginJob(muonType="tight")
+      allelectronsPlots[level].beginJob(electronList="allelectrons", electronType="none")
+      tightelectronsPlots[level].beginJob(electronType="tight")
+      jetmetAK5PFPlots[level].beginJob(btagging=btagAlgo)
+      vertexPlots[level].beginJob()
+      selectionPlots[level].beginJob()
+      if handlePU: lumiReWeightingPlots[level].beginJob()
+      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
-      #if NLOWeight: nloReWeightingPlots[level].beginJob()
 
-  # the PU reweighting engine
-  if handlePU: 
-    PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, systematicShift=0)
-  # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
-  if handleBT:
-    BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)
-  if handleLeptonEff:
-    LeffW = LeptonsReWeighting()
-  
   # process events
   i = 0
   t0 = time.time()
   for event in events:
-    runNumber= event.eventAuxiliary().run()
+    runNumber= event.run()
     if i%100==0 : 
       print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
       t0 = time.time()
     for muChannel in [True, False]:
-      categoryData = category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber)
       if muChannel: 
-        if onlyEle:
-	  plots = []
-	else:
-          plots = filter(lambda x: isInCategory(x,categoryData) ,levels)
+        categoryData = event.catMu
+        plots = [] if onlyEle else filter(lambda x: isInCategory(x,categoryData) ,levels)
       else:
-        if onlyMu:
-	  plots = []
-	else:
-          plots = map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
+        categoryData = event.catEle
+        plots = [] if onlyMu else map(lambda x: x+eventCategories(),filter(lambda x: isInCategory(x,categoryData) ,levels))
       # process event
       if len(plots)>0: 
         jetmetAK5PFPlotsData = jetmetAK5PFPlots[plots[0]].process(event)
@@ -226,65 +173,12 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         tightelectronsPlotsData = tightelectronsPlots[plots[0]].process(event)
         vertexPlotsData = vertexPlots[plots[0]].process(event)
         selectionPlotsData = selectionPlots[plots[0]].process(event)
-        if handlePU: 
-            lumiReWeightingPlotsData = lumiReWeightingPlots[plots[0]].process(event)
-        if handleBT:
-          btagReWeightingPlotsData = btagReWeightingPlots[plots[0]].process(event)
-        if handleLeptonEff:
-          leptonsReWeightingPlotsData = leptonsReWeightingPlots[plots[0]].process(event)
+        if handlePU: lumiReWeightingPlotsData = lumiReWeightingPlots[plots[0]].process(event)
+        if handleBT: btagReWeightingPlotsData = btagReWeightingPlots[plots[0]].process(event)
+        if handleLeptonEff: leptonsReWeightingPlotsData = leptonsReWeightingPlots[plots[0]].process(event)
       for level in plots:
         # compute the weight 
-        eventWeight = 1 # here, we could have another method to compute a weight (e.g. btag efficiency per jet, ...)
-        if handlePU: eventWeight *= PileUp.weight(fwevent=event)
-        if handleLeptonEff: eventWeight *= LeffW.weight(fwevent=event,muChannel=muChannel)
-
-        # for nlo reweighting
-        if NLOWeight :
-          event.getByLabel("generator",genInfoHandle)
-          genInfo = genInfoHandle.product()
-          #weight sign only +/-
-          eventWeight *= (genInfo.weight())/(abs(genInfo.weight()))
-          #weight
-          #eventWeight *= (genInfo.weight())
-
-	if handleBT:
-          catName = categoryName(level%eventCategories())
-          # security against negative weights
-          #BeffW.setMode("*")
-          #if BeffW.weight(event,muChannel)<0: eventWeight=0
-          
-	  if catName.find("(HEHE") != -1:
-	    BeffW.setMode("HEHE")
-            if BeffW.weight(event,muChannel)<0: eventWeight=0
-            else : eventWeight *= BeffW.weight(event,muChannel)
-	  elif catName.find("(HEHP") != -1:
-	    BeffW.setMode("HEHP")
-	    if BeffW.weight(event,muChannel)<0: eventWeight=0
-            else :eventWeight *= BeffW.weight(event,muChannel)
-	  elif catName.find("(HPHP") != -1:
-	    BeffW.setMode("HPHP")
-	    if BeffW.weight(event,muChannel)<0: eventWeight=0
-            else :eventWeight *= BeffW.weight(event,muChannel)
-	  elif catName.find("(HE") != -1:
-            if catName.find("exclusive") != -1:
-              BeffW.setMode("HEexcl")
-	      if BeffW.weight(event,muChannel)<0: eventWeight=0
-              else :eventWeight *= BeffW.weight(event,muChannel)
-            else:
-              BeffW.setMode("HE")
-	      if BeffW.weight(event,muChannel)<0: eventWeight=0
-              else :eventWeight *= BeffW.weight(event,muChannel)
-	  elif catName.find("(HP") != -1:
-            if catName.find("exclusive") != -1:
-              BeffW.setMode("HPexcl")
-	      if BeffW.weight(event,muChannel)<0: eventWeight=0
-              else :eventWeight *= BeffW.weight(event,muChannel)
-            else:
-              BeffW.setMode("HP")
-	      if BeffW.weight(event,muChannel)<0: eventWeight=0
-              else :eventWeight *= BeffW.weight(event,muChannel)
-        # security against negative weights 
-        #if eventWeight<0: eventWeight=0
+        eventWeight = event.weight(muChannel=muChannel,Bmode=btaggingWeightMode(categoryName(level%eventCategories())), MCmode="mc")
         # fill the histograms
         jetmetAK5PFPlots[level].fill(jetmetAK5PFPlotsData, eventWeight)
         allmuonsPlots[level].fill(allmuonsPlotsData, eventWeight)
@@ -299,8 +193,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
           btagReWeightingPlots[level].fill(btagReWeightingPlotsData) #no weight
         if handleLeptonEff:
           leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData) #no weight
-        #if NLOWeight :
-        #  nloReWeightingPlots[level].fill(nloReWeightingPlotsData) #no weight
     i += 1
 
   # save all
@@ -323,8 +215,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
        btagReWeightingPlots[level].endJob()
      if handleLeptonEff:
        leptonsReWeightingPlots[level].endJob()
-     #if NLOWeight :
-     #  nloReWeightingPlots[level].endJob()  
   output.Close()
 
 def main(options):
@@ -385,6 +275,25 @@ def main(options):
     return
   # if all ok, run the procedure
   runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight),NLOWeight=options.NLOWeight)
+
+def btaggingWeightMode(catName):
+  if catName.find("(HEHE") != -1:
+    return "HEHE"
+  elif catName.find("(HEHP") != -1:
+    return "HEHP"
+  elif catName.find("(HPHP") != -1:
+    return "HPHP"
+  elif catName.find("(HE") != -1:
+    if catName.find("exclusive") != -1:
+      return "HEexcl"
+    else:
+      return "HE"
+  elif catName.find("(HP") != -1:
+    if catName.find("exclusive") != -1:
+      return "HPexcl"
+    else:
+      return "HP"
+  return "None"
 
 if __name__ == "__main__":
   main(options)

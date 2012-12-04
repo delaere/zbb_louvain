@@ -1,4 +1,4 @@
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from eventSelection import *
 from zbbCommons import zbblabel, zbbsystematics
 from math import sqrt
@@ -73,11 +73,6 @@ class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
 
    def __init__(self):
-     # handle to event objects
-     self.zmuHandle_  = Handle ("vector<reco::CompositeCandidate>")
-     self.zeleHandle_ = Handle ("vector<reco::CompositeCandidate>")
-     self.vertexHandle_ = Handle ("vector<reco::Vertex>")
-     #self.rhoHandle_ = Handle ("double")
      # the efficiency maps
    
      # ===================== ELECTRONS ========== 
@@ -268,19 +263,7 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         fwevent.getByLabel (zbblabel.zmumulabel, self.zmuHandle_)
-         zCandidatesMu = self.zmuHandle_.product()
-         fwevent.getByLabel (zbblabel.zelelabel, self.zeleHandle_)
-         zCandidatesEle = self.zeleHandle_.product()
-         fwevent.getByLabel(zbblabel.vertexlabel,self.vertexHandle_)
-         vertices = self.vertexHandle_.product()
-         if vertices.size()>0 :
-            vertex = vertices[0]
-         else:
-            vertex = None
-         #fwevent.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle_)
-         #rho = self.rhoHandle_.product()
-         bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
+         bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
          if not bestZcandidate is None:
            if muChannel :
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]

@@ -1,32 +1,25 @@
 import ROOT
 import math
 from copy import deepcopy
-
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from zbbCommons import zbblabel,zbbfile
 #from myFuncTimer import print_timing
 
 class MonteCarloReWeighting:
    """A class to reweight MC according to kinematic uncertainties."""
 
-   def __init__(self, shift=0, genlabel=zbblabel.genlabel, genjetlabel="prunedJets"):
+   def __init__(self, shift=0):
      # do we reweight or not, by how much ?
-     self._shift = 0 
-     self._modes = [ "bpt", "zpt", "all", "none" ]
-     # inputs
-     self.genlabel=genlabel
-     self.genHandle = Handle ("vector<reco::GenParticle>")
-     self.genjetlabel = genjetlabel
-     self.genjetHandle = Handle ("vector<reco::GenJet>")
-
+     self._shift = shift 
+     self._modes = [ "sign", "mc", "bpt", "zpt", "all", "none" ]
    #@print_timing
-   def weight( self, fwevent=None, mode="none"):
+   def weight( self, fwevent=None, MCmode="none"):
      """MC shape reweighting, computed from the MC truth"""
      # returns the weight computed from the MC truth only if needed. 
      if self._shift==0:
        return 1.
-     if not mode in self._modes:
-        print "ERROR: ", mode, " is not a recognized mode for MonteCarloReWeighting."
+     if not MCmode in self._modes:
+        print "ERROR: ", MCmode, " is not a recognized mode for MonteCarloReWeighting."
         return 1.
      # apply systematic shift ?
      if not fwevent is None:
@@ -35,23 +28,18 @@ class MonteCarloReWeighting:
          return 1.
        else: 
          # check that fwevent and npu were not specified at the same time.
-         return _eventWeight(fwevent, mode)
+         return _eventWeight(fwevent, MCmode)
 
    def _eventWeight( self, fwevent=None, mode="none"):
      """(Internal) actual function to compute the event weight"""
-     # get the MC truth: Z and genjets
-     event.getByLabel (self.genlabel,self.genHandle)
-     particles = self.genHandle.product()
      theZpt = 0.
-     for part in particles:
+     for part in fwevent.genParticles:
        if particle.pdgId() == 23:
          theZpt = particle.pt()
          break
-     bparts = [part for part in particles if (499 < math.fabs(part.pdgId()) < 600) or (4999 < math.fabs(part.pdgId()) < 6000)]
+     bparts = [part for part in fwevent.genParticles if (499 < math.fabs(part.pdgId()) < 600) or (4999 < math.fabs(part.pdgId()) < 6000)]
      bhads = [part for part in bparts if self._is_final_bhad(part)]
-     event.getByLabel (self.genjetlabel,self.genjetHandle)
-     genjets = self.genjetHandle.product()
-     gen_b_jets = self._match_obo(genjets, bhads, 0.5)
+     gen_b_jets = self._match_obo(fwevent.genJets, bhads, 0.5)
      maxbjetPt = 0.
      for bjet in gen_b_jets:
        if bjet.pt() > maxbjetPt:
@@ -68,6 +56,10 @@ class MonteCarloReWeighting:
                  3.89175e-07  * weightArgument**4 + 4.77903e-05 * weightArgument**3 - \
                  0.00266683   * weightArgument**2 + 0.0646297   * weightArgument + 0.320127
      # final result
+     if mode=="sign":
+       return (event.genInfo.weight())/(abs(event.genInfo.weight()))
+     if mode=="mc":
+       return event.genInfo.weight()
      if mode=="zpt" : 
        return 1+self._shift*(zptweight-1)
      if mode=="bpt" : 

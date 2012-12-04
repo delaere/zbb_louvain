@@ -3,7 +3,7 @@
 import ROOT
 import sys
 import os
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
 from btaggingWeight import *
 from zbbCommons import zbbfile
@@ -26,37 +26,36 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       self.add("HEHE","HEHE",200,0,2)
       self.add("HEHP","HEHP",200,0,2)
       self.add("HPHP","HPHP",200,0,2)
-      # reweig engine
-      self.engine = btaggingWeight(0,999,0,999,perfData,btagging)
     
     #@print_timing
     def process(self,event):
       """BtaggingReWeightingControlPlots"""
       result = { }
-      self.engine.setMode("HE")
-      result["HE"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HP")
-      result["HP"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HEexcl")
-      result["HEexcl"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HPexcl")
-      result["HPexcl"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HEHE")
-      result["HEHE"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HEHP")
-      result["HEHP"] = self.engine.weight(event,self.muChannel)
-      self.engine.setMode("HPHP")
-      result["HPHP"] = self.engine.weight(event,self.muChannel)
+      result["HE"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HE")
+      result["HP"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HP")
+      result["HEexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEexcl")
+      result["HPexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPexcl")
+      result["HEHE"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHE")
+      result["HEHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHP")
+      result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP")
       return result
 
-def runTest():
+def runTest(path="../testfiles/ttbar/"):
   controlPlots = BtaggingReWeightingControlPlots()
-  path="../testfiles/ttbar/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
+  events.addWeight("Btagging",btaggingWeight(0,999,0,999))
+
   controlPlots.beginJob()
   i = 0
   for event in events:

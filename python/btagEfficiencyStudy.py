@@ -1,11 +1,10 @@
 import ROOT
 import sys
 import os 
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from eventSelection import *
 from LumiReWeighting import *
 from zbbCommons import zbblabel,zbbfile
-
 
 def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   # prepare output
@@ -25,47 +24,22 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   tree = ROOT.TTree( 'btagEff', 'btag efficiency' )
   tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:csv/F:eventWeight/F' )
   # input
-  dirList=os.listdir(path) 
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
-  metlabel=zbblabel.metlabel
-  jetlabel=zbblabel.jetlabel
-  zmulabel=zbblabel.zmumulabel
-  zelelabel=zbblabel.zelelabel
-  triggerlabel=zbblabel.triggerlabel
-  vertexlabel = zbblabel.vertexlabel
-  jetHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  vertexHandle = Handle ("vector<reco::Vertex>")
-  trigInfoHandle = Handle ("pat::TriggerEvent")
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,btagging="SSV",ZjetFilter="bcl",checkTrigger=False)
   weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, zbblabel.pulabel)
   # event loop
   eventCnt = 0
   for event in events:
-    event.getByLabel (jetlabel,jetHandle)
-    event.getByLabel (metlabel,metHandle)
-    event.getByLabel (zmulabel,zmuHandle)
-    event.getByLabel (zelelabel,zeleHandle)
-    event.getByLabel (triggerlabel,trigInfoHandle)
-    event.getByLabel (vertexlabel,vertexHandle)
-    jets = jetHandle.product()
-    met = metHandle.product()
-    zCandidatesMu = zmuHandle.product()
-    zCandidatesEle = zeleHandle.product()
-    vertices = vertexHandle.product()
-    #triggerInfo = trigInfoHandle.product()
-    triggerInfo = None
-    runNumber= event.eventAuxiliary().run()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel)
-    if vertices.size()>0 :
-          vertex = vertices[0]
-    else:
-          vertex = None
-    bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
+    categoryData = event.catMu if muChannel else event.catEle
     if isInCategory(stage, categoryData):
       eventCnt = eventCnt +1
       if eventCnt%100==0 : print ".",
@@ -73,8 +47,8 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
       # event weight
       mystruct.eventWeight = weight_engine.weight( fwevent=event )
       # that's where we access the jets
-      for jet in jets:
-        if not isGoodJet(jet,bestZcandidate): continue
+      for jet in event.jets:
+        if not isGoodJet(jet,event.bestZcandidate): continue
         mystruct.pt = jet.pt()
         mystruct.eta = jet.eta()
         mystruct.flavor = jet.partonFlavour()

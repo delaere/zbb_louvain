@@ -5,7 +5,7 @@ import ROOT
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 ROOT.gSystem.Load("libUserCodezbb_louvain.so")
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from zbbCommons import zbblabel,zbbfile,zbbsystematics
 #from myFuncTimer import print_timing
 
@@ -14,12 +14,7 @@ class btaggingWeight:
 
   def __init__(self,jmin1,jmax1,jmin2,jmax2, file=zbbfile.ssvperfData, btagging="SSV"):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
-    self.jetHandle = Handle ("vector<pat::Jet>")
-    self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-    self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
     self.myJetSet = ROOT.JetSet(zbbsystematics.SF_running_mode,file)
-    self.vertexHandle = Handle ("vector<reco::Vertex>")
-    self.btagging=btagging
 
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
@@ -38,25 +33,14 @@ class btaggingWeight:
       self.engine.setLimits(0,999,0,999)
 
   #@print_timing    
-  def weight(self,event,muChannel):
+  def weight(self,event, muChannel=True, Bmode=None, btagging="SSV"):
     """btag eff weight"""
     # for data, immediately return 1.
-    if event.object().event().eventAuxiliary().isRealData():
+    if event.object().event().eventAuxiliary().isRealData() or Bmode=="None":
       return 1.
-    # retrieve the objects (jets and Z candidates)
-    event.getByLabel(zbblabel.jetlabel,self.jetHandle)
-    event.getByLabel(zbblabel.zmumulabel,self.zmuHandle)
-    event.getByLabel(zbblabel.zelelabel,self.zeleHandle)
-    event.getByLabel (zbblabel.vertexlabel,self.vertexHandle)          
-    jets = self.jetHandle.product()
-    zCandidatesMu  = self.zmuHandle.product()
-    zCandidatesEle = self.zeleHandle.product()
-    vertices = self.vertexHandle.product()
-    if vertices.size()>0 :
-      vertex = vertices[0]
-    else:
-      vertex = None    
-    Z = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
+    if not Bmode is None: 
+      self.setMode(Bmode)
+    Z = event.bestZmumuCandidate if muChannel else event.bestZelelCandidate
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
@@ -64,27 +48,27 @@ class btaggingWeight:
     ntagsNoFlvavorHE = 0
     ntagsNoFlvavorHP = 0
     # retrieve the jets
-    for jet in jets:
+    for jet in event.jets:
       # apply selection
       if not isGoodJet(jet, Z): continue
       # check flavor
       flavor = jet.partonFlavour()
       # check btagging
-      if isBJet(jet,"HP",self.btagging):
+      if isBJet(jet,"HP",btagging):
         ntagsHP += 1
         if flavor == 0:
           if jet.et() > 100. : print "WARNING : "+self.btagging+"HP tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHP += 1
-      if isBJet(jet,"HE",self.btagging):
+      if isBJet(jet,"HE",btagging):
         ntagsHE += 1
         if flavor == 0:
           if jet.et() > 100. : print "WARNING : "+self.btagging+"HE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
       self.myJetSet.addJet(zbbsystematics.SF_uncert, flavor,jet.et(),jet.eta())
-    if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+self.btagging+"HP tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
-    if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+self.btagging+"HE tagged jets with no flavour !! Event should be checked !! Event number : ", event.eventAuxiliary().id().event()
-    return self.getWeight(self.myJetSet,ntagsHE,ntagsHP)
+    if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+btagging+"HP tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
+    if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+btagging+"HE tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
+    return max(self.getWeight(self.myJetSet,ntagsHE,ntagsHP),0.)
 
   def getWeight(self,jetset, ntags1, ntags2):
     return self.engine.weight2(jetset, ntags1, ntags2)

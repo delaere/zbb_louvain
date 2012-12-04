@@ -3,7 +3,7 @@
 import ROOT
 import sys
 import os
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
 from LeptonsReweighting import *
 #from myFuncTimer import print_timing
@@ -31,14 +31,21 @@ class LeptonsReweightingControlPlots(BaseControlPlots):
       return result
 
 
-def runTest():
+def runTest(path="../testfiles/"):
   controlPlots = LeptonsReweightingControlPlots()
-  path="../testfiles/ttbar/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
+
   controlPlots.beginJob()
   i = 0
   for event in events:

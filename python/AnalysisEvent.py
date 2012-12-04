@@ -270,7 +270,7 @@ class AnalysisEvent(Events):
            mystring += "%s => vector of %d Lorentz Vector(s)\n" % (k,len(v))
          except:
            pass
-         for vec in v: mystring += self._lorentzVectorString(vec)
+         for vec in v: mystring += self._lorentzVectorString(k,vec)
        elif isinstance(v,TLorentzVector): mystring += self._lorentzVectorString(k,v)
      mystring += dictjoin(dict((k,v) for k, v in self.vardict.iteritems() if not k in self._collections.keys() and not (isinstance(v,Iterable) and all(isinstance(n, TLorentzVector) for n in v))))
      return mystring

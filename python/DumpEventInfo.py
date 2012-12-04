@@ -1,27 +1,13 @@
-import sys
 import os
-import ROOT
 from AnalysisEvent import AnalysisEvent
+from eventSelection import prepareAnalysisEvent
+
+import ROOT
 from itertools import combinations
-from eventSelection import jetId, findBestCandidate, isGoodJet, isBJet, isGoodElectron, isGoodMuon, eventCategory
-from zbbCommons import zbblabel
-
-#these methods are temporary interfaces during the transition to the new framework.
-def category(fwevent,muChannel=True,  btagging="SSV"):
-  runNumber= fwevent.eventAuxiliary().run()
-  return eventCategory(fwevent.trigger, fwevent.Zmumu, fwevent.Zelel, fwevent.vertices, fwevent.jets, fwevent.MET, runNumber, muChannel, btagging)
-
-def vertex(event):
-  vertices = event.vertices
-  if vertices.size()>0 :
-    return vertices[0]
-  else:
-    return None
-
-def bestZcandidate(fwevent):
-  return findBestCandidate(None,fwevent.vertex,fwevent.Zmumu,fwevent.Zelel)
+from eventSelection import isGoodJet, isBJet
 
 # a method to add some 4vectors to the event
+#TODO: move to eventSelection and use in EventSelectionControlPlots
 def candidateproducer(fwevent,candidate):
   if fwevent.bestZcandidate is not None:
     if candidate=="ZbHP":
@@ -37,9 +23,9 @@ def candidateproducer(fwevent,candidate):
           z = ROOT.TLorentzVector(fwevent.bestZcandidate.px(),fwevent.bestZcandidate.py(),fwevent.bestZcandidate.pz(),fwevent.bestZcandidate.energy())
           return z+b
     elif candidate=="bbHP":
-      return map(sum,combinations(filter(lambda jet: isGoodJet(jet,fwevent.bestZcandidate) and isBJet(jet,"HP"),fwevent.jets),2))
+      return map(lambda v:ROOT.TLorentzVector(v.Px(),v.Py(),v.Pz(),v.E()),map(lambda (a,b):a+b,combinations(map(lambda j: j.p4(),filter(lambda jet: isGoodJet(jet,fwevent.bestZcandidate) and isBJet(jet,"HP"),fwevent.jets)),2)))
     elif candidate=="bbHE":
-      return map(sum,combinations(filter(lambda jet: isGoodJet(jet,fwevent.bestZcandidate) and isBJet(jet,"HE"),fwevent.jets),2))
+      return map(lambda v:ROOT.TLorentzVector(v.Px(),v.Py(),v.Pz(),v.E()),map(lambda (a,b):a+b,combinations(map(lambda j: j.p4(),filter(lambda jet: isGoodJet(jet,fwevent.bestZcandidate) and isBJet(jet,"HE"),fwevent.jets)),2)))
     elif candidate=="ZbbHP":
       z = ROOT.TLorentzVector(fwevent.bestZcandidate.px(),fwevent.bestZcandidate.py(),fwevent.bestZcandidate.pz(),fwevent.bestZcandidate.energy())
       return map(lambda a:a+z,fwevent.bbHP)
@@ -69,20 +55,8 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
     events = AnalysisEvent(files)
     DumpEventInfo(events[(run,event,lumi)])
     return
-  # collections used in the analysis
-  fwevent.addCollection("vertices","vector<reco::Vertex>",zbblabel.vertexlabel)
-  fwevent.addCollection("jets","vector<pat::Jet>",zbblabel.jetlabel)
-  fwevent.addCollection("MET","vector<pat::MET>",zbblabel.metlabel)
-  fwevent.addCollection("Zmumu","vector<reco::CompositeCandidate>",zbblabel.zmumulabel)
-  fwevent.addCollection("Zelel","vector<reco::CompositeCandidate>",zbblabel.zelelabel)
-  fwevent.addCollection("trigger","pat::TriggerEvent",zbblabel.triggerlabel)
-  fwevent.addCollection("electrons","vector<pat::Electron>",zbblabel.allelectronslabel)
-  fwevent.addCollection("muons","vector<pat::Muon>",zbblabel.allmuonslabel)
-  # producers used later on
-  fwevent.addProducer("catMu",category,muChannel=True)
-  fwevent.addProducer("catEle",category,muChannel=False)
-  fwevent.addProducer("vertex",vertex)
-  fwevent.addProducer("bestZcandidate",bestZcandidate)
+  # collections and producers used in the analysis
+  prepareAnalysisEvent(fwevent, btagging="SSV",ZjetFilter="bcl",checkTrigger=True)
   fwevent.addProducer("bbHE",candidateproducer,candidate="bbHE")
   fwevent.addProducer("bbHP",candidateproducer,candidate="bbHP")
   fwevent.addProducer("ZbHE",candidateproducer,candidate="ZbHE")
@@ -91,7 +65,7 @@ def DumpEventInfo(fwevent=None, run=None, event=None, lumi=None, path="../testfi
   fwevent.addProducer("ZbbHP",candidateproducer,candidate="ZbbHP")
   # add some information to the event before printing
   # products from producers are not printed if they are not in cache
-  tmp = fwevent.catMu, fwevent.catEle, fwevent.ZbHE, fwevent.ZbHP, fwevent.ZbbHE, fwevent.ZbbHP
+  tmp = fwevent.catMu, fwevent.catEle, fwevent.bbHE, fwevent.bbHP, fwevent.ZbHE, fwevent.ZbHP, fwevent.ZbbHE, fwevent.ZbbHP, fwevent.bestZmumuCandidate, fwevent.bestZelelCandidate, fwevent.bestZcandidate, fwevent.dijet_muChannel, fwevent.dijet_eleChannel
   # Now, wa can go on with the printing.
   print fwevent
 

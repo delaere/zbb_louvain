@@ -3,6 +3,7 @@ import string
 import intervalmap
 from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from zbbCommons import zbblabel
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 
@@ -33,7 +34,6 @@ ourtriggers.murunMap[193805:195961] = ("HLT_Mu17_Mu8_v17",)
 ourtriggers.murunMap[196045:196754] = ("HLT_Mu17_Mu8_v18",)
 ourtriggers.murunMap[197769:199632] = ("HLT_Mu17_Mu8_v19",)
 ourtriggers.murunMap[199695:] = ("HLT_Mu17_Mu8_v21",)
-
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
 ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
@@ -66,7 +66,6 @@ ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.e
 ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
 
 def electron_iswrongPS(electron, runNumber, lumi_section):
-  #lumi_section = event.eventAuxiliary().luminosityBlock() 
   if runNumber==171050 and (lumi_section==47 or lumi_section==92):
     return True
   if runNumber==171156 and (lumi_section==42 or lumi_section==211):
@@ -87,9 +86,7 @@ def electron_iswrongPS(electron, runNumber, lumi_section):
     return True
   if runNumber==171578 and (lumi_section==47 or lumi_section==347):
     return True
-  
   else : return False
-
 
 def selectedTriggers(triggerInfo):
   """Returns a list with the decision of each trigger considered in the analysis"""
@@ -103,17 +100,25 @@ def selectedTriggers(triggerInfo):
       return False
   return map(lambda path:isFired(path),paths)
 
-def isTriggerOK(triggerInfo, zCandidate, runNumber, lumi_section, muChannel=True):
+def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
   """Checks if the proper trigger is passed"""
   # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
   # more complex case: different trigger for various run ranges (lowest unprescaled)
-
-
+  # trigger info
+  triggerInfo = event.triggerInfo
+  runNumber = event.run()
+  # best Z candidate
+  if muChannel and eleChannel:
+    bestZcandidate = event.bestZcandidate
+  elif muChannel:
+    bestZcandidate = event.bestZmumuCandidate
+  elif eleChannel:
+    bestZcandidate = event.bestZelelCandidate
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
-  if runNumber is None:
+  if not perRun:
     if muChannel:
       intersect = set(pathnames) & set(ourtriggers.mutriggers)
     else:
@@ -132,16 +137,13 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, lumi_section, muChannel=True
       else:  
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
   outcome = len(intersect)>0
-  #print "outcome ", outcome, "  triggerMatched : ", isTriggerMatchZcandidate(zCandidate,runNumber, lumi_section)
   return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber,lumi_section))
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
-
   # anything on top of PAT cfg ?
   # cleaning ?
-
   return True
 
 def isTightMuon(muon):
@@ -152,22 +154,18 @@ def isTightMuon(muon):
   #if muMatches(muon).size() > 0 :
   # anything else on top of PAT cfg ?
   # cleaning ?
-  
-  if muon.hasMasterClone():
-    mu = muon.masterClone()
-    ROOT.SetOwnership( mu, False ) 
-  else:
-    mu = muon
-  
+  #if muon.hasMasterClone():
+  #  mu = muon.masterClone()
+  #  ROOT.SetOwnership( mu, False ) 
+  #else:
+  #  mu = muon
   return (isLooseMuon(muon))
 
 def isMatchedMuon(muon):
   """Perform additional checks that define a matched muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
-
   # anything else on top of PAT cfg ?
   # cleaning ?
-
   return (isTightMuon(muon) and True)
 
 def isGoodMuon(muon,role):
@@ -181,47 +179,37 @@ def isGoodMuon(muon,role):
 
 def isLooseElectron(electron):
   """Perform additional checks that define a loose electron"""
-
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-
   return abs(electron.eta())<2.4
   ##return electron.eta()<2.5
   #return True
 
 def isTightElectron(electron):
   """Perform additional checks that define a tight electron"""
-
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
   #to correct the PAT error (temporary)
-  
-  if electron.hasMasterClone():
-    el = electron.masterClone()
-    ROOT.SetOwnership( el, False ) 
-  else:
-    el = electron
- 
-   ##everything should be in the pat now
-    #isMatched = True # no need anymore: this is done in PAT and complemented by the trigger check at step 1.
-
+  #if electron.hasMasterClone():
+  #  el = electron.masterClone()
+  #  ROOT.SetOwnership( el, False ) 
+  #else:
+  #  el = electron
+  ##everything should be in the pat now
   return (isLooseElectron(electron))
 
 def isMatchedElectron(electron):
-
   """Perform additional checks that define a matched electron"""
-
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #print "has electron a clone? ",electron.hasMasterClone()
   #print "clone:",electron.masterClone().isNonnull()
   #if electron.hasOverlaps("muons"): return False
-
   return (isTightElectron(electron) and True)
 
 def isGoodElectron(electron,role):
@@ -233,7 +221,6 @@ def isGoodElectron(electron,role):
   print "Warning: Unknown electron role:",role
   return True
 
-  
 def hasNoOverlap(jet, Z):
   """check overlap between jets and leptons from the Z"""
   l1 = Z.daughter(0)
@@ -248,7 +235,6 @@ def hasNoOverlap(jet, Z):
     
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
-
   rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
@@ -322,7 +308,6 @@ def isBJet(jet,workingPoint,algo="CSV"):
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
 
-
 def isZcandidate(zCandidate,vertex=None):
   """Checks that this is a suitable candidate from lepton quality"""
   result = True
@@ -361,155 +346,109 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
     ROOT.SetOwnership( Daugh2, False )
     case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber,lumi_section) 
     case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber,lumi_section)
-    #print "isTriggerMatchZcandidate decisions: ", case1, case2
     return (case1 or case2)
-    #return (isTriggerMatchPair(Daugh1,Daugh2,runNumber, lumi_section) or isTriggerMatchPair(Daugh2,Daugh1,runNumber, lumi_section))
   else:
     return False
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
-    
   if l1.isMuon() :
-    #print "Muons"
-    #print "run number", runNumber
     if runNumber>=160410 and runNumber<163269 :
-      #print "l1.triggerObjectMatchesByPath(HLT_DoubleMu6_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",1,0).size())
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
         return True
-    
     if runNumber>=163269 and runNumber<165121 :
-      #print "l1.triggerObjectMatchesByPath(HLT_DoubleMu7_v*) size", (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",1,0).size())
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu7_v*",0,0).size()>0):
         return True
-        
     if runNumber >= 165121 and runNumber< 178420:
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*),0,1 size", (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size())
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*),1,1 size", (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",1,1).size())
-      #print "l1.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-      #print "l1.triggerObjectMatchesByFilter(hltDiMuonL3p5PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size())
-      #print "l1.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
-      #print "l2.triggerObjectMatchesByPath(HLT_Mu13_Mu8_v*,0,1 size", (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size())
-      #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*),1,1 size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",1,1).size())
-      #print "l2.triggerObjectMatchesByFilter(hltDiMuonL3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size())
-      #print "l2.triggerObjectMatchesByFilter(hltDiMuonL3p5PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size())
-      #print "l2.triggerObjectMatchesByFilter(hltSingleMu13L3Filtered13) size",(l2.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size())
       if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and ((l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
         return True
-
     if runNumber >= 178420 and runNumber< 180253:
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*),0,1 size", (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size())
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*),1,0 size", (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",1,0).size())
-      #print "l1.triggerObjectMatchesByFilter(hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8) size",(l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size())
-      #print "l1.triggerObjectMatchesByFilter(hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17) size",(l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size())
-      #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size())
-      #print "l2.triggerObjectMatchesByFilter(hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8) size",(l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size())
-      #print "l1.triggerObjectMatchesByPath(HLT_Mu17_tkMu8_v*) size", (l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size())
-      #print "l1.triggerObjectMatchesByFilter(hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17) size",(l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size())      
-      #print "l2.triggerObjectMatchesByPath(HLT_Mu17_Mu8_v*) size", (l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,0).size())
-      #print "l2 hltDiMuonL3p5PreFiltered8 size = ",  l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0)       : #or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3Mu17FromDiMuonFiltered17").size()> 0 ):
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0): 
         return True
-
 ### data 2012
     if runNumber >= 180253 :  
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0)     : #or ( l1.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_tkMu8_v*",0,1).size()>0 and l1.triggerObjectMatchesByFilter("hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17").size()>0 ) :
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0): 
         return True
-      
-      
   if l1.isElectron() :
     if electron_iswrongPS(l1, runNumber, lumi_section):
       return False
     else :
-      
-    #print "Electrons :"
-    #print "run number : ", runNumber
-    #print "l1 path(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*,0,0)",l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()
-    #print " l1 filter(hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter)", l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()
-    #print "l1 path(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*,0,0)",l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()
-    #print "l1 filter(hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter)", l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()    
-    #print "l2 path(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*,0,0)",l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()
-    #print " l2 filter(hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter)", l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()
-    #print "l2 path(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*,0,0)",l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()
-    #print "l2 filter(hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter)", l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()
-    #print "path * 0,0 " , (l1.triggerObjectMatchesByPath("*",0,0).size())
-    #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
-    #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,1).size())   
-    #print "filter * match" , (l1.triggerObjectMatchesByFilter("*").size())
-    
        if runNumber < 165121:
-       #print "run number < 165121"
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*)size 0 0", (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size())
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size() 
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()
            if (l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0)and (l1.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByFilter("hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter").size()>0) :
              return True
-    
        if runNumber >= 165121 and runNumber < 190455:
-       #print "run number > 165121"
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size() 
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
-       #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,1).size())
-       #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
            if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter").size())) or ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()>0)) :
              return True
-
        if runNumber >= 190455 :
+<<<<<<< eventSelection.py
+=======
        #print "run number > 165121"
            print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size() 
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
            print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,0).size())
            print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
+>>>>>>> 1.101
            if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and(l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size())) :
              return True
-
   return False
 
-def findBestCandidate(muChannel, vertex, *zCandidates):
+def findBestCandidate(event, muChannel=True, eleChannel=False):
   """Finds the best Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates.
      muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
   bestZ = None
   bestM = -1000.
-  if muChannel is None:
-    for col in zCandidates:
-      for z in col:
-        if not isZcandidate(z,vertex): continue
-        if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
-          bestM = z.mass()
-          bestZ = z
-  else:
-    for col in zCandidates:
-      for z in col:
-        if not isZcandidate(z,vertex): continue
-	if (muChannel==True and z.daughter(0).isElectron() ) or (muChannel==False and z.daughter(0).isMuon()) : continue
-        if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
-          bestM = z.mass()
-          bestZ = z
+  vertex = event.vertex
+  if muChannel:
+    for z in event.Zmumu:
+      if not isZcandidate(z,vertex): continue
+      if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
+        bestM = z.mass()
+        bestZ = z
+  if eleChannel:
+    for z in event.Zelel:
+      if not isZcandidate(z,vertex): continue
+      if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
+        bestM = z.mass()
+        bestZ = z
   return bestZ
 
-def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
+def findDijetPair(event, btagging="SSV", muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
+  # best Z candidate
+  if muChannel and eleChannel:
+    bestZcandidate = event.bestZcandidate
+  elif muChannel:
+    bestZcandidate = event.bestZmumuCandidate
+  elif eleChannel:
+    bestZcandidate = event.bestZelelCandidate
   # check number of good jets
-  indices = [index for index,jet in enumerate(jets) if isGoodJet(jet,bestZcandidate) ]
+  indices = [index for index,jet in enumerate(event.jets) if isGoodJet(jet,bestZcandidate) ]
   if len(indices)<1: return (None, None)
-  if len(indices)<2: return (jets[indices[0]],None)
+  if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []
   # start with HP b-jets
   for index in indices[:]:
-    if isBJet(jets[index],"HP",btagging):
+    if isBJet(event.jets[index],"HP",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
+  if len(jetList)>=2: return (event.jets[jetList[0]],event.jets[jetList[1]])
   # continue with HE b-jets
   for index in indices[:]:
-    if isBJet(jets[index],"HE",btagging):
+    if isBJet(event.jets[index],"HE",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2: return (jets[jetList[0]],jets[jetList[1]])
+  if len(jetList)>=2: return (event.jets[jetList[0]],event.jets[jetList[1]])
   # fill with remaining good jets
   for index in indices:
     jetList.append(index)
-  return (jets[jetList[0]],jets[jetList[1]])
+  return (event.jets[jetList[0]],event.jets[jetList[1]])
+
+def vertex(event):
+  vertices = event.vertices
+  if vertices.size()>0 :
+    return vertices[0]
+  else:
+    return None
 
 categoryNames = [ 
   "Trigger", 
@@ -528,9 +467,6 @@ categoryNames = [
   "Z+bb (HEHE)", 
   "Z+bb (HEHP)", 
   "Z+bb (HPHP)", 
-#  "Z+bb (HEHE+MET)", 
-#  "Z+bb (HEHP+MET)", 
-#  "Z+bb (HPHP+MET)", 
   "Z+bb (HEHE+MET significance)", 
   "Z+bb (HEHP+MET significance)", 
   "Z+bb (HPHP+MET significance)",
@@ -606,19 +542,24 @@ def isInCategory(category, categoryTuple):
   else:
     return False
 
-def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel=True, btagging="SSV", lumi_section=0):
+#TODO: replace the checkTrigger flag by isData
+def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFilter="bcl", checkTrigger=True, perRun=True):
   """Check analysis requirements for various steps."""
+  # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
+  if not ZjetFilter=="bcl":
+    if isZbEvent(event.genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
+    if (isZcEvent(event.genParticles,0,False) and not isZbEvent(event.genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
+    if (not isZcEvent(event.genParticles,0,False) and not isZbEvent(event.genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
   output = []
-  if vertices.size()>0 :
-    vertex = vertices[0]
-  else:
-    vertex = None
-  bestZcandidate = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
+  if muChannel and eleChannel:
+    bestZcandidate = event.bestZcandidate
+  elif muChannel:
+    bestZcandidate = event.bestZmumuCandidate
+  elif eleChannel:
+    bestZcandidate = event.bestZelelCandidate
   # output[0]: Trigger
-  #print "runnumber in eventcqt = ", runNumber
-  if isTriggerOK(triggerInfo,bestZcandidate, runNumber, lumi_section, muChannel):
+  if checkTrigger==False or (event.isMuTriggerOK and muChannel) or (event.isEleTriggerOK and eleChannel):
     output.append(1)
-    #print "passed"
   else:
     output.append(0)
   # output[1], output[2]: di-lepton and mass cut
@@ -633,7 +574,7 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
   nBjetsHE = 0
   nBjetsHP = 0
   nBjetsHEHP = 0
-  for jet in jets:
+  for jet in event.jets:
     if isGoodJet(jet,bestZcandidate):
       nJets += 1
       HE = isBJet(jet,"HE",btagging)
@@ -646,12 +587,12 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
   output.append(nBjetsHP)
   output.append(nBjetsHEHP)
   # output[7] : MET
-  if isGoodMet(met[0]):
+  if isGoodMet(event.MET[0]):
     output.append(1)
   else: 
     output.append(0)
   # output[8] : MET Significance
-  if isGoodMet_Sig(met[0]):
+  if isGoodMet_Sig(event.MET[0]):
     output.append(1)
   else: 
     output.append(0)
@@ -663,7 +604,8 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
     output.append(bestZcandidate.pt())
   # output[10] : delta R (bb)
   # output[11] : delta R (bb) via SV
-  dijet = findDijetPair(jets, bestZcandidate, btagging)
+  #dijet = findDijetPair(event.jets, bestZcandidate, btagging)
+  dijet = findDijetPair(event, btagging, muChannel, eleChannel)
   if dijet[0] is None or dijet[1] is None: 
     output.append(-1)
     output.append(-1)
@@ -681,4 +623,39 @@ def eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, me
       output.append(-1)
   # return the list of results
   return output
+
+def prepareAnalysisEvent(event, btagging="SSV",ZjetFilter="bcl",checkTrigger=True):
+  # collections
+  event.addCollection("genParticles","vector<reco::GenParticle>",zbblabel.genlabel)
+  event.addCollection("genJets","vector<reco::GenJet>",zbblabel.genjetlabel)
+  event.addCollection("genInfo","GenEventInfoProduct",zbblabel.genInfolabel)
+  event.addCollection("vertices","vector<reco::Vertex>",zbblabel.vertexlabel)
+  event.addCollection("jets","vector<pat::Jet>",zbblabel.jetlabel)
+  event.addCollection("MET","vector<pat::MET>",zbblabel.metlabel)
+  event.addCollection("Zmumu","vector<reco::CompositeCandidate>",zbblabel.zmumulabel)
+  event.addCollection("Zelel","vector<reco::CompositeCandidate>",zbblabel.zelelabel)
+  event.addCollection("triggerInfo","pat::TriggerEvent",zbblabel.triggerlabel)
+  event.addCollection("electrons","vector<pat::Electron>",zbblabel.electronlabel)
+  event.addCollection("muons","vector<pat::Muon>",zbblabel.muonlabel)
+  event.addCollection("allelectrons","vector<pat::Electron>",zbblabel.allelectronslabel)
+  event.addCollection("allmuons","vector<pat::Muon>",zbblabel.allmuonslabel)
+  event.addCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >",zbblabel.pulabel)
+  # producers
+  event.addProducer("vertex",vertex)
+  event.addProducer("isMuTriggerOK",isTriggerOK,muChannel=True,eleChannel=False,perRun=True)
+  event.addProducer("isEleTriggerOK",isTriggerOK,muChannel=False,eleChannel=True,perRun=True)
+  event.addProducer("isTriggerOK",isTriggerOK,muChannel=True,eleChannel=True,perRun=True)
+  event.addProducer("catMu",eventCategory,muChannel=True,eleChannel=False,btagging=btagging,ZjetFilter=ZjetFilter,checkTrigger=checkTrigger,perRun=True)
+  event.addProducer("catEle",eventCategory,muChannel=False,eleChannel=True,btagging=btagging,ZjetFilter=ZjetFilter,checkTrigger=checkTrigger,perRun=True)
+  event.addProducer("bestZmumuCandidate",findBestCandidate,muChannel=True,eleChannel=False)
+  event.addProducer("bestZelelCandidate",findBestCandidate,muChannel=False,eleChannel=True)
+  event.addProducer("bestZcandidate",findBestCandidate,muChannel=True,eleChannel=True)
+  event.addProducer("dijet_muChannel",findDijetPair,btagging=btagging,muChannel=True,eleChannel=False)
+  event.addProducer("dijet_eleChannel",findDijetPair,btagging=btagging,muChannel=False,eleChannel=True)
+  #event.addProducer("bbHE",candidateproducer,candidate="bbHE")
+  #event.addProducer("bbHP",candidateproducer,candidate="bbHP")
+  #event.addProducer("ZbHE",candidateproducer,candidate="ZbHE")
+  #event.addProducer("ZbHP",candidateproducer,candidate="ZbHP")
+  #event.addProducer("ZbbHE",candidateproducer,candidate="ZbbHE")
+  #event.addProducer("ZbbHP",candidateproducer,candidate="ZbbHP")
 
