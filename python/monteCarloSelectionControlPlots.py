@@ -3,7 +3,8 @@
 import ROOT
 import sys
 import os
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
+from eventSelection import prepareAnalysisEvent
 from baseControlPlots import BaseControlPlots
 from monteCarloSelection import *
 from zbbCommons import zbblabel
@@ -16,7 +17,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection", dataset=dataset, mode=mode)
 
-    def beginJob(self, genlabel=zbblabel.genlabel):
+    def beginJob(self):
       # declare histograms
       self.add("eventType","Event Type (0,l,c,b)+Z",4,0,4)
 
@@ -48,10 +49,6 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       self.add("NBottom","NBottom status3", 10, -0.5, 9.5)
       self.add("NAntibottom","NAntibottom status3", 10, -0.5, 9.5)
 
-
-      # prepare handles
-      self.genlabel=genlabel
-      self.genHandle = Handle ("vector<reco::GenParticle>")
       # various local variables
       self.cjet = 0
       self.bjet = 0
@@ -62,9 +59,6 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
     def process(self,event):
       """monteCarloSelectionControlPlots"""
       result = { }
-      event.getByLabel (self.genlabel,self.genHandle)
-      particles = self.genHandle.product()
-
      
       #Fill some gen information for the status 3 leptons and b, and bbar quarks
       nLepPos = 0
@@ -94,7 +88,8 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       antibottomPz = 0
       antibottomEn = 0
       
-      
+      particles = event.genParticles
+
       for part in particles:
 	if part.status()!=3: break;
         
@@ -132,9 +127,6 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 	    antibottomEn = part.energy()
           nAntibottom =+ 1
 
-
-
-
       result["NLepPos"] = nLepPos
       result["NLepNeg"] = nLepNeg
       result["NBottom"] = nBottom
@@ -162,10 +154,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result["AntibottomPz"] = antibottomPz
       result["AntibottomEn"] = antibottomEn
       
-
-
       #Clasify the event in Zb, Zcc, or Zl
-
       self.i += 1
       if isZbEvent(particles,0,False):
         self.bjet += 1
@@ -182,20 +171,25 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result["eventType"] = 0
       return result
 
-
     def endJob(self):
       BaseControlPlots.endJob(self)
       print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
 
-def runTest():
+def runTest(path="/home/fynu/tdupree/store/zbb_13Sep/TT_MC/skim/"):
   controlplots = MonteCarloSelectionControlPlots()
-  path="/home/fynu/tdupree/store/zbb_13Sep/TT_MC/skim/"
-  #path="../testfiles/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
+
   controlplots.beginJob()
   i = 0
   for event in events:

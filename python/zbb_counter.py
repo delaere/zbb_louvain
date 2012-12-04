@@ -6,7 +6,6 @@ import numpy as n
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate,isGoodMet
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent
 from zbbCommons import zbblabel

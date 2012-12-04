@@ -1,9 +1,8 @@
 #! /usr/bin/env python
-
 import ROOT
 import sys
 import os
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
@@ -21,13 +20,11 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, metlabel=zbblabel.metlabel, jetlabel=zbblabel.jetlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel, triggerlabel=zbblabel.triggerlabel, btagging="SSV", vertexlabel=zbblabel.vertexlabel):
-      self.btagging = btagging
+    def beginJob(self):
       # declare histograms
       self.add("run","Run number",30000,160000,190000)
       self.add("event","Event number",1000,0,5e9)
       self.add("ls","Lumi section",2000,0,2000)
-      #self.add("lumi","Lumi versus run",2000,0,2000,)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("zmassMu","zmassMu",10000,0,1000)
@@ -68,77 +65,35 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el1etapm","leading electron Eta",50,-2.5,2.5)
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
       self.add("drllEle","drllEle",100,0,5)
-      # prepare handles
-      self.jetHandle = Handle ("vector<pat::Jet>")
-      self.metHandle = Handle ("vector<pat::MET>")
-      self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.trigInfoHandle = Handle ("pat::TriggerEvent")
-      self.vertexHandle = Handle ("vector<reco::Vertex>")
-      self.jetlabel = jetlabel
-      self.metlabel = metlabel
-      self.zmulabel = zmulabel
-      self.zelelabel = zelelabel
-      self.trigInfolabel = triggerlabel
-      self.vertexlabel = vertexlabel
-      #self.rhoHandle = Handle ("double")
 
     #@print_timing
     def process(self, event):
       """eventSelectionControlPlots"""
       result = { }
-      # load event
-      event.getByLabel(self.jetlabel,self.jetHandle)
-      event.getByLabel(self.metlabel,self.metHandle)
-      event.getByLabel(self.zmulabel,self.zmuHandle)
-      event.getByLabel(self.zelelabel,self.zeleHandle)
-      event.getByLabel(self.vertexlabel,self.vertexHandle)
-      #event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
-
-      jets = self.jetHandle.product()
-      met = self.metHandle.product()
-      zCandidatesMu = self.zmuHandle.product()
-      zCandidatesEle = self.zeleHandle.product()
-      vertices = self.vertexHandle.product()
-      #rho = self.rhoHandle.product()
-      
-      if vertices.size()>0 :
-          vertex = vertices[0]
-      else:
-          vertex = None
-      bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle) 
-      runNumber= event.eventAuxiliary().run()
-      #lumi= event.eventAuxiliary().lumi()
-      #print "RunNumber" , runNumber
-      if self.checkTrigger:
-        event.getByLabel (self.trigInfolabel,self.trigInfoHandle)
-        triggerInfo = self.trigInfoHandle.product()
-      else:
-        triggerInfo = None
       ## trigger
-      result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, event.eventAuxiliary().luminosityBlock(), self.muChannel)
-      result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
+      result["triggerSelection"] = self.checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
+      result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel, "SSV", event.eventAuxiliary().luminosityBlock())
+      categoryData = event.catMu if self.muChannel else event.catEle
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
           result["category"].append(category)
-      result["run"] = event.eventAuxiliary().run()
-      result["event"] = event.eventAuxiliary().id().event()
-      result["ls"] = event.eventAuxiliary().luminosityBlock()
-
+      result["run"] = event.run()
+      result["event"] = event.event()
+      result["ls"] = event.lumi()
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]
-      for z in zCandidatesMu:
+      for z in event.Zmumu:
         result["zmassMu"].append(z.mass())
         result["zptMu"].append(z.pt())
       result["zmassEle"] = [ ]
       result["zptEle"] = [ ]
-      for z in zCandidatesEle:
+      for z in event.Zelel:
         result["zmassEle"].append(z.mass())
         result["zptEle"].append(z.pt())
+      bestZcandidate = event.bestZmumuCandidate if self.muChannel else event.bestZelelCandidate
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
@@ -174,19 +129,14 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["el2eta"] = abs(ele2.eta())
           result["el1etapm"] = ele1.eta()
           result["el2etapm"] = ele2.eta()
-
       ## plots looking for resonnances / kinematics
       # that method returns the best jet pair. When only one is btagged, it is the first one.
       # when two bjets are present, these are the two.
-      # this means that in cat 4 we have here Zj and Zjj
-      # in cat 5 we have Zb and Zbl
-      # in cat 9 we have Zb and Zbb
       # later on, variables are refering to b-jets, even if some are light jets
       if not bestZcandidate is None:
-        dijet = findDijetPair(jets, bestZcandidate, self.btagging)
+        dijet = event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
-          #b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
           b1 = self._JECuncertainty.jet(dijet[0])
           Zb = z+b1
           result["ZbM"] = Zb.M()
@@ -195,7 +145,6 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["dphiZbj1"] = abs(z.DeltaPhi(b1))
           result["drZbj1"] = z.DeltaR(b1)
         if not dijet[1] is None:
-          #b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
           b2 = self._JECuncertainty.jet(dijet[1])
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
@@ -207,6 +156,7 @@ class EventSelectionControlPlots(BaseControlPlots):
             svdr = -1
           bb = b1 + b2
           Zbb = Zb + b2
+          met = event.MET
           met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
           result["dijetM"] = bb.M()
           result["dijetPt"] = bb.Pt()
@@ -220,14 +170,19 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["dphidijetMET"] = bb.DeltaPhi(met4v)
       return result
 
-def runTest():
+def runTest(path='../testfiles/'):
   controlPlots = EventSelectionControlPlots(muChannel=True)
-  path="../testfiles/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
   controlPlots.beginJob()
   i = 0
   for event in events:
@@ -237,36 +192,18 @@ def runTest():
   controlPlots.endJob()
 
 def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
-  metlabel=zbblabel.metlabel
-  jetlabel=zbblabel.jetlabel
-  zmulabel=zbblabel.zmumulabel
-  zelelabel=zbblabel.zelelabel
-  triggerlabel=zbblabel.triggerlabel
-  vertexlabel = zbblabel.vertexlabel
-  jetHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  vertexHandle = Handle ("vector<reco::Vertex>")
-  trigInfoHandle = Handle ("pat::TriggerEvent")
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
   for event in events:
-    event.getByLabel (jetlabel,jetHandle)
-    event.getByLabel (metlabel,metHandle)
-    event.getByLabel (zmulabel,zmuHandle)
-    event.getByLabel (zelelabel,zeleHandle)
-    event.getByLabel (triggerlabel,trigInfoHandle)
-    event.getByLabel (vertexlabel,vertexHandle)
-    jets = jetHandle.product()
-    met = metHandle.product()
-    zCandidatesMu = zmuHandle.product()
-    zCandidatesEle = zeleHandle.product()
-    vertices = vertexHandle.product()
-    triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, "SSV", 15., event.eventAuxiliary().luminosityBlock())
+    categoryData = event.catMu if muChannel else event.catEle
     if isInCategory(stage, categoryData):
-      print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
+      print >> event_list , "Run", event.run(), ", Lumisection", event.lumi(), ", Event", event.event()

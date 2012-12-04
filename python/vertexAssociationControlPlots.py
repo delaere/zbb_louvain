@@ -2,8 +2,10 @@
 
 import ROOT
 import sys
-from DataFormats.FWLite import Events, Handle
+import os
+from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
+from eventSelection import prepareAnalysisEvent
 from vertexAssociation import *
 from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
@@ -15,7 +17,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="vertexAssociation", dataset=dataset, mode=mode)
     
-    def beginJob(self, jetlabel=zbblabel.jetlabel, zlabel=zbblabel.zmumulabel, vertexlabel=zbblabel.vertexlabel , sigcut = 2.):
+    def beginJob(self, sigcut = 2.):
       self.sigcut = sigcut
       # declare histograms
       self.add("nvertices","nvertices",30,0,30)
@@ -51,13 +53,6 @@ class VertexAssociationControlPlots(BaseControlPlots):
       self.add("j1_ratio1b_nopu","leading jet/vertex association ratio v1 using vertexing",100,0,1)
       self.add("j1_ratio2b_nopu","leading jet/vertex association ratio v2 using vertexing",100,0,1)
       self.add("j1_ratio3b_nopu","leading jet/vertex association ratio v3 using vertexing",100,0,1)
-      # prepare handles
-      self.jetHandle = Handle ("vector<pat::Jet>")
-      self.zHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.vertexHandle = Handle ("vector<reco::Vertex>")
-      self.jetlabel = (jetlabel)
-      self.zlabel = (zlabel)
-      self.vertexlabel = (vertexlabel)
 
     def jetSelection(self, jet, Z):
       """This corresponds to the loose jet id selection for PF jets and avoid overlap with leptons"""
@@ -81,25 +76,12 @@ class VertexAssociationControlPlots(BaseControlPlots):
     def process(self,event):
       """vertexAssociationControlPlots"""
       result = { }
-      # load event
-      event.getByLabel (self.jetlabel,self.jetHandle)
-      event.getByLabel (self.zlabel,self.zHandle)
-      event.getByLabel (self.vertexlabel,self.vertexHandle)
-      jets = self.jetHandle.product()
-      zs = self.zHandle.product()
-      vs = self.vertexHandle.product()
-      result["nvertices"] = vs.size()
+      result["nvertices"] = event.vertices.size()
       # only events with one Z candidate
-      if zs.size()==0 : return result
-      # select the Z
-      bestZ = zs[0]
-      bestM = -1000.
-      for z in zs :
-        if abs(z.mass()-91.1876)<abs(bestM-91.1876) :
-          bestM = z.mass()
-          bestZ = z
+      bestZ = event.bestZcandidate
+      if bestZ is None : return result
       # select the vertex
-      vertex = findPrimaryVertex(bestZ, vs)
+      vertex = findPrimaryVertex(bestZ, event.vertices)
       result["vx"] = vertex.x()
       result["vy"] = vertex.y()
       result["vz"] = vertex.z()
@@ -134,7 +116,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
       result["j1_ratio3b_nopu"] = 0
       result["distance"] = [ ]
       result["sig"] = [ ]
-      for jet in jets: 
+      for jet in event.jets: 
         if not self.jetSelection(jet,bestZ) : continue
         ptsum = 0.
         ptsumx = 0.
@@ -209,18 +191,24 @@ class VertexAssociationControlPlots(BaseControlPlots):
           result["j1_ratio3b"] = (ptsumx**2+ptsumy**2)**(0.5)/jet.et()
           if isMcPrimaryJet: result["j1_ratio3b_nopu"] = (ptsumx**2+ptsumy**2)**(0.5)/jet.et()
         firstJet = False
-      result["goodevent"] = checkVertexAssociation(bestZ, jets, vs)
+      result["goodevent"] = checkVertexAssociation(bestZ, event.jets, event.vertices)
       return result
-    
 
-def runTest():
+def runTest(path="../testfiles/ttbar/"):
   controlPlots = VertexAssociationControlPlots()
-  path="../testfiles/ttbar/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
+
   controlPlots.beginJob()
   i = 0
   for event in events:

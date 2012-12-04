@@ -7,17 +7,14 @@ class zbblabel:
   electronlabel="tightElectrons"
   jetlabel="cleanPatJets"
   zmumulabel="zmuTightmuTight"
-  #zmumulabel="zmuAllmuAll"
   zelelabel="zelTightelTight"
-  #zelelabel="zelAllelAll"
   vertexlabel="goodPV"
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
   metlabel="patType01SCorrectedPFMet"
-  zmmbblabel="Zmmbb"
-  zeebblabel="Zeebb"
-  bblabel ="bbbar"
-  genlabel="genParticles"
+  genlabel="prunedGen"
+  genjetlabel="prunedJets"
+  genInfolabel="generator"
 
 class zbbsystematics:
   SF_uncert="mean" ## choose among min/max/mean

@@ -4,7 +4,7 @@ import ROOT
 import sys
 import os
 from math import sin, sqrt
-from DataFormats.FWLite import Events, Handle
+from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
@@ -28,7 +28,7 @@ class MuonsControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="muons", dataset=dataset, mode=mode)
     
-    def beginJob(self, muonlabel=zbblabel.muonlabel, muonType="tight"):
+    def beginJob(self, muonList="muons", muonType="tight"):
       # declare histograms
       self.add("muonType","Muon type", 4,0,4)
       self.add("muonTckLayers","Muon Tck Layers",50,0,50)
@@ -43,19 +43,13 @@ class MuonsControlPlots(BaseControlPlots):
       self.add("muonMHits","Muon muon hits",100,0,100)
       self.add("muondb","muon dB",100,0,0.05)
       self.add("nmu","muon count",5,0,5)
-      
-      # prepare handles
-      self.muonHandle = Handle ("vector<pat::Muon>")
-      self.muonlabel  = muonlabel
-      self.muonType   = muonType
+      self.muonType = muonType
+      self.muonList = muonList
     
     #@print_timing
     def process(self, event):
       """objectsControlPlots"""
       result = { }
-      # load event
-      event.getByLabel (self.muonlabel,self.muonHandle)
-      muons = self.muonHandle.product()
       # process event and fill histograms
       result["muonType"]        = [ ]
       result["muonTckLayers"]   = [ ]
@@ -70,7 +64,7 @@ class MuonsControlPlots(BaseControlPlots):
       result["muonMHits"]       = [ ]
       result["muondb"]          = [ ]
       nmu = 0
-      for muon in muons:
+      for muon in getattr(event, self.muonList):
         # for muons:
         chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt
         chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt  
@@ -106,9 +100,7 @@ class MuonsControlPlots(BaseControlPlots):
         if isGoodMuon(muon,self.muonType) : nmu += 1
         result["muondb"].append(abs(muon.dB()))
       result["nmu"] = nmu
-   
       return result
-    
 
 class ElectronsControlPlots(BaseControlPlots):
     """A class to create control plots for electrons"""
@@ -117,7 +109,7 @@ class ElectronsControlPlots(BaseControlPlots):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="electrons", dataset=dataset, mode=mode)
     
-    def beginJob(self, electronlabel=zbblabel.electronlabel, electronType="tight"):
+    def beginJob(self, electronList="electrons", electronType="tight"):
       # declare histograms
       self.add("eleid","electron id",10,0,10)
       self.add("elemisshits","Electron missing hits",5,0,5)
@@ -137,22 +129,13 @@ class ElectronsControlPlots(BaseControlPlots):
       self.add("eledeta","Electron deta at calo",100,0,0.01)
       self.add("eleinin","Electron sigma ieta ieta",100,0,0.1)
       self.add("nel","electron count",5,0,5)
-      # prepare handles
-      self.electronHandle = Handle ("vector<pat::Electron>")
-      self.electronlabel  = electronlabel
       self.electronType   = electronType
-      #self.rhoHandle = Handle ("double")
+      self.electronList   = electronList
 
     #@print_timing
     def process(self, event):
       """ElectronsControlPlots"""
       result = { }
-      # load event
-      event.getByLabel(self.electronlabel,self.electronHandle)
-      electrons = self.electronHandle.product()
-      #event.getByLabel("kt6PFJetsForIsolation","rho",self.rhoHandle)
-      #rho = self.rhoHandle.product()
-      
       # lepton selection
       result["eleid"] = [ ]
       result["elemisshits"] = [ ]
@@ -172,9 +155,8 @@ class ElectronsControlPlots(BaseControlPlots):
       result["eledeta"] = [ ]
       result["eleinin"] = [ ]
       nel = 0
-      for electron in electrons:
+      for electron in getattr(event, self.electronList):
         # for electrons
-              
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
         result["eleid"].append(electron.userInt("MediumWP"))
         result["elemisshits"].append(electron.gsfTrack().numberOfLostHits())
@@ -200,7 +182,6 @@ class ElectronsControlPlots(BaseControlPlots):
       result["nel"] = nel
       return result
     
-
 class JetmetControlPlots(BaseControlPlots):
     """A class to create control plots for jets and MET"""
 
@@ -210,7 +191,7 @@ class JetmetControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, jetlabel=zbblabel.jetlabel, metlabel=zbblabel.metlabel, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel,vertexlabel=zbblabel.vertexlabel, btagging="SSV"):
+    def beginJob(self, btagging="SSV"):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,0,10)
@@ -309,38 +290,11 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("nch","charged multiplicity",50,0,50)
       self.add("cef","charged EmEnergy fraction",101,0,1.01)
       self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
-      # prepare handles
-      self.jetHandle = Handle("vector<pat::Jet>")
-      self.metHandle = Handle("vector<pat::MET>")
-      self.zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-      self.vertexHandle = Handle ("vector<reco::Vertex>")
-      self.jetlabel  = jetlabel
-      self.metlabel  = metlabel
-      self.zmulabel = zmulabel
-      self.zelelabel = zelelabel
-      self.vertexlabel = vertexlabel      
     
     #@print_timing
     def process(self, event):
       """JetmetControlPlots"""
       result = { }
-      # load event
-      event.getByLabel(self.jetlabel,self.jetHandle)
-      event.getByLabel(self.metlabel,self.metHandle)
-      event.getByLabel(self.zmulabel,self.zmuHandle)
-      event.getByLabel(self.zelelabel,self.zeleHandle)
-      event.getByLabel (self.vertexlabel,self.vertexHandle)      
-      jets = self.jetHandle.product()
-      met  = self.metHandle.product()
-      zCandidatesMu = self.zmuHandle.product()
-      zCandidatesEle = self.zeleHandle.product()
-      vertices = self.vertexHandle.product()
-      if vertices.size()>0 :
-          vertex = vertices[0]
-      else:
-          vertex = None
-      bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
@@ -377,11 +331,10 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      for jet in jets:
+      for jet in event.jets:
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
-        if isGoodJet(jet,bestZcandidate):
-        #if isGoodJet(jet) and not jet.hasOverlaps("muons") and not jet.hasOverlaps("electrons"): 
+        if isGoodJet(jet,event.bestZcandidate):
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
 	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
@@ -508,25 +461,30 @@ class JetmetControlPlots(BaseControlPlots):
       result["nj"] = nj
       result["nb"] = nb
       result["nbP"] = nbP
-      result["MET"] = met[0].pt()
-      result["METphi"] = met[0].phi()
+      result["MET"] = event.MET[0].pt()
+      result["METphi"] = event.MET[0].phi()
       result["METsignificance"] = 0.
-      if met[0].getSignificanceMatrix()(0,0)<1e10 and met[0].getSignificanceMatrix()(1,1)<1e10: 
-        result["METsignificance"] = met[0].significance()
+      if event.MET[0].getSignificanceMatrix()(0,0)<1e10 and event.MET[0].getSignificanceMatrix()(1,1)<1e10: 
+        result["METsignificance"] = event.MET[0].significance()
       return result
 
-def runTest():
+def runTest(path="../testfiles/"):
   output = ROOT.TFile(zbbfile.controlPlots, "RECREATE")
   jetmetPlots = JetmetControlPlots(output.mkdir("jetmet"))
   electronsPlots = ElectronsControlPlots(output.mkdir("electrons"))
   muonsPlots = MuonsControlPlots(output.mkdir("muons"))
 
-  path="../testfiles/"
-  dirList=os.listdir(path)
-  files=[]
-  for fname in dirList:
-    files.append(path+fname)
-  events = Events (files)
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent(files)
+  prepareAnalysisEvent(events,checkTrigger=False)
 
   muonsPlots.beginJob()
   electronsPlots.beginJob()
