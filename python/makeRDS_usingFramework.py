@@ -248,9 +248,9 @@ events = Events (files)
 ### booking
 
 escp.beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
-brcp.beginJob(btagPerfData) 
+brcp.beginJob(btagPerfData, btagging=btagAlgo) 
 lrcp.beginJob()             
-jmcp.beginJob()
+jmcp.beginJob(btagging=btagAlgo)
 if muChannel[channel] : vacp.beginJob(zlabel=zbblabel.zmumulabel)
 else : vacp.beginJob(zlabel=zbblabel.zelelabel)
 if channel[-2:] == "MC":

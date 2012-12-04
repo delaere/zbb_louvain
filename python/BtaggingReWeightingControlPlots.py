@@ -17,7 +17,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="BtaggingReweighting", dataset=dataset, mode=mode)
       self.muChannel=muChannel
     
-    def beginJob(self, perfData=zbbfile.ssvperfData):
+    def beginJob(self, perfData=zbbfile.ssvperfData, btagging="SSV"):
       # declare histograms
       self.add("HE","HE",200,0,2)
       self.add("HP","HP",200,0,2)
@@ -27,7 +27,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       self.add("HEHP","HEHP",200,0,2)
       self.add("HPHP","HPHP",200,0,2)
       # reweig engine
-      self.engine = btaggingWeight(0,999,0,999,perfData)
+      self.engine = btaggingWeight(0,999,0,999,perfData,btagging)
     
     #@print_timing
     def process(self,event):

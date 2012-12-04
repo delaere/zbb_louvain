@@ -184,7 +184,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       vertexPlots[level].beginJob(zlabel=zlabel)
       selectionPlots[level].beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
       if handlePU: lumiReWeightingPlots[level].beginJob(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName)
-      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
+      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName,btagging=btagAlgo)
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
       #if NLOWeight: nloReWeightingPlots[level].beginJob()
 
