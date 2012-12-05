@@ -17,11 +17,13 @@ class zbblabel:
   genInfolabel="generator"
 
 class zbbsystematics:
+  # btagging reweighting
   SF_uncert="mean" ## choose among min/max/mean
-  #SF_running_mode= "hardcoded" ## choose between hardcoded/database
-  SF_running_mode= "database" ## choose between hardcoded/database
-  JERfactor = 1. # 1 = recommended smearing
+  SF_running_mode= "database" ## choose between "hardcoded" and "database"
+  # Jet Energy corrections for MC. For data, these factors must be (forced to) zero!
+  JERfactor = 1. # 1 = recommended smearing for MC
   JESfactor = 0. # 1 = +1sigma
+  # Lepton reweighting uncertainty
   LeptonTnPfactor = 0
 
 class zbbfile:

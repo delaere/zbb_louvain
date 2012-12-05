@@ -154,9 +154,15 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
   t0 = time.time()
   for event in events:
     runNumber= event.run()
+    # force JES and JER to 0 for data
+    if event.object().event().eventAuxiliary().isRealData():
+      zbbsystematics.JERfactor = 0
+      zbbsystematics.JESfactor = 0
+    # printout
     if i%100==0 : 
       print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
       t0 = time.time()
+    # loop on channels
     for muChannel in [True, False]:
       if muChannel: 
         categoryData = event.catMu
