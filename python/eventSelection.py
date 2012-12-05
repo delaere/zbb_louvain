@@ -629,6 +629,7 @@ def prepareAnalysisEvent(event, btagging="SSV",ZjetFilter="bcl",checkTrigger=Tru
   event.addCollection("vertices","vector<reco::Vertex>",zbblabel.vertexlabel)
   event.addCollection("jets","vector<pat::Jet>",zbblabel.jetlabel)
   event.addCollection("MET","vector<pat::MET>",zbblabel.metlabel)
+  event.addCollection("METNNregression","vector<pat::MET>","patMETsPF")
   event.addCollection("Zmumu","vector<reco::CompositeCandidate>",zbblabel.zmumulabel)
   event.addCollection("Zelel","vector<reco::CompositeCandidate>",zbblabel.zelelabel)
   event.addCollection("triggerInfo","pat::TriggerEvent",zbblabel.triggerlabel)
