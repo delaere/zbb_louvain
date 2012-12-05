@@ -57,12 +57,12 @@ class btaggingWeight:
       if isBJet(jet,"HP",btagging):
         ntagsHP += 1
         if flavor == 0:
-          if jet.et() > 100. : print "WARNING : "+self.btagging+"HP tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          if jet.et() > 100. : print "WARNING : "+btagging+"HP tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHP += 1
       if isBJet(jet,"HE",btagging):
         ntagsHE += 1
         if flavor == 0:
-          if jet.et() > 100. : print "WARNING : "+self.btagging+"HE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          if jet.et() > 100. : print "WARNING : "+btagging+"HE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
       self.myJetSet.addJet(zbbsystematics.SF_uncert, flavor,jet.et(),jet.eta())
