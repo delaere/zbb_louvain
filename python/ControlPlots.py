@@ -66,7 +66,7 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from MonteCarloReweighting import *
 from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
+import cProfile
 
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
@@ -119,7 +119,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       tightmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("tightmuons")))
       allelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("allelectrons")))
       tightelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("tightelectrons")))
-      jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF")))
+      jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF"),muChannel))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
       selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
       if handlePU: 
@@ -193,6 +193,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
           btagReWeightingPlots[level].fill(btagReWeightingPlotsData) #no weight
         if handleLeptonEff:
           leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData) #no weight
+    if i>5000: break #TODO: remove ! temporary escape after 5000 events for profiling
     i += 1
 
   # save all
@@ -297,3 +298,4 @@ def btaggingWeightMode(catName):
 
 if __name__ == "__main__":
   main(options)
+  #cProfile.run('main(options)', 'controlPlots.prof')

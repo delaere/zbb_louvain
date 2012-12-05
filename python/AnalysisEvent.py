@@ -191,7 +191,8 @@ class AnalysisEvent(Events):
      if attr in self.__dict__["vardict"]:
        return self.vardict[attr]
      if attr in self._collections:
-       return self.getCollection(attr)
+       self.getByLabel(self._collections[attr]["collection"],self._collections[attr]["handle"])
+       return self.vardict.setdefault(attr, self._collections[attr]["handle"].product())
      if attr in self._producers:
        return self.vardict.setdefault(attr, self._producers[attr][0](self, **self._producers[attr][1]))
      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))

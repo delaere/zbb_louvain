@@ -185,11 +185,12 @@ class ElectronsControlPlots(BaseControlPlots):
 class JetmetControlPlots(BaseControlPlots):
     """A class to create control plots for jets and MET"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, muChannel=True, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
 
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
+      self.muChannel = muChannel
     
     def beginJob(self, btagging="SSV"):
       self.btagging=btagging
@@ -345,10 +346,11 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      for jet in event.jets:
+      for index,jet in enumerate(event.jets):
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
-        if isGoodJet(jet,event.bestZcandidate):
+        goodJets = event.goodJets_mu if self.muChannel else event.goodJets_ele
+        if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
 	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))

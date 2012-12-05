@@ -40,6 +40,7 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   eventCnt = 0
   for event in events:
     categoryData = event.catMu if muChannel else event.catEle
+    goodJets = event.goodJets_mu if muChannel else event.goodJets_ele
     if isInCategory(stage, categoryData):
       eventCnt = eventCnt +1
       if eventCnt%100==0 : print ".",
@@ -47,8 +48,8 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
       # event weight
       mystruct.eventWeight = weight_engine.weight( fwevent=event )
       # that's where we access the jets
-      for jet in event.jets:
-        if not isGoodJet(jet,event.bestZcandidate): continue
+      for index,jet in enumerate(event.jets):
+        if not goodJets[index]: continue
         mystruct.pt = jet.pt()
         mystruct.eta = jet.eta()
         mystruct.flavor = jet.partonFlavour()

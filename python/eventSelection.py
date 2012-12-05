@@ -254,25 +254,25 @@ def jetId(jet,level="loose"):
 
 def isGoodJet(jet, Z = None):
   """Perform additional checks that define a good jet"""
-  # restrict in eta
-  outcome = abs(jet.eta())<2.4
-  outcome = outcome and JECuncertaintyProxy.jetPt(jet)>20.
   # overlap checking
-  # the following would be too dangerous for bjets... would probably need to restrict to tight leptons
-  #  if jet.hasOverlaps("muons"): return False
-  #  if jet.hasOverlaps("electrons"): return False
   if not Z is None :
-    outcome = outcome
     if not hasNoOverlap(jet,Z) :
       return False 
-  # check jetid (loose)
-  outcome = outcome and jetId(jet,"loose")
-  # to study the impact of PU on MC, request the jet to be matched to a genjet
-  # outcome = outcome and not (jet.genJet() is None)
-  # vertex match - disabled... further studies pending.
-  #outcome = outcome and jet.userFloat("betaStar") < 0.2 # option 1: use beta*
-  #outcome = outcome and jet.userFloat("beta") > 0.15 # option 2: use beta
-  return outcome
+  # pt, eta, and jetid
+  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>20. and jetId(jet,"loose")
+
+def goodJets(event, muChannel=True, eleChannel=True):
+  # best Z candidate
+  if muChannel and eleChannel:
+    bestZcandidate = event.bestZcandidate
+  elif muChannel:
+    bestZcandidate = event.bestZmumuCandidate
+  elif eleChannel:
+    bestZcandidate = event.bestZelelCandidate
+  else:
+    bestZcandidate = None
+  # compute the good jets
+  return map(lambda jet:isGoodJet(jet,bestZcandidate),event.jets)
 
 def isGoodMet(met,cut=50):
   """Apply the MET cut"""
@@ -411,15 +411,17 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
 
 def findDijetPair(event, btagging="SSV", muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
-  # best Z candidate
+  # the proper goodJets list
   if muChannel and eleChannel:
-    bestZcandidate = event.bestZcandidate
+    goodJets = event.goodJets_common
   elif muChannel:
-    bestZcandidate = event.bestZmumuCandidate
+    goodJets = event.goodJets_mu
   elif eleChannel:
-    bestZcandidate = event.bestZelelCandidate
+    goodJets = event.goodJets_ele
+  else:
+    goodJets = event.goodJets
   # check number of good jets
-  indices = [index for index,jet in enumerate(event.jets) if isGoodJet(jet,bestZcandidate) ]
+  indices = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   if len(indices)<1: return (None, None)
   if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []
@@ -550,10 +552,13 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFi
   output = []
   if muChannel and eleChannel:
     bestZcandidate = event.bestZcandidate
+    goodJets = event.goodJets_all
   elif muChannel:
     bestZcandidate = event.bestZmumuCandidate
+    goodJets = event.goodJets_mu
   elif eleChannel:
     bestZcandidate = event.bestZelelCandidate
+    goodJets = event.goodJets_ele
   # output[0]: Trigger
   if checkTrigger==False or (event.isMuTriggerOK and muChannel) or (event.isEleTriggerOK and eleChannel):
     output.append(1)
@@ -571,8 +576,8 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFi
   nBjetsHE = 0
   nBjetsHP = 0
   nBjetsHEHP = 0
-  for jet in event.jets:
-    if isGoodJet(jet,bestZcandidate):
+  for index,jet in enumerate(event.jets):
+    if goodJets[index]:
       nJets += 1
       HE = isBJet(jet,"HE",btagging)
       HP = isBJet(jet,"HP",btagging)
@@ -601,7 +606,6 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFi
     output.append(bestZcandidate.pt())
   # output[10] : delta R (bb)
   # output[11] : delta R (bb) via SV
-  #dijet = findDijetPair(event.jets, bestZcandidate, btagging)
   dijet = findDijetPair(event, btagging, muChannel, eleChannel)
   if dijet[0] is None or dijet[1] is None: 
     output.append(-1)
@@ -640,6 +644,10 @@ def prepareAnalysisEvent(event, btagging="SSV",ZjetFilter="bcl",checkTrigger=Tru
   event.addCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >",zbblabel.pulabel)
   # producers
   event.addProducer("vertex",vertex)
+  event.addProducer("goodJets_mu",goodJets,muChannel=True,eleChannel=False)
+  event.addProducer("goodJets_ele",goodJets,muChannel=False,eleChannel=True)
+  event.addProducer("goodJets_all",goodJets,muChannel=True,eleChannel=True)
+  event.addProducer("goodJets_none",goodJets,muChannel=False,eleChannel=False)
   event.addProducer("isMuTriggerOK",isTriggerOK,muChannel=True,eleChannel=False,perRun=True)
   event.addProducer("isEleTriggerOK",isTriggerOK,muChannel=False,eleChannel=True,perRun=True)
   event.addProducer("isTriggerOK",isTriggerOK,muChannel=True,eleChannel=True,perRun=True)

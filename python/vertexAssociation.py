@@ -26,6 +26,20 @@ def findPrimaryVertex(zcandidate, vertices):
       closestVertex = vertex
   return closestVertex
 
+def findPrimaryVertexIndex(zcandidate, vertices):
+  # look for closest vertex
+  # vertices are already filtered... no need to check quality
+  lepton1 = zcandidate.daughter(0)
+  lepton2 = zcandidate.daughter(1)
+  vz = (lepton1.vz()+lepton2.vz())/2.
+  mindz = 1000.
+  closestVertex = 0
+  for index,vertex in enumerate(vertices):
+    if abs(vertex.z()-vz)<mindz :
+      mindz = abs(vertex.z()-vz)
+      closestVertex = index
+  return closestVertex
+
 def zVertex(zcandidate, cut, vertex=None):
   lepton1 = zcandidate.daughter(0)
   lepton2 = zcandidate.daughter(1)

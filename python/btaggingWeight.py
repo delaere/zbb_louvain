@@ -40,7 +40,7 @@ class btaggingWeight:
       return 1.
     if not Bmode is None: 
       self.setMode(Bmode)
-    Z = event.bestZmumuCandidate if muChannel else event.bestZelelCandidate
+    goodJets = event.goodJets_mu if muChannel else event.goodJets_ele
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
@@ -48,9 +48,9 @@ class btaggingWeight:
     ntagsNoFlvavorHE = 0
     ntagsNoFlvavorHP = 0
     # retrieve the jets
-    for jet in event.jets:
+    for index,jet in enumerate(event.jets):
       # apply selection
-      if not isGoodJet(jet, Z): continue
+      if not goodJets[index]: continue
       # check flavor
       flavor = jet.partonFlavour()
       # check btagging
