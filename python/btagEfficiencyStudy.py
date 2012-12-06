@@ -8,6 +8,7 @@ from zbbCommons import zbblabel,zbbfile
 
 def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   # prepare output
+  #path='/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/'
   ROOT.gROOT.ProcessLine(
   "struct MyStruct {\
      Float_t     pt;\
@@ -34,10 +35,11 @@ def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
   else:
     files=[]
   events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,btagging="SSV",ZjetFilter="bcl",checkTrigger=False)
+  prepareAnalysisEvent(events,btagging="CSV",ZjetFilter="bcl",checkTrigger=False)
   weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, zbblabel.pulabel)
   # event loop
   eventCnt = 0
+  print "starting loop on events"
   for event in events:
     categoryData = event.catMu if muChannel else event.catEle
     goodJets = event.goodJets_mu if muChannel else event.goodJets_ele
