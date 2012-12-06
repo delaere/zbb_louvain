@@ -31,13 +31,13 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
     def process(self,event,btagging="CSV"):
       """BtaggingReWeightingControlPlots"""
       result = { }
-      result["HE"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HE", btagging)
-      result["HP"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HP", btagging)
-      result["HEexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEexcl", btagging)
-      result["HPexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPexcl", btagging)
-      result["HEHE"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHE", btagging)
-      result["HEHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHP", btagging)
-      result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP", btagging)
+      result["HE"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HE", btagging=btagging)
+      result["HP"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HP", btagging=btagging)
+      result["HEexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEexcl", btagging=btagging)
+      result["HPexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPexcl", btagging=btagging)
+      result["HEHE"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHE", btagging=btagging)
+      result["HEHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHP", btagging=btagging)
+      result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP", btagging=btagging)
       return result
 
 def runTest(path="../testfiles/ttbar/"):
