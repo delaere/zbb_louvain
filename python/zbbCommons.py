@@ -19,19 +19,19 @@ class zbblabel:
 class zbbsystematics:
   # btagging reweighting
   SF_uncert="mean" ## choose among min/max/mean
+  #SF_running_mode= "hardcoded" ## choose between hardcoded/database
   SF_running_mode= "database" ## choose between "hardcoded" and "database"
   # Jet Energy corrections for MC. For data, these factors must be (forced to) zero!
-  JERfactor = 1. # 1 = recommended smearing for MC
+  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
   JESfactor = 0. # 1 = +1sigma
   # Lepton reweighting uncertainty
   LeptonTnPfactor = 0
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData="../data/performance_ssv_witheff_062012.root"
-  #ssvperfData="../data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
-  pileupData="../data/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON_v2_pileupTruth.root"
-  pileupMC="../data/Fall11_PU_MC.root"
+  ssvperfData="../data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
+  pileupData="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
+  pileupMC="../data/MCpileup_Summer12_S10.root"
   jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
 
   pileupData2012="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
@@ -46,7 +46,7 @@ class zbbnorm:
   lumi_totEle2011=5.217 #in fb-1
   lumi_totMu2011=5.275
 
-  lumi_tot2012=0.809 #only A for the moment
+  lumi_tot2012=5.21 #only A for the moment
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
