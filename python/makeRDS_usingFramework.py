@@ -31,7 +31,7 @@ from vertexAssociationControlPlots import *
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-from zbbCommons import zbbfile
+from zbbCommons import zbbfile, isZbbSelection
 from eventSelection import eventCategories, eventCategory, isInCategory
 from optparse import OptionParser
 
@@ -65,6 +65,7 @@ DataPUFileName=zbbfile.pileupData
 btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="SSV"
+if not isZbbSelection : btagAlgo="CSV"
 
 
 ############
@@ -339,7 +340,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     #ws.writeToFile("File_rds_zbb_"+channel+".root") 
     #gDirectory.Add(ws)
 
-    f=TFile("RDSwithVA/File_rds_zbb_"+channel+".root","RECREATE")
+    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
     rds_zbb.Write()
     f.Close()
 
