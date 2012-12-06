@@ -4,6 +4,7 @@ import intervalmap
 from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel
+from math import sqrt
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 
@@ -308,6 +309,66 @@ def isBJet(jet,workingPoint,algo="CSV"):
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
 
+def jetPtD(jet):
+  #input of VBF NN regression
+  #returns the jet constituent Pt Distribution defined as sqrt(Sum(Pt**2))/Sum(Pt)
+  # where the sum goes to the jet constituents
+  #For 5X samples there is a method to access it:
+  #return jet.constituentPtDistribution()
+  #For 4X it is necessary to loop over the jet constituents
+
+  pfConst = jet.getPFConstituents()
+  sum_ptconst = 0
+  sum_ptconst2 = 0
+
+  for iConst in range (0, pfConst.size()):
+    ptconst = pfConst[iConst].pt()
+    ptconst2 = ptconst * ptconst
+    sum_ptconst += ptconst
+    sum_ptconst2 += ptconst2
+         
+  if sum_ptconst != 0:
+    ptD = sqrt(sum_ptconst2)/sum_ptconst
+  else:
+    ptD = 0
+
+  return ptD
+  
+def jetVtx3dL(jet):
+  #input of VBF NN regression
+  #returns the 3D of the SV jet if it exists
+  output = 0
+  tisv = jet.tagInfoSecondaryVertex()
+  if tisv.nVertices()>0:
+    output = tisv.flightDistance(0).value()
+  return output
+
+def jetVtx3deL(jet):
+  #input of VBF NN regression
+  #returns the 3D error of the SV jet if it exists
+  output = 0
+  tisv = jet.tagInfoSecondaryVertex()
+  if tisv.nVertices()>0:
+    output = tisv.flightDistance(0).error()
+  return output
+
+
+def jetVtxPt(jet):
+  #input of VBF NN regression
+  #it is basically the jet PT of the jet secondary vertex
+  #  (in fact it sums vectorially all SV in the jet)
+  VtxPt = 0
+  tisv = jet.tagInfoSecondaryVertex()
+  if tisv.nVertices()>0:
+    for ivtx in range(0, tisv.nVertices()):
+      if ivtx == 0:
+        vertexSum = tisv.secondaryVertex(ivtx).p4()
+      else:
+        vertexSum += tisv.secondaryVertex(ivtx).p4()
+    TLvertexSum = ROOT.TLorentzVector(vertexSum.px(),vertexSum.py(),vertexSum.pz(),vertexSum.energy())
+    VtxPt = TLvertexSum.Pt()
+  return VtxPt
+  
 def isZcandidate(zCandidate,vertex=None):
   """Checks that this is a suitable candidate from lepton quality"""
   result = True
