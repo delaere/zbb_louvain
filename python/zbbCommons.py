@@ -34,19 +34,15 @@ class zbbfile:
   pileupMC="../data/MCpileup_Summer12_S10.root"
   jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
 
-  pileupData2012="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
-  pileupMC2012="../data/MCpileup_Summer12_S10.root"
-
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
-
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
   lumi_totEle2011=5.217 #in fb-1
   lumi_totMu2011=5.275
 
-  lumi_tot2012=5.21 #only A for the moment
+  lumi_tot2012=5.21 #only A and B for the moment
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
