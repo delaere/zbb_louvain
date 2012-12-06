@@ -65,6 +65,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el1etapm","leading electron Eta",50,-2.5,2.5)
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
       self.add("drllEle","drllEle",100,0,5)
+      self.add("rho", "Rho Variable",100,0,100)
 
     #@print_timing
     def process(self, event):
@@ -168,6 +169,10 @@ class EventSelectionControlPlots(BaseControlPlots):
           result["dphiZbb"] = abs(z.DeltaPhi(bb))
           result["drZbb"] = z.DeltaR(bb)
           result["dphidijetMET"] = bb.DeltaPhi(met4v)
+	  
+      #rho
+      result["rho"] = event.rho[0]
+      
       return result
 
 def runTest(path='../testfiles/'):

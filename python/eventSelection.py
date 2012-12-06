@@ -703,6 +703,8 @@ def prepareAnalysisEvent(event, btagging="CSV",ZjetFilter="bcl",checkTrigger=Tru
   event.addCollection("allelectrons","vector<pat::Electron>",zbblabel.allelectronslabel)
   event.addCollection("allmuons","vector<pat::Muon>",zbblabel.allmuonslabel)
   event.addCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >",zbblabel.pulabel)
+  event.addCollection("rho","double",("kt6PFJetsForIsolation","rho"))
+
   # producers
   event.addProducer("vertex",vertex)
   event.addProducer("goodJets_mu",goodJets,muChannel=True,eleChannel=False)
