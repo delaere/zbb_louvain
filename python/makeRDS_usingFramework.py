@@ -248,7 +248,7 @@ events = Events (files)
 ### booking
 
 escp.beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
-brcp.beginJob(btagPerfData, btagging=btagAlgo) 
+brcp.beginJob(btagPerfData) 
 lrcp.beginJob()             
 jmcp.beginJob(btagging=btagAlgo)
 if muChannel[channel] : vacp.beginJob(zlabel=zbblabel.zmumulabel)
@@ -293,7 +293,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
       escp.processEvent(event)
-      brcp.processEvent(event)
+      brcp.processEvent(event,btagging=btagAlgo)
       lrcp.processEvent(event)
       jmcp.processEvent(event)
       vacp.processEvent(event)

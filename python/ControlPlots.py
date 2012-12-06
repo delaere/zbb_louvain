@@ -180,7 +180,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
         vertexPlotsData = vertexPlots[plots[0]].process(event)
         selectionPlotsData = selectionPlots[plots[0]].process(event)
         if handlePU: lumiReWeightingPlotsData = lumiReWeightingPlots[plots[0]].process(event)
-        if handleBT: btagReWeightingPlotsData = btagReWeightingPlots[plots[0]].process(event)
+        if handleBT: btagReWeightingPlotsData = btagReWeightingPlots[plots[0]].process(event,btagging=btagAlgo)
         if handleLeptonEff: leptonsReWeightingPlotsData = leptonsReWeightingPlots[plots[0]].process(event)
       for level in plots:
         # compute the weight 
