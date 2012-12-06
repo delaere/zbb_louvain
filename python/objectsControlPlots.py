@@ -192,7 +192,7 @@ class JetmetControlPlots(BaseControlPlots):
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
       self.muChannel = muChannel
     
-    def beginJob(self, btagging="SSV"):
+    def beginJob(self, btagging="CSV"):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,0,10)

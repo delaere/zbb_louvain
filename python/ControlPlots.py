@@ -25,8 +25,8 @@ parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl",
                   help="Jet flavor filter. Examples: --jetFlavor b or --jetFlavor cl")
 parser.add_option("--trigger",action="store_true",dest="checkTrigger", default=False, 
                   help="Check the trigger at the early stage of the event selection.")
-parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
-                  help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
+parser.add_option("-b","--btag", dest="btagAlgo", default="CSV",
+                  help="Choice of the btagging algorithm: CSV (default) or SSV.", metavar="ALGO")
 parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default=zbbfile.pileupData,
                   help="Read estimated PU distribution for data from file.", metavar="file")
 parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default=zbbfile.pileupMC,
@@ -68,7 +68,7 @@ from MonteCarloReweighting import *
 from zbbCommons import zbblabel
 import cProfile
 
-def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
+def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="CSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
   # Summary flags for the PU and btag reweighting
   handlePU = not (PUDataFileName is None or PUMonteCarloFileName is None)

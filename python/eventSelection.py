@@ -296,7 +296,7 @@ def isBJet(jet,workingPoint,algo="CSV"):
       print "Error: unforeseen working point for b-tagging. Use HE or HP"
       return False
   elif algo=="CSV":
-    #HE is Medium WP and HP is Tight WP valid both for 2011 and 2012
+    #HE is Loose WP and HP is Medium WP valid both for 2011 and 2012
     if workingPoint=="HE":
       return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.244
     elif workingPoint=="HP":
@@ -409,7 +409,7 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
 
-def findDijetPair(event, btagging="SSV", muChannel=True, eleChannel=False):
+def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
   if muChannel and eleChannel:
@@ -542,7 +542,7 @@ def isInCategory(category, categoryTuple):
     return False
 
 #TODO: replace the checkTrigger flag by isData
-def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFilter="bcl", checkTrigger=True, perRun=True):
+def eventCategory(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFilter="bcl", checkTrigger=True, perRun=True):
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
   if not ZjetFilter=="bcl":
@@ -625,7 +625,7 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="SSV", ZjetFi
   # return the list of results
   return output
 
-def prepareAnalysisEvent(event, btagging="SSV",ZjetFilter="bcl",checkTrigger=True):
+def prepareAnalysisEvent(event, btagging="CSV",ZjetFilter="bcl",checkTrigger=True):
   # collections
   event.addCollection("genParticles","vector<reco::GenParticle>",zbblabel.genlabel)
   event.addCollection("genJets","vector<reco::GenJet>",zbblabel.genjetlabel)
