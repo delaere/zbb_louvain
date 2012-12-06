@@ -12,7 +12,7 @@ from zbbCommons import zbblabel,zbbfile,zbbsystematics
 class btaggingWeight:
   """compute the event weight based on btagging SF"""
 
-  def __init__(self,jmin1,jmax1,jmin2,jmax2, file=zbbfile.ssvperfData, btagging="SSV"):
+  def __init__(self,jmin1,jmax1,jmin2,jmax2, file=zbbfile.ssvperfData):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
     self.myJetSet = ROOT.JetSet(zbbsystematics.SF_running_mode,file)
 
@@ -33,7 +33,7 @@ class btaggingWeight:
       self.engine.setLimits(0,999,0,999)
 
   #@print_timing    
-  def weight(self,event, muChannel=True, Bmode=None, btagging="SSV"):
+  def weight(self,event, muChannel=True, Bmode=None, btagging="CSV"):
     """btag eff weight"""
     # for data, immediately return 1.
     if event.object().event().eventAuxiliary().isRealData() or Bmode=="None":
