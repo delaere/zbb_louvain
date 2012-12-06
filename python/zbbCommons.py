@@ -1,4 +1,8 @@
- 
+##choose if you want to thz Zbb selection or the ZHbb selection 
+isZbbSelection = True
+tagger = "ssv_witheff_062012"
+if not isZbbSelection : tagger = "csv_witheff"
+
 class zbblabel:
   """labels used in the PAT configuration"""
   allmuonslabel="allMuons"
@@ -23,14 +27,13 @@ class zbbsystematics:
   SF_uncert="mean" ## choose among min/max/mean
   #SF_running_mode= "hardcoded" ## choose between hardcoded/database
   SF_running_mode= "database" ## choose between hardcoded/database
-  JERfactor = 1. # 1 = recommended smearing
+  JERfactor = 0. # 1 = recommended smearing
   JESfactor = 0. # 1 = +1sigma
   LeptonTnPfactor = 0
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData="../data/performance_ssv_witheff_062012.root"
-  #ssvperfData="../data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
+  ssvperfData="../data/performance_"+tagger+".root"
   pileupData="../data/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON_v2_pileupTruth.root"
   pileupMC="../data/Fall11_PU_MC.root"
   jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
