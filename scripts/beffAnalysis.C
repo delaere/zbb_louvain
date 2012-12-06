@@ -15,23 +15,15 @@ void beffAnalysis(const char* input, const char* output) {
   TFile* outputFile = TFile::Open(output,"RECREATE");
 
   // histogram with proper binning... cloned later on 
-  Double_t binning[22] = {25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,1000};
-  TH1F* ptSpectrum = new TH1F("PtSpectrum","PtSpectrum",21,binning);
+  Double_t binning[23] = {20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,1000};
+  TH1F* ptSpectrum = new TH1F("PtSpectrum","PtSpectrum",22,binning);
   ptSpectrum->Sumw2();
 
-  // produce the ratio plot for the 12 combinations of (SSVHE,SSVHP),(Barrel,Endcap),(b,c,l)
-
-  TClonesArray algorithms("TCut",2);
-  new(algorithms[0]) TCut("SSVHEM","ssvhe>1.74");
-  new(algorithms[1]) TCut("SSVHPT","ssvhp>2.0");
-
-  //uncomment this line to extract the csv efficiencies from the tree
-  /*
+  // produce the ratio plot for the 12 combinations of (CSVL,CSVM,CSVT),(Barrel,Endcap),(b,c,l)
   TClonesArray algorithms("TCut",2);
   new(algorithms[0]) TCut("CSVL","csv>0.244");
   new(algorithms[1]) TCut("CSVM","csv>0.679");
   new(algorithms[2]) TCut("CSVT","csv>0.898");
-  */
 
   TClonesArray etaRegions("TCut",2);
   new(etaRegions[0]) TCut("Barrel","abs(eta)<=1.2");
