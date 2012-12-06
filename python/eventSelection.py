@@ -514,7 +514,7 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
       jetList.append(index)
       indices.remove(index)
   if len(jetList)>=2:
-    if jets[jetList[0]].pt()>jets[jetList[1]] :
+    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
       return (jets[jetList[0]],jets[jetList[1]])
     else :
       return (jets[jetList[1]],jets[jetList[0]])
@@ -524,14 +524,14 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
       jetList.append(index)
       indices.remove(index)
   if len(jetList)>=2:
-    if jets[jetList[0]].pt()>jets[jetList[1]] :
+    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
       return (jets[jetList[0]],jets[jetList[1]])
     else :
       return (jets[jetList[1]],jets[jetList[0]])
   # fill with remaining good jets
   for index in indices:
     jetList.append(index)
-  if jets[jetList[0]].pt()>jets[jetList[1]] :
+  if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
     return (jets[jetList[0]],jets[jetList[1]])
   else :
     return (jets[jetList[1]],jets[jetList[0]])
