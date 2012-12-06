@@ -17,7 +17,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="BtaggingReweighting", dataset=dataset, mode=mode)
       self.muChannel=muChannel
     
-    def beginJob(self, perfData=zbbfile.ssvperfData, btagging="SSV"):
+    def beginJob(self, perfData=zbbfile.ssvperfData):
       # declare histograms
       self.add("HE","HE",200,0,2)
       self.add("HP","HP",200,0,2)
@@ -28,16 +28,16 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       self.add("HPHP","HPHP",200,0,2)
     
     #@print_timing
-    def process(self,event):
+    def process(self,event,btagging="CSV"):
       """BtaggingReWeightingControlPlots"""
       result = { }
-      result["HE"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HE")
-      result["HP"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HP")
-      result["HEexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEexcl")
-      result["HPexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPexcl")
-      result["HEHE"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHE")
-      result["HEHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHP")
-      result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP")
+      result["HE"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HE", btagging)
+      result["HP"]     = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HP", btagging)
+      result["HEexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEexcl", btagging)
+      result["HPexcl"] = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPexcl", btagging)
+      result["HEHE"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHE", btagging)
+      result["HEHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HEHP", btagging)
+      result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP", btagging)
       return result
 
 def runTest(path="../testfiles/ttbar/"):
