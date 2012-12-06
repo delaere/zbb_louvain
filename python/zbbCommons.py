@@ -12,6 +12,7 @@ class zbblabel:
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
   metlabel="patType01SCorrectedPFMet"
+  rholabel="kt6PFJets"
   genlabel="prunedGen"
   genjetlabel="prunedJets"
   genInfolabel="generator"
