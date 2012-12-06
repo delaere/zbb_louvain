@@ -6,9 +6,14 @@ from eventSelection import *
 from LumiReWeighting import *
 from zbbCommons import zbblabel,zbbfile
 
-def btagEfficiencyTreeProducer(stage=4, muChannel=True, path='../testfiles/'):
+def btagEfficiencyTreeProducer(stageName="Z+jet", muChannel=True, path='../testfiles/'):
+  #search for category number
+  stage=-1
+  for cat in categoryNames :
+    stage+=1
+    if cat==stageName : break
   # prepare output
-  #path='/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/'
+  path='/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/'
   ROOT.gROOT.ProcessLine(
   "struct MyStruct {\
      Float_t     pt;\
