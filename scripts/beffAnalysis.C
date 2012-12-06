@@ -20,7 +20,7 @@ void beffAnalysis(const char* input, const char* output) {
   ptSpectrum->Sumw2();
 
   // produce the ratio plot for the 12 combinations of (CSVL,CSVM,CSVT),(Barrel,Endcap),(b,c,l)
-  TClonesArray algorithms("TCut",2);
+  TClonesArray algorithms("TCut",3);
   new(algorithms[0]) TCut("CSVL","csv>0.244");
   new(algorithms[1]) TCut("CSVM","csv>0.679");
   new(algorithms[2]) TCut("CSVT","csv>0.898");
