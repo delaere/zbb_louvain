@@ -5,6 +5,7 @@ from ROOT import TLorentzVector,TVector3
 from datetime import datetime
 from math import sin
 from collections import Iterable
+from types import StringTypes
 
 class AnalysisEvent(Events):
    """A class that complements fwlite::Events with analysis facilities.
@@ -266,15 +267,35 @@ class AnalysisEvent(Events):
      # list the content of vardict, excluding collections
      mystring += "Content of the cache:\n"
      for k, v in self.vardict.iteritems():
-       if not k in self._collections.keys() and isinstance(v,Iterable) and all(isinstance(n, TLorentzVector) for n in v):
+       if k in self._collections.keys() : continue
+       if isinstance(v,Iterable) and not isinstance(v,StringTypes):
          try:
-           mystring += "%s => vector of %d Lorentz Vector(s)\n" % (k,len(v))
+           thisstring = "%s => vector of %d objects(s)\n" % (k,len(v))
          except:
-           pass
-         for vec in v: mystring += self._lorentzVectorString(k,vec)
-       elif isinstance(v,TLorentzVector): mystring += self._lorentzVectorString(k,v)
-     mystring += dictjoin(dict((k,v) for k, v in self.vardict.iteritems() if not k in self._collections.keys() and not (isinstance(v,Iterable) and all(isinstance(n, TLorentzVector) for n in v))))
+           mystring += self._genericString(k,v)
+         else:
+           try:
+             for vec in v:
+               thisstring += self._genericString(k,vec, useDefault=False)
+           except: 
+             mystring += "%s => %s\n"%(k,str(v))
+           else:
+             mystring += thisstring
+       else:
+         mystring += self._genericString(k,v)
      return mystring
+
+   def _genericString(self,name,item, useDefault=True):
+     for method in [self._metString,self._jetString,self._electronString,self._muonString,self._vertexString, 
+                    lambda i:self._candidateString(name,i),lambda i:self._lorentzVectorString(name,i)]:
+       try:
+         return "%s => %s"%(name,method(item))
+       except:
+         pass
+     if useDefault==True:
+       return "%s => %s\n"%(name,str(item))
+     else:
+       raise TypeError
 
    def _vertexString(self, vertex):
      theString =  "Vertex position: (%f,%f,%f) +/- (%f,%f,%f)\n" % (vertex.x(), vertex.y(),vertex.z(),vertex.xError(),vertex.yError(),vertex.zError())
@@ -316,7 +337,7 @@ class AnalysisEvent(Events):
          theString += "     details about the secondary vertex:\n"
          theString += "     * number of tracks: %d\n" % sv.tracksSize()
          theString += "     * chi2: %f\n" % sv.chi2()
-         theString += "     * distance: %f+/-%f" % (distance.value(),distance.error())
+         theString += "     * distance: %f+/-%f\n" % (distance.value(),distance.error())
          theString += "     * distance significance: %f\n" % distance.significance()
          theString += "     * flight direction: %f,%f,%f\n" % (dir.x(),dir.y(),dir.z())
          theString += "     * dR(jet): %f\n" % dirv.DeltaR(dirj)
