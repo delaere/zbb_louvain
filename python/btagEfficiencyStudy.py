@@ -41,7 +41,7 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", muChannel=True, path='../testf
     files=[]
   events = AnalysisEvent(files)
   prepareAnalysisEvent(events,btagging="CSV",ZjetFilter="bcl",checkTrigger=False)
-  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData, zbblabel.pulabel)
+  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData)
   # event loop
   eventCnt = 0
   print "starting loop on events"
