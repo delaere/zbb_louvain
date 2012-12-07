@@ -383,7 +383,7 @@ def main(options):
     print "Error: jobNumber must be strictly smaller than Njobs."
     parser.print_help()
     return
-  if not isZbbSelection and btagAlgo=="SSV" : btagAlgo="CSV"
+  if not isZbbSelection and options.btagAlgo=="SSV" : options.btagAlgo="CSV"
   # if all ok, run the procedure
   runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight),NLOWeight=options.NLOWeight)
 
