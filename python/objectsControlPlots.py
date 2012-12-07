@@ -123,7 +123,6 @@ class ElectronsControlPlots(BaseControlPlots):
       self.add("eleneutralIso","Electron neutral Hadron isolation ",100,0,0.2)
       self.add("elepfIsoPUc","Electron pfIsoPUCorrected",100,0,0.2)
       self.add("elepfIsoPUcMC","Electron pfIsoPUCorrectedMC",100,0,0.2)
-      #self.add("rho","Rho Variable",100,0,100)
       #self.add("eleHoE","Electron H over E",100,0,0.1)
       self.add("eledphi","Electron dphi at calo",100,0,0.1)
       self.add("eledeta","Electron deta at calo",100,0,0.01)
@@ -149,7 +148,6 @@ class ElectronsControlPlots(BaseControlPlots):
       #result["eleneutralIso"] = [ ]
       result["elepfIsoPUc"] = [ ]
       result["elepfIsoPUcMC"] = [ ]
-      #result["rho"] = [ ]
       #result["eleHoE"] = [ ]
       result["eledphi"] = [ ]
       result["eledeta"] = [ ]
@@ -165,7 +163,6 @@ class ElectronsControlPlots(BaseControlPlots):
         #result["eleneutralIso"].append()
         result["elepfIsoPUc"].append(electron.userFloat("PFIsoPUCorrected"))
         result["elepfIsoPUcMC"].append(electron.userFloat("PFIsoPUCorrectedMC"))
-        #result["rho"].append(rho[0])
         #result["eleHcalIso"].append(electron.dr03HcalTowerSumEt()/scEt)
         #result["eleEcalIso"].append(electron.dr03EcalRecHitSumEt()/scEt)
         #result["eleTkIso"].append(electron.dr03TkSumPt()/scEt)
@@ -341,6 +338,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("nch","charged multiplicity",50,0,50)
       self.add("cef","charged EmEnergy fraction",101,0,1.01)
       self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
+      self.add("rho", "Rho Variable",100,0,100)
     
     #@print_timing
     def process(self, event):
@@ -568,6 +566,9 @@ class JetmetControlPlots(BaseControlPlots):
       result["METsignificance"] = 0.
       if event.MET[0].getSignificanceMatrix()(0,0)<1e10 and event.MET[0].getSignificanceMatrix()(1,1)<1e10: 
         result["METsignificance"] = event.MET[0].significance()
+      #rho
+      result["rho"] = event.rho[0]
+
       return result
 
 def runTest(path="../testfiles/"):
