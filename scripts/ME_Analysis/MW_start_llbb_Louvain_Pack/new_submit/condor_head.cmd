@@ -14,8 +14,8 @@ when_to_transfer_output = ON_EXIT
 
 # the following two parameters are required for the ingrid cluster
 universe       = vanilla
-requirements   = (CMSFARM =?= TRUE)
+#requirements   = (CMSFARM =?= TRUE)
 # for Madgraph users replace the previous line by:
-#requirements   = (MADGRAPH =?= TRUE)
+requirements   = (MADGRAPH =?= TRUE)
 
 
