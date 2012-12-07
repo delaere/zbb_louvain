@@ -53,7 +53,7 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", muChannel=True, path='../testf
       if eventCnt%100==0 : print ".",
       if eventCnt%1000==0 : print ""
       # event weight
-      mystruct.eventWeight = weight_engine.weight( fwevent=event )
+      mystruct.eventWeight = weight_engine.weight( event=event )
       # that's where we access the jets
       for index,jet in enumerate(event.jets):
         if not goodJets[index]: continue
