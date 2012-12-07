@@ -8,7 +8,7 @@ from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel,zbbfile
+from zbbCommons import zbblabel,zbbfile,isZbbSelection
 #from myFuncTimer import print_timing
 
 ############
@@ -377,6 +377,7 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
+      dijet = findDijetPair(jets, bestZcandidate=bestZcandidate, btagging=self.btagging)
       for jet in jets:
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
@@ -463,7 +464,7 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2betaStar"] = jet.userFloat("betaStar")
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
-            if nb==1:
+            if nb==1 and ( isZbbSelection or (not isZbbSelection and jet in dijet) ) :
               result["bjet1pt"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet1Flavor"] = jet.partonFlavour()
@@ -482,7 +483,7 @@ class JetmetControlPlots(BaseControlPlots):
 	      result["dptj1b1"] = jetPt-j1pt
               result["bjet1beta"] = jet.userFloat("beta")
               result["bjet1betaStar"] = jet.userFloat("betaStar")
-            elif nb==2:
+            elif nb==2 and ( isZbbSelection or (not isZbbSelection and jet in dijet) ) :
               result["bjet2pt"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet2Flavor"] = jet.partonFlavour()
@@ -525,7 +526,7 @@ def runTest():
   dirList=os.listdir(path)
   files=[]
   for fname in dirList:
-    files.append(path+fname)
+      files.append(path+fname)
   events = Events (files)
 
   muonsPlots.beginJob()
@@ -533,13 +534,12 @@ def runTest():
   jetmetPlots.beginJob()
   i = 0
   for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    jetmetPlots.processEvent(event)
-    muonsPlots.processEvent(event)
-    electronsPlots.processEvent(event)
-    i += 1
+      if i%1000==0 : print "Processing... event ", i
+      jetmetPlots.processEvent(event)
+      muonsPlots.processEvent(event)
+      electronsPlots.processEvent(event)
+      i += 1
   jetmetPlots.endJob()
   muonsPlots.endJob()
   electronsPlots.endJob()
   output.Close()
-
