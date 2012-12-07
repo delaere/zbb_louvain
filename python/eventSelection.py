@@ -513,28 +513,17 @@ def findDijetPair(jets, bestZcandidate=None, btagging="SSV"):
     if isBJet(jets[index],"HP",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2:
-    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
-      return (jets[jetList[0]],jets[jetList[1]])
-    else :
-      return (jets[jetList[1]],jets[jetList[0]])
+  if len(jetList)>=2 : return (jets[jetList[0]],jets[jetList[1]])
   # continue with HE b-jets
   for index in indices[:]:
     if isBJet(jets[index],"HE",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2:
-    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
-      return (jets[jetList[0]],jets[jetList[1]])
-    else :
-      return (jets[jetList[1]],jets[jetList[0]])
+  if len(jetList)>=2 : return (jets[jetList[0]],jets[jetList[1]])
   # fill with remaining good jets
   for index in indices:
     jetList.append(index)
-  if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
-    return (jets[jetList[0]],jets[jetList[1]])
-  else :
-    return (jets[jetList[1]],jets[jetList[0]])
+  return (jets[jetList[0]],jets[jetList[1]])
 
 categoryNames = [ 
   "Trigger", 
