@@ -199,7 +199,6 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
           btagReWeightingPlots[level].fill(btagReWeightingPlotsData) #no weight
         if handleLeptonEff:
           leptonsReWeightingPlots[level].fill(leptonsReWeightingPlotsData) #no weight
-    if i>5000: break #TODO: remove ! temporary escape after 5000 events for profiling
     i += 1
 
   # save all
