@@ -267,6 +267,6 @@ def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
     zCandidatesEle = zeleHandle.product()
     vertices = vertexHandle.product()
     triggerInfo = trigInfoHandle.product()
-    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, "SSV", 15., event.eventAuxiliary().luminosityBlock())
+    categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, self.btagging, event.eventAuxiliary().luminosityBlock())
     if isInCategory(stage, categoryData):
       print >> event_list , "Run", event.eventAuxiliary().run(), ", Lumisection", event.eventAuxiliary().luminosityBlock(), ", Event", event.eventAuxiliary().id().event()
