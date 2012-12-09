@@ -119,7 +119,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSelection"] = isTriggerOK(triggerInfo, bestZcandidate, runNumber, event.eventAuxiliary().luminosityBlock(), self.muChannel)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(triggerInfo)) if trigger==1]
       ## event category
-      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel, "SSV", event.eventAuxiliary().luminosityBlock())
+      categoryData = eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, self.muChannel, self.btagging, event.eventAuxiliary().luminosityBlock())
       result["category"] = [ ]
       for category in range(eventCategories()):
         if isInCategory(category, categoryData):
