@@ -45,7 +45,7 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
   else 
     perfBTAGSSVHEM_ = NULL;
 
-  es_->get(testRecID).get(plHandleMISTAGSSVHEM_, ("MISTAGS"+heWP).c_str() ); 
+  es_->get(testRecID).get(plHandleMISTAGSSVHEM_, ("MISTAG"+heWP).c_str() ); 
   es_->get(testRecID).get(wpHandleMISTAGSSVHEM_, ("MISTAG"+heWP).c_str() );
   if ( plHandleMISTAGSSVHEM_.isValid() && wpHandleMISTAGSSVHEM_.isValid() ) 
     perfMISTAGSSVHEM_ = new BtagPerformance(*plHandleMISTAGSSVHEM_, *wpHandleMISTAGSSVHEM_);
