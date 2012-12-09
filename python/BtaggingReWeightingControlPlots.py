@@ -17,7 +17,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="BtaggingReweighting", dataset=dataset, mode=mode)
       self.muChannel=muChannel
     
-    def beginJob(self, perfData=zbbfile.ssvperfData):
+    def beginJob(self):
       # declare histograms
       self.add("HE","HE",200,0,2)
       self.add("HP","HP",200,0,2)
@@ -60,7 +60,7 @@ def runTest(path="../testfiles/ttbar/"):
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
+    controlPlots.process(event)
     i += 1
   controlPlots.endJob()
 
