@@ -13,7 +13,7 @@ class zbblabel:
   triggerlabel="patTriggerEvent"
   metlabel="patType01SCorrectedPFMet"
   rholabel="kt6PFJets"
-  genlabel="prunedGen"
+  genlabel="genParticles" #genlabel="prunedGen"
   genjetlabel="prunedJets"
   genInfolabel="generator"
 
