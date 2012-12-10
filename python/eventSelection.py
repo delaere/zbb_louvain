@@ -482,7 +482,12 @@ def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
   else:
     goodJets = event.goodJets
   # check number of good jets
-  indices = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
+  indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
+  csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(jets) if isGoodJet(jet,bestZcandidate)]
+  csvList.sort(reverse=True)
+  indices = []
+  for icsv in csvList:
+    indices.append(icsv[1])
   if len(indices)<1: return (None, None)
   if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []
@@ -491,15 +496,25 @@ def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
     if isBJet(event.jets[index],"HP",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2: return (event.jets[jetList[0]],event.jets[jetList[1]])
+      indices_pt.remove(index)
+  if len(jetList)>=2:
+    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
+      return (jets[jetList[0]],jets[jetList[1]])
+    else :
+      return (jets[jetList[1]],jets[jetList[0]])
   # continue with HE b-jets
   for index in indices[:]:
     if isBJet(event.jets[index],"HE",btagging):
       jetList.append(index)
       indices.remove(index)
-  if len(jetList)>=2: return (event.jets[jetList[0]],event.jets[jetList[1]])
+      indices_pt.remove(index)
+  if len(jetList)>=2:
+    if jets[jetList[0]].pt()>jets[jetList[1]].pt() :
+      return (jets[jetList[0]],jets[jetList[1]])
+    else :
+      return (jets[jetList[1]],jets[jetList[0]])
   # fill with remaining good jets
-  for index in indices:
+  for index in indices_pt:
     jetList.append(index)
   return (event.jets[jetList[0]],event.jets[jetList[1]])
 
