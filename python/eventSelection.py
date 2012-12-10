@@ -4,6 +4,7 @@ import intervalmap
 from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel
+from monteCarloSelection import *
 from math import sqrt
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
