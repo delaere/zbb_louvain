@@ -75,68 +75,68 @@ class LeptonsReWeighting:
    def __init__(self):
      # the efficiency maps
    
-     # ===================== ELECTRONS ========== 
-     # NEW SF (13-11-2012): finer binning, Z inclusive, updated according to POG reccomendations
-     # Systematics taken from the difference between two methods (counting vs fitting) and added in quadrature.
-
+     # ===================== ELECTRONS 2012 A+B (WP medium) systematics NOT included yet (need to be evaluated) RECO SF assumed ~1 according to e-gamma POG==========
+     
      self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.998,sqrt(0.011**2+0.005**2)), (1.01,sqrt(0.0093**2+0.015**2)), (1.01,sqrt(0.021**2+0.0)), (0.996,sqrt(0.0084**2+0.003**2)), (0.999,sqrt(0.0086**2+0.005**2))],      # 20-30 GeV
-                                    [(0.994,sqrt(0.017**2+0.001**2)), (0.995,sqrt(0.0023**2+0.001**2)), (0.994,sqrt(0.0058**2+0.002**2)), (0.993,sqrt(0.0033**2+0.001**2)), (0.993,sqrt(0.0038**2+0.0))],   # 30-40 GeV
-                                    [(0.997,sqrt(0.0002**2+0.001**2)), (0.99,sqrt(0.0012**2+0.0)), (0.988,sqrt(0.0047**2+0.003**2)), (1.00,sqrt(0.0043**2+0.0)), (0.993,sqrt(0.0029**2+0.0))],
-     # 40-50 GeV
-                                    [(0.996,sqrt(0.0022**2+0.001**2)), (0.996,sqrt(0.0028**2+0.005**2)), (1.01,sqrt(0.002**2+0.01**2)), (1.00,sqrt(0.0037**2+0.0)), (0.996,sqrt(0.005**2+0.001**2))]])      # 50-200 GeV
+                                   [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
  
      
      self._eleIsoWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.983,sqrt(0.0091**2+0.005**2)), (0.957,sqrt(0.010**2+0.011**2)), (0.894, sqrt(0.036**2+0.019**2)), (1.02, sqrt(0.017**2+0.01**2)), (1.01, sqrt(0.015**2+0.01**2))],   # 20-30 GeV
-                                    [(0.993,sqrt(0.0032**2+0.003**2)), (0.982,sqrt(0.004**2+0.001**2)), (0.969, sqrt(0.019**2+0.006**2)), (0.987,sqrt(0.0075**2+0.005**2)), (1.01,sqrt(0.0042**2+0.0))],     # 30-40 GeV
-                                    [(0.993,sqrt(0.0011**2+0.0)), (0.99, sqrt(0.0038**2+0.001**2)), (0.981,sqrt(0.025**2+0.003**2)), (0.994,sqrt(0.0027**2+0.002**2)), (1.01,sqrt(0.0036**2+0.012**2))],     # 40-50 GeV
-                                    [(0.993,sqrt(0.0057**2+0.001**2)), (0.99, sqrt(0.0022**2+0.0)), (0.943,sqrt(0.011**2+0.023**2)), (1.00, sqrt(0.0045**2+0.016**2)), (1.03,sqrt(0.0064**2+0.0))]])         # 50-200 GeV
+                                   [[(1.017,sqrt(0.004**2+0.01**2)), (0.991,sqrt(0.013**2 +0.01**2)),  (1.176,sqrt(0.025**2+0.01**2)), (1.010, sqrt(0.009**2+0.01**2)), (1.110,sqrt(0.005**2+0.01**2))],     # 20-30 GeV
+                                    [(1.019,sqrt(0.002**2+0.01**2)), (1.002,sqrt(0.002**2 +0.01**2)),  (1.038,sqrt(0.011**2+0.01**2)), (1.010, sqrt(0.004**2+0.01**2)), (1.074,sqrt(0.005**2+0.01**2))],     # 30-40 GeV
+                                    [(1.015,sqrt(0.001**2+0.01**2)), (1.001,sqrt(0.002**2 +0.01**2)),  (0.985,sqrt(0.009**2+0.01**2)), (1.013, sqrt(0.003**2+0.01**2)), (1.042,sqrt(0.004**2+0.01**2))],     # 40-50 GeV
+                                    [(1.005,sqrt(0.002**2+0.01**2)), (0.992,sqrt(0.003**2 +0.01**2)),  (0.990,sqrt(0.037**2+0.01**2)), (1.005, sqrt(0.005**2+0.01**2)), (1.020,sqrt(0.007**2+0.01**2))]])    # 50-200 GeV
 
-     #===== electron trigger ======================
+     #===== electron trigger ( https://indico.cern.ch/getFile.py/access?contribId=60&sessionId=7&resId=0&materialId=slides&confId=219050 ) ======================
      self._ele17TrgWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.984,0.0019), (0.986,0.0021), (1.00,0.0), (0.988,0.0037), (0.98,0.0038)],       # 20-30 GeV
-                                    [(0.994,0.0012), (0.995,0.0003), (1.00,0.0), (0.994,0.0012), (0.995,0.001)],       # 30-40 GeV
-                                    [(0.995,0.0046), (0.997,0.0005),  (1.00,0.00), (0.995,0.0009), (0.997,0.0014)],    # 40-50 GeV
-                                    [(0.998,0.00047), (0.997,0.00075), (1.00,0.00), (0.998,0.00094), (0.998,0.0013)]]) # 50-200 GeV
+                                   [[(0.978,0.0019),  (0.980,0.001), (1.00,0.001), (0.989,0.001), (0.984,0.001)],       # 20-30 GeV
+                                    [(0.991,0.0012),  (0.992,0.001), (1.00,0.001), (0.995,0.001), (0.993,0.001)],       # 30-40 GeV
+                                    [(0.993,0.0046),  (0.994,0.001), (1.00,0.001), (0.997,0.001), (0.997,0.001)],    # 40-50 GeV
+                                    [(0.993,0.00047), (0.995,0.001), (1.00,0.001), (0.997,0.001), (0.996,0.001)]]) # 50-200 GeV
 
      self._ele8TrgWeight  = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.994,0.012), (0.998,0.0011),   (1.00,0.00), (0.997,0.0018), (0.997,0.0017)],     # 20-30 GeV
-                                    [(0.997,0.0004), (0.998,0.00036),  (1.00,0.00), (0.999,0.00055), (0.999,0.00059)],  # 30-40 GeV
-                                    [(0.998,0.00029), (0.99,0.00024),  (1.00,0.00), (0.998,0.00032), (1.00,0.00011)],   # 40-50 GeV
-                                    [(0.999,0.00035), (0.999,0.00048), (1.00,0.00), (0.99,0.00065), (0.999,0.00074)]])  # 50-200 GeV
+                                   [[(0.980,0.001), (0.980,0.001), (1.00,0.00), (0.986,0.001), (0.985,0.001)],     # 20-30 GeV
+                                    [(0.989,0.001), (0.989,0.001), (1.00,0.00), (0.991,0.001), (0.991,0.001)],  # 30-40 GeV
+                                    [(0.991,0.001), (0.991,0.001), (1.00,0.00), (0.994,0.001), (0.993,0.001)],   # 40-50 GeV
+                                    [(0.991,0.001), (0.992,0.001), (1.00,0.00), (0.995,0.001), (0.995,0.001)]])  # 50-200 GeV
      
      ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
-     ## Note2: Systematics for the trigger not included, asked to POG how to estimate 
 
-     # ===================== MUONS ========== 
+     # ===================== MUONS 2012A+B ========== 
      ## CAVEAT: systematics assumed to come only from background modelling and added in quadrature ( https://twiki.cern.ch/twiki/bin/view/CMS/MuonTagAndProbe#Systematic_uncertainties )
      
      self._muPidWeight  = PtEtaMap([],[0.9,2.1],
-                                   [[(0.995,sqrt(0.001**2+0.002**2)), (0.972,sqrt(0.0012**2+0.004**2)), (0.978,sqrt(0.0041**2+0.004**2))]])
+                                   [[(0.9941,sqrt(0.0003**2+0.002**2)), (0.9917,sqrt(0.0005**2+0.004**2)), (0.9982,sqrt(0.0004**2+0.004**2))]])
      self._muIsoWeight  = PtEtaMap([],[0.9,2.1],
-                                   [[(0.9926,sqrt(0.0008**2+0.002**2)), (0.998,sqrt(0.0008**2+0.004**2)), (1.010,sqrt(0.0027**2+0.004**2))]]) 
+                                   [[(0.9972,sqrt(0.0001**2+0.002**2)), (0.9992,sqrt(0.0002**2+0.004**2)), (1.0004,sqrt(0.0001**2+0.004**2))]]) 
 
-     #===== muon trigger=====================
-     self._mu7TrgWeight = PtEtaMap([],[1.2],
-                                   [[(0.971,sqrt(0.0018**2+0.0005**2)), (0.948,sqrt(0.0031**2+0.0005**2))]])
-     self._mu8Trg_Mu13Mu8_Weight = PtEtaMap([30,50],[1.2],
-                                   [[(0.968,sqrt(0.0014**2+0.0005**2)), (0.935,sqrt(0.0023**2+0.0005**2))],
-                                    [(0.967,sqrt(0.0007**2+0.0005**2)), (0.933,sqrt(0.0012**2+0.0005**2))],
-                                    [(0.968,sqrt(0.0010**2+0.0005**2)), (0.939,sqrt(0.0019**2+0.0005**2))]])
-     self._mu13Trg_Mu13Mu8_Weight = PtEtaMap([30,50],[1.2],
-                                   [[(0.967,sqrt(0.0015**2+0.0005**2)), (0.924,sqrt(0.0025**2+0.0005**2))],
-                                    [(0.967,sqrt(0.0007**2+0.0005**2)), (0.927,sqrt(0.0013**2+0.0005**2))],
-                                    [(0.968,sqrt(0.0010**2+0.0005**2)), (0.934,sqrt(0.0019**2+0.0005**2))]])
-
-     self._mu8Trg_Mu17Mu8_Weight = PtEtaMap([30,50],[1.2],
-                                   [[(0.962,sqrt(0.0038**2+0.0005**2)), (0.919,sqrt(0.0037**2+0.0005**2))],
-                                    [(0.967,sqrt(0.0010**2+0.0005**2)), (0.929,sqrt(0.0019**2+0.0005**2))],
-                                    [(0.967,sqrt(0.0015**2+0.0005**2)), (0.930,sqrt(0.0032**2+0.0005**2))]])
-     self._mu17Trg_Mu17Mu8_Weight = PtEtaMap([30,50],[1.2],
-                                   [[(0.960,sqrt(0.0023**2+0.0005**2)), (0.907,sqrt(0.0036**2+0.0005**2))],
-                                    [(0.965,sqrt(0.0010**2+0.0005**2)), (0.919,sqrt(0.0020**2+0.0005**2))],
-                                    [(0.966,sqrt(0.0014**2+0.0005**2)), (0.923,sqrt(0.0033**2+0.0005**2))]])
+     ## ============= muon  trigger==================
+     ## ============ periodA (calculating the dz cut efficiency)=============
+     self._mu8Trg_Mu17Mu8_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.959,sqrt(0.0014**2+0.0005**2)), (0.932,sqrt(0.003**2+0.0005**2)),(0.917,sqrt(0.002**2+0.0005**2)),(0.898,sqrt(0.004**2+0.0005**2))],
+                                    [(0.955,sqrt(0.0005**2+0.0005**2)), (0.930,sqrt(0.0011**2+0.0005**2)),(0.905,sqrt(0.001**2+0.0005**2)),(0.913,sqrt(0.0019**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.957,sqrt(0.0014**2+0.0005**2)), (0.919,sqrt(0.0034**2+0.0005**2)),(0.900,sqrt(0.0021**2+0.0005**2)),(0.824,sqrt(0.005**2+0.0005**2))],
+                                    [(0.954,sqrt(0.0049**2+0.0005**2)), (0.923,sqrt(0.0017**2+0.0005**2)),(0.896,sqrt(0.0013**2+0.0005**2)),(0.869,sqrt(0.003**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_dz_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.899,sqrt(0.0021**2+0.0005**2)), (0.912,sqrt(0.0036**2+0.0005**2)),(0.871,sqrt(0.0026**2+0.0005**2)),(0.879,sqrt(0.005**2+0.0005**2))],
+                                    [(0.92,sqrt(0.0006**2+0.0005**2)), (0.897,sqrt(0.0014**2+0.0005**2)),(0.841,sqrt(0.0011**2+0.0005**2)),(0.856,sqrt(0.0025**2+0.0005**2))]
+                                    ])
+     
+     ## ============= periodB (dz cut removed) ==============
+     self._mu8Trg_Mu17Mu8_B_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.956,sqrt(0.0061**2+0.0005**2)), (0.928,sqrt(0.0013**2+0.0005**2)),(0.908,sqrt(0.00086**2+0.0005**2)),(0.898,sqrt(0.0018**2+0.0005**2))],
+                                    [(0.954,sqrt(0.0021**2+0.0005**2)), (0.925,sqrt(0.0005**2+0.0005**2)),(0.897,sqrt(0.00038**2+0.0005**2)),(0.905,sqrt(0.0008**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_B_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.953,sqrt(0.00062**2+0.0005**2)), (0.914,sqrt(0.0014**2+0.0005**2)),(0.891,sqrt(0.0009**2+0.0005**2)),(0.829,sqrt(0.0022**2+0.0005**2))],
+                                    [(0.952,sqrt(0.0002**2+0.0005**2)), (0.916,sqrt(0.0005**2+0.0005**2)),(0.887,sqrt(0.0004**2+0.0005**2)),(0.863,sqrt(0.001**2+0.0005**2))]
+                                    ])
     
    def uncertainty_ee(self,e1,e2):
      """Relative uncertainty on the total weight.
@@ -190,34 +190,34 @@ class LeptonsReWeighting:
      # isolation
      unc += (self._muIsoWeight[(m1.pt(),m1.eta())][1]/self._muIsoWeight[(m1.pt(),m1.eta())][0] +  \
              self._muIsoWeight[(m2.pt(),m2.eta())][1]/self._muIsoWeight[(m2.pt(),m2.eta())][0])**2
-     # trigger (approximate)
-     hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
-                             self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
-     hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-                                 self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-                             (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-     hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-                             (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-                              self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-     hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-                                 self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-                             (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-     hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-                             (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-                              self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-     unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
+##      # trigger (approximate) ==== FIXME!! ===============
+##      hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
+##                              self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
+##      hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+##                              (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+##                              (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+##                              (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+##                              (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
      #outcome
      return sqrt(unc)
 
@@ -231,17 +231,18 @@ class LeptonsReWeighting:
      lw *= self._muIsoWeight[(m1.pt(),m1.eta())][0]
      lw *= self._muIsoWeight[(m2.pt(),m2.eta())][0]
      # trigger
-     hlt_sf_run2011_a = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
+     #hlt_sf_run2011_a = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
 
-     hlt_sf_run2011_b = self._mu8Trg_Mu13Mu8_Weight [(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0] + \
-                        self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight [(m2.pt(),m2.eta())][0] - \
-                        self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]
+     hlt_sf_run2011_a = self._mu17Trg_Mu17Mu8_dz_A_Weight *\
+                        (self._mu8Trg_Mu17Mu8_A_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_A_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0])
 
-     hlt_sf_run2011_c = self._mu8Trg_Mu17Mu8_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0] + \
-                        self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight [(m2.pt(),m2.eta())][0] - \
-                        self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]
+     hlt_sf_run2011_b = self._mu8Trg_Mu17Mu8_B_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_B_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0]
      
-     lw *= (0.044*hlt_sf_run2011_a+0.802*hlt_sf_run2011_b+0.154* hlt_sf_run2011_c) ##percentage according to the lumi in which they were not prescaled.
+     lw *= (0.5*hlt_sf_run2011_a+0.5* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
 
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
