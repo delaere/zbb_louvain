@@ -233,7 +233,7 @@ class LeptonsReWeighting:
      # trigger
      #hlt_sf_run2011_a = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
 
-     hlt_sf_run2011_a = self._mu17Trg_Mu17Mu8_dz_A_Weight *\
+     hlt_sf_run2011_a = self._mu17Trg_Mu17Mu8_dz_A_Weight[(m1.pt(),m1.eta())][0] *\
                         (self._mu8Trg_Mu17Mu8_A_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0] + \
                         self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_A_Weight [(m2.pt(),m2.eta())][0] - \
                         self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0])
