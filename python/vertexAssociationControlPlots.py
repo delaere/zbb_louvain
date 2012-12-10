@@ -37,6 +37,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
       """vertexAssociationControlPlots"""
       result = { }
       result["nvertices"] = event.vertices.size()
+      if event.vertices.size()==0 : return result
       vertex = event.vertex
       result["vx"] = vertex.x()
       result["vy"] = vertex.y()
