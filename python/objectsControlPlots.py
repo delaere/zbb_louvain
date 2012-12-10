@@ -376,6 +376,7 @@ class JetmetControlPlots(BaseControlPlots):
       nj  = 0
       nb  = 0
       nbP = 0
+      indexDijet = 0
       maxbdiscSSVHE = -1
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
@@ -491,7 +492,8 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2betaStar"] = jet.userFloat("betaStar")            
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
-            if nb==1 and jet in dijet:
+            if indexDijet==0 and jet in dijet:
+              indexDijet+=1
               result["bjet1pt"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet1Flavor"] = jet.partonFlavour()
@@ -522,7 +524,8 @@ class JetmetControlPlots(BaseControlPlots):
 	      result["dptj1b1"] = jetPt-j1pt
               result["bjet1beta"] = jet.userFloat("beta")
               result["bjet1betaStar"] = jet.userFloat("betaStar")
-            elif nb==2 and jet in dijet:
+            elif indexDijet==1 and jet in dijet:
+              indexDijet+=1
               result["bjet2pt"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet2Flavor"] = jet.partonFlavour()
