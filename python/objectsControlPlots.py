@@ -380,6 +380,7 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
+      dijet =  event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
       for index,jet in enumerate(event.jets):
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
@@ -487,10 +488,10 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
             result["jet2JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
             result["jet2beta"] = jet.userFloat("beta")
-            result["jet2betaStar"] = jet.userFloat("betaStar")
+            result["jet2betaStar"] = jet.userFloat("betaStar")            
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
-            if nb==1:
+            if nb==1 and jet in dijet:
               result["bjet1pt"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet1Flavor"] = jet.partonFlavour()
@@ -521,7 +522,7 @@ class JetmetControlPlots(BaseControlPlots):
 	      result["dptj1b1"] = jetPt-j1pt
               result["bjet1beta"] = jet.userFloat("beta")
               result["bjet1betaStar"] = jet.userFloat("betaStar")
-            elif nb==2:
+            elif nb==2 and jet in dijet:
               result["bjet2pt"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet2Flavor"] = jet.partonFlavour()
