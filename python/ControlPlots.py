@@ -146,7 +146,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       vertexPlots[level].beginJob()
       selectionPlots[level].beginJob()
       if handlePU: lumiReWeightingPlots[level].beginJob()
-      if handleBT: btagReWeightingPlots[level].beginJob(perfData=BtagEffDataFileName)
+      if handleBT: btagReWeightingPlots[level].beginJob()
       if handleLeptonEff: leptonsReWeightingPlots[level].beginJob()
 
   # process events
