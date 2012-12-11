@@ -139,7 +139,7 @@ def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
       else:  
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
   outcome = len(intersect)>0
-  return (outcome and isTriggerMatchZcandidate(zCandidate,runNumber,lumi_section))
+  return (outcome and isTriggerMatchZcandidate(bestZcandidate,runNumber,lumi_section))
 
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
