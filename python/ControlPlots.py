@@ -26,7 +26,7 @@ parser.add_option("-j", "--jetFlavor", dest="ZjetFilter", default="bcl",
 parser.add_option("--trigger",action="store_true",dest="checkTrigger",
                   help="Check the trigger at the early stage of the .")
 parser.add_option("-b","--btag", dest="btagAlgo", default="SSV",
-                  help="Choice of the btagging algorithm: SSV (default) or TC.", metavar="ALGO")
+                  help="Choice of the btagging algorithm: SSV (default) or CSV.", metavar="ALGO")
 parser.add_option("-p", "--PileUpData", dest="PUDataFileName", default=zbbfile.pileupData,
                   help="Read estimated PU distribution for data from file.", metavar="file")
 parser.add_option("-P", "--PileUpMC", dest="PUMonteCarloFileName", default=zbbfile.pileupMC,
@@ -82,6 +82,9 @@ vertexHandle = Handle("vector<reco::Vertex>")
 #@print_timing
 def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
   """Compute the event category for histogramming"""
+
+  print "in ControlPlots.py, in category, btagAlgo is ", btagAlgo
+
   if not ZjetFilter=="bcl":
     event.getByLabel (zbblabel.genlabel,genHandle)
     genParticles = genHandle.product()
@@ -116,6 +119,10 @@ def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo,runNumber):
 
 def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, checkTrigger=False, btagAlgo="SSV", onlyMu=False, onlyEle=False, PUDataFileName=None, PUMonteCarloFileName=None,NLOWeight=None, Njobs=1, jobNumber=1, BtagEffDataFileName=None, handleLeptonEff=True):
   """produce all the plots in one go"""
+
+  print "in  ControlPlots.py, in runTest, btagAlgo is ", btagAlgo
+  print "in  ControlPlots.py, in runTest, BtagEffDataFileName is ", BtagEffDataFileName
+  
   # output file
   output = ROOT.TFile(outputname, "RECREATE")
 
@@ -193,7 +200,7 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
     PileUp = LumiReWeighting(MonteCarloFileName=PUMonteCarloFileName, DataFileName=PUDataFileName, systematicShift=0)
   # the Beff reweighting engine. From 1 to 5(=infinity) b-jets
   if handleBT:
-    BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName)
+    BeffW = btaggingWeight(0,999,0,999,file=BtagEffDataFileName,btagging=btagAlgo)
   if handleLeptonEff:
     LeffW = LeptonsReWeighting()
   
@@ -385,6 +392,10 @@ def main(options):
     return
   if not isZbbSelection and options.btagAlgo=="SSV" : options.btagAlgo="CSV"
   # if all ok, run the procedure
+
+  print "in ControlPlots.py, in main, options.btagAlgo is ", options.btagAlgo
+  print "in ControlPlots.py, in main, options.BtagEffDataFileName is ", options.BtagEffDataFileName
+
   runTest(path=options.path,outputname=options.outputname, levels=levels, ZjetFilter=options.ZjetFilter, checkTrigger=options.checkTrigger, btagAlgo=options.btagAlgo, onlyMu=options.onlyMu,onlyEle=options.onlyEle,PUDataFileName=options.PUDataFileName,PUMonteCarloFileName=options.PUMonteCarloFileName, Njobs=options.Njobs, jobNumber=options.jobNumber, BtagEffDataFileName=options.BtagEffDataFileName, handleLeptonEff=not(options.noLweight),NLOWeight=options.NLOWeight)
 
 if __name__ == "__main__":
