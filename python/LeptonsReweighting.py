@@ -242,7 +242,7 @@ class LeptonsReWeighting:
                         self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_B_Weight [(m2.pt(),m2.eta())][0] - \
                         self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0]
      
-     lw *= (0.5*hlt_sf_run2011_a+0.5* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
+     lw *= (0.13*hlt_sf_run2011_a+0.87* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
 
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
