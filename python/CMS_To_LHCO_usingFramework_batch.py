@@ -5,7 +5,7 @@ import numpy as n
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate
+from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate, JetCorrectionUncertaintyProxy
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent
 from zbbCommons import zbblabel
@@ -13,7 +13,156 @@ from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
 
+#from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+
+_JECuncertainty = JetCorrectionUncertaintyProxy()
+
 print sys.argv 
+
+#Global variables
+idPartons_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+idPartons_1 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+idMothers_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+idMothers_1 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+nDYmothers = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+nDY2mothers = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+
+
+def CodeDYprod(genParticles):
+
+  npart = 0
+  #print "*****************eventbegins****************"
+  for part in genParticles:
+
+  
+    if part.status()!=3:
+      break
+      
+#    print "N=", npart, " id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
+#    if part.pdgId()==2212: 
+#      npart += 1
+#      continue
+#    for n in range(0, part.numberOfMothers()):
+#      print "  id=", part.mother(n).pdgId(), " status=", part.mother(n).status(), " nMothers=", part.mother(n).numberOfMothers(), " ndaughters=", part.mother(n).numberOfDaughters(), " px=", part.mother(n).px()
+#      for n2 in range(0, part.mother(n).numberOfMothers()):
+#        print "    id=", part.mother(n).mother(n2).pdgId(), " status=", part.mother(n).mother(n2).status(), " nMothers=",  part.mother(n).mother(n2).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).numberOfDaughters(), " px=", part.mother(n).mother(n2).px()
+#        for n3 in range(0, part.mother(n).mother(n2).numberOfMothers()):
+#          print "      id=", part.mother(n).mother(n2).mother(n3).pdgId(), " status=", part.mother(n).mother(n2).mother(n3).status(), " nMothers=",  part.mother(n).mother(n2).mother(n3).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).mother(n3).numberOfDaughters(), " px=", part.mother(n).mother(n2).mother(n3).px()
+
+#
+
+#    for n in range(0, part.numberOfDaughters()):
+#      #print "  id=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px()
+#      if part.daughter(n).pdgId()==23:
+#        print "idn1=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
+#
+#      for n2 in range(0, part.daughter(n).numberOfDaughters()):
+#        #print "    id=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px()
+#        if part.daughter(n).daughter(n2).pdgId() ==23:
+#	  print "idn2=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
+#
+#        for n3 in range(0, part.daughter(n).daughter(n2).numberOfDaughters()):
+#          #print "      id=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px()
+#          if part.daughter(n).daughter(n2).daughter(n3).pdgId()==23:
+#	    print "idn3=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
+
+    npart += 1
+
+  #print "*****************eventends****************"
+  #print ""
+
+#type of DY production
+#it is set to -1 if not found the production mechanism
+#is is set to 0 for gg
+#is is set to 1 fog qg
+#is is set to 2 fog qq 
+  
+  output = -1
+  countgluons = []
+  countquarks = []
+  idparton_first = []
+  idparton_second = []
+  idmother_first = []
+  idmother_second = []
+  NOriginalPartonFound = []
+  NMotherFound = []
+  
+  countZ = 0
+
+  for part in genParticles:
+    if part.status()!=3: break;
+
+    #Status 3 Z boson
+    if part.pdgId() == 23 and part.status() == 3:
+      countgluons.append(0)
+      countquarks.append(0)
+      idparton_first.append(0)
+      idparton_second.append(0)
+      idmother_first.append(0)
+      idmother_second.append(0)
+          
+      NOriginalPartonFound.append(0)
+      NMotherFound.append(0)
+      #Z boson mothers
+      for n in range(0, part.numberOfMothers()):
+	#Z boson second mothers (direct from the proton)
+
+	print " mother(", n, ")=", part.mother(n).pdgId(), " number of mothers = ", part.mother(n).numberOfMothers()," IDX = ", part.mother(n)
+
+
+        #Save first 2 mother id's
+	if (NMotherFound[countZ] == 0):
+	  idmother_first[countZ] = part.mother(n).pdgId()
+	elif (NMotherFound[countZ] == 1):
+	  idmother_second[countZ] = part.mother(n).pdgId()
+	NMotherFound[countZ] += 1
+
+
+	for n2 in range(0, part.mother(n).numberOfMothers()):	  
+	  #Save first 2 second mother id's
+
+	  print "   mother2(", n2, ")=", part.mother(n).mother(n2).pdgId()," IDX = ", part.mother(n).mother(2)
+
+	  if (NOriginalPartonFound[countZ] == 0):
+	    idparton_first[countZ] = part.mother(n).mother(n2).pdgId()
+	  elif (NOriginalPartonFound[countZ] == 1):
+            idparton_second[countZ] = part.mother(n).mother(n2).pdgId()
+	  NOriginalPartonFound[countZ] += 1
+
+	  if abs(part.mother(n).mother(n2).pdgId()) < 7 and part.mother(n).mother(n2).mother().pdgId() == 2212:
+	    countquarks[countZ] += 1
+	  if part.mother(n).mother(n2).pdgId() == 21 and part.mother(n).mother(n2).mother().pdgId() == 2212:
+	    countgluons[countZ] += 1
+      
+          #for n3 in range(0, part.mother(n).mother(n2).numberOfMothers()):
+	    #print "     mother3(", n3, ")=", part.mother(n).mother(n2).mother(n3).pdgId()," IDX = ", part.mother(n).mother(n2).mother(3)
+
+
+      #print "For Z[", countZ, "], NMotherFound=", NMotherFound[countZ], " NOriginalPartonFound=", NOriginalPartonFound[countZ]
+      countZ += 1
+
+  
+  if countZ == 1:
+    nDYmothers[0] = NMotherFound[0]
+    nDY2mothers[0] = NOriginalPartonFound[0]
+    
+    if countquarks[0] +  countgluons[0] == 2:
+      idPartons_0[0] = idparton_first[0]
+      idPartons_1[0] = idparton_second[0]
+      idMothers_0[0] = idmother_first[0]
+      idMothers_1[0] = idmother_second[0]
+      if countquarks[0] == 0 and countgluons[0] == 2:
+        output = 0
+      if countquarks[0] == 1 and countgluons[0] == 1:
+        output = 1
+      if countquarks[0] == 2 and countgluons[0] == 0:
+        output = 2 
+    else:
+      return output
+
+  print "output=", output, "___"
+
+  return output
 
 def Delta(par1,par2):
   delta_phi=abs(par2.phi()-par1.phi())
@@ -91,12 +240,16 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
     print "DumpLHCOEvent Error: not enough jets"
     return
 
+
+  b1 = _JECuncertainty.jet(dijet[0])
+  b2 = _JECuncertainty.jet(dijet[1])
+  
   # print event in lhco format
   PrintEvent(fwevent,file)
   PrintLepton(bestZcandidate.daughter(0),file,1)
   PrintLepton(bestZcandidate.daughter(1),file,2)
-  PrintJet(dijet[0],file,3)
-  PrintJet(dijet[1],file,4)
+  PrintJet(dijet[0],b1, file,3)
+  PrintJet(dijet[1],b2, file,4)
   # print MET
   PrintMET(met[0],file,numberOfInteractions,5)
 
@@ -111,8 +264,8 @@ def PrintLepton(lepton, file, index) :
   else:
     print "ERROR: can only handle electrons or muons"
 
-def PrintJet(jet, file, index) :
-  file.write(str(index) + ' 4 ' + str(jet.eta()) + ' ' + str(jet.phi()) + ' ' + str(jet.pt()) + ' ' + str(jet.mass()) + ' ' + str(jet.charge()) + ' 2 0 0 0 \n')
+def PrintJet(jet, jet4v, file, index) :
+  file.write(str(index) + ' 4 ' + str(jet.eta()) + ' ' + str(jet.phi()) + ' ' + str(jet4v.Pt()) + ' ' + str(jet.mass()) + ' ' + str(jet.charge()) + ' 2 0 0 0 \n')
 
 def PrintMET(met, file,numberOfInteractions ,index) :
   file.write(str(index) + ' 6 ' + str(met.eta()) + ' ' + str(met.phi()) + ' ' + str(met.pt()) + ' 0 0 0 ' + str(numberOfInteractions) +' 0 0 \n')
@@ -122,7 +275,7 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 ###############################
 
 #data muChannel
-def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+#def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #data elChannel
 #def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
@@ -131,7 +284,7 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
 #def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #MC elChannel
-#def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
@@ -187,14 +340,16 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
   nBjetsHP = n.zeros(1, dtype=int)
   nBjetsHEHP = n.zeros(1, dtype=int)
 
+  codeDYprod = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
+
   isZb =  n.zeros(1, dtype=int) # nbre of primary vertices
   isZc =  n.zeros(1, dtype=int) # nbre of primary vertices
   isZl =  n.zeros(1, dtype=int) # nbre of primary vertices
   Pile_up =  n.zeros(1, dtype=float) # MC pile-up number (not in data)
   nbr_PV =  n.zeros(1, dtype=int) # nbre of primary vertices
 
-  tree1.Branch("runNumber", runNumber, "runNumber/I")
-  tree1.Branch("eventNumber", eventNumber, "eventNumber/I")
+  tree1.Branch("runNumber", runNumber, "runNumber/l")
+  tree1.Branch("eventNumber", eventNumber, "eventNumber/l")
 
   tree1.Branch("E_j1",E_j1,"E_j1/D")
   tree1.Branch("E_j2",E_j2,"E_j2/D")
@@ -229,6 +384,13 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
   tree1.Branch("noPUcorrMet_phi", noPUcorrMet_phi, "noPUcorrMet_phi/D")
   tree1.Branch("noPUcorrMet_sig", noPUcorrMet_sig, "noPUcorrMet_sig/D")
 
+  tree1.Branch("codeDYprod", codeDYprod, "codeDYprod/I")
+  tree1.Branch("nDYmothers", nDYmothers, "nDYmothers/I")
+  tree1.Branch("nDY2mothers", nDY2mothers, "nDY2mothers/I")
+  tree1.Branch("idPartons_0", idPartons_0, "idPartons_0/I")
+  tree1.Branch("idPartons_1", idPartons_1, "idPartons_1/I")
+  tree1.Branch("idMothers_0", idMothers_0, "idMothers_0/I")
+  tree1.Branch("idMothers_1", idMothers_1, "idMothers_1/I")
   tree1.Branch("isZb", isZb, "isZb/I")
   tree1.Branch("isZc", isZc, "isZc/I")
   tree1.Branch("isZl", isZl, "isZl/I")
@@ -316,7 +478,7 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
 
     runNumber[0] = event.eventAuxiliary().run()
     eventNumber[0] = event.eventAuxiliary().id().event()
-
+    
     jets = jetHandle.product()
     met = metHandle.product()
     noPUcorrmet = noPUcorrmetHandle.product()
@@ -332,7 +494,20 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
       vertex = vertices[0]
     else:
       vertex = None
-      
+    
+    #gen level production mechanism of DY production
+    #it is set to -1 if not found the production mechanism
+    #is is set to 0 for gg
+    #is is set to 1 fog qg
+    #is is set to 2 fog qq
+    
+    codeDYprod[0] = -1 
+    nDYmothers[0] = -1 
+    nDY2mothers[0] = -1 
+    idPartons_0[0] = 0
+    idPartons_1[0] = 0
+    idMothers_0[0] = 0
+    idMothers_1[0] = 0
     nbr_PV[0] = vertices.size()
     #gen level info
     Pile_up[0] = 0
@@ -357,7 +532,7 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
 	isZc[0] = 1
       if isZlEvent(genparts)==True:
 	isZl[0] = 1
-
+      
     else: #It looks that for MC loading the trigger branch produces a crash
       event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
       triggerInfo = trigInfoHandle.product()
@@ -366,7 +541,7 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
 # Start procedure selection
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel)
+    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
         
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
@@ -386,21 +561,21 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
           dphi= (2*pi) - dphi
         DR=sqrt(pow(dijet[0].eta()-dijet[1].eta(),2)+pow(dphi,2))
 
-        b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-	b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+        b1 = _JECuncertainty.jet(dijet[0])
+	b2 = _JECuncertainty.jet(dijet[1])
 	bb = b1 + b2
 	bbM[0] = bb.M()
 	
 	llM[0] = bestZ.mass()
 	
-        E_j1[0]=dijet[0].energy() 
-        E_j2[0]=dijet[1].energy()
+        E_j1[0]=b1.E() 
+        E_j2[0]=b2.E()
         Eta_j1[0]=dijet[0].eta()
         Eta_j2[0]=dijet[1].eta()
         phi_j1[0]=dijet[0].phi()
         phi_j2[0]=dijet[1].phi()
-        Pt_j1[0]=dijet[0].pt()
-        Pt_j2[0]=dijet[1].pt()
+        Pt_j1[0]=b1.Pt()
+        Pt_j2[0]=b2.Pt()
 	btag_j1[0]=dijet[0].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
 	btag_j2[0]=dijet[1].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
         DR_jet[0]=DR
@@ -444,12 +619,19 @@ def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj
             if HP: nBjetsHP[0] += 1
             if HE and HP: nBjetsHEHP[0] +=1
 
+        #some gen level information (it requires looping)
+	if isData==False:
+	  codeDYprod[0] = CodeDYprod(genparts)
+
         #only fill tree if 2 bjets for the moment
 	#print " Met = ", Met[0], " Met_phi = ", Met_phi[0], " Met_sig = ", Met_sig[0]
 	#print " nJets = ", nJets[0], " nBJetsHE = ", nBjetsHE[0], " nBJetsHP = ", nBjetsHP[0], "nBJetsHEHP = ", nBjetsHEHP[0]
 	#print " Pile_up = ", Pile_up[0], "isZb = ", isZb[0], " isZc = ", isZc[0], " isZl = ", isZl[0]
 	#print " btag_j1 = ", btag_j1[0], " btag_j2 = ", btag_j2[0]
 	
+	#print "[", runNumber[0], ", ", eventNumber[0], "]"
+        
+
 	
         tree1.Fill()
               
