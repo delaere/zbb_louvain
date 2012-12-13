@@ -5,7 +5,7 @@ import numpy as n
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate, JetCorrectionUncertaintyProxy
+from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate, isGoodMet_Sig, JetCorrectionUncertaintyProxy
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent
 from zbbCommons import zbblabel, isZbbSelection
@@ -475,7 +475,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 # Event loop
   iEventLoop=0
   for event in events:
-    if iEventLoop > 400: break;
+    #if iEventLoop > 400: break;
     #if isZbEvent(genparts)==False:
      # continue
       
@@ -558,7 +558,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     #Start procedure selection
     categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, btagAlgo, event.eventAuxiliary().luminosityBlock())   #defalut mass windows = 15
     
-    if isInCategory(stage, categTuple):
+    if isInCategory(stage, categTuple) and isGoodMet_Sig(met[0]):
       
 
       bestZ = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
