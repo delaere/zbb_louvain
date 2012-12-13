@@ -42,34 +42,6 @@ def CodeDYprod(genParticles):
     if part.status()!=3:
       break
       
-#    print "N=", npart, " id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#    if part.pdgId()==2212: 
-#      npart += 1
-#      continue
-#    for n in range(0, part.numberOfMothers()):
-#      print "  id=", part.mother(n).pdgId(), " status=", part.mother(n).status(), " nMothers=", part.mother(n).numberOfMothers(), " ndaughters=", part.mother(n).numberOfDaughters(), " px=", part.mother(n).px()
-#      for n2 in range(0, part.mother(n).numberOfMothers()):
-#        print "    id=", part.mother(n).mother(n2).pdgId(), " status=", part.mother(n).mother(n2).status(), " nMothers=",  part.mother(n).mother(n2).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).numberOfDaughters(), " px=", part.mother(n).mother(n2).px()
-#        for n3 in range(0, part.mother(n).mother(n2).numberOfMothers()):
-#          print "      id=", part.mother(n).mother(n2).mother(n3).pdgId(), " status=", part.mother(n).mother(n2).mother(n3).status(), " nMothers=",  part.mother(n).mother(n2).mother(n3).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).mother(n3).numberOfDaughters(), " px=", part.mother(n).mother(n2).mother(n3).px()
-
-#
-
-#    for n in range(0, part.numberOfDaughters()):
-#      #print "  id=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px()
-#      if part.daughter(n).pdgId()==23:
-#        print "idn1=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#
-#      for n2 in range(0, part.daughter(n).numberOfDaughters()):
-#        #print "    id=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px()
-#        if part.daughter(n).daughter(n2).pdgId() ==23:
-#	  print "idn2=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#
-#        for n3 in range(0, part.daughter(n).daughter(n2).numberOfDaughters()):
-#          #print "      id=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px()
-#          if part.daughter(n).daughter(n2).daughter(n3).pdgId()==23:
-#	    print "idn3=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-
     npart += 1
 
   #print "*****************eventends****************"
@@ -138,11 +110,6 @@ def CodeDYprod(genParticles):
 	  if part.mother(n).mother(n2).pdgId() == 21 and part.mother(n).mother(n2).mother().pdgId() == 2212:
 	    countgluons[countZ] += 1
       
-          #for n3 in range(0, part.mother(n).mother(n2).numberOfMothers()):
-	    #print "     mother3(", n3, ")=", part.mother(n).mother(n2).mother(n3).pdgId()," IDX = ", part.mother(n).mother(n2).mother(3)
-
-
-      #print "For Z[", countZ, "], NMotherFound=", NMotherFound[countZ], " NOriginalPartonFound=", NOriginalPartonFound[countZ]
       countZ += 1
 
   
@@ -164,7 +131,6 @@ def CodeDYprod(genParticles):
     else:
       return output
 
-  #print "output=", output, "___"
 
   return output
 
@@ -175,67 +141,18 @@ def Delta(par1,par2):
   delta=sqrt((delta_phi)**2 + (par1.eta()-par2.eta())**2)
   return delta
 
-def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None , numberOfInteractions=None):
+def DumpLHCOEvent(file, event, dijet, bestZcandidate, met, numberOfInteractions=None):
 
   """Dump informations about a given event in the LHCO format for MadWeight"""
   # output must be specified
   if file is None:
     print "Output must be specified. Set file argument to the file object opened for writing"
     return
-  # in case no fwevent is provided, find it using run,event,(lumi)
-  if fwevent is None:
-    if (run is None) or (event is None):
-      print "DumpLHCOEvent Error: either pass a fwlite event or give both run and event number"
-      return
-    # find event based on run  and event
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-    events = Events (files)
-    # there is the method to(run, event) can we use it ???
-    for fwevent in events:
-      if fwevent.eventAuxiliary().run()==run and fwevent.eventAuxiliary().id().event()==event and ( lumi is None or fwevent.eventAuxiliary().luminosityBlock()==lumi) :
-        break
-    if fwevent.eventAuxiliary().run()==run and fwevent.eventAuxiliary().id().event()==event and ( lumi is None or fwevent.eventAuxiliary().luminosityBlock()==lumi) :
-      DumpLHCOEvent(fwevent)
-    else:
-      print "Event not found."
-    return
-  # in case a fwevent is provided, use it
-  # load objects
-  jetHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  noPUcorrmetHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
-  RhoHandle = Handle("double")
-  fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
-  fwevent.getByLabel (zbblabel.metlabel,metHandle)
-  fwevent.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
-  fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
-  fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
-  fwevent.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
-  fwevent.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
-  jets = jetHandle.product()
-  met = metHandle.product()
-  noPUcorrmet = noPUcorrmetHandle.product()
-  rho = RhoHandle.product()
-  vertices = PrimaryVertexHandle.product()
-  if vertices.size()>0 :
-    vertex = vertices[0]
-  else:
-    vertex = None
-  zCandidatesMu = zmuHandle.product()
-  zCandidatesEle = zeleHandle.product()
-  #find the best z candidate
-  bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
-  # loop over jets and print
-
-
-  dijet = findDijetPair(jets, bestZcandidate)
               
+  if event is None:
+    print "DumpLHCOEvent could not find event"
+    return
+
   if dijet[1] is None:
     print "DumpLHCOEvent Error: not enough jets"
     return
@@ -245,7 +162,7 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   b2 = _JECuncertainty.jet(dijet[1])
   
   # print event in lhco format
-  PrintEvent(fwevent,file)
+  PrintEvent(event,file)
   PrintLepton(bestZcandidate.daughter(0),file,1)
   PrintLepton(bestZcandidate.daughter(1),file,2)
   PrintJet(dijet[0],b1, file,3)
@@ -459,7 +376,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 # Event loop
   iEventLoop=0
   for event in events:
-    if iEventLoop > 400: break;
+    #if iEventLoop > 400: break;
     #if isZbEvent(genparts)==False:
      # continue
       
@@ -544,12 +461,11 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     
     if isInCategory(stage, categTuple):
       
-      DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
-      #bestZ = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
+
       bestZ = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
-
       dijet = findDijetPair(jets, bestZ)  
-
+      
+      DumpLHCOEvent(out_file_INCL, event, dijet, bestZ, met, numberOfInteractions)
 
       if (not dijet[1] is None) and (not dijet[0] is None):
         l1=bestZ.daughter(0)
