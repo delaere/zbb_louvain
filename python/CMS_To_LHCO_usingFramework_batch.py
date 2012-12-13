@@ -23,6 +23,115 @@ if not isZbbSelection : btagAlgo="CSV"
 
 print sys.argv 
 
+channel = sys.argv[1]
+
+############
+### Maps ###
+############
+
+muChannel = { "MuA_DATA"     : True ,
+              "ElA_DATA"     : False,
+              "MuB_DATA"     : True ,
+              "ElB_DATA"     : False,
+              "Mu_MC"        : True ,
+              "El_MC"        : False,
+              "Zbb_Mu_MC"    : True ,
+              "Zbb_El_MC"    : False,
+              "TT_Mu_MC"     : True ,
+              "TT_El_MC"     : False,
+              "ZZ_Mu_MC"     : True ,
+              "ZZ_El_MC"     : False,
+              "ZH115_Mu_MC"  : True ,
+              "ZH115_El_MC"  : False,
+              "ZH120_Mu_MC"  : True ,
+              "ZH120_El_MC"  : False,
+              "ZH125_Mu_MC"  : True ,
+              "ZH125_El_MC"  : False,
+              "ZH130_Mu_MC"  : True ,
+              "ZH130_El_MC"  : False,
+              "ZH135_Mu_MC"  : True ,
+              "ZH135_El_MC"  : False,
+              "tW_Mu_MC"     : True ,
+              "tW_El_MC"     : False,
+              "tbarW_Mu_MC"  : True ,
+              "tbarW_El_MC"  : False,
+              "evtgen_MC"    : False,
+              "herwig_MC"    : False,
+              "pythia_MC"    : False,
+              "ZA_Mu_MC" : True,
+              "ZA_El_MC" : False
+              }
+
+path = { 
+  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
+  "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "Zbb_El_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "TT_Mu_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "tW_Mu_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tW_El_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tbarW_Mu_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "tbarW_El_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
+  "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
+  "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
+  "ZA_Mu_MC" : "/nfs/user/acaudron/ZApat/",
+  "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
+  }
+
+checkTrigger = {
+  "MuA_DATA"     : True ,
+  "ElA_DATA"     : True ,
+  "MuB_DATA"     : True ,
+  "ElB_DATA"     : True ,
+  "Mu_MC"        : False,
+  "El_MC"        : False,
+  "Zbb_Mu_MC"    : False,
+  "Zbb_El_MC"    : False,
+  "TT_Mu_MC"     : False,
+  "TT_El_MC"     : False,
+  "ZZ_Mu_MC"     : False,
+  "ZZ_El_MC"     : False,
+  "ZH115_Mu_MC"  : False,
+  "ZH115_El_MC"  : False,
+  "ZH120_Mu_MC"  : False,
+  "ZH120_El_MC"  : False,
+  "ZH125_Mu_MC"  : False,
+  "ZH125_El_MC"  : False,
+  "ZH130_Mu_MC"  : False,
+  "ZH130_El_MC"  : False,
+  "ZH135_Mu_MC"  : False,
+  "ZH135_El_MC"  : False,
+  "tW_Mu_MC"     : False,
+  "tW_El_MC"     : False,
+  "tbarW_Mu_MC"  : False,
+  "tbarW_El_MC"  : False,
+  "evtgen_MC"    : False,
+  "herwig_MC"    : False,
+  "pythia_MC"    : False,
+  "ZA_Mu_MC" : False,
+  "ZA_El_MC" : False
+  }
+  
 #Global variables
 idPartons_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
 idPartons_1 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
@@ -191,17 +300,7 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 ### Proxy for eventCategory ###
 ###############################
 
-#data muChannel
-#def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#data elChannel
-#def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#MC muChannel
-#def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#MC elChannel
-def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO_",RootFile="outCMStoLHCO_",numb=None, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
@@ -376,7 +475,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 # Event loop
   iEventLoop=0
   for event in events:
-    #if iEventLoop > 400: break;
+    if iEventLoop > 400: break;
     #if isZbEvent(genparts)==False:
      # continue
       
@@ -565,7 +664,6 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 for num, arg in enumerate(sys.argv):
   print num, arg
 
-#dumpAll(fileAll=sys.argv[1],file2j=sys.argv[2],RootFile=sys.argv[3],numb=sys.argv[4])
-#
-dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=10)
+
+dumpAll(path=path[channel], isData=checkTrigger[channel], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=channel+sys.argv[4], stage=10)
     
