@@ -8,14 +8,19 @@ from DataFormats.FWLite import Events, Handle
 from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate, JetCorrectionUncertaintyProxy
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent
-from zbbCommons import zbblabel
+from zbbCommons import zbblabel, isZbbSelection
 from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
 
-#from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+
+
 
 _JECuncertainty = JetCorrectionUncertaintyProxy()
+
+btagAlgo="SSV"
+if not isZbbSelection : btagAlgo="CSV"
 
 print sys.argv 
 
@@ -403,11 +408,13 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   tree1.Branch("nBjetsHP", nBjetsHP, "nBjetsHP/I")
   tree1.Branch("nBjetsHEHP", nBjetsHEHP, "nBjetsHEHP/I")
   
-  
+  import glob 
   
 
   # read data
-  dirList=os.listdir(path)
+  
+  #dirList=os.listdir(path)
+  dirList=glob.glob(path+"*")
   files=[]
   number=0
   numb = int(numb)
@@ -428,17 +435,13 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     if number>filemin and number<=filemax:
       files.append(path+fname)
       print "We will run over file ", fname
+  files=glob.glob(path+"*")
   events = Events (files)
 
-  metlabel=zbblabel.metlabel # To be check to load MeT type 1 + phi correction
-  jetlabel=zbblabel.jetlabel
+   # To be check to load MeT type 1 + phi correction
   jetalllabel="patJets"
-  zmulabel=zbblabel.zmumulabel
-  zelelabel=zbblabel.zelelabel
-  genpartlabel=zbblabel.genlabel
   labelElectron = zbblabel.electronlabel
   labelMuon = zbblabel.muonlabel
-  vertexLabel =zbblabel.vertexlabel
 
   RhoHandle = Handle("double")
   jetHandle = Handle ("vector<pat::Jet>")
@@ -459,22 +462,25 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   PUHandle= Handle("std::vector<PileupSummaryInfo>")
 
 # Event loop
+  iEventLoop=0
   for event in events:
+    #if iEventLoop > 400: break;
     #if isZbEvent(genparts)==False:
      # continue
       
     #print '----------------------- New Event -------------------------'
-    event.getByLabel (jetlabel,jetHandle)
+    event.getByLabel (zbblabel.jetlabel,jetHandle)
     event.getByLabel (jetalllabel,jetallHandle)
-    event.getByLabel (metlabel,metHandle)
+    event.getByLabel (zbblabel.metlabel,metHandle)
     event.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
-    event.getByLabel (zmulabel,zmuHandle)
-    event.getByLabel (zelelabel,zeleHandle)
+    event.getByLabel (zbblabel.zmumulabel,zmuHandle)
+    event.getByLabel (zbblabel.zelelabel,zeleHandle)
     event.getByLabel (labelElectron,electronHandle)
     event.getByLabel (labelMuon,muonHandle)
-    event.getByLabel (vertexLabel, PrimaryVertexHandle)
+    event.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
     event.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
     run = event.eventAuxiliary().run()
+    print "run=",run
 
     runNumber[0] = event.eventAuxiliary().run()
     eventNumber[0] = event.eventAuxiliary().id().event()
@@ -484,7 +490,6 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     noPUcorrmet = noPUcorrmetHandle.product()
     zCandidatesMu = zmuHandle.product()
     zCandidatesEle = zeleHandle.product()
-#    triggerInfo = trigInfoHandle.product()
     vertices = PrimaryVertexHandle.product()
     muons = muonHandle.product()
     electrons = electronHandle.product()
@@ -518,7 +523,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     triggerInfo = None
 
     if isData==False:
-      event.getByLabel (genpartlabel,genpartHandle)
+      event.getByLabel (zbblabel.genlabel,genpartHandle)
       event.getByLabel (PULabel,PUHandle)
       PU= PUHandle.product()
       genparts = genpartHandle.product()
@@ -540,8 +545,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     #We require the event selection given by the variable "stage"
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
-# Start procedure selection
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
+    #Start procedure selection
+    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, btagAlgo, event.eventAuxiliary().luminosityBlock())   #defalut mass windows = 15
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
         
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
@@ -634,7 +639,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 
 	
         tree1.Fill()
-              
+
+    iEventLoop += 1              
   # close file
   out_file_INCL.close()
   f.Write()
@@ -646,5 +652,5 @@ for num, arg in enumerate(sys.argv):
 
 #dumpAll(fileAll=sys.argv[1],file2j=sys.argv[2],RootFile=sys.argv[3],numb=sys.argv[4])
 #
-dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=9)
+dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=10)
     
