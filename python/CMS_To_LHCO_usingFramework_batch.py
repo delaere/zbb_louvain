@@ -13,7 +13,6 @@ from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
 
-from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 
 
 
@@ -165,7 +164,7 @@ def CodeDYprod(genParticles):
     else:
       return output
 
-  print "output=", output, "___"
+  #print "output=", output, "___"
 
   return output
 
@@ -234,12 +233,8 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
   bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
   # loop over jets and print
 
-  bjetp=[]
-  for jet in jets:
-    if isGoodJet(jet,bestZcandidate) and isBJet(jet, "HE", "SSV"):
-      bjetp+=[jet]
 
-  dijet = findDijetPair(bjetp, bestZcandidate)
+  dijet = findDijetPair(jets, bestZcandidate)
               
   if dijet[1] is None:
     print "DumpLHCOEvent Error: not enough jets"
@@ -464,7 +459,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 # Event loop
   iEventLoop=0
   for event in events:
-    #if iEventLoop > 400: break;
+    if iEventLoop > 400: break;
     #if isZbEvent(genparts)==False:
      # continue
       
@@ -480,7 +475,6 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     event.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
     event.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
     run = event.eventAuxiliary().run()
-    print "run=",run
 
     runNumber[0] = event.eventAuxiliary().run()
     eventNumber[0] = event.eventAuxiliary().id().event()
@@ -547,17 +541,17 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 
     #Start procedure selection
     categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, btagAlgo, event.eventAuxiliary().luminosityBlock())   #defalut mass windows = 15
-    if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
-        
+    
+    if isInCategory(stage, categTuple):
+      
       DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
-      bestZ = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
+      #bestZ = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
+      bestZ = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
 
-      bjetp=[]
-      for jet in jets:
-        if isGoodJet(jet,bestZ) and isBJet(jet, "HE", "SSV"):
-          bjetp+=[jet]
-      if len(bjetp)>1:
-        dijet = findDijetPair(bjetp, bestZ)  
+      dijet = findDijetPair(jets, bestZ)  
+
+
+      if (not dijet[1] is None) and (not dijet[0] is None):
         l1=bestZ.daughter(0)
         l2=bestZ.daughter(1)
 
@@ -581,9 +575,14 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
         phi_j2[0]=dijet[1].phi()
         Pt_j1[0]=b1.Pt()
         Pt_j2[0]=b2.Pt()
-	btag_j1[0]=dijet[0].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-	btag_j2[0]=dijet[1].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-        DR_jet[0]=DR
+	if btagAlgo == "SSV":
+	  btag_j1[0]=dijet[0].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+	  btag_j2[0]=dijet[1].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+        else:
+	  btag_j1[0]=dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
+	  btag_j2[0]=dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
+        
+	DR_jet[0]=DR
       
         E_l1[0]=l1.energy()
         E_l2[0]=l2.energy()
@@ -618,8 +617,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
         for jet in jets:
           if isGoodJet(jet,bestZ):
             nJets[0] += 1
-            HE = isBJet(jet,"HE","SSV")
-            HP = isBJet(jet,"HP","SSV")
+            HE = isBJet(jet,"HE",btagAlgo)
+            HP = isBJet(jet,"HP",btagAlgo)
             if HE: nBjetsHE[0] += 1
             if HP: nBjetsHP[0] += 1
             if HE and HP: nBjetsHEHP[0] +=1
