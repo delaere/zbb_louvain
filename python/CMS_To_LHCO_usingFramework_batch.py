@@ -665,5 +665,5 @@ for num, arg in enumerate(sys.argv):
   print num, arg
 
 
-dumpAll(path=path[channel], isData=checkTrigger[channel], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=channel+sys.argv[4], stage=10)
+dumpAll(path=path[channel], isData=checkTrigger[channel], muChannel=muChannel[channel],numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=channel+sys.argv[4], stage=10)
     
