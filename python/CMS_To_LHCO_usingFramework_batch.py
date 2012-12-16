@@ -192,7 +192,7 @@ def CodeDYprod(genParticles):
       for n in range(0, part.numberOfMothers()):
 	#Z boson second mothers (direct from the proton)
 
-	print " mother(", n, ")=", part.mother(n).pdgId(), " number of mothers = ", part.mother(n).numberOfMothers()," IDX = ", part.mother(n)
+	#print " mother(", n, ")=", part.mother(n).pdgId(), " number of mothers = ", part.mother(n).numberOfMothers()," IDX = ", part.mother(n)
 
 
         #Save first 2 mother id's
@@ -206,7 +206,7 @@ def CodeDYprod(genParticles):
 	for n2 in range(0, part.mother(n).numberOfMothers()):	  
 	  #Save first 2 second mother id's
 
-	  print "   mother2(", n2, ")=", part.mother(n).mother(n2).pdgId()," IDX = ", part.mother(n).mother(2)
+	  #print "   mother2(", n2, ")=", part.mother(n).mother(n2).pdgId()," IDX = ", part.mother(n).mother(2)
 
 	  if (NOriginalPartonFound[countZ] == 0):
 	    idparton_first[countZ] = part.mother(n).mother(n2).pdgId()
