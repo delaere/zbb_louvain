@@ -562,7 +562,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
       
 
       bestZ = findBestCandidate(muChannel, vertex, zCandidatesMu, zCandidatesEle)
-      dijet = findDijetPair(jets, bestZ)  
+      dijet = findDijetPair(jets, bestZ, btagAlgo)  
       
       DumpLHCOEvent(out_file_INCL, event, dijet, bestZ, met, numberOfInteractions)
 
