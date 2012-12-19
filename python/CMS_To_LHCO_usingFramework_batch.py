@@ -4,20 +4,19 @@ import ROOT
 import numpy as n
 import sys
 import os
-from DataFormats.FWLite import Events, Handle
-from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate, JetCorrectionUncertaintyProxy
+from AnalysisEvent import AnalysisEvent
+from monteCarloSelection import *
+from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent, findDijetPair, isBJet
 from LumiReWeighting import LumiReWeighting
-from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent
 from zbbCommons import zbblabel
 from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
-
-#from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-
-_JECuncertainty = JetCorrectionUncertaintyProxy()
+from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 
 print sys.argv 
+
+_JECuncertainty = JetCorrectionUncertaintyProxy()
 
 #Global variables
 idPartons_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
@@ -171,7 +170,7 @@ def Delta(par1,par2):
   delta=sqrt((delta_phi)**2 + (par1.eta()-par2.eta())**2)
   return delta
 
-def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None , numberOfInteractions=None):
+def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None , numberOfInteractions=None, muChannel=True):
 
   """Dump informations about a given event in the LHCO format for MadWeight"""
   # output must be specified
@@ -183,78 +182,49 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
     if (run is None) or (event is None):
       print "DumpLHCOEvent Error: either pass a fwlite event or give both run and event number"
       return
-    # find event based on run  and event
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-    events = Events (files)
-    # there is the method to(run, event) can we use it ???
-    for fwevent in events:
-      if fwevent.eventAuxiliary().run()==run and fwevent.eventAuxiliary().id().event()==event and ( lumi is None or fwevent.eventAuxiliary().luminosityBlock()==lumi) :
-        break
-    if fwevent.eventAuxiliary().run()==run and fwevent.eventAuxiliary().id().event()==event and ( lumi is None or fwevent.eventAuxiliary().luminosityBlock()==lumi) :
-      DumpLHCOEvent(fwevent)
+    # find event based on run  and event    
+    if os.path.isdir(path):
+      files=[]
+      dirList=os.listdir(path)      
+      for fname in dirList:
+        files.append(path+fname)
+    elif os.path.isfile(path):
+      files=[path]
     else:
-      print "Event not found."
+      files=[]
+    events = AnalysisEvent(files)
+    # there is the method to(run, event) can we use it ???
+    DumpLHCOEvent(events[(run,event,lumi)])
     return
   # in case a fwevent is provided, use it
-  # load objects
-  jetHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  noPUcorrmetHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
-  RhoHandle = Handle("double")
-  fwevent.getByLabel (zbblabel.jetlabel,jetHandle)
-  fwevent.getByLabel (zbblabel.metlabel,metHandle)
-  fwevent.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
-  fwevent.getByLabel (zbblabel.zmumulabel,zmuHandle)
-  fwevent.getByLabel (zbblabel.zelelabel,zeleHandle)
-  fwevent.getByLabel (zbblabel.vertexlabel, PrimaryVertexHandle)
-  fwevent.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
-  jets = jetHandle.product()
-  met = metHandle.product()
-  noPUcorrmet = noPUcorrmetHandle.product()
-  rho = RhoHandle.product()
-  vertices = PrimaryVertexHandle.product()
-  if vertices.size()>0 :
-    vertex = vertices[0]
+  #prepareAnalysisEvent(fwevent, btagging="CSV",ZjetFilter="bcl",checkTrigger=True)
+
+  if muChannel:
+    bestZcandidate = fwevent.bestZmumuCandidate
   else:
-    vertex = None
-  zCandidatesMu = zmuHandle.product()
-  zCandidatesEle = zeleHandle.product()
-  #find the best z candidate
-  bestZcandidate = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
-  # loop over jets and print
+    bestZcandidate = fwevent.bestZelelCandidate
 
-  bjetp=[]
-  for jet in jets:
-    if isGoodJet(jet,bestZcandidate) and isBJet(jet, "HE", "SSV"):
-      bjetp+=[jet]
+  dijet = findDijetPair(fwevent, "CSV", muChannel, (not muChannel))
 
-  dijet = findDijetPair(bjetp, bestZcandidate)
-              
-  if dijet[1] is None:
-    print "DumpLHCOEvent Error: not enough jets"
+  if dijet[1] is None :
+    print "njets < 2"
     return
+ 
+  ptb1 = _JECuncertainty.jet(dijet[0])
+  ptb2 = _JECuncertainty.jet(dijet[1])
+  met = fwevent.MET
 
-
-  b1 = _JECuncertainty.jet(dijet[0])
-  b2 = _JECuncertainty.jet(dijet[1])
-  
   # print event in lhco format
   PrintEvent(fwevent,file)
   PrintLepton(bestZcandidate.daughter(0),file,1)
   PrintLepton(bestZcandidate.daughter(1),file,2)
-  PrintJet(dijet[0],b1, file,3)
-  PrintJet(dijet[1],b2, file,4)
+  PrintJet(dijet[0],ptb1, file,3)
+  PrintJet(dijet[1],ptb2, file,4)
   # print MET
   PrintMET(met[0],file,numberOfInteractions,5)
 
 def PrintEvent(event, file) :
-  file.write('0 ' + str(event.eventAuxiliary().run()) + ' ' +str(event.eventAuxiliary().id().event())+' \n')
+  file.write('0 ' + str(event.event())+ ' ' + str(event.run()) +' \n')
   
 def PrintLepton(lepton, file, index) :
   if lepton.isMuon():
@@ -284,7 +254,7 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 #def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
 
 #MC elChannel
-def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
+def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
@@ -428,35 +398,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     if number>filemin and number<=filemax:
       files.append(path+fname)
       print "We will run over file ", fname
-  events = Events (files)
-
-  metlabel=zbblabel.metlabel # To be check to load MeT type 1 + phi correction
-  jetlabel=zbblabel.jetlabel
-  jetalllabel="patJets"
-  zmulabel=zbblabel.zmumulabel
-  zelelabel=zbblabel.zelelabel
-  genpartlabel=zbblabel.genlabel
-  labelElectron = zbblabel.electronlabel
-  labelMuon = zbblabel.muonlabel
-  vertexLabel =zbblabel.vertexlabel
-
-  RhoHandle = Handle("double")
-  jetHandle = Handle ("vector<pat::Jet>")
-  jetallHandle = Handle ("vector<pat::Jet>")
-  metHandle = Handle ("vector<pat::MET>")
-  noPUcorrmetHandle = Handle ("vector<pat::MET>")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  trigInfoHandle = Handle ("pat::TriggerEvent")
-  zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-  zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-  muonHandle = Handle ("vector<pat::Muon>")
-  electronHandle = Handle ("vector<pat::Electron>")
-  genpartHandle =  Handle("std::vector<reco::GenParticle>")
-  PrimaryVertexHandle = Handle ("vector<reco::Vertex>")
-
-  PULabel = "addPileupInfo"
-  PUHandle= Handle("std::vector<PileupSummaryInfo>")
+  events = AnalysisEvent (files)
+  prepareAnalysisEvent(events, btagging="CSV",ZjetFilter="bcl",checkTrigger=isData)
 
 # Event loop
   for event in events:
@@ -464,36 +407,12 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
      # continue
       
     #print '----------------------- New Event -------------------------'
-    event.getByLabel (jetlabel,jetHandle)
-    event.getByLabel (jetalllabel,jetallHandle)
-    event.getByLabel (metlabel,metHandle)
-    event.getByLabel ("patType1SCorrectedPFMet",noPUcorrmetHandle)
-    event.getByLabel (zmulabel,zmuHandle)
-    event.getByLabel (zelelabel,zeleHandle)
-    event.getByLabel (labelElectron,electronHandle)
-    event.getByLabel (labelMuon,muonHandle)
-    event.getByLabel (vertexLabel, PrimaryVertexHandle)
-    event.getByLabel("kt6PFJetsForIsolation","rho",RhoHandle)
-    run = event.eventAuxiliary().run()
+    run = event.run()
 
-    runNumber[0] = event.eventAuxiliary().run()
-    eventNumber[0] = event.eventAuxiliary().id().event()
+    runNumber[0] = event.run()
+    eventNumber[0] = event.event()
     
-    jets = jetHandle.product()
-    met = metHandle.product()
-    noPUcorrmet = noPUcorrmetHandle.product()
-    zCandidatesMu = zmuHandle.product()
-    zCandidatesEle = zeleHandle.product()
-#    triggerInfo = trigInfoHandle.product()
-    vertices = PrimaryVertexHandle.product()
-    muons = muonHandle.product()
-    electrons = electronHandle.product()
-    rho = RhoHandle.product()
-    
-    if vertices.size()>0 :
-      vertex = vertices[0]
-    else:
-      vertex = None
+    vertex = event.vertex
     
     #gen level production mechanism of DY production
     #it is set to -1 if not found the production mechanism
@@ -508,7 +427,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     idPartons_1[0] = 0
     idMothers_0[0] = 0
     idMothers_1[0] = 0
-    nbr_PV[0] = vertices.size()
+    nbr_PV[0] = event.vertices.size()
     #gen level info
     Pile_up[0] = 0
     numberOfInteractions = 0
@@ -518,41 +437,49 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
     triggerInfo = None
 
     if isData==False:
-      event.getByLabel (genpartlabel,genpartHandle)
-      event.getByLabel (PULabel,PUHandle)
-      PU= PUHandle.product()
-      genparts = genpartHandle.product()
-      #Number of pile up interactions variable is duplicated. I should remove one
-      numberOfInteractions = PUHandle.product()[0].getPU_NumInteractions()
-      Pile_up[0] = PUHandle.product()[0].getPU_NumInteractions()
+      pileup = event.PileupSummaryInfo
+      numberOfInteractions = 0
+      for pvi in pileup:
+        if pvi.getBunchCrossing()==0:
+          numberOfInteractions = pvi.getPU_NumInteractions()  
+      Pile_up[0] = numberOfInteractions
 
-      if isZbEvent(genparts)==True:
+      if isZbEvent(event.genParticles,0,False)==True:
 	isZb[0] = 1
-      if isZcEvent(genparts)==True:
+      if isZcEvent(event.genParticles,0,False)==True:
 	isZc[0] = 1
-      if isZlEvent(genparts)==True:
+      if isZlEvent(event.genParticles,0,False)==True:
 	isZl[0] = 1
       
     else: #It looks that for MC loading the trigger branch produces a crash
-      event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
-      triggerInfo = trigInfoHandle.product()
+      triggerInfo = event.triggerInfo
 
     #We require the event selection given by the variable "stage"
     #We require in addition at least one Z candidate and 2 jets regardless the value we chose for "stage"
 
-# Start procedure selection
-    categTuple=eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices,jets, met, run ,muChannel, massWindow=30.)   #defalut mass windows = 15
+    # Start procedure selection
+    if muChannel :
+      categTuple=event.catMu
+    else :
+      categTuple=event.catEle
     if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
         
-      DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions)
-      bestZ = findBestCandidate(None,vertex,zCandidatesMu,zCandidatesEle)
+      DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions,muChannel)
 
-      bjetp=[]
-      for jet in jets:
-        if isGoodJet(jet,bestZ) and isBJet(jet, "HE", "SSV"):
-          bjetp+=[jet]
-      if len(bjetp)>1:
-        dijet = findDijetPair(bjetp, bestZ)  
+      if muChannel:
+        bestZ = event.bestZmumuCandidate
+        goodJets = event.goodJets_mu
+      else:
+        bestZ = event.bestZelelCandidate
+        goodJets = event.goodJets_ele
+
+      bjetp=0
+      for index,jet in enumerate(event.jets):
+        if goodJets[index]:
+          if isBJet(jet, "HE", "CSV"):
+            bjetp+=1
+      if bjetp>1:
+        dijet = findDijetPair(event, "CSV", muChannel, (not muChannel)) 
         l1=bestZ.daughter(0)
         l2=bestZ.daughter(1)
 
@@ -591,6 +518,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 	
 
         #info about MET
+        met = event.MET
         Met[0] = met[0].pt()
         Met_phi[0] = met[0].phi()
         Met_sig[0] = 0.
@@ -598,6 +526,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
           Met_sig[0] = met[0].significance()
 	
         #info about MET, collection no PU corr
+        noPUcorrmet = event.METNNregression
         noPUcorrMet[0] = noPUcorrmet[0].pt()
         noPUcorrMet_phi[0] = noPUcorrmet[0].phi()
         noPUcorrMet_sig[0] = 0.
@@ -610,18 +539,18 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
         nBjetsHE[0] = 0
         nBjetsHP[0] = 0
         nBjetsHEHP[0] = 0
-        for jet in jets:
-          if isGoodJet(jet,bestZ):
+        for index,jet in enumerate(event.jets):
+          if goodJets[index]:
             nJets[0] += 1
-            HE = isBJet(jet,"HE","SSV")
-            HP = isBJet(jet,"HP","SSV")
+            HE = isBJet(jet,"HE","CSV")
+            HP = isBJet(jet,"HP","CSV")
             if HE: nBjetsHE[0] += 1
             if HP: nBjetsHP[0] += 1
             if HE and HP: nBjetsHEHP[0] +=1
 
         #some gen level information (it requires looping)
 	if isData==False:
-	  codeDYprod[0] = CodeDYprod(genparts)
+	  codeDYprod[0] = CodeDYprod(event.genParticles)
 
         #only fill tree if 2 bjets for the moment
 	#print " Met = ", Met[0], " Met_phi = ", Met_phi[0], " Met_sig = ", Met_sig[0]
@@ -646,5 +575,5 @@ for num, arg in enumerate(sys.argv):
 
 #dumpAll(fileAll=sys.argv[1],file2j=sys.argv[2],RootFile=sys.argv[3],numb=sys.argv[4])
 #
-dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=9)
-    
+#dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=9)    
+dumpAll(stage=9)    
