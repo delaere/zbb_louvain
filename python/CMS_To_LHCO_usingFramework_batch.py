@@ -6,7 +6,7 @@ import sys
 import os
 from AnalysisEvent import AnalysisEvent
 from monteCarloSelection import *
-from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent, findDijetPair, isBJet
+from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent, findDijetPair, isBJet, categoryNames
 from LumiReWeighting import LumiReWeighting
 from zbbCommons import zbblabel
 from math import *
@@ -503,8 +503,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
         phi_j2[0]=dijet[1].phi()
         Pt_j1[0]=b1.Pt()
         Pt_j2[0]=b2.Pt()
-	btag_j1[0]=dijet[0].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-	btag_j2[0]=dijet[1].bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+	btag_j1[0]=dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
+	btag_j2[0]=dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
         DR_jet[0]=DR
       
         E_l1[0]=l1.energy()
@@ -575,5 +575,11 @@ for num, arg in enumerate(sys.argv):
 
 #dumpAll(fileAll=sys.argv[1],file2j=sys.argv[2],RootFile=sys.argv[3],numb=sys.argv[4])
 #
-#dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=9)    
-dumpAll(stage=9)    
+category="Z+bb (HEHP) wide"
+stageNumber=3
+for index,cat in enumerate(categoryNames):
+  if cat==category :
+    stageNumber=index
+    break
+
+dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=stageNumber)    
