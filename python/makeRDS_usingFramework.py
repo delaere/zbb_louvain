@@ -18,7 +18,6 @@ import os
 import itertools
 import time
 
-from DataFormats.FWLite import Events, Handle
 from eventSelection import *
 from eventSelectionControlPlots import *
 from monteCarloSelectionControlPlots import *
@@ -27,12 +26,12 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from objectsControlPlots import *
 from vertexAssociationControlPlots import *
+from AnalysisEvent import AnalysisEvent
 
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
 from zbbCommons import zbbfile
-from eventSelection import eventCategories, eventCategory, isInCategory
 from optparse import OptionParser
 
 ###############
@@ -76,8 +75,6 @@ muChannel = { "MuA_DATA"     : True ,
               "ElB_DATA"     : False,
               "Mu_MC"        : True ,
               "El_MC"        : False,
-              "Zbb_Mu_MC"    : True ,
-              "Zbb_El_MC"    : False,
               "TT_Mu_MC"     : True ,
               "TT_El_MC"     : False,
               "ZZ_Mu_MC"     : True ,
@@ -92,97 +89,38 @@ muChannel = { "MuA_DATA"     : True ,
               "ZH130_El_MC"  : False,
               "ZH135_Mu_MC"  : True ,
               "ZH135_El_MC"  : False,
-              "tW_Mu_MC"     : True ,
-              "tW_El_MC"     : False,
-              "tbarW_Mu_MC"  : True ,
-              "tbarW_El_MC"  : False,
               "evtgen_MC"    : False,
               "herwig_MC"    : False,
               "pythia_MC"    : False,
-              "ZA_Mu_MC" : True,
-              "ZA_El_MC" : False
               }
 
 path = { 
-  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
-  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
-  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
-  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
-  "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
-  "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
-  #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
-  #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
-  "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
-  "Zbb_El_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
-  "TT_Mu_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
-  "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
-  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
-  "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
-  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
-  "ZH125_El_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
-  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
-  "tW_Mu_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
-  "tW_El_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
-  "tbarW_Mu_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
-  "tbarW_El_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "MuA_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim53X/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim53X/El_DataB/" ,
+  "Mu_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
+  "El_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
+  "TT_Mu_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
+  "TT_El_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
+  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
   "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
   "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
   "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
   "ZA_Mu_MC" : "/nfs/user/acaudron/ZApat/",
   "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
   }
-
-###############################
-### Proxy for eventCategory ###
-###############################
-
-jetHandle = Handle ("vector<pat::Jet>")
-metHandle = Handle ("vector<pat::MET>")
-zmuHandle = Handle ("vector<reco::CompositeCandidate>")
-zeleHandle = Handle ("vector<reco::CompositeCandidate>")
-trigInfoHandle = Handle ("pat::TriggerEvent")
-genHandle = Handle ("vector<reco::GenParticle>")
-vertexHandle = Handle ("vector<reco::Vertex>")
-#rhoHandle = Handle ("double")
-
-
-def category(event,muChannel,ZjetFilter,checkTrigger,btagAlgo):
-  """Compute the event category for histogramming"""
-  if not ZjetFilter=="bcl":
-    event.getByLabel (zbblabel.genlabel,genHandle)
-    genParticles = genHandle.product()
-    if isZbEvent(genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
-    if (isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
-    if (not isZcEvent(genParticles,0,False) and not isZbEvent(genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
-  event.getByLabel(zbblabel.jetlabel,jetHandle)
-  event.getByLabel(zbblabel.metlabel,metHandle)
-  event.getByLabel(zbblabel.zmumulabel,zmuHandle)
-  event.getByLabel(zbblabel.zelelabel,zeleHandle)
-  event.getByLabel(zbblabel.vertexlabel,vertexHandle)
-  #event.getByLabel("kt6PFJetsForIsolation","rho",rhoHandle)
-
-  runNumber= event.eventAuxiliary().run()
-  
-  jets = jetHandle.product()
-  met = metHandle.product()
-  zCandidatesMu = zmuHandle.product()
-  zCandidatesEle = zeleHandle.product()
-  vertices = vertexHandle.product()
-  #rho = rhoHandle.product()
-  if checkTrigger:
-    event.getByLabel(zbblabel.triggerlabel,trigInfoHandle)
-    triggerInfo = trigInfoHandle.product()
-  else:
-    triggerInfo = None
-  #print triggerInfo   
-  return eventCategory(triggerInfo, zCandidatesMu, zCandidatesEle, vertices, jets, met, runNumber, muChannel, btagAlgo, event.eventAuxiliary().luminosityBlock())
 
 ############################################
 ### Define RooRealVars and RooCategories ###
@@ -195,8 +133,6 @@ checkTrigger = {
   "ElB_DATA"     : True ,
   "Mu_MC"        : False,
   "El_MC"        : False,
-  "Zbb_Mu_MC"    : False,
-  "Zbb_El_MC"    : False,
   "TT_Mu_MC"     : False,
   "TT_El_MC"     : False,
   "ZZ_Mu_MC"     : False,
@@ -211,10 +147,6 @@ checkTrigger = {
   "ZH130_El_MC"  : False,
   "ZH135_Mu_MC"  : False,
   "ZH135_El_MC"  : False,
-  "tW_Mu_MC"     : False,
-  "tW_El_MC"     : False,
-  "tbarW_Mu_MC"  : False,
-  "tbarW_El_MC"  : False,
   "evtgen_MC"    : False,
   "herwig_MC"    : False,
   "pythia_MC"    : False,
@@ -234,29 +166,29 @@ if channel[-2:] == "MC":
   prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 
 ### input
-
-#dirList=list(itertools.islice(os.listdir(path[channel]), jobNumber, None, Njobs))
-#files=[]
-#for fname in dirList:
-#  print "fname = ", fname
-#  files.append(path[channel]+"/"+fname)
 import glob
 files=glob.glob(path[channel]+"*")
 print "files = ", files  
-events = Events (files)
+events = AnalysisEvent (files)
+prepareAnalysisEvent(events, btagging=btagAlgo,ZjetFilter="bcl",checkTrigger=checkTrigger[channel])
+
+if channel[-2:] == "MC":
+  events.addWeight("PileUp",LumiReWeighting(MonteCarloFileName=MonteCarloPUFileName, DataFileName=DataPUFileName, systematicShift=0))
+  events.addWeight("Btagging",btaggingWeight(0,999,0,999,file=btagPerfData))
+  events.addWeight("Leptons",LeptonsReWeighting())
+
 
 ### booking
 
-escp.beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
+escp.beginJob()
 brcp.beginJob() 
 lrcp.beginJob()             
 jmcp.beginJob(btagging=btagAlgo)
-if muChannel[channel] : vacp.beginJob(zlabel=zbblabel.zmumulabel)
-else : vacp.beginJob(zlabel=zbblabel.zelelabel)
+vacp.beginJob()
 if channel[-2:] == "MC":
-  mscp.beginJob(genlabel=zbblabel.genlabel)
-  prcp.beginJob(MonteCarloPUFileName, DataPUFileName, vertexlabel=zbblabel.vertexlabel, pulabel=zbblabel.pulabel)
-
+  mscp.beginJob()
+  prcp.beginJob()
+  
 ntuple = getArgSet([escp
 #                   , mscp
 #                   , prcp
@@ -289,17 +221,20 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
-      categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo=btagAlgo)
+      if muChannel :
+        categoryData=event.catMu
+      else :
+        categoryData=event.catEle
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
-      escp.processEvent(event)
-      brcp.processEvent(event,btagging=btagAlgo)
-      lrcp.processEvent(event)
-      jmcp.processEvent(event)
-      vacp.processEvent(event)
+      escp.process(event)
+      brcp.process(event,btagging=btagAlgo)
+      lrcp.process(event)
+      jmcp.process(event)
+      vacp.process(event)
       if channel[-2:] == "MC":
-        mscp.processEvent(event)
-        prcp.processEvent(event)
+        mscp.process(event)
+        prcp.process(event)
       
       ras_escp=escp._obsSet
       ras_lrcp=lrcp._obsSet
