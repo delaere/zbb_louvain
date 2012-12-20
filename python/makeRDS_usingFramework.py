@@ -157,11 +157,11 @@ checkTrigger = {
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
-brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
-lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 if channel[-2:] == "MC":
+  brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
+  lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
   mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
   prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 
@@ -181,11 +181,11 @@ if channel[-2:] == "MC":
 ### booking
 
 escp.beginJob()
-brcp.beginJob() 
-lrcp.beginJob()             
 jmcp.beginJob(btagging=btagAlgo)
 vacp.beginJob()
 if channel[-2:] == "MC":
+  brcp.beginJob() 
+  lrcp.beginJob()             
   mscp.beginJob()
   prcp.beginJob()
   
@@ -228,28 +228,28 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
       escp.process(event)
-      brcp.process(event,btagging=btagAlgo)
-      lrcp.process(event)
       jmcp.process(event)
       vacp.process(event)
       if channel[-2:] == "MC":
+        brcp.process(event,btagging=btagAlgo)
+        lrcp.process(event)
         mscp.process(event)
         prcp.process(event)
       
       ras_escp=escp._obsSet
-      ras_lrcp=lrcp._obsSet
-      ras_brcp=brcp._obsSet
       ras_jmcp=jmcp._obsSet
       ras_vacp=vacp._obsSet
       if channel[-2:] == "MC":
+        ras_lrcp=lrcp._obsSet
+        ras_brcp=brcp._obsSet
         ras_mscp=mscp._obsSet
         ras_prcp=prcp._obsSet
 
-      ras_escp.add(ras_lrcp)
-      ras_escp.add(ras_brcp)
-      ras_escp.add(ras_jmcp)
       ras_escp.add(ras_vacp)
+      ras_escp.add(ras_jmcp)
       if channel[-2:] == "MC":
+        ras_escp.add(ras_lrcp)
+        ras_escp.add(ras_brcp)
         ras_escp.add(ras_mscp)
         ras_escp.add(ras_prcp)
 
@@ -258,11 +258,11 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       i += 1
 
     escp.endJob()
-    brcp.endJob()
-    lrcp.endJob()
     jmcp.endJob()
     vacp.endJob()
     if channel[-2:] == "MC":
+      brcp.endJob()
+      lrcp.endJob()
       mscp.endJob()
       prcp.endJob()
 
@@ -273,7 +273,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     #ws.writeToFile("File_rds_zbb_"+channel+".root") 
     #gDirectory.Add(ws)
 
-    f=TFile("RDSwithVA/File_rds_zbb_"+channel+".root","RECREATE")
+    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
     rds_zbb.Write()
     f.Close()
 
