@@ -14,33 +14,36 @@ import sys
 import LaunchOnCondor
 import glob
 
-from optparse import OptionParser
-#import sys
-#usage="""%prog [options]"""
-#description="""A simple script to generate control plots."""
-#epilog="""Example:
-#./ControlPlots.py -i /storage/data/cms/store/user/favereau/MURun2010B-DiLeptonMu-Dec22/ -o controlPlots_MURun2010B.root --all
-#"""
-#parser = OptionParser(usage=usage,add_help_option=True,description=description,epilog=epilog)
-parser = OptionParser()
-parser.add_option("-w", "--which", dest="which",
-                  help="which sample to analyse.", metavar="WHICH")
-(options, args) = parser.parse_args()
+samples = [
+            "DY_MC",
+            "TT_MC",
+            "Mu_DataA",
+            "El_DataA",
+            "Mu_DataB",
+            "El_DataB",
+            "ZZ_MC",
+            #"ZH115_MC",
+            #"ZH120_MC",
+            "ZH125_MC",
+            #"ZH130_MC",
+            #"ZH135_MC"
+            ]
 
-whichSample = options.which
-
-print "sample = ", whichSample
-
-FarmDirectory = "FARM"
-JobName = "Zmumubb_"+options.which
+FarmDirectory = "FARM_skim"
+JobName = "Skim_pats"
 LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 LaunchOnCondor.Jobs_RunHere= 1
-for i in range(1,11):
-    command = "/home/fynu/tdupree/scratch/testMakeRDSfromControlPlots2/CMSSW_4_2_7/src/UserCode/zbb_louvain/test/skimDY_423_cfg.py"  
-    option  = " sample="+whichSample+" slice="+str(i)  
-    print "command = ", command
-    print "option  = ", option
-    LaunchOnCondor.SendCluster_Push(["CMSSW", command, option ])
+
+for s in samples :
+    whichSample = s #options.which
+    os.system('mkdir /nfs/user/acaudron/skim53X/'+whichSample)
+            
+    for i in range(1,11):
+        command = "/nfs/user/acaudron/CMSSW_5_3_2_patch4/src/UserCode/zbb_louvain/test/skimDY_423_cfg.py"  
+        option  = " sample="+whichSample+" slice="+str(i)  
+        print "command = ", command
+        print "option  = ", option
+        LaunchOnCondor.SendCluster_Push(["CMSSW", command, option ])
 LaunchOnCondor.SendCluster_Submit()
 
