@@ -221,7 +221,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
-      if muChannel :
+      if _muChan :
         categoryData=event.catMu
       else :
         categoryData=event.catEle
