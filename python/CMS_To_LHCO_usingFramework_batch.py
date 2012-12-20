@@ -484,7 +484,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
 
     met = event.MET
 
-    if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1 and isGoodMet_Sig(met[0]):
+    if isInCategory(stage, categTuple) and isGoodMet_Sig(met[0]):
         
       if muChannel:
         bestZ = event.bestZmumuCandidate
