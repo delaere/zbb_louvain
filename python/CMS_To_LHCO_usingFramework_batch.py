@@ -6,7 +6,7 @@ import sys
 import os
 from AnalysisEvent import AnalysisEvent
 from monteCarloSelection import *
-from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent, findDijetPair, isBJet, categoryNames
+from eventSelection import eventCategories, eventCategory, isInCategory, prepareAnalysisEvent, findDijetPair, isBJet, categoryNames, isGoodMet_Sig
 from LumiReWeighting import LumiReWeighting
 from zbbCommons import zbblabel
 from math import *
@@ -16,7 +16,84 @@ from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 
 print sys.argv 
 
+channel = sys.argv[1]
+
 _JECuncertainty = JetCorrectionUncertaintyProxy()
+
+############
+### Maps ###
+############
+
+muChannel = { "MuA_DATA"     : True ,
+              "ElA_DATA"     : False,
+              "MuB_DATA"     : True ,
+              "ElB_DATA"     : False,
+              "Mu_MC"        : True ,
+              "El_MC"        : False,
+              "Zbb_Mu_MC"    : True ,
+              "Zbb_El_MC"    : False,
+              "TT_Mu_MC"     : True ,
+              "TT_El_MC"     : False,
+              "ZZ_Mu_MC"     : True ,
+              "ZZ_El_MC"     : False,
+              "ZH115_Mu_MC"  : True ,
+              "ZH115_El_MC"  : False,
+              "ZH120_Mu_MC"  : True ,
+              "ZH120_El_MC"  : False,
+              "ZH125_Mu_MC"  : True ,
+              "ZH125_El_MC"  : False,
+              "ZH130_Mu_MC"  : True ,
+              "ZH130_El_MC"  : False,
+              "ZH135_Mu_MC"  : True ,
+              "ZH135_El_MC"  : False,
+              }
+
+path = {
+  "MuA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012A_V3/" ,
+  "ElA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012B_V3/" ,
+  "MuB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012A_V4/" ,
+  "ElB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012B_V4/" ,
+  "Mu_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
+  "El_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
+  "TT_Mu_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/"    ,
+  "TT_El_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/ZZ_Summer12_V2/"    ,
+  "ZZ_El_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/ZZ_Summer12_V2/"    ,
+  "ZH115_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH125_Summer12_V2/" ,
+  "ZH125_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH125_Summer12_V2/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH135_MC/" ,
+  }
+
+checkTrigger = {
+  "MuA_DATA"     : True ,
+  "ElA_DATA"     : True ,
+  "MuB_DATA"     : True ,
+  "ElB_DATA"     : True ,
+  "Mu_MC"        : False,
+  "El_MC"        : False,
+  "TT_Mu_MC"     : False,
+  "TT_El_MC"     : False,
+  "ZZ_Mu_MC"     : False,
+  "ZZ_El_MC"     : False,
+  "ZH115_Mu_MC"  : False,
+  "ZH115_El_MC"  : False,
+  "ZH120_Mu_MC"  : False,
+  "ZH120_El_MC"  : False,
+  "ZH125_Mu_MC"  : False,
+  "ZH125_El_MC"  : False,
+  "ZH130_Mu_MC"  : False,
+  "ZH130_El_MC"  : False,
+  "ZH135_Mu_MC"  : False,
+  "ZH135_El_MC"  : False,
+  }
+
 
 #Global variables
 idPartons_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
@@ -36,34 +113,6 @@ def CodeDYprod(genParticles):
   
     if part.status()!=3:
       break
-      
-#    print "N=", npart, " id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#    if part.pdgId()==2212: 
-#      npart += 1
-#      continue
-#    for n in range(0, part.numberOfMothers()):
-#      print "  id=", part.mother(n).pdgId(), " status=", part.mother(n).status(), " nMothers=", part.mother(n).numberOfMothers(), " ndaughters=", part.mother(n).numberOfDaughters(), " px=", part.mother(n).px()
-#      for n2 in range(0, part.mother(n).numberOfMothers()):
-#        print "    id=", part.mother(n).mother(n2).pdgId(), " status=", part.mother(n).mother(n2).status(), " nMothers=",  part.mother(n).mother(n2).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).numberOfDaughters(), " px=", part.mother(n).mother(n2).px()
-#        for n3 in range(0, part.mother(n).mother(n2).numberOfMothers()):
-#          print "      id=", part.mother(n).mother(n2).mother(n3).pdgId(), " status=", part.mother(n).mother(n2).mother(n3).status(), " nMothers=",  part.mother(n).mother(n2).mother(n3).numberOfMothers()," ndaughters=", part.mother(n).mother(n2).mother(n3).numberOfDaughters(), " px=", part.mother(n).mother(n2).mother(n3).px()
-
-#
-
-#    for n in range(0, part.numberOfDaughters()):
-#      #print "  id=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px()
-#      if part.daughter(n).pdgId()==23:
-#        print "idn1=", part.daughter(n).pdgId(), " status=", part.daughter(n).status(), " nMothers=", part.daughter(n).numberOfMothers(), " ndaughters=", part.daughter(n).numberOfDaughters(), " px=", part.daughter(n).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#
-#      for n2 in range(0, part.daughter(n).numberOfDaughters()):
-#        #print "    id=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px()
-#        if part.daughter(n).daughter(n2).pdgId() ==23:
-#	  print "idn2=", part.daughter(n).daughter(n2).pdgId(), " status=", part.daughter(n).daughter(n2).status(), " nMothers=",  part.daughter(n).daughter(n2).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
-#
-#        for n3 in range(0, part.daughter(n).daughter(n2).numberOfDaughters()):
-#          #print "      id=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px()
-#          if part.daughter(n).daughter(n2).daughter(n3).pdgId()==23:
-#	    print "idn3=", part.daughter(n).daughter(n2).daughter(n3).pdgId(), " status=", part.daughter(n).daughter(n2).daughter(n3).status(), " nMothers=",  part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters()," ndaughters=", part.daughter(n).daughter(n2).daughter(n3).numberOfDaughters(), " px=", part.daughter(n).daughter(n2).daughter(n3).px(), "|||id=", part.pdgId(), " nMothers=", part.numberOfMothers()," nDaughters=", part.numberOfDaughters(), " px=", part.px()
 
     npart += 1
 
@@ -170,7 +219,7 @@ def Delta(par1,par2):
   delta=sqrt((delta_phi)**2 + (par1.eta()-par2.eta())**2)
   return delta
 
-def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=None , numberOfInteractions=None, muChannel=True):
+def DumpLHCOEvent(file=None, fwevent=None, numberOfInteractions=None, bestZcandidate=None, dijet=None):
 
   """Dump informations about a given event in the LHCO format for MadWeight"""
   # output must be specified
@@ -179,32 +228,12 @@ def DumpLHCOEvent(fwevent=None, run=None, event=None, lumi=None, path="", file=N
     return
   # in case no fwevent is provided, find it using run,event,(lumi)
   if fwevent is None:
-    if (run is None) or (event is None):
-      print "DumpLHCOEvent Error: either pass a fwlite event or give both run and event number"
-      return
-    # find event based on run  and event    
-    if os.path.isdir(path):
-      files=[]
-      dirList=os.listdir(path)      
-      for fname in dirList:
-        files.append(path+fname)
-    elif os.path.isfile(path):
-      files=[path]
-    else:
-      files=[]
-    events = AnalysisEvent(files)
-    # there is the method to(run, event) can we use it ???
-    DumpLHCOEvent(events[(run,event,lumi)])
+    print "DumpLHCOEvent could not find event"
     return
-  # in case a fwevent is provided, use it
-  #prepareAnalysisEvent(fwevent, btagging="CSV",ZjetFilter="bcl",checkTrigger=True)
 
-  if muChannel:
-    bestZcandidate = fwevent.bestZmumuCandidate
-  else:
-    bestZcandidate = fwevent.bestZelelCandidate
-
-  dijet = findDijetPair(fwevent, "CSV", muChannel, (not muChannel))
+  if bestZcandidate is None or dijet is None:
+    print "DumpLHCOEvent no Z or no dijet pair"
+    return
 
   if dijet[1] is None :
     print "njets < 2"
@@ -244,16 +273,6 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 ### Proxy for eventCategory ###
 ###############################
 
-#data muChannel
-#def dumpAll(stage=12, muChannel=True, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#data elChannel
-#def dumpAll(stage=12, muChannel=False, isData=True, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#MC muChannel
-#def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarciaj/scratch/DYJets_Summer11_fewfiles/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=None, Nfiles=10, Suffix=""):
-
-#MC elChannel
 def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
 
   if (muChannel):
@@ -462,10 +481,11 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
       categTuple=event.catMu
     else :
       categTuple=event.catEle
-    if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1:
-        
-      DumpLHCOEvent(event, None, None, None, "", out_file_INCL,numberOfInteractions,muChannel)
 
+    met = event.MET
+
+    if isInCategory(stage, categTuple) and  isInCategory( 3, categTuple) and categTuple[3]>1 and isGoodMet_Sig(met[0]):
+        
       if muChannel:
         bestZ = event.bestZmumuCandidate
         goodJets = event.goodJets_mu
@@ -473,13 +493,16 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
         bestZ = event.bestZelelCandidate
         goodJets = event.goodJets_ele
 
+      dijet = findDijetPair(event, "CSV", muChannel, (not muChannel)) 
+
+      DumpLHCOEvent(out_file_INCL, event, numberOfInteractions,muChannel, bestZ, dijet)
+
       bjetp=0
       for index,jet in enumerate(event.jets):
         if goodJets[index]:
           if isBJet(jet, "HE", "CSV"):
             bjetp+=1
       if bjetp>1:
-        dijet = findDijetPair(event, "CSV", muChannel, (not muChannel)) 
         l1=bestZ.daughter(0)
         l2=bestZ.daughter(1)
 
@@ -518,7 +541,6 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
 	
 
         #info about MET
-        met = event.MET
         Met[0] = met[0].pt()
         Met_phi[0] = met[0].phi()
         Met_sig[0] = 0.
@@ -582,4 +604,5 @@ for index,cat in enumerate(categoryNames):
     stageNumber=index
     break
 
-dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=stageNumber)    
+#dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=stageNumber)    
+dumpAll(path=path[channel], isData=checkTrigger[channel], muChannel=muChannel[channel],numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=channel+sys.argv[4], stage=stageNumber)
