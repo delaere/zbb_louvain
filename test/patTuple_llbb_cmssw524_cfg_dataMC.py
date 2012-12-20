@@ -133,8 +133,8 @@ readFiles.extend([
     ])
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(reportEvery = cms.untracked.int32(1000))
-process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(-1) )
+process.MessageLogger.cerr.FwkReport  = cms.untracked.PSet(reportEvery = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet(  input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
                             fileNames = readFiles,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -188,14 +188,19 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ()
 # setup any defaults you want
-options.register('boolMC',
-                 0, # default value
+options.register('stringMC',
+                 "MC", # default value
                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
-                 VarParsing.VarParsing.varType.int,         # string, int, or float
+                 VarParsing.VarParsing.varType.string,         # string, int, or float
                  "MC flag")
 
 options.parseArguments()
-isMC = bool(options.boolMC)
+if options.boolMC=="MC":
+    isMC = True
+else :
+    isMC = False
+    dataIs = options.boolMC
+    
 
 ###remove MC matching for DATA and use the good collection for muons for MC
 if not isMC : removeMCMatching(process, ['All'])
@@ -206,9 +211,19 @@ process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(False),
                                      )
 
 if isMC :
-    process.GlobalTag.globaltag = 'START53_V7A::All'
-else :    
-    process.GlobalTag.globaltag = 'FT_53_V6_AN1::All'
+    process.GlobalTag.globaltag = 'START53_V7G::All'
+elif dataIs=="13Julrereco" :    
+    process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'
+elif dataIs=="06Augrereco" :
+    process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All'
+elif dataIs=="24Augrereco" :
+    process.GlobalTag.globaltag = 'FT_53_V10_AN3::All'
+elif dataIs=="Run2012Cv2" :
+    process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'
+elif dataIs=="Run2012D":
+    process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
+else:
+    print "error : argument doesn't correspond to any option"
 
 #import FWCore.PythonUtilities.LumiList as LumiList
 #import FWCore.ParameterSet.Types as CfgTypes
@@ -339,7 +354,7 @@ if isMC:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
                                                   'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
+                                                  #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
@@ -347,7 +362,7 @@ if isMC:
   process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
                                                   'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
+                                                  #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
@@ -356,7 +371,7 @@ else:
   process.tightElectrons = process.selectedPatElectrons.clone( cut = 
                                                   'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
+                                                  #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5'
@@ -364,7 +379,7 @@ else:
   process.matchedElectrons = process.cleanPatElectrons.clone( preselection =
                                                   'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
                                                   'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for data
-                                                  '((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
+                                                  #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' #fiducial cut
                                                   'abs(dB) < 0.02 &'
                                                   'pt>20 &'
                                                   'abs(eta) < 2.5 &'
@@ -442,7 +457,7 @@ process.pfIsolatedMuons.isolationCut = 0.5
 #################################
 #https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT#2012_Runs
 #Selection OK : need only to check if trigger became prescaled
-pathTriggerMu = 'path("HLT_Mu17_Mu8_v*",0,1)'# || path("HLT_Mu17_TkMu8_v*",0,1)'
+pathTriggerMu = 'path("HLT_Mu17_Mu8_v*",0,1) || path("HLT_Mu17_TkMu8_v*",0,1) || path("HLT_IsoMu24_v*",0,1)'
 
 process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
                                                   src     = cms.InputTag( 'selectedPatMuons' ) ,
@@ -735,8 +750,8 @@ process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
 process.patDefaultSequence.replace(process.selectedPatMuons,cms.Sequence(process.selectedPatMuons+process.selectedMuonsWithIsolationData))
 process.patDefaultSequence.replace(process.selectedPatElectrons,cms.Sequence(process.selectedPatElectrons+process.selectedElectronsWithIsolationData))
 process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuence+process.patJetsWithBeta))
-if not isMC : process.patDefaultSequence.replace(process.patTrigger,process.patTrigger*process.producePatPFMETobjectWithCorrections)
-else : process.patDefaultSequence.replace(process.patPFMet,process.producePatPFMETobjectWithCorrections)
+#if not isMC : process.patDefaultSequence.replace(process.patTrigger,process.patTrigger*process.producePatPFMETobjectWithCorrections)
+#else : process.patDefaultSequence.replace(process.patPFMet,process.producePatPFMETobjectWithCorrections)
 
 process.PFLeptons = cms.Sequence(
     process.TotalEventCounter*
@@ -755,7 +770,7 @@ process.PFLeptons = cms.Sequence(
     (process.preMuonSequence * process.preElectronSequence)*
     process.patPF2PATSequence *
     # this is to add the various corrections to the MET that we use.
-    #process.producePatPFMETobjectWithCorrections *
+    process.producePatPFMETobjectWithCorrections *
     process.bjets*                                             ## our b jets
     process.CSVbjets*
     process.JPbjets* 
