@@ -19,6 +19,7 @@ process = cms.Process("ZplusJets")
 #--- Tag ---    --- RelTag --- -------- Package --------
 #V00-02-10                     CMGTools/External
 #V06-05-06-03   V06-05-06-01   DataFormats/PatCandidates
+#V00-00-12      V00-00-14      CommonTools/RecoUtils
 #V00-00-18                     EGamma/EGammaAnalysisTools
 #V00-00-70      V00-00-66      FWCore/GuiBrowsers
 #V08-09-50      V08-09-37      PhysicsTools/PatAlgos
@@ -181,18 +182,18 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ()
 # setup any defaults you want
-options.register('stringMC',
+options.register('stringDATAMC',
                  "MC", # default value
                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                  VarParsing.VarParsing.varType.string,         # string, int, or float
                  "MC flag")
 
 options.parseArguments()
-if options.boolMC=="MC":
+if options.stringDATAMC=="MC":
     isMC = True
 else :
     isMC = False
-    dataIs = options.boolMC
+    dataIs = options.stringDATAMC
     
 
 ###remove MC matching for DATA and use the good collection for muons for MC
