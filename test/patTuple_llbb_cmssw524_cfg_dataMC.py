@@ -15,24 +15,17 @@ process = cms.Process("ZplusJets")
 #packages for 52X : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X
 #444pat : https://twiki.cern.ch/twiki/bin/view/CMSPublic/LeptonSelectionVjets2011
 
-#packages are for 532patch4, should work also in 533patch2 
-#--- Tag ---    -------- Package --------
-#V00-02-09      CMGTools/External
-#V00-03-16      CommonTools/ParticleFlow
-#V00-03-23      CommonTools/RecoAlgos
-#V00-00-13      CommonTools/RecoUtils
-#V02-06-05      DataFormats/HLTReco
-#V15-03-03      DataFormats/ParticleFlowCandidate
-#V00-02-14      DataFormats/StdDictionaries
-#V10-02-02      DataFormats/TrackReco
-#V02-00-04      DataFormats/VertexReco
-#V00-00-18      EGamma/EGammaAnalysisTools
-#V04-06-09      JetMETCorrections/Type1MET
-#V08-09-23      PhysicsTools/PatAlgos
-#V03-09-23      PhysicsTools/PatUtils
-#NoTag          UserCode/zbb_louvain
-#NoTag          ZbbAnalysis/AnalysisStep
-#NoTag          ZbbAnalysis/Tools
+#packages are for 537 
+#--- Tag ---    --- RelTag --- -------- Package --------
+#V00-02-10                     CMGTools/External
+#V06-05-06-03   V06-05-06-01   DataFormats/PatCandidates
+#V00-00-18                     EGamma/EGammaAnalysisTools
+#V00-00-70      V00-00-66      FWCore/GuiBrowsers
+#V08-09-50      V08-09-37      PhysicsTools/PatAlgos
+#V15-02-06      V15-02-05-01   RecoParticleFlow/PFProducer
+#NoTag                         UserCode/zbb_louvain
+#NoTag                         ZbbAnalysis/AnalysisStep
+#NoTag                         ZbbAnalysis/Tools
 #---------------------------------------
 
 #leptons : check triggers prescaled
