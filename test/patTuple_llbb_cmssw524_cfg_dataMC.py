@@ -2,11 +2,11 @@ import FWCore.ParameterSet.Config as cms
 #import os
 process = cms.Process("ZplusJets")
 
-#electron and muons approvals : https://indico.cern.ch/conferenceDisplay.py?confId=193787
+#electron and muons approvals : https://indico.cern.ch/conferenceDisplay.py?confId=193787, https://indico.cern.ch/conferenceDisplay.py?confId=172473
 #Muons : https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId , https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT
 #electrons : https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection , https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification , https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation
 
-#jet and met approvals : https://indico.cern.ch/conferenceDisplay.py?confId=172447
+#jet and met approvals : https://indico.cern.ch/conferenceDisplay.py?confId=172474 (including btag)
 #MET : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis , https://twiki.cern.ch/twiki/bin/view/CMS/MissingET
 #Jet : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections , https://twiki.cern.ch/twiki/bin/view/CMS/JetID , https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetID 
 
