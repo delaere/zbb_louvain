@@ -227,14 +227,14 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
         categoryData=event.catEle
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
-      escp.process(event)
-      jmcp.process(event)
-      vacp.process(event)
+      escp.processEvent(event)
+      jmcp.processEvent(event)
+      vacp.processEvent(event)
       if channel[-2:] == "MC":
-        brcp.process(event,btagging=btagAlgo)
-        lrcp.process(event)
-        mscp.process(event)
-        prcp.process(event)
+        brcp.processEvent(event,btagging=btagAlgo)
+        lrcp.processEvent(event)
+        mscp.processEvent(event)
+        prcp.processEvent(event)
       
       ras_escp=escp._obsSet
       ras_jmcp=jmcp._obsSet

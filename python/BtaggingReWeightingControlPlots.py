@@ -60,7 +60,7 @@ def runTest(path="../testfiles/ttbar/"):
   i = 0
   for event in events:
     if i%1000==0 : print "Processing... event ", i
-    controlPlots.process(event)
+    controlPlots.processEvent(event)
     i += 1
   controlPlots.endJob()
 
