@@ -1,7 +1,6 @@
 #include <vector>
 #include <map>
 #include <iostream>
-#include <string>
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
@@ -25,7 +24,6 @@ class plotCombiner {
      plotCombiner(edm::ParameterSet& options) {
        _nostack = options.getUntrackedParameter("nostack",false);
        _lumi = options.getUntrackedParameter("luminosity",1.);
-       _rescaleMu = options.getUntrackedParameter("lumiMuCor",1.);
        _autoLumiScaling = options.getUntrackedParameter("autoLumiScaling",false);
        _lat = new TLatex(0.2,0.87,options.getUntrackedParameter("label",std::string("")).c_str());
        _leg = new TLegend(0.6,0.7,0.9,0.9);
@@ -63,7 +61,7 @@ class plotCombiner {
        _legendCompleted = false;
      }
    private:
-     void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output, std::string channel, std::string stage);
+     void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      void CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      TH1* Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterator& style);
      std::vector<edm::ParameterSet> _dataInputs;
@@ -75,10 +73,6 @@ class plotCombiner {
      double _lumi;
      TLegend* _leg;
      TLatex* _lat;
-     double _rescaleMu;
-     std::string channel;
-     std::string stage;
-
 };
 
 void setTDRStyle() {
@@ -219,7 +213,7 @@ int main(int argc, char *argv[]){
   return 0;
 }
 
-void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output, std::string channel, std::string stage)
+void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output)
 {
    // we need something called data to initialize the canvas and stack.
    // if no data is provided, copy first MC.
@@ -248,30 +242,10 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    data->SetTitle("data");
    if(!_legendCompleted) _leg->AddEntry(data,"Data","LEP");
    // now to the MC
-   int nf = 0;
    std::vector<edm::ParameterSet>::const_iterator mcConf = _mcInputs.begin();
    for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it, ++mcConf) {
      TH1* h;
      (*it)->GetObject(data->GetName(),h);
-
-     double rescaleCombined = 1;
-     if(channel=="Combined"){
-       std::string MM = (*it)->GetName();
-       std::string MM2 = data->GetName();
-       MM = "MuMuChannel/"+stage+"/"+MM+"/"+MM2;
-       //std::cout<<MM<<std::endl;
-       TH1F *mumu;
-       _filesMC[nf]->GetObject(MM.c_str(),mumu);
-       if(mumu==NULL) _filesMC[nf]->GetObject((MM+"Mu").c_str(),mumu);
-       int nentries = mumu->GetEntries();
-       int Centries = h->GetEntries();
-       if(Centries>0) rescaleCombined = double(Centries-nentries+nentries*_rescaleMu)/double(Centries);
-       //std::cout<<rescaleCombined<<std::endl;
-       nf++;
-     }
-
-
-
      // title
      h->SetTitle(mcConf->getParameter<std::string>("role").c_str());
      // color and style
@@ -286,11 +260,7 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      }
      // scale
      h->Sumw2();
-     double scale = mcConf->getParameter<double>("scale");
-     if(channel=="MuMu") scale *= _rescaleMu;
-     if(channel=="Combined") scale *= rescaleCombined;
-     //if(channel=="EE") std::cout<<scale<<std::endl;
-     h->Scale(scale);
+     h->Scale(mcConf->getParameter<double>("scale"));
      if(_autoLumiScaling)
        h->Scale(_lumi);
      // rebin
@@ -420,16 +390,6 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
    TKey *key;
    while ((key = (TKey*) next())) {
      if(key->IsFolder()) {
-	std::string k = key->GetName();
-	if(k.find("MuMu")==0 || k.find("EE")==0 || k.find("Combined")==0){
-	  if(k.find("MuMu")==0) channel="MuMu";
-	  else if(k.find("EE")==0) channel="EE";
-	  else if(k.find("Combined")==0) channel="Combined";
-	  std::cout<<key->GetName()<<" , "<<channel<<std::endl;
-	}
-	if(k.find("stage")==0){
-	  stage=k;
-	}
         std::vector<TDirectory*> dataitems;
         for(std::vector<TDirectory*>::const_iterator it = datadirs.begin();it<datadirs.end();++it) {
           TDirectory* dir;
@@ -444,7 +404,7 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
         }
         CombineDir(dataitems, mcitems, output->mkdir(key->GetName(),key->GetTitle()));
      } else if (key->ReadObj()->InheritsFrom("TH1")) {
-       CombineHistos(key->GetName(),datadirs,mcdirs,output,channel,stage);
+        CombineHistos(key->GetName(),datadirs,mcdirs,output);
      }
    }
 }
