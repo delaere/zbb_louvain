@@ -32,12 +32,12 @@ def RemoveErrorsHisto(h):
 ### sample/wp/selection of interest
 #####################################################
 
-WP       = "16"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
-channel  = "Mu"    #"El","Mu"
+WP       = "17"    #"HP","HPMET","HP_excl","HE","HEmet","He_excl"
+channel  = "El"    #"El","Mu"
 #extraCut = "eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
-extraCut = "eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
+#extraCut = "eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.&jetmetbjet1pt>25&jetmetbjet2pt>25"
 
-#extraCut = ""
+extraCut = ""
 #extraCut = "mlphiggsvszbb>0.35&mlphiggsvstt>0.35&mlphiggsvszz>0.35"
 
 totalCutString = ""+extraCut
@@ -52,7 +52,7 @@ totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
 sampleList  = ["DATA","DY","TT","ZZ","ZH125"]
 
 
-lumi = { "DATA"   : zbbnorm.lumi_tot2011,
+lumi = { "DATA"   : zbbnorm.lumi_totMu2011,
          "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
          "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
          "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
@@ -102,24 +102,26 @@ myRDS_red_w = {}
 #  print "Invalid channel name = ", channel, ". Exitting!"
 #  exit()
 #
-inputfolder ="/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/"
+#inputfolder ="/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/RDS_ME/"
+inputfolder ="/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsCSV2011/"
+
 
 if channel  == "El" :
-  filename = {"DATA_A" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ElA_DATA.root",
-                 "DATA_B" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ElB_DATA.root",
-                 "TT"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_TT_El_MC.root",
-                 "DY"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_El_MC.root",
-                 "ZZ"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZZ_El_MC.root",
-                 "ZH125"  : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZH125_El_MC.root"
+  filename = {"DATA_A" : inputfolder+"RDS_rdsME_ElA_DATA.root",
+                 "DATA_B" : inputfolder+"RDS_rdsME_ElB_DATA.root",
+                 "TT"     : inputfolder+"RDS_rdsME_TT_El_MC.root",
+                 "DY"     : inputfolder+"RDS_rdsME_El_MC.root",
+                 "ZZ"     : inputfolder+"RDS_rdsME_ZZ_El_MC.root",
+                 "ZH125"  : inputfolder+"RDS_rdsME_ZH125_El_MC.root"
                  }
 		 
 elif channel == "Mu" :
-  filename = {"DATA_A" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_MuA_DATA.root",
-                 "DATA_B" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_MuB_DATA.root",
-                 "TT"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_TT_Mu_MC.root",
-                 "DY"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_Mu_MC.root",
-                 "ZZ"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZZ_Mu_MC.root",
-                 "ZH125"  : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZH125_Mu_MC.root"
+  filename = {"DATA_A" : inputfolder+"RDS_rdsME_MuA_DATA.root",
+                 "DATA_B" : inputfolder+"RDS_rdsME_MuB_DATA.root",
+                 "TT"     : inputfolder+"RDS_rdsME_TT_Mu_MC.root",
+                 "DY"     : inputfolder+"RDS_rdsME_Mu_MC.root",
+                 "ZZ"     : inputfolder+"RDS_rdsME_ZZ_Mu_MC.root",
+                 "ZH125"  : inputfolder+"RDS_rdsME_ZH125_Mu_MC.root"
                  }
 else :
   print "Invalid channel name = ", channel, ". Exitting!"
@@ -170,20 +172,20 @@ for sample in sampleList :
 
 ras_zbb = myRDS["Zb"].get()
 
-rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHE"]  ,
-           "6"  : ras_zbb["BtaggingReweightingHP"]  ,
-           "7"  : ras_zbb["BtaggingReweightingHE"]  ,
-           "8"  : ras_zbb["BtaggingReweightingHP"]  ,
-           "9"  : ras_zbb["BtaggingReweightingHEHE"], 
-           "10" : ras_zbb["BtaggingReweightingHEHP"],
-           "11" : ras_zbb["BtaggingReweightingHPHP"],
-           "12" : ras_zbb["BtaggingReweightingHEHE"],
-           "13" : ras_zbb["BtaggingReweightingHEHP"],
-           "14" : ras_zbb["BtaggingReweightingHPHP"],
-           "15" : ras_zbb["BtaggingReweightingHE"]  ,
+rrv_w_b = {"5"  : ras_zbb["BtaggingReweightingHP"]  ,
+           "6"  : ras_zbb["BtaggingReweightingHE"]  ,
+           "7"  : ras_zbb["BtaggingReweightingHP"]  ,
+           "8"  : ras_zbb["BtaggingReweightingHE"]  ,
+           "9"  : ras_zbb["BtaggingReweightingHP"], 
+           "10" : ras_zbb["BtaggingReweightingHEHE"],
+           "11" : ras_zbb["BtaggingReweightingHEHP"],
+           "12" : ras_zbb["BtaggingReweightingHPHP"],
+           "13" : ras_zbb["BtaggingReweightingHEHE"],
+           "14" : ras_zbb["BtaggingReweightingHEHP"],
+           "15" : ras_zbb["BtaggingReweightingHEHP"]  ,
            "16" : ras_zbb["BtaggingReweightingHEHE"], 
-           "18" : ras_zbb["BtaggingReweightingHEHP"],
-           "19" : ras_zbb["BtaggingReweightingHPHP"],
+           "17" : ras_zbb["BtaggingReweightingHEHP"],
+           "18" : ras_zbb["BtaggingReweightingHPHP"],
            
            }
 
@@ -194,16 +196,16 @@ rrv_w_ptz = ras_zbb["eventSelectionbestzptMu"]
 #w = RooFormulaVar("w","w", "1.*1.", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 
 w1 = RooFormulaVar("w1","w1", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
-#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*1.1", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 
 #357.15/402.1   392.86/400.05  393.94/401.23
 #276.63/313.7 electron
 
-#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(392.86/400.05)*(-9.25908e-13* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.0011533 *min(@3*@3,3.06250000000000000e+04) + 0.0264567 *min(@3,175.) +0.687981))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz)) 
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(392.86/400.05)*(-9.25908e-13* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.0012533 *min(@3*@3,3.06250000000000000e+04) + 0.0264567 *min(@3,175.) +0.687981))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz)) 
 
-#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(1.)*(-9.25908e-13*2* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10*2* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 *2* min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *2* min(@3*@3*@3,5.35937500000000000e+06) -0.0011533 *2* min(@3*@3,3.06250000000000000e+04) + 0.0264567 *2* min(@3,175.) +0.687981/2.))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+#w2 = RooFormulaVar("w2","w2", "@0*@1*@2*(1.1*(1.)*(-9.25908e-13*2* min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 6.83686e-10*2* min(@3*@3*@3*@3*@3,1.64130859375000000e+11) -1.8346e-07 *2* min(@3*@3*@3*@3,9.37890625000000000e+08) + 2.19074e-05 *2* min(@3*@3*@3,5.35937500000000000e+06) -0.0012533 *2* min(@3*@3,3.06250000000000000e+04) + 0.0264567 *2* min(@3,175.) +0.687981/2.))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
 
-w2 = RooFormulaVar("w2","w2", "@0*@1*@2*((419.86/414.71)*(-1.84241e-12 * min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 1.41919e-09 * min(@3*@3*@3*@3*@3,1.64130859375000000e+11) - 3.89175e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 4.77903e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.00266683*min(@3*@3,3.06250000000000000e+04) + 0.0646297*min(@3,175.) +0.320127))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
+w2 = RooFormulaVar("w2","w2", "@0*@1*@2*((417.8/413.5)*(-1.84241e-12 * min(@3*@3*@3*@3*@3*@3,2.87229003906250000e+13) + 1.41919e-09 * min(@3*@3*@3*@3*@3,1.64130859375000000e+11) - 3.89175e-07 * min(@3*@3*@3*@3,9.37890625000000000e+08) + 4.77903e-05 *min(@3*@3*@3,5.35937500000000000e+06) -0.00266683*min(@3*@3,3.06250000000000000e+04) + 0.0646297*min(@3,175.) +0.320127))", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
 
 #w = RooFormulaVar("w","w", "1.", RooArgList(rrv_w_b[WP],rrv_w_lep,rrv_w_lumi))
 
@@ -291,6 +293,8 @@ namePlotList = [
      "eventSelectionbestzptEle"   ,
     "jetmetbjet1pt"              ,   
     "jetmetbjet2pt"              ,   
+    "jetmetbjet1CSVdisc"              ,   
+    "jetmetbjet2CSVdisc"              ,   
     "jetmetMET"                  ,
     "eventSelectiondphiZbb"      ,
     "eventSelectiondphiZbj1"     , 
@@ -305,29 +309,30 @@ namePlotList = [
     ,"mlpZbbvsTTtight"
      ,"jetmetnj"
      ,"mlpZbbvsTT_tight_Wmet"
-     ,"mlphiggsvszbb"
-    ,"mlphiggsvstt"
-    ,"mlphiggsvszz"
-    ,"mlphiggsvsbkg"
-    ,"mlphiggsvsbkg_fulll"
-    ,"mlphiggsvszbb_mu"
-    ,"mlphiggsvstt_mu"
-    ,"mlphiggsvszz_mu"
-    ,"mlphiggsvsbkg_mu"
-    ,"mlpZbbvsTT_mu"
-    ,"mlpzbbvstt_multi_EE_tight"
+     ,"mlphiggsvszbb_125"
+    ,"mlphiggsvstt_125"
+#    ,"mlphiggsvszz_125"
+    ,"mlphiggsvsbkg_125"
+#    ,"mlphiggsvsbkg_fulll_125"
+#    ,"mlphiggsvszbb_125_mu"
+#    ,"mlphiggsvstt_125_mu"
+#    ,"mlphiggsvszz_125_mu"
+#    ,"mlphiggsvsbkg_125_mu"
+#    ,"mlpZbbvsTT_mu"
+#    ,"mlpzbbvstt_multi_EE_tight"
     ,"Wgg"           
     ,"Wqq"           
     ,"Wtt"           
 #    ,"Wtwb"           
     ,"Wzz3"          
     ,"Wzz0"           
-    ,"Whi3"           
-    ,"Whi0"
+    ,"Whi3_125"           
+    ,"Whi0_125"
     ,"jetmetMETsignificance"
      ,"jetmetMET"
-    ,"mlpzbbttmmll_MeTtest_mll_met"
-    ,"mlpzbbttmlltest_mll"
+##    ,"mlpzbbttmmll_MeTtest_mll_met"
+##    ,"mlpzbbttmlltest_mll"
+##    ,"ProdEstimator"
     ]
 
 ################
@@ -342,6 +347,8 @@ min = {
     "eventSelectiondrZbj1"      :    0 ,
     "jetmetbjet1pt"             :    5 ,
     "jetmetbjet2pt"             :    5 ,   
+    "jetmetbjet1CSVdisc"             :    0 ,
+    "jetmetbjet2CSVdisc"             :    0 ,   
     "jetmetMET"                 :    0 , 
     "eventSelectiondphiZbj1"    :    0 ,
     "eventSelectiondphiZbb"     :    0 ,
@@ -362,15 +369,15 @@ min = {
     ,"mlpZbbvsTT_tight_Wmet" : -0.2
     ,"mlpzbbvstt_multi_EE_tight" : -0.2
     ,"jetmetnj":2
-    ,"mlphiggsvszbb": -0.5
-    ,"mlphiggsvstt": -0.5
-    ,"mlphiggsvszz": -0.5
-    ,"mlphiggsvsbkg": -0.5
-    ,"mlphiggsvsbkg_fulll": -0.5
-    ,"mlphiggsvszbb_mu" : -0.5
-    ,"mlphiggsvstt_mu" : -0.5
-    ,"mlphiggsvszz_mu" : -0.5
-    ,"mlphiggsvsbkg_mu" : -0.5
+    ,"mlphiggsvszbb_125": -0.5
+    ,"mlphiggsvstt_125": -0.5
+    ,"mlphiggsvszz_125": -0.5
+    ,"mlphiggsvsbkg_125": -0.5
+    ,"mlphiggsvsbkg_fulll_125": -0.5
+    ,"mlphiggsvszbb_125_mu" : -0.5
+    ,"mlphiggsvstt_125_mu" : -0.5
+#    ,"mlphiggsvszz_125_mu" : -0.5
+    ,"mlphiggsvsbkg_125_mu" : -0.5
     ,"mlpZbbvsTT_mu" : -0.5
     ,"Wgg"      :    15 
     ,"Wqq"      :    15 
@@ -378,12 +385,13 @@ min = {
 #    ,"Wtwb"      :    20 
     ,"Wzz3"      :    7 
     ,"Wzz0"      :    16 
-    ,"Whi3"      :    11 
-    ,"Whi0"      :    18 
+    ,"Whi3_125"      :    11 
+    ,"Whi0_125"      :    18 
     ,"jetmetMETsignificance" : 0
     ,"jetmetMET" : 0
     ,"mlpzbbttmmll_MeTtest_mll_met" :-0.2
     ,"mlpzbbttmlltest_mll" : -0.2
+    ,"ProdEstimator" : -0.2
     }
 
 ################
@@ -398,6 +406,8 @@ max = {
     "eventSelectiondrZbj1"      :    5 ,
     "jetmetbjet1pt"             :  265 ,
     "jetmetbjet2pt"             :  265 ,   
+    "jetmetbjet1CSVdisc"             :  1 ,
+    "jetmetbjet2CSVdisc"             :  1 ,   
     "jetmetMET"                 :  200 , 
     "eventSelectiondphiZbj1"    :  3.2 ,
     "eventSelectiondphiZbb"     :  3.2 ,
@@ -416,15 +426,15 @@ max = {
     "eventSelectiondrelel"      :    5 
     ,"mlpZbbvsTTtight"  :1.2
     ,"mlpZbbvsTT_tight_Wmet" : 1.2
-    ,"mlphiggsvszbb" : 1.5
-    ,"mlphiggsvstt" : 1.5
-    ,"mlphiggsvszz" : 1.5
-    ,"mlphiggsvsbkg" : 1.5
-    ,"mlphiggsvsbkg_fulll": 1.5
-    ,"mlphiggsvszbb_mu": 1.5
-    ,"mlphiggsvstt_mu" : 1.5
-    ,"mlphiggsvszz_mu" : 1.5
-    ,"mlphiggsvsbkg_mu" : 1.5
+    ,"mlphiggsvszbb_125" : 1.5
+    ,"mlphiggsvstt_125" : 1.5
+#    ,"mlphiggsvszz_125" : 1.5
+    ,"mlphiggsvsbkg_125" : 1.5
+    ,"mlphiggsvsbkg_fulll_125": 1.5
+    ,"mlphiggsvszbb_125_mu": 1.5
+    ,"mlphiggsvstt_125_mu" : 1.5
+    ,"mlphiggsvszz_125_mu" : 1.5
+    ,"mlphiggsvsbkg_125_mu" : 1.5
     ,"mlpZbbvsTT_mu" : 1.5
     ,"mlpzbbvstt_multi_EE_tight" : 1.2
     ,"jetmetnj":8
@@ -434,12 +444,13 @@ max = {
 #    ,"Wtwb"      :    30 
     ,"Wzz3"      :    17 
     ,"Wzz0"      :    26 
-    ,"Whi3"      :    21
-    ,"Whi0"      :    32
+    ,"Whi3_125"      :    21
+    ,"Whi0_125"      :    32
     ,"jetmetMETsignificance" : 80
     ,"jetmetMET" : 100
     ,"mlpzbbttmmll_MeTtest_mll_met" : 1.2
     ,"mlpzbbttmlltest_mll" : 1.2
+    ,"ProdEstimator" : 1.2
     }
 
 ################
@@ -454,6 +465,8 @@ binning = {
     "eventSelectiondrZbj1"      :   10 , #0.5
     "jetmetbjet1pt"             :   26 , #10GeV
     "jetmetbjet2pt"             :   26 ,   
+    "jetmetbjet1CSVdisc"             :  100  ,
+    "jetmetbjet2CSVdisc"             :  100  ,   
     "jetmetMET"                 :   20 , #10GeV 
     "eventSelectiondphiZbj1"    :   16 , #0.2
     "eventSelectiondphiZbb"     :   16 ,
@@ -473,16 +486,16 @@ binning = {
     ,"jetmetnj" : 6
     ,"mlpZbbvsTTtight" :20
     ,"mlpZbbvsTT_tight_Wmet" : 20
-    ,"mlphiggsvszbb" : 30
-    ,"mlphiggsvstt" : 30
-    ,"mlphiggsvszz" : 30
-    ,"mlphiggsvsbkg" : 30
-    ,"mlphiggsvsbkg_fulll": 30
+    ,"mlphiggsvszbb_125" : 30
+    ,"mlphiggsvstt_125" : 30
+#    ,"mlphiggsvszz_125" : 30
+    ,"mlphiggsvsbkg_125" : 30
+    ,"mlphiggsvsbkg_fulll_125": 30
     ,"mlpzbbvstt_multi_EE_tight" : 20
-    ,"mlphiggsvszbb_mu": 30
-    ,"mlphiggsvstt_mu" : 30
-    ,"mlphiggsvszz_mu" : 30
-    ,"mlphiggsvsbkg_mu" :30 
+    ,"mlphiggsvszbb_125_mu": 30
+    ,"mlphiggsvstt_125_mu" : 30
+    ,"mlphiggsvszz_125_mu" : 30
+    ,"mlphiggsvsbkg_125_mu" :30 
     ,"mlpZbbvsTT_mu" : 30
     ,"Wgg"      :    25 
     ,"Wqq"      :    25 
@@ -490,12 +503,13 @@ binning = {
  #   ,"Wtwb"      :    30 
     ,"Wzz3"      :    20 
     ,"Wzz0"      :    25 
-    ,"Whi3"      :    20 
-    ,"Whi0"      :    35
+    ,"Whi3_125"      :    20 
+    ,"Whi0_125"      :    35
     ,"jetmetMETsignificance" : 80
     ,"jetmetMET" : 20
     ,"mlpzbbttmmll_MeTtest_mll_met" : 20
     ,"mlpzbbttmlltest_mll" : 20
+    ,"ProdEstimator" : 30
     }
     
 
@@ -565,15 +579,15 @@ componentString={}
 # TH2 Plot
 for sample in totsampleList:
     for name in namePlotList:
-        th2[sample+"whi3"+name] = TH2D("whi3"+name+"_"+sample,"whi3"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Whi3"].getBins(),var["Whi3"].getMin(),var["Whi3"].getMax())
-        myRDS_red_w[sample].fillHistogram(th2[sample+"whi3"+name], RooArgList(var[name],var["Whi3"]))
-#        CANVAS[sample+"whi3"+name] = TCanvas("CANVAS_whi3"+name,"CANVASwhi3"+name,1200,600)
-#        th2[sample+"whi3"+name].Draw()
+        th2[sample+"whi3_125"+name] = TH2D("whi3_125"+name+"_"+sample,"whi3_125"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Whi3_125"].getBins(),var["Whi3_125"].getMin(),var["Whi3_125"].getMax())
+        myRDS_red_w[sample].fillHistogram(th2[sample+"whi3_125"+name], RooArgList(var[name],var["Whi3_125"]))
+#        CANVAS[sample+"whi3_125"+name] = TCanvas("CANVAS_whi3_125"+name,"CANVASwhi3_125"+name,1200,600)
+#        th2[sample+"whi3_125"+name].Draw()
 
-        th2[sample+"whi0"+name] = TH2D("whi0"+name+"_"+sample,"whi0"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Whi0"].getBins(),var["Whi0"].getMin(),var["Whi0"].getMax())
-        myRDS_red_w[sample].fillHistogram(th2[sample+"whi0"+name], RooArgList(var[name],var["Whi0"]))
-#        CANVAS[sample+"whi0"+name] = TCanvas("CANVAS_whi0"+name,"CANVASwhi0"+name,1200,600)
-#        th2[sample+"whi0"+name].Draw()
+        th2[sample+"whi0_125"+name] = TH2D("whi0_125"+name+"_"+sample,"whi0_125"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Whi0_125"].getBins(),var["Whi0_125"].getMin(),var["Whi0_125"].getMax())
+        myRDS_red_w[sample].fillHistogram(th2[sample+"whi0_125"+name], RooArgList(var[name],var["Whi0_125"]))
+#        CANVAS[sample+"whi0_125"+name] = TCanvas("CANVAS_whi0_125"+name,"CANVASwhi0_125"+name,1200,600)
+#        th2[sample+"whi0_125"+name].Draw()
 
         th2[sample+"wgg"+name] = TH2D("wgg"+name+"_"+sample,"wgg"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Wgg"].getBins(),var["Wgg"].getMin(),var["Wgg"].getMax())
         myRDS_red_w[sample].fillHistogram(th2[sample+"wgg"+name], RooArgList(var[name],var["Wgg"]))
@@ -582,7 +596,7 @@ for sample in totsampleList:
 
 
         th2[sample+"wqq"+name] = TH2D("wqq"+name+"_"+sample,"wqq"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["Wqq"].getBins(),var["Wqq"].getMin(),var["Wqq"].getMax())
-        myRDS_red_w[sample].fillHistogram(th2[sample+"whi3"+name], RooArgList(var[name],var["Wqq"]))
+        myRDS_red_w[sample].fillHistogram(th2[sample+"wqq"+name], RooArgList(var[name],var["Wqq"]))
 #        CANVAS[sample+"wqq"+name] = TCanvas("CANVAS_wqq"+name,"CANVASwqq"+name,1200,600)
 #        th2[sample+"wqq"+name].Draw()
 
@@ -591,10 +605,10 @@ for sample in totsampleList:
 #        CANVAS[sample+"wtt"+name] = TCanvas("CANVAS_wtt"+name,"CANVASwtt"+name,1200,600)
 #        th2[sample+"wtt"+name].Draw()
 
-        th2[sample+"mlphiggsvsbkg"+name] = TH2D("mlphiggsvsbkg"+name+"_"+sample,"mlphiggsvsbkg"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["mlphiggsvsbkg"].getBins(),var["mlphiggsvsbkg"].getMin(),var["mlphiggsvsbkg"].getMax())
-        myRDS_red_w[sample].fillHistogram(th2[sample+"mlphiggsvsbkg"+name], RooArgList(var[name],var["mlphiggsvsbkg"]))
-#        CANVAS[sample+"mlphiggsvsbkg"+name] = TCanvas("CANVAS_mlphiggsvsbkg"+name,"CANVASmlphiggsvsbkg"+name,1200,600)
-#        th2[sample+"mlphiggsvsbkg"+name].Draw()
+        th2[sample+"mlphiggsvsbkg_125"+name] = TH2D("mlphiggsvsbkg_125"+name+"_"+sample,"mlphiggsvsbkg_125"+name+"_"+sample,var[name].getBins(),var[name].getMin(),var[name].getMax(),var["mlphiggsvsbkg_125"].getBins(),var["mlphiggsvsbkg_125"].getMin(),var["mlphiggsvsbkg_125"].getMax())
+        myRDS_red_w[sample].fillHistogram(th2[sample+"mlphiggsvsbkg_125"+name], RooArgList(var[name],var["mlphiggsvsbkg_125"]))
+#        CANVAS[sample+"mlphiggsvsbkg_125"+name] = TCanvas("CANVAS_mlphiggsvsbkg_125"+name,"CANVASmlphiggsvsbkg_125"+name,1200,600)
+#        th2[sample+"mlphiggsvsbkg_125"+name].Draw()
     
 #-----------------------------------
 for name in namePlotList:
@@ -683,16 +697,16 @@ for name in namePlotList:
         #th1_copy["DATA"+name].Draw()
         #for sample in ("DY","TT","ZZ"): th1_copy[sample+name].DrawNormal
 
-plot = TFile("All_plot_mm_ptzrew_rescale_100higgs_correl.root","RECREATE")
+plot = TFile("All_plot_mumu_ptzrew_rescale_100higgs_correl_h125.root","RECREATE")
 for name in namePlotList:
     CANVAS[name].Write()
     for sample in totsampleList:
         th2[sample+"wtt"+name].Write()
         th2[sample+"wqq"+name].Write()
         th2[sample+"wgg"+name].Write()
-        th2[sample+"whi0"+name].Write()
-        th2[sample+"whi3"+name].Write()
-        th2[sample+"mlphiggsvsbkg"+name].Write()
+        th2[sample+"whi0_125"+name].Write()
+        th2[sample+"whi3_125"+name].Write()
+        th2[sample+"mlphiggsvsbkg_125"+name].Write()
 
 plot.Close()
 
