@@ -40,6 +40,10 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       result["HPHP"]   = event.weight(weightList=["Btagging"], muChannel=self.muChannel, Bmode="HPHP", btagging=btagging)
       return result
 
+    def processEvent(self,event,weight = 1.,btagging="CSV"):
+      """process event and fill histograms"""
+      self.fill(self.process(event,btagging),weight)
+
 def runTest(path="../testfiles/ttbar/"):
   controlPlots = BtaggingReWeightingControlPlots()
 
