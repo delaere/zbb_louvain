@@ -64,6 +64,7 @@ btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
 
+RooAbsData.setDefaultStorageType(RooAbsData.Tree)
 
 ############
 ### Maps ###
@@ -217,7 +218,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      #if i > 40: break;
+      if i > 40: break;
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -264,7 +265,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       brcp.endJob()
       lrcp.endJob()
       mscp.endJob()
-      prcp.endJob()
+      #prcp.endJob()
 
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)
@@ -273,9 +274,19 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     #ws.writeToFile("File_rds_zbb_"+channel+".root") 
     #gDirectory.Add(ws)
 
-    f=TFile("File_rds_zbb_"+channel+".root","RECREATE")
-    rds_zbb.Write()
+    ras_zbb = rds_zbb.get()
+    ws_ras = RooWorkspace("ws_ras","workspace_ras")
+    getattr(ws_ras,'import')(ras_zbb)
+    ws_ras.Print()
+    
+    ws_ras.writeToFile("File_rds_zbb_"+channel+".root")
+    gDirectory.Add(ws_ras)
+
+    f=TFile("File_rds_zbb_"+channel+".root","UPDATE")
+    tree_zbb = rds_zbb.tree()
+    tree_zbb.Write()
     f.Close()
+
 
 print "Running processInputFile(", muChannel[channel], ", ", path[channel], ")"
 processInputFile(muChannel[channel], path[channel])
