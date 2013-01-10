@@ -218,7 +218,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      if i > 40: break;
+      #if i > 40: break;
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -265,7 +265,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       brcp.endJob()
       lrcp.endJob()
       mscp.endJob()
-      #prcp.endJob()
+      prcp.endJob()
 
     ws = RooWorkspace("ws","workspace")
     getattr(ws,'import')(rds_zbb)
