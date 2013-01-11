@@ -23,7 +23,7 @@ from eventSelection import categoryNames
 ### sample/wp/selection of interest
 #####################################################
 
-btagWP = "HEHE" #choose between HE, HP, HEHE, HEHP, HPHP
+btagWP = "HPHP" #choose between HE, HP, HEHE, HEHP, HPHP
 llMassWP = "" #"" or "wide"
 metWP = "MET" #"MET" or "", MET means met significance
 
@@ -44,7 +44,18 @@ channels  = [
 
 #choose you set of cuts
 extraCuts = [
-    ""
+    "",
+    "eventSelectiondijetdR<1.",
+    "eventSelectiondijetdR<0.75",
+    "((eventSelectiondrllMu<1.&&eventSelectiondrllMu>0.)||(eventSelectiondrllEle<1.&&eventSelectiondrllEle>0.))",
+    "eventSelectiondijetPt>50",
+    "eventSelectiondijetPt>100",
+    "eventSelectiondijetPt>150",
+    "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
+    "(eventSelectionbestzptEle>100||eventSelectionbestzptMu>100)",
+    "(eventSelectionbestzptEle>150||eventSelectionbestzptMu>150)",
+    "(eventSelectionbestzptEle>225||eventSelectionbestzptMu>225)",
+
     ]
 
 extraCutsLep = {
@@ -64,23 +75,23 @@ for i in range(0,len(extraCuts)) :
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
+MCsampleList   = ["TT","ZZ","Zb","Zc","Zl","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+SMMCsampleList = ["TT","ZZ","Zb","Zc","Zl"]
 NSMMCsampleList= ["ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-sampleList     = ["DATA","DY","TT","ZZ","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]
+totsampleList  = ["DATA","TT","ZZ","Zb","Zc","Zl","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
+sampleList     = ["DATA","TT","ZZ","DY","ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]
 
-lumi = { "DATA"   : zbbnorm.lumi_tot2011,
-         "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
-         "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zl"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZZ"     : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
-         "ZH115"  : zbbnorm.nev_ZH115_fall11/zbbnorm.xsec_ZH115_7TeV/1000.,
-         "ZH120"  : zbbnorm.nev_ZH120_fall11/zbbnorm.xsec_ZH120_7TeV/1000.,
-         "ZH125"  : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV/1000.,
-         "ZH130"  : zbbnorm.nev_ZH130_fall11/zbbnorm.xsec_ZH130_7TeV/1000.,
-         "ZH135"  : zbbnorm.nev_ZH135_fall11/zbbnorm.xsec_ZH135_7TeV/1000.
+lumi = { "DATA"   : zbbnorm.lumi_tot2012,
+         "TT"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "Zb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zc"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zl"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZZ"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000.,
+         #"ZH115"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
+         #"ZH120"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
+         "ZH125"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000.,
+         #"ZH130"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
+         #"ZH135"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.
          }
 
 MCweight = {}
@@ -100,28 +111,28 @@ myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {}
 
-filename_el = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_ElA_DATA.root",
-               "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_ElB_DATA.root",
-               "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_El_MC.root",
-               "DY"     : "condorRDSmaker/outputs/File_rds_zbb_El_MC.root",
-               "ZZ"     : "condorRDSmaker/outputs/File_rds_zbb_ZZ_El_MC.root",
-               "ZH115"  : "condorRDSmaker/outputs/File_rds_zbb_ZH115_El_MC.root",
-               "ZH120"  : "condorRDSmaker/outputs/File_rds_zbb_ZH120_El_MC.root",
-               "ZH125"  : "condorRDSmaker/outputs/File_rds_zbb_ZH125_El_MC.root",
-               "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_El_MC.root",
-               "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_El_MC.root"
+filename_el = {"DATA_A" : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ElA_DATA.root",
+               "DATA_B" : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ElB_DATA.root",
+               "TT"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_TT_El_MC.root",
+               "DY"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_El_MC.root",
+               "ZZ"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZZ_El_MC.root",
+               "ZH115"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH115_El_MC.root",
+               "ZH120"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH120_El_MC.root",
+               "ZH125"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH125_El_MC.root",
+               "ZH130"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH130_El_MC.root",
+               "ZH135"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH135_El_MC.root"
                }
 
-filename_mu = {"DATA_A" : "condorRDSmaker/outputs/File_rds_zbb_MuA_DATA.root",
-               "DATA_B" : "condorRDSmaker/outputs/File_rds_zbb_MuB_DATA.root",
-               "TT"     : "condorRDSmaker/outputs/File_rds_zbb_TT_Mu_MC.root",
-               "DY"     : "condorRDSmaker/outputs/File_rds_zbb_Mu_MC.root",
-               "ZZ"     : "condorRDSmaker/outputs/File_rds_zbb_ZZ_Mu_MC.root",
-               "ZH115"  : "condorRDSmaker/outputs/File_rds_zbb_ZH115_Mu_MC.root",
-               "ZH120"  : "condorRDSmaker/outputs/File_rds_zbb_ZH120_Mu_MC.root",
-               "ZH125"  : "condorRDSmaker/outputs/File_rds_zbb_ZH125_Mu_MC.root",
-               "ZH130"  : "condorRDSmaker/outputs/File_rds_zbb_ZH130_Mu_MC.root",
-               "ZH135"  : "condorRDSmaker/outputs/File_rds_zbb_ZH135_Mu_MC.root"
+filename_mu = {"DATA_A" : "/nfs/user/acaudron/RDS53X/File_rds_zbb_MuA_DATA.root",
+               "DATA_B" : "/nfs/user/acaudron/RDS53X/File_rds_zbb_MuB_DATA.root",
+               "TT"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_TT_Mu_MC.root",
+               "DY"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_Mu_MC.root",
+               "ZZ"     : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZZ_Mu_MC.root",
+               "ZH115"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH115_Mu_MC.root",
+               "ZH120"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH120_Mu_MC.root",
+               "ZH125"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH125_Mu_MC.root",
+               "ZH130"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH130_Mu_MC.root",
+               "ZH135"  : "/nfs/user/acaudron/RDS53X/File_rds_zbb_ZH135_Mu_MC.root"
                }
 
 
@@ -134,18 +145,24 @@ for sample in sampleList :
             
             if channel=="EEChannel" : file_mc  = TFile(filename_el[sample])
             else : file_mc  = TFile(filename_mu[sample])
+
+            tree_zbb = file_mc.Get("rds_zbb")
+            ws_zbb = file_mc.Get("ws_ras")
+            ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+            rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
             
-            nEntries = file_mc.Get("rds_zbb").numEntries()
-        
+            
+            nEntries = rds_zbb.numEntries()
+            # file_mc.Get("rds_zbb")
             if sample == "DY" :
-                myRDS[channel+"Zb"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==3")
-                myRDS[channel+"Zc"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==2")
-                myRDS[channel+"Zl"] = file_mc.Get("rds_zbb").reduce(redStage + "&mcSelectioneventType==1")
+                myRDS[channel+"Zb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==3")
+                myRDS[channel+"Zc"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==2")
+                myRDS[channel+"Zl"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==1")
                 print "myRDS.numEntries() for ", "Zb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zb"].numEntries()
                 print "myRDS.numEntries() for ", "Zc" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zc"].numEntries()
                 print "myRDS.numEntries() for ", "Zl" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zl"].numEntries()
             else :
-                myRDS[channel+sample] = file_mc.Get("rds_zbb").reduce(redStage)
+                myRDS[channel+sample] = rds_zbb.reduce(redStage)
                 print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+sample].numEntries()
         
             file_mc.Close()
@@ -157,12 +174,25 @@ for sample in sampleList :
             else:
                 file_A  = TFile(filename_mu["DATA_A"])
                 file_B  = TFile(filename_mu["DATA_B"])
+                
+            tree_zbb = file_A.Get("rds_zbb")
+            ws_zbb = file_A.Get("ws_ras")
+            ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+            rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
+
+            tree_zbb = file_B.Get("rds_zbb")
+            ws_zbb = file_B.Get("ws_ras")
+            ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+            tmp = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
             
-            nEntries = file_A.Get("rds_zbb").numEntries()+file_B.Get("rds_zbb").numEntries()
+            rds_zbb.append(tmp)
             
-            myRDS[channel+sample] = file_A.Get("rds_zbb").reduce(redStage)
-            tmp = file_B.Get("rds_zbb").reduce(redStage)
-            myRDS[channel+sample].append(tmp)
+            #nEntries = file_A.Get("rds_zbb").numEntries()+file_B.Get("rds_zbb").numEntries()
+            nEntries = rds_zbb.numEntries()
+            
+            myRDS[channel+sample] = rds_zbb.reduce(redStage)
+            #tmp = file_B.Get("rds_zbb").reduce(redStage)
+            #myRDS[channel+sample].append(tmp)
             
             print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+sample].numEntries()
             
@@ -172,7 +202,7 @@ for sample in sampleList :
 ###############
 ### weights ###
 ###############
-tmp=myRDS["EEChannelZc"].reduce("mcSelectioneventType==1")
+tmp=myRDS["EEChannelTT"].reduce("mcSelectioneventType==1")
 ras_zbb = tmp.get()
 tmp=0
 
@@ -356,6 +386,8 @@ for channel in channels :
             
             myRDS_red = myRDS[channel+sample]
 
+            print "myRDS_red.numEntries()", myRDS_red.numEntries()
+
             if iCut : myRDS_red = myRDS_red.reduce(iCut)
             
             if sample != "DATA": myRDS_red.addColumn(w)
@@ -364,6 +396,7 @@ for channel in channels :
             else               : myRDS_red_w = RooDataSet("myRDS_red_w","myRDS_red_w",myRDS_red,myRDS_red.get())
 
             nevts["pure"+sample+channel+cut]     = myRDS_red_w.numEntries()
+            print "myRDS_red_w.numEntries()", myRDS_red_w.numEntries()
             if sample in MCsampleList :
                 nevts["effective"+sample+channel+cut]= myRDS_red_w.numEntries()*(lumi["DATA"]/lumi[sample])
                 nevts["weighted"+sample+channel+cut] = myRDS_red_w.sumEntries()*(lumi["DATA"]/lumi[sample])
@@ -414,7 +447,7 @@ for channel in channels:
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
         for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+channel+cut]),
-        print '{0}'.ljust(10).format(sumSMMC["pure"+channel+cut]), '{0}'.ljust(10).format(sumNSMMC["pure"+channel+cut])
+        print '{0}'.ljust(10).format(sumSMMC["pure"+channel+cut])#, '{0}'.ljust(10).format(sumNSMMC["pure"+channel+cut])
     print " "
     print "normalized MC yields ......................................................."
     print "Cuts".ljust(10),
@@ -423,7 +456,7 @@ for channel in channels:
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
         for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+channel+cut]).ljust(10),
-        print '{0:.2f}'.format(sumSMMC["effective"+channel+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["effective"+channel+cut]).ljust(10)
+        print '{0:.2f}'.format(sumSMMC["effective"+channel+cut]).ljust(10)#, '{0:.2f}'.format(sumNSMMC["effective"+channel+cut]).ljust(10)
     print " "
     print "weighted and normalized MC yields vs DATA yield ............................"
     print "Cuts".ljust(10),
@@ -432,7 +465,7 @@ for channel in channels:
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
         for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+channel+cut]).ljust(10),
-        print '{0:.2f}'.format(sumSMMC["weighted"+channel+cut]).ljust(10), '{0:.2f}'.format( sumNSMMC["weighted"+channel+cut]).ljust(10), '{0}'.ljust(10).format( nevts["pure"+"DATA"+channel+cut])
+        print '{0:.2f}'.format(sumSMMC["weighted"+channel+cut]).ljust(10)#, '{0:.2f}'.format( sumNSMMC["weighted"+channel+cut]).ljust(10), '{0}'.ljust(10).format( nevts["pure"+"DATA"+channel+cut])
     print "............................................................................"
     print "............................................................................"
     print " "
@@ -448,7 +481,7 @@ print "totSMMC".ljust(10), "totNSMMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
     for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+"EEChannel"+cut]+nevts["pure"+sample+"MuMuChannel"+cut]),
-    print '{0}'.ljust(10).format(sumSMMC["pure"+"EEChannel"+cut]+sumSMMC["pure"+"MuMuChannel"+cut]), '{0}'.ljust(10).format(sumNSMMC["pure"+"EEChannel"+cut]+sumNSMMC["pure"+"MuMuChannel"+cut])
+    print '{0}'.ljust(10).format(sumSMMC["pure"+"EEChannel"+cut]+sumSMMC["pure"+"MuMuChannel"+cut])#, '{0}'.ljust(10).format(sumNSMMC["pure"+"EEChannel"+cut]+sumNSMMC["pure"+"MuMuChannel"+cut])
 print " "
 print "normalized MC yields ......................................................."
 print "Cuts".ljust(10),
@@ -457,7 +490,7 @@ print "totSMMC".ljust(10), "totNSMMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
     for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+"EEChannel"+cut]+nevts["effective"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumSMMC["effective"+"EEChannel"+cut]+sumSMMC["effective"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["effective"+"EEChannel"+cut]+sumNSMMC["effective"+"MuMuChannel"+cut]).ljust(10)
+    print '{0:.2f}'.format(sumSMMC["effective"+"EEChannel"+cut]+sumSMMC["effective"+"MuMuChannel"+cut]).ljust(10)#, '{0:.2f}'.format(sumNSMMC["effective"+"EEChannel"+cut]+sumNSMMC["effective"+"MuMuChannel"+cut]).ljust(10)
 print " "
 print "weighted and normalized MC yields vs DATA yield ............................"
 print "Cuts".ljust(10),
@@ -466,7 +499,7 @@ print "totSMMC".ljust(10), "totNSMMC".ljust(10), "DATA".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
     for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+"EEChannel"+cut]+nevts["weighted"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumSMMC["weighted"+"EEChannel"+cut]+sumSMMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["weighted"+"EEChannel"+cut]+sumNSMMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"EEChannel"+cut]+nevts["pure"+"DATA"+"MuMuChannel"+cut])
+    print '{0:.2f}'.format(sumSMMC["weighted"+"EEChannel"+cut]+sumSMMC["weighted"+"MuMuChannel"+cut]).ljust(10)#, '{0:.2f}'.format(sumNSMMC["weighted"+"EEChannel"+cut]+sumNSMMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"EEChannel"+cut]+nevts["pure"+"DATA"+"MuMuChannel"+cut])
 print "............................................................................"
 print "............................................................................"
 print " "
@@ -479,7 +512,7 @@ print " "
 file={}
 #her you could choose the root ouput filenames
 for sample in totsampleList:
-    file[sample]=TFile("Yields/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
+    file[sample]=TFile("DeltaRRbb/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
     for channel in channels:
         if channel=="Combined" : continue
         chDir=file[sample].mkdir(channel,channel)
