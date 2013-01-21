@@ -31,11 +31,7 @@ ourtriggers.murunMap[173236:178381] = ("HLT_Mu13_Mu8_v7",)
 ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10",)#"HLT_Mu17_tkMu8_v3")
 ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11",)#"HLT_Mu17_tkMu8_v4")
 ### data 2012
-ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v1*",)     ##"HLT_Mu17_tkMu8_v9"
-#ourtriggers.murunMap[193805:195961] = ("HLT_Mu17_Mu8_v17",)
-#ourtriggers.murunMap[196045:196754] = ("HLT_Mu17_Mu8_v18",)
-#ourtriggers.murunMap[197769:199632] = ("HLT_Mu17_Mu8_v19",)
-#ourtriggers.murunMap[199695:] = ("HLT_Mu17_Mu8_v21",)
+ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v16","HLT_Mu17_Mu8_v17","HLT_Mu17_Mu8_v18","HLT_Mu17_Mu8_v19","HLT_Mu17_Mu8_v21",)     ##"HLT_Mu17_tkMu8_v9"
 
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
