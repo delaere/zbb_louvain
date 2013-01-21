@@ -49,26 +49,26 @@ muChannel = { "MuA_DATA"     : True ,
               }
 
 path = {
-  "MuA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012A_V3/" ,
-  "ElA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012A_V4/" ,
-  "MuB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012B_V3/" ,
-  "ElB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012B_V4/" ,
-  "Mu_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
-  "El_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
-  "TT_Mu_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/"    ,
-  "TT_El_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/"    ,
-  "ZZ_Mu_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/ZZ_Summer12_V2/"    ,
-  "ZZ_El_MC"     : "/nfs/user/llbb/Pat_8TeV_532p4/ZZ_Summer12_V2/"    ,
-  "ZH115_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH125_Summer12_V2/" ,
-  "ZH125_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH125_Summer12_V2/" ,
-  "ZH130_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/nfs/user/llbb/Pat_8TeV_532p4/ZH135_MC/" ,
+  "MuA_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim53X/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim53X/El_DataB/" ,
+  "Mu_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
+  "El_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
+  "TT_Mu_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
+  "TT_El_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
+  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
   }
 
 checkTrigger = {
@@ -273,7 +273,7 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 ### Proxy for eventCategory ###
 ###############################
 
-def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
+def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/acaudron/skim53X/TT_MC/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
