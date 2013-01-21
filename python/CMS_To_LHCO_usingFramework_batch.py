@@ -50,8 +50,8 @@ muChannel = { "MuA_DATA"     : True ,
 
 path = {
   "MuA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012A_V3/" ,
-  "ElA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012B_V3/" ,
-  "MuB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012A_V4/" ,
+  "ElA_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012A_V4/" ,
+  "MuB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012B_V3/" ,
   "ElB_DATA"     : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012B_V4/" ,
   "Mu_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
   "El_MC"        : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/"    ,
@@ -495,7 +495,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/llbb/Pat_8T
 
       dijet = findDijetPair(event, "CSV", muChannel, (not muChannel)) 
 
-      DumpLHCOEvent(out_file_INCL, event, numberOfInteractions,muChannel, bestZ, dijet)
+      DumpLHCOEvent(out_file_INCL, event, numberOfInteractions, bestZ, dijet)
 
       bjetp=0
       for index,jet in enumerate(event.jets):
