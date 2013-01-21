@@ -31,11 +31,12 @@ ourtriggers.murunMap[173236:178381] = ("HLT_Mu13_Mu8_v7",)
 ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10",)#"HLT_Mu17_tkMu8_v3")
 ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11",)#"HLT_Mu17_tkMu8_v4")
 ### data 2012
-ourtriggers.murunMap[190455:193687] = ("HLT_Mu17_Mu8_v16",)     ##"HLT_Mu17_tkMu8_v9"
-ourtriggers.murunMap[193805:195961] = ("HLT_Mu17_Mu8_v17",)
-ourtriggers.murunMap[196045:196754] = ("HLT_Mu17_Mu8_v18",)
-ourtriggers.murunMap[197769:199632] = ("HLT_Mu17_Mu8_v19",)
-ourtriggers.murunMap[199695:] = ("HLT_Mu17_Mu8_v21",)
+ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v1*",)     ##"HLT_Mu17_tkMu8_v9"
+#ourtriggers.murunMap[193805:195961] = ("HLT_Mu17_Mu8_v17",)
+#ourtriggers.murunMap[196045:196754] = ("HLT_Mu17_Mu8_v18",)
+#ourtriggers.murunMap[197769:199632] = ("HLT_Mu17_Mu8_v19",)
+#ourtriggers.murunMap[199695:] = ("HLT_Mu17_Mu8_v21",)
+
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
 ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
@@ -442,7 +443,7 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
              return True
        if runNumber >= 190455 :
        #print "run number > 165121"
-           print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size() 
+           #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size() 
        #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
            #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,0).size())
            #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
