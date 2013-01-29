@@ -22,7 +22,7 @@ class EventSelectionControlPlots(BaseControlPlots):
     
     def beginJob(self):
       # declare histograms
-      self.add("run","Run number",30000,160000,190000)
+      self.add("run","Run number",50000,160000,210000)
       self.add("event","Event number",1000,0,5e9)
       self.add("ls","Lumi section",2000,0,2000)
       self.add("triggerSelection","triggerSelection ",2,0,2)
