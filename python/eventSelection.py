@@ -182,7 +182,7 @@ def isLooseElectron(electron):
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return abs(electron.eta())<2.4 and ((abs(electron.superCluster.eta)< 1.442)||((1.566<(abs(electron.superCluster.eta)))&&((abs(electron.superCluster.eta))<2.50)))
+  return abs(electron.eta())<2.4 and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) )
   ##return electron.eta()<2.5
   #return True
 
