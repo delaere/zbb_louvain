@@ -24,10 +24,14 @@ if narguments != 4:
   print "python ", sys.argv[0], "ElB_DATA 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "Mu_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "El_MC 9999 _CSV2011Sel"
+  print "python ", sys.argv[0], "DY_Pt100_Mu_MC 9999 _CSV2011Sel"
+  print "python ", sys.argv[0], "DY_Pt100_El_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "TT_Mu_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "TT_El_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "ZZ_Mu_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "ZZ_El_MC 9999 _CSV2011Sel"
+  print "python ", sys.argv[0], "ZH110_Mu_MC 9999 _CSV2011Sel"
+  print "python ", sys.argv[0], "ZH110_El_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "ZH115_Mu_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "ZH115_El_MC 9999 _CSV2011Sel"
   print "python ", sys.argv[0], "ZH120_Mu_MC 9999 _CSV2011Sel"
@@ -48,6 +52,8 @@ mappath = {
   "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
   "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
   "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  "DY_Pt100_Mu_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
+  "DY_Pt100_El_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
   #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
   #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
   "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
@@ -56,6 +62,8 @@ mappath = {
   "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
   "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
   "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZH110_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
+  "ZH110_El_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
   "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
   "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
   "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
