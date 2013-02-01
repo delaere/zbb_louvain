@@ -9,21 +9,22 @@ import glob
 import os
 
 samples = [
-    "DY",
-    "TT",
-    "ZZ",
-    "ZH",
+    "DATA",
+    #"DY",
+    #"TT",
+    #"ZZ",
+    #"ZH",
     ]
 
 DYsamples = [
     "DYjets",
-    "DY1jets",
-    "DY2jets",
-    "DY3jets",
-    "DY4jets",
-    "DYjets_Pt50to70",
-    "DYjets_Pt70to100",
-    "DYjets_Pt180",
+    #"DY1jets",
+    #"DY2jets",
+    #"DY3jets",
+    #"DY4jets",
+    #"DYjets_Pt50to70",
+    #"DYjets_Pt70to100",
+    #"DYjets_Pt180",
     ]
 
 DYbcl = [
@@ -36,7 +37,7 @@ mass = [125] #[110,115,120,125,130,135]
 
 MC = "Summer12"
 DATA = "2012"
-cpVersion = "V1"
+cpVersion = "V3"
 
 listdata=[
         "A",
@@ -87,11 +88,12 @@ for sample in samples :
             for fl in DYbcl :
                 os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+dy+'_'+fl)
     else: os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+sample)
-
-for ch in DataChannel :
-    for samp in DataSample :
-        for period in listdata :
-            os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+samp+ch+DATA+period)
+    
+if "DATA" in samples :
+    for ch in DataChannel :
+        for samp in DataSample :
+            for period in listdata :
+                os.system('mkdir ControlPlots_'+cpVersion+'/ControlPlots_'+samp+ch+DATA+period)
 
 FarmDirectory = "FARM_CP_"+cpVersion
 JobName = "llbb_All_"+cpVersion
@@ -109,12 +111,13 @@ if "ZZ" in samples :
     for i in range(0,njobs):
         LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/ControlPlots.py -i /nfs/user/llbb/Pat_8TeV_537/Summer12_ZZ_S10/ -o ControlPlots_"+cpVersion+"/ControlPlots_ZZ/ZZ_"+MC+"_"+str(i)+".root --all -p ../data/Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root -P ../data/MCpileup_Summer12_S10.root -w ../data/performance_csv_witheff.root  --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
-for ch in DataChannel :
-    for samp in DataSample :
-        for period in listdata :
-            njobs = jobs[period]
-            for i in range(0,njobs):
-                LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/ControlPlots.py -i /nfs/user/llbb/Pat_8TeV_537/"+samp+ch+DATA+period+"/ -o ControlPlots_"+cpVersion+"/ControlPlots_"+samp+ch+DATA+period+"/"+samp+ch+DATA+period+"_"+str(i)+".root --all --noPUweight --noBweight --noLweight --trigger --onlyMu --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+if "DATA" in samples :
+    for ch in DataChannel :
+        for samp in DataSample :
+            for period in listdata :
+                njobs = jobs[period]
+                for i in range(0,njobs):
+                    LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/ControlPlots.py -i /nfs/user/llbb/Pat_8TeV_537/"+samp+ch+DATA+period+"/ -o ControlPlots_"+cpVersion+"/ControlPlots_"+samp+ch+DATA+period+"/"+samp+ch+DATA+period+"_"+str(i)+".root --all --noPUweight --noBweight --noLweight --trigger --only"+ch+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "DY" in samples :
     for dy in DYsamples :
