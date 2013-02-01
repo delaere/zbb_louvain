@@ -1,4 +1,5 @@
- 
+doNNJetRegression = False
+
 class zbblabel:
   """labels used in the PAT configuration"""
   allmuonslabel="allMuons"
