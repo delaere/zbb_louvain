@@ -31,7 +31,19 @@ ourtriggers.murunMap[173236:178381] = ("HLT_Mu13_Mu8_v7",)
 ourtriggers.murunMap[178420:179890] = ("HLT_Mu17_Mu8_v10",)#"HLT_Mu17_tkMu8_v3")
 ourtriggers.murunMap[179959:180253] = ("HLT_Mu17_Mu8_v11",)#"HLT_Mu17_tkMu8_v4")
 ### data 2012
-ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v16","HLT_Mu17_Mu8_v17","HLT_Mu17_Mu8_v18","HLT_Mu17_Mu8_v19","HLT_Mu17_Mu8_v21",)     ##"HLT_Mu17_tkMu8_v9"
+ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v16",
+                                 "HLT_Mu17_Mu8_v17",
+                                 "HLT_Mu17_Mu8_v18",
+                                 "HLT_Mu17_Mu8_v19",
+                                 "HLT_Mu17_Mu8_v21",
+                                 "HLT_Mu17_Mu8_v22",
+                                 "HLT_Mu17_TkMu8_v9",
+                                 "HLT_Mu17_TkMu8_v10",
+                                 "HLT_Mu17_TkMu8_v11",
+                                 "HLT_Mu17_TkMu8_v12",
+                                 "HLT_Mu17_TkMu8_v13",
+                                 "HLT_Mu17_TkMu8_v14",
+                                 "HLT_Mu17_TkMu8_NoDZ_v1",)
 
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
@@ -55,10 +67,12 @@ ourtriggers.elrunMap[173236:178381] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkI
 ourtriggers.elrunMap[178420:179890] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)
 ourtriggers.elrunMap[179959:180253] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v10",)
 ### data 2012
-ourtriggers.elrunMap[190455:190739] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15",)
-ourtriggers.elrunMap[190761:191427] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16",)
-ourtriggers.elrunMap[191511:196754] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17",)
-ourtriggers.elrunMap[197769:]       = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18",)
+ourtriggers.elrunMap[190455:] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15",
+                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16",
+                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17",
+                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18",
+                                 "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v19",
+                                 )
 # merged lists of triggers
 ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
@@ -116,6 +130,7 @@ def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
+  #for i in range(paths.size()) : print paths[i].name()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if not perRun:
     if muChannel:
@@ -424,8 +439,20 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
       if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0): 
         return True
 ### data 2012
-    if runNumber >= 180253 :  
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17").size()>0): 
+    if runNumber >= 180253 :
+      #if (l1.triggerObjectMatchesByPath("HLT_Mu17_*Mu8_*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_*Mu8_*",0,1).size()>0) : # and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0) :
+        #print runNumber
+        
+        #print l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0			
+        #print l2.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0	
+        
+        #print l1.triggerObjectMatchesByFilter("*").size()>0
+        #for i in range(0,l1.triggerObjectMatch(0).conditionNames().size()) : print "conditions", l1.triggerObjectMatch(0).conditionNames()[i]
+        #for i in range(0,l1.triggerObjectMatch(0).filterLabels().size()) : print "labels", l1.triggerObjectMatch(0).filterLabels()[i]
+        #for i in range(0,l1.triggerObjectMatch(0).pathNames().size()) : print "labels", l1.triggerObjectMatch(0).pathNames()[i]
+      
+      
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0): 
         return True
   if l1.isElectron() :
     if electron_iswrongPS(l1, runNumber, lumi_section):
@@ -697,6 +724,7 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFi
     else:
       output.append(-1)
   # return the list of results
+  #print output
   return output
 
 def prepareAnalysisEvent(event, btagging="CSV",ZjetFilter="bcl",checkTrigger=True):
