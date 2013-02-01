@@ -3,12 +3,13 @@
 import ROOT
 import sys
 import os
+import array
 from math import sin, sqrt
 from AnalysisEvent import AnalysisEvent
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel,zbbfile
+from zbbCommons import zbblabel,zbbfile,doNNJetRegression
 #from myFuncTimer import print_timing
 
 ############
@@ -181,6 +182,23 @@ class ElectronsControlPlots(BaseControlPlots):
     
 class JetmetControlPlots(BaseControlPlots):
     """A class to create control plots for jets and MET"""
+    readerREG = ROOT.TMVA.Reader("!Color:!Silent")
+    var_jetBtag = array.array('f', [0])
+    var_jetPt = array.array('f', [0])
+    var_jetEta = array.array('f', [0])
+    var_jetMetPhi = array.array('f', [0])
+    var_jetChf = array.array('f', [0])
+    var_jetPhf = array.array('f', [0])
+    var_jetNhf = array.array('f', [0])
+    var_jetElf = array.array('f', [0])
+    var_jetMuf = array.array('f', [0])
+    var_jetPtD = array.array('f', [0])
+    var_jetVtxPt = array.array('f', [0])
+    var_jetVtx3dL = array.array('f', [0])
+    var_jetVtx3deL = array.array('f', [0])
+    var_met = array.array('f', [0])
+    var_rho = array.array('f', [0])
+
 
     def __init__(self, dir=None, dataset=None, muChannel=True, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
@@ -280,6 +298,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.add("bjet1phi","leading bjet Phi",25,-4,4)
       self.add("bjet1energy","leading bjet energy",125,0,3000)
+      self.add("bjet1NNCorrenergy","NN corrected leading bjet energy",125,0,3000)
       self.add("bjet1mass","leading bjet mass",125,0,500)
       self.add("bjet1Chf","charged hadron energy fraction leading bjet",100,0,1.5)
       self.add("bjet1Nhf","neutral hadron energy fraction leading bjet",100,0,1.5)
@@ -307,6 +326,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.add("bjet2phi","subleading bjet Phi",25,-4,4)
       self.add("bjet2energy","subleading bjet energy",125,0,3000)
+      self.add("bjet2NNCorrenergy","NN corrected subleading bjet energy",125,0,3000)
       self.add("bjet2mass","subleading bjet mass",125,0,500)
       self.add("bjet2Chf","charged hadron energy fraction sublieading bjet",100,0,1.5)
       self.add("bjet2Nhf","neutral hadron energy fraction sublieading bjet",100,0,1.5)
@@ -327,6 +347,8 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet2JPdisc","subleading bjet JP discriminant",100,0,2.5)
       self.add("bjet2beta","subleading bjet beta function",20,-1,1)
       self.add("bjet2betaStar","subleading bjet beta* function",20,-1,1)
+      self.add("bbM","",1000,0,1000)
+      self.add("bbNNCorrM","",1000,0,1000)
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.add("nj","jet count",15,-0.5,14.5)
       self.add("nb","b-jet count",5,-0.5,4.5)
@@ -339,6 +361,26 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("cef","charged EmEnergy fraction",101,0,1.01)
       self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       self.add("rho", "Rho Variable",100,0,100)
+      #Initialize Reader for NN Correction
+      if doNNJetRegression == True:
+        self.readerREG.AddVariable("jetBtag"   ,self.var_jetBtag)
+        self.readerREG.AddVariable("jetPt"     ,self.var_jetPt)
+        self.readerREG.AddVariable("jetEta"    ,self.var_jetEta)
+        self.readerREG.AddVariable("jetMetPhi" ,self.var_jetMetPhi)
+        self.readerREG.AddVariable("jetChf"    ,self.var_jetChf)
+        self.readerREG.AddVariable("jetPhf"    ,self.var_jetPhf)
+        self.readerREG.AddVariable("jetNhf"    ,self.var_jetNhf)
+        self.readerREG.AddVariable("jetElf"    ,self.var_jetElf)
+        self.readerREG.AddVariable("jetMuf"    ,self.var_jetMuf)
+        self.readerREG.AddVariable("jetPtD"    ,self.var_jetPtD)
+        self.readerREG.AddVariable("jetVtxPt"  ,self.var_jetVtxPt)
+        self.readerREG.AddVariable("jetVtx3dL" ,self.var_jetVtx3dL)
+        self.readerREG.AddVariable("jetVtx3deL",self.var_jetVtx3deL)
+        self.readerREG.AddVariable("met"       ,self.var_met)
+        self.readerREG.AddVariable("rho"       ,self.var_rho)
+        self.readerREG.BookMVA("BDT_REG","/home/fynu/vizangarciaj/storage/TMVA/factoryJetReg_BDT.weights.xml")
+
+
     
     #@print_timing
     def process(self, event):
@@ -382,6 +424,10 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
       dijet =  event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+      b1 = ROOT.TLorentzVector(0,0,0,0)#4-vec first bjet (use only if nb>0)
+      b2 = ROOT.TLorentzVector(0,0,0,0)#4-vec first bjet (use only if nb>1)
+      bNNCorr1 = ROOT.TLorentzVector(0,0,0,0)#4-vec first NNcorr bjet
+      bNNCorr2 = ROOT.TLorentzVector(0,0,0,0)#4-vec first NNcorr bjet
       for index,jet in enumerate(event.jets):
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
@@ -440,8 +486,8 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet1energy"] = jet.energy()
             result["jet1mass"] = jet.mass()	    
             result["jet1Chf"] = jet.chargedHadronEnergyFraction()
-            result["jet1Phf"] = jet.neutralHadronEnergyFraction()
-            result["jet1Nhf"] = jet.photonEnergyFraction()
+            result["jet1Nhf"] = jet.neutralHadronEnergyFraction()
+            result["jet1Phf"] = jet.photonEnergyFraction()
             result["jet1Elf"] = jet.electronEnergyFraction()
             result["jet1Muf"] = jet.muonEnergyFraction()
             result["jet1Vtx3dL"] = jetVtx3dL(jet)
@@ -470,8 +516,8 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2energy"] = jet.energy()
             result["jet2mass"] = jet.mass()
             result["jet2Chf"] = jet.chargedHadronEnergyFraction()
-            result["jet2Phf"] = jet.neutralHadronEnergyFraction()
-            result["jet2Nhf"] = jet.photonEnergyFraction()
+            result["jet2Nhf"] = jet.neutralHadronEnergyFraction()
+            result["jet2Phf"] = jet.photonEnergyFraction()
             result["jet2Elf"] = jet.electronEnergyFraction()
             result["jet2Muf"] = jet.muonEnergyFraction()
             result["jet2Vtx3dL"] = jetVtx3dL(jet)
@@ -489,7 +535,7 @@ class JetmetControlPlots(BaseControlPlots):
             result["jet2CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
             result["jet2JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
             result["jet2beta"] = jet.userFloat("beta")
-            result["jet2betaStar"] = jet.userFloat("betaStar")            
+            result["jet2betaStar"] = jet.userFloat("betaStar")             
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
             if indexDijet==0 and jet in dijet:
@@ -503,8 +549,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1energy"] = jet.energy()
               result["bjet1mass"] = jet.mass()
               result["bjet1Chf"] = jet.chargedHadronEnergyFraction()
-              result["bjet1Phf"] = jet.neutralHadronEnergyFraction()
-              result["bjet1Nhf"] = jet.photonEnergyFraction()
+              result["bjet1Nhf"] = jet.neutralHadronEnergyFraction()
+              result["bjet1Phf"] = jet.photonEnergyFraction()
               result["bjet1Elf"] = jet.electronEnergyFraction()
               result["bjet1Muf"] = jet.muonEnergyFraction()
               result["bjet1Vtx3dL"] = jetVtx3dL(jet)
@@ -515,15 +561,40 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
               result["bjet1nVertHE"] = nHEvert
               result["bjet1nVertHP"] = nHPvert
+	      bjet1svmass=-1
+	      bjet1svpt=-1
 	      if tISV :
 	        if tISV.secondaryVertex(0) :
-	          result["bjet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
-                  result["bjet1SVpT"] = tISV.secondaryVertex(0).p4().pt()
-              result["bjet1CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+	          bjet1svmass = tISV.secondaryVertex(0).p4().mass()
+                  bjet1svpt = tISV.secondaryVertex(0).p4().pt()
+              result["bjet1SVmass"] = bjet1svmass
+	      result["bjet1SVpT"] = bjet1svpt
+	      result["bjet1CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
               result["bjet1JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
 	      result["dptj1b1"] = jetPt-j1pt
               result["bjet1beta"] = jet.userFloat("beta")
               result["bjet1betaStar"] = jet.userFloat("betaStar")
+	      corr = 1.
+	      if doNNJetRegression == True:
+                self.var_jetBtag[0] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+                self.var_jetPt[0] = jetPt
+                self.var_jetEta[0] = jet.eta()
+                self.var_jetMetPhi[0] = abs(jet.phi()-event.METNNregression[0].phi())
+                self.var_jetChf[0] = jet.chargedHadronEnergyFraction()
+                self.var_jetPhf[0] = jet.photonEnergyFraction()
+                self.var_jetNhf[0] = jet.neutralHadronEnergyFraction()
+                self.var_jetElf[0] = jet.electronEnergyFraction()
+                self.var_jetMuf[0] = jet.muonEnergyFraction()
+                self.var_jetPtD[0] = jetPtD(jet)
+                self.var_jetVtxPt[0] = jetVtxPt(jet)
+                self.var_jetVtx3dL[0] = jetVtx3dL(jet)
+                self.var_jetVtx3deL[0] = jetVtx3deL(jet)
+                self.var_met[0] = event.METNNregression[0].pt()
+                self.var_rho[0] = event.rho[0]
+	        corr = self.readerREG.EvaluateRegression("BDT_REG")[0]/jetPt
+	      result["bjet1NNCorrenergy"] = jet.energy()*corr
+	      b1.SetPtEtaPhiM(jetPt, jet.eta(), jet.phi(), jet.mass())#notice mass not scale for JES variation (maybe not optimal)
+	      bNNCorr1.SetPtEtaPhiM(jetPt*corr, jet.eta(), jet.phi(), jet.mass()*corr)#notice mass not scale for JES variation (maybe not optimal)
             elif indexDijet==1 and jet in dijet:
               indexDijet+=1
               result["bjet2pt"] = jetPt
@@ -535,8 +606,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet2energy"] = jet.energy()
               result["bjet2mass"] = jet.mass()
               result["bjet2Chf"] = jet.chargedHadronEnergyFraction()
-              result["bjet2Phf"] = jet.neutralHadronEnergyFraction()
-              result["bjet2Nhf"] = jet.photonEnergyFraction()
+              result["bjet2Nhf"] = jet.neutralHadronEnergyFraction()
+              result["bjet2Phf"] = jet.photonEnergyFraction()
               result["bjet2Elf"] = jet.electronEnergyFraction()
               result["bjet2Muf"] = jet.muonEnergyFraction()
               result["bjet2Vtx3dL"] = jetVtx3dL(jet)
@@ -545,16 +616,45 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet2PtD"] = jetPtD(jet)
               result["bjet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["bjet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+	      bjet2svmass=-1
+	      bjet2svpt=-1
 	      if tISV :
 	        if tISV.secondaryVertex(0) :
-	          result["bjet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
-                  result["bjet2SVpT"] = tISV.secondaryVertex(0).p4().pt()
+	          bjet2svmass = tISV.secondaryVertex(0).p4().mass()
+                  bjet2svpt = tISV.secondaryVertex(0).p4().pt()
+              result["bjet2SVmass"] = bjet2svmass
+	      result["bjet2SVpT"] = bjet2svpt
               result["bjet2CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
               result["bjet2JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
               result["bjet2nVertHE"] = nHEvert
               result["bjet2nVertHP"] = nHPvert
               result["bjet2beta"] = jet.userFloat("beta")
               result["bjet2betaStar"] = jet.userFloat("betaStar")
+	      corr = 1.
+	      if doNNJetRegression == True:
+                self.var_jetBtag[0] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+                self.var_jetPt[0] = jetPt
+                self.var_jetEta[0] = jet.eta()
+                self.var_jetMetPhi[0] = abs(jet.phi()-event.METNNregression[0].phi())
+                self.var_jetChf[0] = jet.chargedHadronEnergyFraction()
+                self.var_jetPhf[0] = jet.photonEnergyFraction()
+                self.var_jetNhf[0] = jet.neutralHadronEnergyFraction()
+                self.var_jetElf[0] = jet.electronEnergyFraction()
+                self.var_jetMuf[0] = jet.muonEnergyFraction()
+                self.var_jetPtD[0] = jetPtD(jet)
+                self.var_jetVtxPt[0] = jetVtxPt(jet)
+                self.var_jetVtx3dL[0] = jetVtx3dL(jet)
+                self.var_jetVtx3deL[0] = jetVtx3deL(jet)
+                self.var_met[0] = event.METNNregression[0].pt()
+                self.var_rho[0] = event.rho[0]
+	        corr = self.readerREG.EvaluateRegression("BDT_REG")[0]/jetPt
+	        result["bjet2NNCorrenergy"] = jet.energy()*corr
+	      b2.SetPtEtaPhiM(jetPt, jet.eta(), jet.phi(), jet.mass())#notice mass not scale for JES variation (maybe not optimal)
+	      bNNCorr2.SetPtEtaPhiM(jetPt*corr, jet.eta(), jet.phi(), jet.mass()*corr)#notice mass not scale for JES variation (maybe not optimal)
+	      result["bbM"] = (b1 + b2).M()
+	      result["bbNNCorrM"] = (bNNCorr1 + bNNCorr2).M()
+	      
+	      
           if isBJet(jet,"HP",self.btagging): nbP += 1
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP
