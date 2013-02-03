@@ -8,7 +8,7 @@ from eventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel
 #from myFuncTimer import print_timing
-event_list = open("eventlist.txt","w")
+#event_list = open("eventlist.txt","w")
 
 class EventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
