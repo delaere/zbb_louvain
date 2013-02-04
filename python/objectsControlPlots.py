@@ -226,7 +226,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("CSVdiscDisc1","CSVdiscDisc1",100,0,1)
       self.add("JPdiscDisc1","JPdiscDisc1",100,0,2.5)
       self.add("MET","MET",100,0,200)
-      self.add("MET","MET for input ME",10,0,99999.)
+      self.add("MET_ME","MET for input ME",10,0,99999.)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("METsignificance","MET significance",100,0,20)
       self.add("jetpt","Jet Pt",100,15,215)
