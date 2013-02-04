@@ -226,6 +226,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("CSVdiscDisc1","CSVdiscDisc1",100,0,1)
       self.add("JPdiscDisc1","JPdiscDisc1",100,0,2.5)
       self.add("MET","MET",100,0,200)
+      self.add("MET","MET for input ME",10,0,99999.)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("METsignificance","MET significance",100,0,20)
       self.add("jetpt","Jet Pt",100,15,215)
@@ -275,13 +276,14 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jet2beta","subleading jet beta function",20,-1,1)
       self.add("jet2betaStar","subleading jet beta* function",20,-1,1)
       self.add("bjet1pt","leading bjet Pt",500,15,515)
+      self.add("bjet1ptME","leading bjet Pt for ME input",10,15,99999.)
       self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
       self.add("bjet1Flavor","leading bjet Flavor (MC)",29,-6.5,22.5)
       self.add("bjet1eta","leading bjet Eta",25,0,2.5)
       self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
       self.add("bjet1phi","leading bjet Phi",25,-4,4)
       self.add("bjet1energy","leading bjet energy",125,0,3000)
-      self.add("bjet1mass","leading bjet mass",125,0,500)
+      self.add("bjet1mass","leading bjet mass",10,0,99999.)
       self.add("bjet1SSVHEdisc","leading bjet SSVHE discriminant",200,1.74,10)
       self.add("bjet1nVertHE","Number of two-tracks vertices in leading bjet",5,-0.5,4.5)
       self.add("bjet1SSVHPdisc","leading bjet SSVHP discriminant",200,0,10)
@@ -293,13 +295,14 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet1beta","leading bjet beta function",20,-1,1)
       self.add("bjet1betaStar","leading bjet beta* function",20,-1,1)
       self.add("bjet2pt","subleading bjet Pt",500,15,515)
+      self.add("bjet2ptME","subleading bjet Pt for ME input",10,15,99999.)
       self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
       self.add("bjet2Flavor","subleading bjet Flavor (MC)",29,-6.5,22.5)
       self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
       self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
       self.add("bjet2phi","subleading bjet Phi",25,-4,4)
       self.add("bjet2energy","subleading bjet energy",125,0,3000)
-      self.add("bjet2mass","subleading bjet mass",125,0,500)
+      self.add("bjet2mass","subleading bjet mass",10,0,99999.)
       self.add("bjet2SSVHEdisc","subleading bjet SSVHE discriminant",200,1.74,10)
       self.add("bjet2nVertHE","Number of two-tracks vertices in subleading bjet",5,-0.5,4.5)
       self.add("bjet2SSVHPdisc","subleading bjet SSVHP discriminant",200,0,10)
@@ -487,6 +490,7 @@ class JetmetControlPlots(BaseControlPlots):
 	    indexDijet += 1
             if indexDijet==1:
               result["bjet1pt"] = jetPt
+              result["bjet1ptME"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet1Flavor"] = jet.partonFlavour()
               result["bjet1eta"] = abs(jet.eta())
@@ -509,6 +513,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1betaStar"] = jet.userFloat("betaStar")
             elif indexDijet==2:
               result["bjet2pt"] = jetPt
+              result["bjet2ptME"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
 	      result["bjet2Flavor"] = jet.partonFlavour()
               result["bjet2eta"] = abs(jet.eta())
@@ -537,6 +542,7 @@ class JetmetControlPlots(BaseControlPlots):
       result["nb"] = nb
       result["nbP"] = nbP
       result["MET"] = met[0].pt()
+      result["MET_ME"] = met[0].pt()
       result["METphi"] = met[0].phi()
       result["METsignificance"] = 0.
       if met[0].getSignificanceMatrix()(0,0)<1e10 and met[0].getSignificanceMatrix()(1,1)<1e10: 
