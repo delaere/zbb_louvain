@@ -340,6 +340,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   Pt_j2 = n.zeros(1, dtype=float)
   btag_j1= n.zeros(1, dtype=float) # estimator b tag value
   btag_j2= n.zeros(1, dtype=float) # estimator b tag value
+  Flavor_j1 = n.zeros(1, dtype=int)
+  Flavor_j2 = n.zeros(1, dtype=int)
 
   Met=  n.zeros(1, dtype=float)
   Met_phi=  n.zeros(1, dtype=float)
@@ -389,6 +391,8 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
   tree1.Branch("Pt_j2",Pt_j2,"Pt_j2/D")
   tree1.Branch("btag_j1",btag_j1,"btag_j1/D")
   tree1.Branch("btag_j2",btag_j2,"btag_j2/D")
+  tree1.Branch("Flavor_j1",Flavor_j1,"Flavor_j1/I")
+  tree1.Branch("Flavor_j2",Flavor_j2,"Flavor_j2/I")
 
   tree1.Branch("llM",llM,"llM/D")
   tree1.Branch("bbM",bbM,"bbM/D")
@@ -609,6 +613,9 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
 	  btag_j1[0]=dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
 	  btag_j2[0]=dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
         
+        Flavor_j1[0]=dijet[0].partonFlavour()
+	Flavor_j2[0]=dijet[1].partonFlavour()
+
 	DR_jet[0]=DR
       
         E_l1[0]=l1.energy()
