@@ -60,6 +60,8 @@ void CompareCMSToLHCO_RDS(TString nameCMStoLHCO, TString nameRDS) {
   else if (TString(fileRDS->GetName()).Contains("_Mu")) channel = "Mu";
   else {std::cout << "could not determine channel (Ele or Mu)" << std::endl; return;}
   std::cout << "channel=" << channel << std::endl;
+  
+  TString muORel = (channel == "Ele")? "el": "mu";
 
   //First check number of entries both selections
   TH1F* hCMSevent = new TH1F("hCMSevent", "", 1, 0, 1);
@@ -99,6 +101,8 @@ void CompareCMSToLHCO_RDS(TString nameCMStoLHCO, TString nameRDS) {
   id="METphi"; iseq=Compare2Histos(150, -3.2, 3.2, "Met_phi", "jetmetMETphi", verbose, id); if (!iseq) allOK=false; cout<<"id="<<id<<":"<<iseq<<endl;
 
   id="llM"; iseq=Compare2Histos(250, 0, 250, "llM", "eventSelectionbestzmass"+channel, verbose, id); if (!iseq) allOK=false; cout<<"id="<<id<<":"<<iseq<<endl;
+  
+  id="Pt_l1"; iseq=Compare2Histos(250, 0, 250, "Pt_l1", "eventSelection"+muORel+"1pt", verbose, id); if (!iseq) allOK=false; cout<<"id="<<id<<":"<<iseq<<endl;
   
   std::cout << "allOK=" << allOK << std::endl;
   
