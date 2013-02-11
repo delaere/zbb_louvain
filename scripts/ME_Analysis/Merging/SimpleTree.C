@@ -42,7 +42,7 @@
 #include "MLP_Higgs_vs_BKG_MM_N_CSV_2011.cxx"
 #include "../NN/MLP_Higgs_vs_BKG_ML_CSV_2011.cxx"
 #include "../NN/MLP_TT_vs_DY_MM_CSV_2011.cxx"
-#include "../NN/MLP_TT_vs_DY_MM_N_CSV_2011.cxx"
+#include "MLP_TT_vs_DY_MM_N_CSV_2011.cxx"
 #include "../NN/MLP_TT_vs_DY_ML_CSV_2011.cxx"
 
 // Include NN traine on mm
@@ -220,6 +220,7 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    Double_t        jetmetSSVHPdiscDisc1;
    Double_t        jetmetTCHEdiscDisc1;
    Double_t        jetmetTCHPdiscDisc1;
+   Double_t        jetmetCSVdiscDisc1;
    Double_t        jetmetbjet1CSVdisc;
    Double_t        jetmetbjet2CSVdisc;
    Double_t        jetmetMET;
@@ -285,6 +286,9 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    Double_t        jetmetbjet2TCHPdisc;
    Double_t        jetmetdptj1b1;
    Double_t        jetmetnj;
+   Double_t        jetmetbjetMinCSVdisc;
+   Double_t        jetmetbjetMaxCSVdisc;
+   Double_t        jetmetbjetProdCSVdisc;
    Double_t        jetmetnb;
    Double_t        jetmetnbP;
    Double_t        jetmetnhf;
@@ -708,6 +712,10 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("jetmetbjet1TCHEdisc", &jetmetbjet1TCHEdisc, "jetmetbjet1TCHEdisc/D");
    t_RDSME->Branch("jetmetbjet1TCHPdisc", &jetmetbjet1TCHPdisc, "jetmetbjet1TCHPdisc/D");
    t_RDSME->Branch("jetmetbjet1pt", &jetmetbjet1pt, "jetmetbjet1pt/D");
+   t_RDSME->Branch("jetmetbjetMinCSVdisc",&jetmetbjetMinCSVdisc,"jetmetbjetMinCSVdisc/D");
+   t_RDSME->Branch("jetmetbjetMaxCSVdisc",&jetmetbjetMaxCSVdisc,"jetmetbjetMaxCSVdisc/D");
+   t_RDSME->Branch("jetmetbjetProdCSVdisc",&jetmetbjetProdCSVdisc,"jetmetbjetProdCSVdisc/D");     
+   t_RDSME->Branch("jetmetCSVdiscDisc1", &jetmetCSVdiscDisc1, "jetmetCSVdiscDisc1/D");
    t_RDSME->Branch("jetmetbjet2CSVdisc", &jetmetbjet2CSVdisc, "jetmetbjet2CSVdisc/D");
    t_RDSME->Branch("jetmetbjet1CSVdisc", &jetmetbjet1CSVdisc, "jetmetbjet1CSVdisc/D");
    t_RDSME->Branch("jetmetbjet2pt_totunc", &jetmetbjet2pt_totunc, "jetmetbjet2pt_totunc/D");
@@ -1094,6 +1102,7 @@ void CreateParentTree(TString InputFile) {
       jetmetjet2SVmass = mc_RDS->jetmetjet2SVmass;
       jetmetbjet1pt = mc_RDS->jetmetbjet1pt;
       jetmetbjet1pt_totunc = mc_RDS->jetmetbjet1pt_totunc;
+      jetmetCSVdiscDisc1 = mc_RDS->jetmetCSVdiscDisc1;
       jetmetbjet1CSVdisc = mc_RDS->jetmetbjet1CSVdisc;
       jetmetbjet2CSVdisc = mc_RDS->jetmetbjet2CSVdisc;
       jetmetbjet1Flavor = mc_RDS->jetmetbjet1Flavor;
@@ -1218,7 +1227,9 @@ void CreateParentTree(TString InputFile) {
         Whi0_130 = mc_ME->Whi0_130;
 	Whi3_135 = mc_ME->Whi3_135;
         Whi0_135 = mc_ME->Whi0_135;
-
+	jetmetbjetMinCSVdisc=min(jetmetbjet1CSVdisc,jetmetbjet2CSVdisc);
+	jetmetbjetMaxCSVdisc=max(jetmetbjet1CSVdisc,jetmetbjet2CSVdisc);
+	jetmetbjetProdCSVdisc=jetmetbjet1CSVdisc*jetmetbjet2CSVdisc;
 
         Inv_Mass_bb = mc_ME->Inv_Mass_bb;
         Inv_Mass_lept = mc_ME->Inv_Mass_lept;
@@ -1226,10 +1237,10 @@ void CreateParentTree(TString InputFile) {
 //---------------------- NN  output here ---------------------------------
         // For DY vs TT
 	mlpZbbvsTT_MM = MLP_TT_vs_DY_MM_ee->Value(0, Wgg, Wqq, Wtt);
-        mlpZbbvsTT_MM_N = MLP_TT_vs_DY_MM_N_ee->Value(0, Wgg, Wqq, Wtt);
+        mlpZbbvsTT_MM_N = max(0.0,min(1.0,MLP_TT_vs_DY_MM_N_ee->Value(0, Wgg,Wqq, jetmetbjet2CSVdisc*jetmetbjet1CSVdisc)));
         mlpZbbvsTT_ML = MLP_TT_vs_DY_ML_ee->Value(0, Wgg, Wqq, Wtt);
 	mlpZbbvsTT_mu_MM = MLP_TT_vs_DY_MM_mm->Value(0, Wgg, Wqq, Wtt);
-        mlpZbbvsTT_mu_MM_N = MLP_TT_vs_DY_MM_N_mm->Value(0, Wgg, Wqq, Wtt);
+        mlpZbbvsTT_mu_MM_N = max(0.0,min(1.0,MLP_TT_vs_DY_MM_N_mm->Value(0, Wgg, Wqq, Wtt)));
 	mlpZbbvsTT_mu_ML = MLP_TT_vs_DY_ML_mm->Value(0, Wgg, Wqq, Wtt);
 
 	// For H 125
@@ -1558,7 +1569,7 @@ void CreateParentTree(TString InputFile) {
 
 	}
 
-
+	
 	//Reweighting stuff here:
 	ZbbReweight_dijetdR = 1.;
 	ZbbReweight_bestzpt = 1.;
@@ -1652,27 +1663,27 @@ double Compute1DReweight(TH1D* hRW, double value) {
 //   CreateParentTree(InputFile);
 
 void SimpleTree() {
-   //CreateParentTree("MuA_DATA");
-   //CreateParentTree("ElA_DATA");
-   //CreateParentTree("MuB_DATA");
-   //CreateParentTree("ElB_DATA");
-   //CreateParentTree("Mu_MC");
-   //CreateParentTree("El_MC");
-   CreateParentTree("DY_Pt100_El_MC");
-   //CreateParentTree("TT_Mu_MC");
-   //CreateParentTree("TT_El_MC");
-   //CreateParentTree("ZZ_Mu_MC");
-   //CreateParentTree("ZZ_El_MC");
-   //CreateParentTree("ZH125_Mu_MC");
-   //CreateParentTree("ZH125_El_MC");
-   //CreateParentTree("ZH115_Mu_MC");
-   //CreateParentTree("ZH115_El_MC");
-   //CreateParentTree("ZH120_Mu_MC");
-   //CreateParentTree("ZH120_El_MC");
-   //CreateParentTree("ZH130_Mu_MC");
-   //CreateParentTree("ZH130_El_MC");
-   //CreateParentTree("ZH135_Mu_MC");
-   //CreateParentTree("ZH135_El_MC");
+   CreateParentTree("MuA_DATA");
+   CreateParentTree("ElA_DATA");
+   CreateParentTree("MuB_DATA");
+   CreateParentTree("ElB_DATA");
+   CreateParentTree("Mu_MC");
+   CreateParentTree("El_MC");
+   //CreateParentTree("DY_Pt100_El_MC");
+   CreateParentTree("TT_Mu_MC");
+   CreateParentTree("TT_El_MC");
+   CreateParentTree("ZZ_Mu_MC");
+   CreateParentTree("ZZ_El_MC");
+   CreateParentTree("ZH125_Mu_MC");
+   CreateParentTree("ZH125_El_MC");
+   CreateParentTree("ZH115_Mu_MC");
+   CreateParentTree("ZH115_El_MC");
+   CreateParentTree("ZH120_Mu_MC");
+   CreateParentTree("ZH120_El_MC");
+   CreateParentTree("ZH130_Mu_MC");
+   CreateParentTree("ZH130_El_MC");
+   CreateParentTree("ZH135_Mu_MC");
+   CreateParentTree("ZH135_El_MC");
 }
 
 //mergeOneSample(InputFile = "Mu_DATA")
