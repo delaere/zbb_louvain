@@ -43,8 +43,17 @@ ourtriggers.murunMap[190455:] = ("HLT_Mu17_Mu8_v16",
                                  "HLT_Mu17_TkMu8_v12",
                                  "HLT_Mu17_TkMu8_v13",
                                  "HLT_Mu17_TkMu8_v14",
-                                 "HLT_Mu17_TkMu8_NoDZ_v1",)
+                                 #"HLT_IsoMu24_v15",
+                                 #"HLT_IsoMu24_v16",
+                                 #"HLT_IsoMu24_v17",
+                                 )
 
+ourtriggers.muSinglerunMap = intervalmap.intervalmap()
+ourtriggers.muSinglerunMap[190455:] = ("HLT_IsoMu24_v15",
+                                       "HLT_IsoMu24_v16",
+                                       "HLT_IsoMu24_v17",
+                                       )
+ 
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
 ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
@@ -77,6 +86,7 @@ ourtriggers.elrunMap[190455:] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_E
 ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
 ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
+ourtriggers.SingleMutriggers = list(set([item for sublist in [i for i in ourtriggers.muSinglerunMap.values()] for item in sublist]))
 
 def electron_iswrongPS(electron, runNumber, lumi_section):
   if runNumber==171050 and (lumi_section==47 or lumi_section==92):
@@ -197,7 +207,7 @@ def isLooseElectron(electron):
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return abs(electron.eta())<2.4 and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) )
+  return abs(electron.eta())<2.5 # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) )
   ##return electron.eta()<2.5
   #return True
 
@@ -426,6 +436,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
   if l1.isMuon() :
+    return True
     if runNumber>=160410 and runNumber<163269 :
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
         return True
