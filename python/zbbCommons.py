@@ -32,7 +32,7 @@ class zbbsystematics:
 class zbbfile:
   """files containing calibrations and other data"""
   ssvperfData="../data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
-  pileupData="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
+  pileupData="../data/Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
   pileupMC="../data/MCpileup_Summer12_S10.root"
   jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
 
@@ -44,7 +44,8 @@ class zbbnorm:
   lumi_totEle2011=5.217 #in fb-1
   lumi_totMu2011=5.275
 
-  lumi_tot2012=5.21 #only A and B for the moment
+  lumi_tot2012= 19.45 #A+B+C+D
+  #lumi_tot2012= 19.45-7.27 #ABC
   
   #x_section 7 TeV in pb
   #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSections
@@ -52,6 +53,7 @@ class zbbnorm:
   xsec_TTjets_7TeV=  157.5    #NLO inclusive
   xsec_TTlept_7TeV=   16.7    #ttbar->llvvbb_
   xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
+  xsec_ZH110_7TeV =    0.0365 #ZHxsec"0.4721", BR(H->bb)"0.744"
   xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
   xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
   xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
@@ -65,7 +67,12 @@ class zbbnorm:
   xsec_DYjets_8TeV=3503.71  #Ml+l->50, NNLO for Z->ll
   xsec_TTjets_8TeV=225.197  #NLO inclusive
   xsec_ZZ_8TeV= 8.25561     #NLO inclusive Ml+l->12
+  xsec_ZH110_8TeV=0.0454    #xsec=0.5869
+  xsec_ZH115_8TeV=0.0374    #xsec=0.5117 
+  xsec_ZH120_8TeV=0.0302    #xsec=0.4483
   xsec_ZH125_8TeV=0.0237    #ZHxsec"0.3943 "*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau
+  xsec_ZH130_8TeV=0.0178    #xsec=0.3473 
+  xsec_ZH135_8TeV=0.0129    #xsec=0.3074 
   xsec_tW_8TeV=11.1         #approx. NNLO inclusive
   xsec_tbarW_8TeV=11.1      #approx. NNLO inclusive
 
@@ -83,12 +90,13 @@ class zbbnorm:
   nev_tbarW_fall11    =   809984 # updated
   
   #summer 12 number of events processed for the PATtuple production
-  nev_DYjets_summer12   = 29310189 # approximate number : 1472 jobs finished on 1527, 1472 to be check possible some finish after
+  nev_DYjets_summer12   = 30459503 # OK, inclusive sample
   nev_TTjets_summer12   =  6923750 # MassiveBinDecay S10, OK
   nev_ZZ_summer12       =  9799908 # OK
-  nev_ZH115_summer12    =  1090000 # not yet
-  nev_ZH120_summer12    =  1090000 # not yet
+  nev_ZH110_summer12    =   998514 # OK
+  nev_ZH115_summer12    =   999699 # OK
+  nev_ZH120_summer12    =  1000215 # OK
   nev_ZH125_summer12    =   999462 # OK
-  nev_ZH130_summer12    =  1100000 # not yet
-  nev_ZH135_summer12    =  1096956 # not yet
+  nev_ZH130_summer12    =  1000000 # OK
+  nev_ZH135_summer12    =  1000000 # OK
                   
