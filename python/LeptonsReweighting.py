@@ -75,13 +75,13 @@ class LeptonsReWeighting:
    def __init__(self):
      # the efficiency maps
    
-     # ===================== ELECTRONS 2012 A+B (WP medium) systematics NOT included yet (need to be evaluated) RECO SF assumed ~1 according to e-gamma POG==========
+     # ===================== ELECTRONS 2012 A+B+C+D (WP medium) error/systematics NOT included yet (need to be filled correctly) RECO SF : https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=230885 ==========
      
-     self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
+     self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+                                   [[(1.010,0.01), (0.981,0.01), (1.046,0.01), (0.992,0.01), (1.045,0.01)],   # 20-30 GeV
+                                    [(1.006,0.01), (0.987,0.01), (1.011,0.01), (0.993,0.01), (1.031,0.01)],   # 30-40 GeV
+                                    [(1.009,0.01), (0.993,0.01), (0.994,0.01), (1.008,0.01), (1.019,0.01)],   # 40-50 GeV
+                                    [(1.008,0.01), (0.997,0.01), (0.997,0.01), (1.019,0.01), (1.014,0.01)]])  # 50-200 GeV
  
      
      self._eleIsoWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
@@ -105,13 +105,13 @@ class LeptonsReWeighting:
      
      ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
 
-     # ===================== MUONS 2012A+B ========== 
+     # ===================== MUONS 2012A+B+C+D ========== error is not updated and SFs gave up to 2.1, we assume they are the same between 2.1 and 2.4
      ## CAVEAT: systematics assumed to come only from background modelling and added in quadrature ( https://twiki.cern.ch/twiki/bin/view/CMS/MuonTagAndProbe#Systematic_uncertainties )
-     
-     self._muPidWeight  = PtEtaMap([],[0.9,2.1],
-                                   [[(0.9941,sqrt(0.0003**2+0.002**2)), (0.9917,sqrt(0.0005**2+0.004**2)), (0.9982,sqrt(0.0004**2+0.004**2))]])
-     self._muIsoWeight  = PtEtaMap([],[0.9,2.1],
-                                   [[(0.9972,sqrt(0.0001**2+0.002**2)), (0.9992,sqrt(0.0002**2+0.004**2)), (1.0004,sqrt(0.0001**2+0.004**2))]]) 
+     ## recommandation : https://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=233592
+     self._muPidWeight  = PtEtaMap([],[0.9,1.2],
+                                   [[(0.9939,sqrt(0.0002**2+0.002**2)), (0.9902,sqrt(0.0003**2+0.004**2)), (0.9970,sqrt(0.0003**2+0.004**2))]])
+     self._muIsoWeight  = PtEtaMap([],[0.9,1.2],
+                                   [[(0.9999,sqrt(0.0001**2+0.002**2)), (1.0013,sqrt(0.0002**2+0.004**2)), (1.0023,sqrt(0.0001**2+0.004**2))]]) 
 
      ## ============= muon  trigger==================
      ## ============ periodA (calculating the dz cut efficiency)=============
@@ -242,7 +242,7 @@ class LeptonsReWeighting:
                         self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_B_Weight [(m2.pt(),m2.eta())][0] - \
                         self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0]
      
-     lw *= (0.13*hlt_sf_run2011_a+0.87* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
+     lw *= 0.966 #(0.13*hlt_sf_run2011_a+0.87* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
 
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
