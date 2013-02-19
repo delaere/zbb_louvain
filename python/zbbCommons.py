@@ -1,5 +1,3 @@
-doNNJetRegression = False
-
 class zbblabel:
   """labels used in the PAT configuration"""
   allmuonslabel="allMuons"
@@ -100,3 +98,6 @@ class zbbnorm:
   nev_ZH130_summer12    =  1000000 # OK
   nev_ZH135_summer12    =  1000000 # OK
                   
+class zbbme:
+  doMEcontrolPlots = True # if false nobody else of this class matters
+  doNNJetRegression = False
