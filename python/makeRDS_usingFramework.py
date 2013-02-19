@@ -19,6 +19,7 @@ import itertools
 import time
 
 from eventSelection import *
+from matrixElementControlPlots import *
 from eventSelectionControlPlots import *
 from monteCarloSelectionControlPlots import *
 from LumiReWeightingControlPlots import *
@@ -31,7 +32,7 @@ from AnalysisEvent import AnalysisEvent
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-from zbbCommons import zbbfile
+from zbbCommons import zbbfile, zbbme
 from optparse import OptionParser
 
 ###############
@@ -160,6 +161,8 @@ rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
 jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+if zbbme.doMEcontrolPlots:
+  mecp	= MatrixElementControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
 if channel[-2:] == "MC":
   brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
   lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
@@ -184,6 +187,8 @@ if channel[-2:] == "MC":
 escp.beginJob()
 jmcp.beginJob(btagging=btagAlgo)
 vacp.beginJob()
+if zbbme.doMEcontrolPlots:
+  mecp.beginJob()
 if channel[-2:] == "MC":
   brcp.beginJob() 
   lrcp.beginJob()             
@@ -231,6 +236,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       escp.processEvent(event)
       jmcp.processEvent(event)
       vacp.processEvent(event)
+      if zbbme.doMEcontrolPlots:
+        mecp.processEvent(event)
       if channel[-2:] == "MC":
         brcp.processEvent(event,btagging=btagAlgo)
         lrcp.processEvent(event)
@@ -240,6 +247,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       ras_escp=escp._obsSet
       ras_jmcp=jmcp._obsSet
       ras_vacp=vacp._obsSet
+      if zbbme.doMEcontrolPlots:
+        ras_mecp=mecp._obsSet
       if channel[-2:] == "MC":
         ras_lrcp=lrcp._obsSet
         ras_brcp=brcp._obsSet
@@ -248,6 +257,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
 
       ras_escp.add(ras_vacp)
       ras_escp.add(ras_jmcp)
+      if zbbme.doMEcontrolPlots:
+        ras_escp.add(ras_mecp)
       if channel[-2:] == "MC":
         ras_escp.add(ras_lrcp)
         ras_escp.add(ras_brcp)
@@ -261,6 +272,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     escp.endJob()
     jmcp.endJob()
     vacp.endJob()
+    if zbbme.doMEcontrolPlots:
+      mecp.endJob()
     if channel[-2:] == "MC":
       brcp.endJob()
       lrcp.endJob()
