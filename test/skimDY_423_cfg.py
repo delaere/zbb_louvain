@@ -101,9 +101,9 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.5 $'),
+    version = cms.untracked.string('$Revision: 1.6 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
+    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
 )
 
@@ -142,8 +142,15 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 #------------------------------ Filter
 
+
+process.LoosePTjets = cms.EDFilter("PATJetSelector", #
+                            src = cms.InputTag("patJetsWithBeta"),
+                            cut = cms.string('pt > 15. & abs(eta) < 2.4'),
+                            filter = cms.bool(True)
+                            )
+
 process.CSVMbjets = cms.EDFilter("PATJetSelector",
-                            src = cms.InputTag("CSVbjets"),
+                            src = cms.InputTag("LoosePTjets"),
                             cut = cms.string('bDiscriminator("combinedSecondaryVertexBJetTags")>0.679'),
                             filter = cms.bool(True)
                             )
@@ -182,10 +189,10 @@ process.zElElFilter = cms.EDFilter("CandViewCountFilter",
 # Run it
 
 process.p4 = cms.Path(process.zMuMuFilter*process.bFilter)
-process.p5 = cms.Path(process.zMuMuFilter*process.CSVMbjets)
+process.p5 = cms.Path(process.zMuMuFilter*process.LoosePTjets*process.CSVMbjets)
 #process.p5 = cms.Path(process.CSVbFilter)
 process.p6 = cms.Path(process.zElElFilter*process.bFilter)
-process.p7 = cms.Path(process.zElElFilter*process.CSVMbjets)
+process.p7 = cms.Path(process.zElElFilter*process.LoosePTjets*process.CSVMbjets)
 
 process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5','p6','p7'))
 
