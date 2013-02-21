@@ -82,6 +82,7 @@ def CreateTheShellFile(argv):
 	shell_file=open(Path_Shell,'w')
 	shell_file.write('#! /bin/sh\n')
 	shell_file.write(CopyRights + '\n')
+	shell_file.write('export HOME=.\n')
 	#shell_file.write('export SCRAM_ARCH=slc5_ia32_gcc434\n')
         #shell_file.write('export BUILD_ARCH=slc5_ia32_gcc434\n')
 	shell_file.write('export SCRAM_ARCH=slc5_amd64_gcc434\n')
