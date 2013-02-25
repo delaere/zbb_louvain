@@ -27,13 +27,16 @@ from BtaggingReWeightingControlPlots import *
 from LeptonsReweightingControlPlots import *
 from objectsControlPlots import *
 from vertexAssociationControlPlots import *
+from matrixElementControlPlots import *
 
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-from zbbCommons import zbbfile, isZbbSelection
+from zbbCommons import zbbfile, isZbbSelection, zbbme
 from eventSelection import eventCategories, eventCategory, isInCategory
 from optparse import OptionParser
+
+
 
 ###############
 ##  USAGE #####
@@ -243,6 +246,10 @@ brcp    = BtaggingReWeightingControlPlots(dir=None, muChannel=muChannel[channel]
 lrcp    = LeptonsReweightingControlPlots(dir=None, muChannel=muChannel[channel], dataset=rds_zbb, mode="dataset")
 jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+
+if zbbme.doMEcontrolPlots:
+  mecp  = MatrixElementControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
+  
 if channel[-2:] == "MC":
   mscp    = MonteCarloSelectionControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
   prcp    = LumiReWeightingControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
@@ -264,7 +271,11 @@ events = Events (files)
 escp.beginJob(btagging=btagAlgo, zmulabel=zbblabel.zmumulabel, zelelabel=zbblabel.zelelabel)
 brcp.beginJob(btagPerfData, btagging=btagAlgo) 
 lrcp.beginJob()             
-jmcp.beginJob(btagging=btagAlgo)
+jmcp.beginJob(btagging=btagAlgo) 
+
+if zbbme.doMEcontrolPlots:
+  mecp.beginJob(btagging=btagAlgo)
+  
 if muChannel[channel] : vacp.beginJob(zlabel=zbblabel.zmumulabel)
 else : vacp.beginJob(zlabel=zbblabel.zelelabel)
 if channel[-2:] == "MC":
@@ -299,7 +310,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      #if i > 40: break;
+      #if i > 400: break;
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -310,7 +321,9 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       brcp.processEvent(event)
       lrcp.processEvent(event)
       jmcp.processEvent(event)
-      vacp.processEvent(event)
+      vacp.processEvent(event) 
+      if zbbme.doMEcontrolPlots:
+        mecp.processEvent(event)
       if channel[-2:] == "MC":
         mscp.processEvent(event)
         prcp.processEvent(event)
@@ -320,6 +333,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       ras_brcp=brcp._obsSet
       ras_jmcp=jmcp._obsSet
       ras_vacp=vacp._obsSet
+      if zbbme.doMEcontrolPlots:
+        ras_mecp=mecp._obsSet
       if channel[-2:] == "MC":
         ras_mscp=mscp._obsSet
         ras_prcp=prcp._obsSet
@@ -328,6 +343,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
       ras_escp.add(ras_brcp)
       ras_escp.add(ras_jmcp)
       ras_escp.add(ras_vacp)
+      if zbbme.doMEcontrolPlots:
+        ras_escp.add(ras_mecp)
       if channel[-2:] == "MC":
         ras_escp.add(ras_mscp)
         ras_escp.add(ras_prcp)
@@ -341,6 +358,8 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     lrcp.endJob()
     jmcp.endJob()
     vacp.endJob()
+    if zbbme.doMEcontrolPlots:
+      mecp.endJob()
     if channel[-2:] == "MC":
       mscp.endJob()
       prcp.endJob()

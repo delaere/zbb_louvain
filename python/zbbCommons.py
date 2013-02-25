@@ -1,5 +1,5 @@
 ##choose if you want to thz Zbb selection or the ZHbb selection 
-isZbbSelection = True
+isZbbSelection = False
 tagger = "ssv_witheff_062012"
 if not isZbbSelection : tagger = "csv_witheff"
 
@@ -98,3 +98,5 @@ class zbbnorm:
   nev_ZH130_summer12    =  1100000 # not yet
   nev_ZH135_summer12    =  1096956 # not yet
                   
+class zbbme:
+  doMEcontrolPlots = True # if false nobody else of this class matters
