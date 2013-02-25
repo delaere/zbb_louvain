@@ -75,20 +75,20 @@ class LeptonsReWeighting:
    def __init__(self):
      # the efficiency maps
    
-     # ===================== ELECTRONS 2012 A+B+C+D (WP medium) error/systematics NOT included yet (need to be filled correctly) RECO SF : https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=230885 ==========
+     # ===================== ELECTRONS 2012 A+B+C+D (WP medium) : https://twiki.cern.ch/twiki/bin/view/Main/EGammaScaleFactors2012#2012_8_TeV_data_53X  ==========
+     # ===================== ELECTRONS RECO SF assumed ~1 according to e-gamma POG==========
      
-     self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
-                                   [[(1.010,0.01), (0.981,0.01), (1.046,0.01), (0.992,0.01), (1.045,0.01)],   # 20-30 GeV
-                                    [(1.006,0.01), (0.987,0.01), (1.011,0.01), (0.993,0.01), (1.031,0.01)],   # 30-40 GeV
-                                    [(1.009,0.01), (0.993,0.01), (0.994,0.01), (1.008,0.01), (1.019,0.01)],   # 40-50 GeV
-                                    [(1.008,0.01), (0.997,0.01), (0.997,0.01), (1.019,0.01), (1.014,0.01)]])  # 50-200 GeV
- 
-     
-     self._eleIsoWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(1.017,sqrt(0.004**2+0.01**2)), (0.991,sqrt(0.013**2 +0.01**2)),  (1.176,sqrt(0.025**2+0.01**2)), (1.010, sqrt(0.009**2+0.01**2)), (1.110,sqrt(0.005**2+0.01**2))],     # 20-30 GeV
-                                    [(1.019,sqrt(0.002**2+0.01**2)), (1.002,sqrt(0.002**2 +0.01**2)),  (1.038,sqrt(0.011**2+0.01**2)), (1.010, sqrt(0.004**2+0.01**2)), (1.074,sqrt(0.005**2+0.01**2))],     # 30-40 GeV
-                                    [(1.015,sqrt(0.001**2+0.01**2)), (1.001,sqrt(0.002**2 +0.01**2)),  (0.985,sqrt(0.009**2+0.01**2)), (1.013, sqrt(0.003**2+0.01**2)), (1.042,sqrt(0.004**2+0.01**2))],     # 40-50 GeV
-                                    [(1.005,sqrt(0.002**2+0.01**2)), (0.992,sqrt(0.003**2 +0.01**2)),  (0.990,sqrt(0.037**2+0.01**2)), (1.005, sqrt(0.005**2+0.01**2)), (1.020,sqrt(0.007**2+0.01**2))]])    # 50-200 GeV
+      self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+                                   [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
+                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
+      
+     self._eleIdIsoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+                                   [[(1.004,sqrt(0.003**2+0.003**2)), (0.975,sqrt(0.013**2 +0.006**2)),  (1.034,sqrt(0.015**2+0.003**2)), (0.983, sqrt(0.006**2+0.009**2)), (1.025,sqrt(0.006**2+0.005**2))],     # 20-30 GeV
+                                    [(1.003,sqrt(0.001**2+0.002**2)), (0.984,sqrt(0.001**2 +0.001**2)),  (1.006,sqrt(0.007**2+0.002**2)), (0.990, sqrt(0.003**2+0.001**2)), (1.022,sqrt(0.003**2+0.002**2))],     # 30-40 GeV
+                                    [(1.007,sqrt(0.001**2+0.001**2)), (0.992,sqrt(0.001**2 +0.001**2)),  (0.991,sqrt(0.003**2+0.004**2)), (1.006, sqrt(0.002**2+0.002**2)), (1.013,sqrt(0.001**2+0.003**2))],     # 40-50 GeV
+                                    [(1.007,sqrt(0.001**2+0.002**2)), (0.995,sqrt(0.002**2 +0.001**2)),  (0.993,sqrt(0.005**2+0.002**2)), (1.007, sqrt(0.003**2+0.0001**2)), (1.009,sqrt(0.002**2+0.001**2))]])    # 50-200 GeV
 
      #===== electron trigger ( https://indico.cern.ch/getFile.py/access?contribId=60&sessionId=7&resId=0&materialId=slides&confId=219050 ) ======================
      self._ele17TrgWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
@@ -142,11 +142,11 @@ class LeptonsReWeighting:
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
      # particle id
-     unc =  (self._elePidWeight[(e1.pt(),e1.eta())][1]/self._elePidWeight[(e1.pt(),e1.eta())][0] +  \
-             self._elePidWeight[(e2.pt(),e2.eta())][1]/self._elePidWeight[(e2.pt(),e2.eta())][0])**2
+     unc =  (self._eleRecoWeight[(e1.pt(),e1.eta())][1]/self._eleRecoWeight[(e1.pt(),e1.eta())][0] +  \
+             self._eleRecoWeight[(e2.pt(),e2.eta())][1]/self._eleRecoWeight[(e2.pt(),e2.eta())][0])**2
      # isolation
-     unc += (self._eleIsoWeight[(e1.pt(),e1.eta())][1]/self._eleIsoWeight[(e1.pt(),e1.eta())][0] +  \
-             self._eleIsoWeight[(e2.pt(),e2.eta())][1]/self._eleIsoWeight[(e2.pt(),e2.eta())][0])**2
+     unc += (self._eleIdIsoWeight[(e1.pt(),e1.eta())][1]/self._eleIdIsoWeight[(e1.pt(),e1.eta())][0] +  \
+             self._eleIdIsoWeight[(e2.pt(),e2.eta())][1]/self._eleIdIsoWeight[(e2.pt(),e2.eta())][0])**2
      # trigger (approximate)
      unc += (abs(self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1]+  \
                 self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-   \
@@ -166,9 +166,9 @@ class LeptonsReWeighting:
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
      # particle ID
-     pid_sf_run2011 = self._elePidWeight[(e1.pt(),e1.eta())][0]*self._elePidWeight[(e2.pt(),e2.eta())][0]
+     pid_sf_run2011 = self._eleRecoWeight[(e1.pt(),e1.eta())][0]*self._eleRecoWeight[(e2.pt(),e2.eta())][0]
      # isolation 
-     iso_sf_run2011 = self._eleIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIsoWeight[(e2.pt(),e2.eta())][0]
+     iso_sf_run2011 = self._eleIdIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIdIsoWeight[(e2.pt(),e2.eta())][0]
      # trigger
      hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
                         self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]- \
