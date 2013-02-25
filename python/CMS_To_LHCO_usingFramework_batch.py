@@ -463,7 +463,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/acaudron/sk
           numberOfInteractions = pvi.getPU_NumInteractions()  
       Pile_up[0] = numberOfInteractions
 
-      if isZbEvent(event.genParticles,0,False)==True:
+      if isZbEvent(event)==True:
 	isZb[0] = 1
       if isZcEvent(event.genParticles,0,False)==True:
 	isZc[0] = 1

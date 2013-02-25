@@ -132,7 +132,7 @@ def dumpAll(stage=9, muChannel=True, path="/home/fynu/lceard/store/Prod_MC_2011_
     event_num+=1
     event.getByLabel (genpartlabel,genpartHandle)
     genparts = genpartHandle.product()
-    if isZbEvent(genparts)==False and muChannel==False:
+    if isZbEvent(event)==False and muChannel==False:
       #print " not Z+b"
       continue
     event.getByLabel (jetlabel,jetHandle)

@@ -4,7 +4,7 @@ import intervalmap
 from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel
-from monteCarloSelection import *
+import monteCarloSelection
 from math import sqrt
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
@@ -658,9 +658,9 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFi
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
   if not ZjetFilter=="bcl":
-    if isZbEvent(event.genParticles,0,False) and not ('b' in ZjetFilter): return [-1]
-    if (isZcEvent(event.genParticles,0,False) and not isZbEvent(event.genParticles,0,False)) and not ('c' in ZjetFilter): return [-1]
-    if (not isZcEvent(event.genParticles,0,False) and not isZbEvent(event.genParticles,0,False)) and not ('l' in ZjetFilter): return [-1]
+    if monteCarloSelection.isZbEvent(event) and not ('b' in ZjetFilter): return [-1]
+    if (monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
+    if (not monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('l' in ZjetFilter): return [-1]
   output = []
   if muChannel and eleChannel:
     bestZcandidate = event.bestZcandidate
@@ -779,4 +779,7 @@ def prepareAnalysisEvent(event, btagging="CSV",ZjetFilter="bcl",checkTrigger=Tru
   #event.addProducer("ZbHP",candidateproducer,candidate="ZbHP")
   #event.addProducer("ZbbHE",candidateproducer,candidate="ZbbHE")
   #event.addProducer("ZbbHP",candidateproducer,candidate="ZbbHP")
+
+  #from other modules
+  monteCarloSelection.prepareAnalysisEvent(event)
 

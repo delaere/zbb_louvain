@@ -7,7 +7,6 @@ import sys
 import os
 from DataFormats.FWLite import Events, Handle
 from LumiReWeighting import LumiReWeighting
-from monteCarloSelection import isZbEvent
 from zbbCommons import zbblabel
 from math import *
 from ROOT import TFile, TTree, TH1F

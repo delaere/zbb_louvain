@@ -156,15 +156,15 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       
       #Clasify the event in Zb, Zcc, or Zl
       self.i += 1
-      if isZbEvent(particles,0,False):
+      if isZbEvent(event):
         self.bjet += 1
         result["eventType"] = 3
         return result
-      if isZcEvent(particles,0,False):
+      if isZcEvent(event):
         self.cjet += 1
         result["eventType"] = 2
         return result
-      if isZlEvent(particles,0,False):
+      if isZlEvent(event):
         self.ljet += 1
         result["eventType"] = 1
         return result

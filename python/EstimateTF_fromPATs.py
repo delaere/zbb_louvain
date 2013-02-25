@@ -614,11 +614,11 @@ def dumpAll(stage=12, muChannel=True, isData=False, path="/home/fynu/vizangarcia
       numberOfInteractions = PUHandle.product()[0].getPU_NumInteractions()
       Pile_up[0] = PUHandle.product()[0].getPU_NumInteractions()
 
-      if isZbEvent(genparts)==True:
+      if isZbEvent(event)==True:
 	isZb[0] = 1
-      if isZcEvent(genparts)==True:
+      if isZcEvent(event)==True:
 	isZc[0] = 1
-      if isZlEvent(genparts)==True:
+      if isZlEvent(event)==True:
 	isZl[0] = 1
       
     else: #It looks that for MC loading the trigger branch produces a crash
