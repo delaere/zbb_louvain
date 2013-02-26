@@ -37,7 +37,7 @@ LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 LaunchOnCondor.Jobs_RunHere= 1
 for i in range(1,11):
-    command = "/home/fynu/tdupree/scratch/testMakeRDSfromControlPlots2/CMSSW_4_2_7/src/UserCode/zbb_louvain/test/skimDY_423_cfg.py"  
+    command = "../test/skimDY_423_cfg.py"  
     option  = " sample="+whichSample+" slice="+str(i)  
     print "command = ", command
     print "option  = ", option
