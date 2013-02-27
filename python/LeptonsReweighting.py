@@ -78,7 +78,7 @@ class LeptonsReWeighting:
      # ===================== ELECTRONS 2012 A+B+C+D (WP medium) : https://twiki.cern.ch/twiki/bin/view/Main/EGammaScaleFactors2012#2012_8_TeV_data_53X  ==========
      # ===================== ELECTRONS RECO SF assumed ~1 according to e-gamma POG==========
      
-     self._elePidWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+     self._eleRecoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
                                    [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
