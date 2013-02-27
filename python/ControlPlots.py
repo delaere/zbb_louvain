@@ -119,15 +119,15 @@ def runTest(path, levels, outputname=zbbfile.controlPlots, ZjetFilter=False, che
       tightmuonsPlots.append(MuonsControlPlots(levelDir.mkdir("tightmuons")))
       allelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("allelectrons")))
       tightelectronsPlots.append(ElectronsControlPlots(levelDir.mkdir("tightelectrons")))
-      jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF"),muChannel))
+      jetmetAK5PFPlots.append(JetmetControlPlots(levelDir.mkdir("jetmetAK5PF"),muChannel=muChannel))
       vertexPlots.append(VertexAssociationControlPlots(levelDir.mkdir("vertexAssociation")))
-      selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel,checkTrigger))
+      selectionPlots.append(EventSelectionControlPlots(levelDir.mkdir("selection"),muChannel=muChannel,checkTrigger=checkTrigger))
       if handlePU: 
         lumiReWeightingPlots.append(LumiReWeightingControlPlots(levelDir.mkdir("lumiReWeighting")))
       if handleBT:
-        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel))
+        btagReWeightingPlots.append(BtaggingReWeightingControlPlots(levelDir.mkdir("btagReWeighting"),muChannel=muChannel))
       if handleLeptonEff:
-        leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel))
+        leptonsReWeightingPlots.append(LeptonsReweightingControlPlots(levelDir.mkdir("leptonsReWeighting"),muChannel=muChannel))
 
   # book histograms
   for muChannel in [True, False]:

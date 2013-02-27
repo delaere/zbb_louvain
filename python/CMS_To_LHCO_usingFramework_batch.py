@@ -24,76 +24,9 @@ _JECuncertainty = JetCorrectionUncertaintyProxy()
 ### Maps ###
 ############
 
-muChannel = { "MuA_DATA"     : True ,
-              "ElA_DATA"     : False,
-              "MuB_DATA"     : True ,
-              "ElB_DATA"     : False,
-              "Mu_MC"        : True ,
-              "El_MC"        : False,
-              "Zbb_Mu_MC"    : True ,
-              "Zbb_El_MC"    : False,
-              "TT_Mu_MC"     : True ,
-              "TT_El_MC"     : False,
-              "ZZ_Mu_MC"     : True ,
-              "ZZ_El_MC"     : False,
-              "ZH115_Mu_MC"  : True ,
-              "ZH115_El_MC"  : False,
-              "ZH120_Mu_MC"  : True ,
-              "ZH120_El_MC"  : False,
-              "ZH125_Mu_MC"  : True ,
-              "ZH125_El_MC"  : False,
-              "ZH130_Mu_MC"  : True ,
-              "ZH130_El_MC"  : False,
-              "ZH135_Mu_MC"  : True ,
-              "ZH135_El_MC"  : False,
-              }
+from variables import pathSkimEMu, muChannel, checkTrigger, dirLHCO
 
-path = {
-  "MuA_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataA/" ,
-  "ElA_DATA"     : "/nfs/user/acaudron/skim53X/El_DataA/" ,
-  "MuB_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataB/" ,
-  "ElB_DATA"     : "/nfs/user/acaudron/skim53X/El_DataB/" ,
-  "Mu_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
-  "El_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
-  "TT_Mu_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
-  "TT_El_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
-  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
-  "ZZ_El_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
-  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
-  "ZH125_El_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
-  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
-  }
-
-checkTrigger = {
-  "MuA_DATA"     : True ,
-  "ElA_DATA"     : True ,
-  "MuB_DATA"     : True ,
-  "ElB_DATA"     : True ,
-  "Mu_MC"        : False,
-  "El_MC"        : False,
-  "TT_Mu_MC"     : False,
-  "TT_El_MC"     : False,
-  "ZZ_Mu_MC"     : False,
-  "ZZ_El_MC"     : False,
-  "ZH115_Mu_MC"  : False,
-  "ZH115_El_MC"  : False,
-  "ZH120_Mu_MC"  : False,
-  "ZH120_El_MC"  : False,
-  "ZH125_Mu_MC"  : False,
-  "ZH125_El_MC"  : False,
-  "ZH130_Mu_MC"  : False,
-  "ZH130_El_MC"  : False,
-  "ZH135_Mu_MC"  : False,
-  "ZH135_El_MC"  : False,
-  }
-
+path = pathSkimEMu
 
 #Global variables
 idPartons_0 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
@@ -273,19 +206,18 @@ def PrintMET(met, file,numberOfInteractions ,index) :
 ### Proxy for eventCategory ###
 ###############################
 
-def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/acaudron/skim53X/TT_MC/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
+def dumpAll(stage=11, muChannel=False, isData=False, path="/nfs/user/acaudron/skim53X/TT_MC/",fileAll="outCMStoLHCO",RootFile="outCMStoLHCO",numb=0, Nfiles=10, Suffix=""):
 
   if (muChannel):
     print "running muChannel selection for stage ", stage
   else:
     print "running elChannel selection for stage ", stage
   
-#def dumpAll(stage=9, muChannel=False, path="/storage/data/cms/store/user/cbeluffi/MC_Zbb_Jan12/TTbar_12_01_12/", fileAll="ttbar_check.lhco",file2j="2jets_ttsemi.lhco", file3j="3jets_ttsemi.lhco"):
   # prepare output
-  out_file_INCL= open(fileAll+Suffix+"_"+str(numb)+".lhco","w")
+  out_file_INCL= open(dirLHCO+fileAll+Suffix+"_"+str(numb)+".lhco","w")
  
   # create root file
-  f = TFile( RootFile+Suffix+"_"+str(numb)+".root", 'recreate' )
+  f = TFile( dirLHCO+RootFile+Suffix+"_"+str(numb)+".root", 'recreate' )
   tree1 = TTree( 'tree1', 'data' )
 
   runNumber =  n.zeros(1, dtype=int) # nbre of primary vertices
@@ -465,9 +397,9 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/acaudron/sk
 
       if isZbEvent(event)==True:
 	isZb[0] = 1
-      if isZcEvent(event.genParticles,0,False)==True:
+      if isZcEvent(event)==True:
 	isZc[0] = 1
-      if isZlEvent(event.genParticles,0,False)==True:
+      if isZlEvent(event)==True:
 	isZl[0] = 1
       
     else: #It looks that for MC loading the trigger branch produces a crash
@@ -595,8 +527,6 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/nfs/user/acaudron/sk
 for num, arg in enumerate(sys.argv):
   print num, arg
 
-#dumpAll(fileAll=sys.argv[1],file2j=sys.argv[2],RootFile=sys.argv[3],numb=sys.argv[4])
-#
 category="Z+bb (HEHP) wide"
 stageNumber=3
 for index,cat in enumerate(categoryNames):
@@ -604,5 +534,4 @@ for index,cat in enumerate(categoryNames):
     stageNumber=index
     break
 
-#dumpAll(path=sys.argv[1], numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=sys.argv[4], stage=stageNumber)    
-dumpAll(path=path[channel], isData=checkTrigger[channel], muChannel=muChannel[channel],numb=sys.argv[2], Nfiles=sys.argv[3], Suffix=channel+sys.argv[4], stage=stageNumber)
+dumpAll(path=path[channel], isData=checkTrigger[channel], muChannel=muChannel[channel], Suffix=channel+sys.argv[2], stage=stageNumber)

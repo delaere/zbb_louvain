@@ -44,10 +44,10 @@ if narguments != 2:
   print "Usage: python ", sys.argv[0], " process"
   print "Examples"
 
-  print "python ", sys.argv[0], " Mu_DATA"
-  print "python ", sys.argv[0], " El_DATA"
-  print "python ", sys.argv[0], " Mu_MC"
-  print "python ", sys.argv[0], " El_MC"
+  print "python ", sys.argv[0], " DoubleMu_DataA"
+  print "python ", sys.argv[0], " DoubleEle_DataA"
+  print "python ", sys.argv[0], " DY_Mu_MC"
+  print "python ", sys.argv[0], " DY_El_MC"
   exit()
 
 ###################
@@ -56,7 +56,7 @@ if narguments != 2:
 
 print sys.argv
 channel = sys.argv[1]
-#channel = "El_DATA" #"ZZ_El_MC" #"Mu_DATA" "El_DATA", "Mu_MC", "El_MC", "Ttbar_Mu_MC", "Ttbar_El_MC"
+#channel = "DoubleEle_DataA" #"ZZ_El_MC" 
 jobNumber = 1
 Njobs = 1
 MonteCarloPUFileName=zbbfile.pileupMC
@@ -65,101 +65,22 @@ btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
 
+from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
+path = pathSkimEMu
+#outputDir=dirRDS[channel]
+outputDir=""
+#checkTrigger[channel]=False
+
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
-
-############
-### Maps ###
-############
-
-muChannel = { "MuA_DATA"     : True ,
-              "ElA_DATA"     : False,
-              "MuB_DATA"     : True ,
-              "ElB_DATA"     : False,
-              "Mu_MC"        : True ,
-              "El_MC"        : False,
-              "TT_Mu_MC"     : True ,
-              "TT_El_MC"     : False,
-              "ZZ_Mu_MC"     : True ,
-              "ZZ_El_MC"     : False,
-              "ZH115_Mu_MC"  : True ,
-              "ZH115_El_MC"  : False,
-              "ZH120_Mu_MC"  : True ,
-              "ZH120_El_MC"  : False,
-              "ZH125_Mu_MC"  : True ,
-              "ZH125_El_MC"  : False,
-              "ZH130_Mu_MC"  : True ,
-              "ZH130_El_MC"  : False,
-              "ZH135_Mu_MC"  : True ,
-              "ZH135_El_MC"  : False,
-              "evtgen_MC"    : False,
-              "herwig_MC"    : False,
-              "pythia_MC"    : False,
-              }
-
-path = { 
-  "MuA_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataA/" ,
-  "ElA_DATA"     : "/nfs/user/acaudron/skim53X/El_DataA/" ,
-  "MuB_DATA"     : "/nfs/user/acaudron/skim53X/Mu_DataB/" ,
-  "ElB_DATA"     : "/nfs/user/acaudron/skim53X/El_DataB/" ,
-  "Mu_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
-  "El_MC"        : "/nfs/user/acaudron/skim53X/DY_MC/"    ,
-  "TT_Mu_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
-  "TT_El_MC"     : "/nfs/user/acaudron/skim53X/TT_MC/"    ,
-  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
-  "ZZ_El_MC"     : "/nfs/user/acaudron/skim53X/ZZ_MC/"    ,
-  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/nfs/user/acaudron/skim53X/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/nfs/user/acaudron/skim53X/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
-  "ZH125_El_MC"  : "/nfs/user/acaudron/skim53X/ZH125_MC/" ,
-  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/nfs/user/acaudron/skim53X/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/nfs/user/acaudron/skim53X/ZH135_MC/" ,
-  "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
-  "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
-  "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
-  "ZA_Mu_MC" : "/nfs/user/acaudron/ZApat/",
-  "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
-  }
 
 ############################################
 ### Define RooRealVars and RooCategories ###
 ############################################
 
-checkTrigger = {
-  "MuA_DATA"     : True ,
-  "ElA_DATA"     : True ,
-  "MuB_DATA"     : True ,
-  "ElB_DATA"     : True ,
-  "Mu_MC"        : False,
-  "El_MC"        : False,
-  "TT_Mu_MC"     : False,
-  "TT_El_MC"     : False,
-  "ZZ_Mu_MC"     : False,
-  "ZZ_El_MC"     : False,
-  "ZH115_Mu_MC"  : False,
-  "ZH115_El_MC"  : False,
-  "ZH120_Mu_MC"  : False,
-  "ZH120_El_MC"  : False,
-  "ZH125_Mu_MC"  : False,
-  "ZH125_El_MC"  : False,
-  "ZH130_Mu_MC"  : False,
-  "ZH130_El_MC"  : False,
-  "ZH135_Mu_MC"  : False,
-  "ZH135_El_MC"  : False,
-  "evtgen_MC"    : False,
-  "herwig_MC"    : False,
-  "pythia_MC"    : False,
-  "ZA_Mu_MC" : False,
-  "ZA_El_MC" : False
-  }
-
 obsSet  = RooArgSet()
 rds_zbb = RooDataSet("rds_zbb",  "rds_zbb", obsSet)
 escp    = EventSelectionControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
-jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
+jmcp    = JetmetControlPlots(dir=None, dataset=rds_zbb, mode="dataset", muChannel=muChannel[channel])
 vacp    = VertexAssociationControlPlots(dir=None, dataset=rds_zbb, mode="dataset")
 if zbbme.doMEcontrolPlots:
   mecp	= MatrixElementControlPlots(dir=None, muChannel=muChannel[channel], checkTrigger=checkTrigger[channel], dataset=rds_zbb, mode="dataset")
@@ -223,7 +144,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      #if i > 40: break;
+      #if i > 100: break;
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -284,18 +205,17 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    #ws.writeToFile("File_rds_zbb_"+channel+".root") 
-    #gDirectory.Add(ws)
-
     ras_zbb = rds_zbb.get()
     ws_ras = RooWorkspace("ws_ras","workspace_ras")
     getattr(ws_ras,'import')(ras_zbb)
     ws_ras.Print()
     
-    ws_ras.writeToFile("File_rds_zbb_"+channel+".root")
+    ws_ras.writeToFile(outputDir+"File_rds_zbb_"+channel+".root")
+    #ws_ras.writeToFile("test.root")
     gDirectory.Add(ws_ras)
 
-    f=TFile("File_rds_zbb_"+channel+".root","UPDATE")
+    f=TFile(outputDir+"File_rds_zbb_"+channel+".root","UPDATE")
+    #f=TFile("test.root","UPDATE")
     tree_zbb = rds_zbb.tree()
     tree_zbb.Write()
     f.Close()

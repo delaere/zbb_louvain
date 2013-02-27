@@ -13,58 +13,24 @@ import glob
 
 from optparse import OptionParser
 
-FarmDirectory = "condorRDSmaker"
+FarmDirectory = "FARM_RDSmaker"
 
-processesToRun = ["MuA_DATA"   ,
-                  "ElA_DATA"   ,
-                  "MuB_DATA"   ,
-                  "ElB_DATA"   ,
-                  "Mu_MC"      ,
-                  "El_MC"      ,
-                  "Zbb_Mu_MC"  ,
-                  "Zbb_El_MC"  ,
-                  "TT_Mu_MC"   ,
-                  "TT_El_MC"   ,
-                  "ZZ_Mu_MC"   ,
-                  "ZZ_El_MC"   ,
-                  "ZH115_Mu_MC",
-                  "ZH115_El_MC",
-                  "ZH120_Mu_MC",
-                  "ZH120_El_MC",
-                  "ZH125_Mu_MC",
-                  "ZH125_El_MC",
-                  "ZH130_Mu_MC",
-                  "ZH130_El_MC",
-                  "ZH135_Mu_MC",
-                  "ZH135_El_MC",
-                  "tW_Mu_MC"   ,
-                  "tW_El_MC"   ,
-                  "tbarW_Mu_MC",
-                  "tbarW_El_MC"
-                  ]
-
+from globalLists import listsamplesEMu
+processesToRun = listsamplesEMu
 
 print "I will run over ", len(processesToRun), "processes"
-
 
 JobName = "File_rds"
 LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 LaunchOnCondor.Jobs_RunHere= 1
 
-
-
 for x in processesToRun[:]:
-
-  #
-  #option  = " " + x
 
   command = "./makeRDS_usingFramework.py" + " " + x
 
   print "command  = ", command
  
-  #When using SendCluster_Push using PYTHON as a first argument, only command is taking into account (the argument option is trashed)
-  #LaunchOnCondor.SendCluster_Push(["PYTHON", command, option ])
   LaunchOnCondor.SendCluster_Push(["PYTHON", command])
 
 LaunchOnCondor.SendCluster_Submit()
