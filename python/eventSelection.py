@@ -4,6 +4,7 @@ import intervalmap
 from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import isZbbSelection
+from Diff_MuonsPhys_Golden_ToBeRemoved import jsonMuonOnly
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 jetEtaCut = 2.1
@@ -71,6 +72,19 @@ ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.m
 ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
 ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
 
+def isInMuonJSONonly(runNumber, lumi_section):
+  json=jsonMuonOnly
+  try:
+    s=json[str(runNumber)]
+  except:
+    return False
+  for i in range(len(json[str(runNumber)])):
+    listLumi=json[str(runNumber)][i]
+    if lumi_section in range(listLumi[0],listLumi[1]+1) :
+      print "event with run =", runNumber, "ls =", lumi_section, "is not in the GOLDEN JSON"
+      return True
+  return False
+      
 def electron_iswrongPS(electron, runNumber, lumi_section):
   #lumi_section = event.eventAuxiliary().luminosityBlock() 
   if runNumber==171050 and (lumi_section==47 or lumi_section==92):
@@ -125,6 +139,7 @@ def isTriggerOK(triggerInfo, zCandidate, runNumber, lumi_section, muChannel=True
     else:
       intersect = set(pathnames) & set(ourtriggers.eltriggers)
   else:
+    if isInMuonJSONonly(runNumber, lumi_section) : return False
     if muChannel:
       if ourtriggers.murunMap[runNumber] is None:
         print "muon unexpected runNumber : " , runNumber
