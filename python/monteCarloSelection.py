@@ -1,5 +1,7 @@
 # OLD methods to classify the DY events, based on parton-level information. Renamed to avoid name conflict with new methods.
 
+import math
+
 def isGenZlEvent(genParticles,ptcut=15, onlyStatus3=False):
   """Select events with at least one light parton > ptcut. isZlEvent != not(isZbEvent or isZcEvent) """
   hasUDSG = False
@@ -55,6 +57,11 @@ def is_final_Dhad(genpart):
   if len([genpart.daughter(i) for i in range(genpart.numberOfDaughters()) if is_Dhad(genpart.daughter(i))]): return False
   return True
 
+def delta_phi(phi1,phi2):
+  dphi = math.fabs(phi1-phi2)
+  if dphi > math.pi : dphi = 2*math.pi-dphi
+  return dphi
+
 def match_GenToHad(genjets, hadrons, dr):
   """match hadrons to jets and returns matched jets"""
   matched = []
@@ -67,13 +74,13 @@ def match_GenToHad(genjets, hadrons, dr):
       bestmatch = min(in_cone)[1]
       matched.append(jet)
       genjets.remove(bestmatch)
-  return (matched,jets)
+  return (matched,genjets)
 
 def genjetCollectionsProducer(fwevent, ptcut=0, etacut=10):
   """Event producer that returns three subcollections of genjets, for b,c,l jets"""
   # list of hadrons in the final state
-  bhads = [part for part in fwevent.genParticles if self._is_final_Bhad(part)]
-  chads = [part for part in fwevent.genParticles if self._is_final_Dhad(part)]
+  bhads = [part for part in fwevent.genParticles if is_final_Bhad(part)]
+  chads = [part for part in fwevent.genParticles if is_final_Dhad(part)]
   # list of genjets passing the pt,eta cuts
   genjets = [ jet for jet in fwevent.genJets if (jet.pt()>ptcut and abs(jet.eta())<etacut) ]
   # now divide it in three independant collections
