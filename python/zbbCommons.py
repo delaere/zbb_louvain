@@ -99,4 +99,4 @@ class zbbnorm:
   nev_ZH135_summer12    =  1096956 # not yet
                   
 class zbbme:
-  doMEcontrolPlots = True # if false nobody else of this class matters
+  doMEcontrolPlots = False # if false nobody else of this class matters
