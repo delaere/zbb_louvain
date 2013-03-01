@@ -670,8 +670,12 @@ addPfMET(process, 'PF')
 
 # for MET systematics: adds ~10 variants of type1-corrected MET
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-if isMC : runMEtUncertainties(process)
-else : process.patPFMet.addGenMET = cms.bool(False)
+if isMC :
+    runMEtUncertainties(process)
+    process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+else :
+    process.patPFMet.addGenMET = cms.bool(False)
+    process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data                        
 
 process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJets')
 process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
