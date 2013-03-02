@@ -24,7 +24,7 @@ _JECuncertainty = JetCorrectionUncertaintyProxy()
 ### Maps ###
 ############
 
-from variables import pathSkimEMu, muChannel, checkTrigger, dirLHCO
+from globalLists import pathSkimEMu, muChannel, checkTrigger, dirLHCO
 
 path = pathSkimEMu
 

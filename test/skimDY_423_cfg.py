@@ -101,7 +101,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.6 $'),
+    version = cms.untracked.string('$Revision: 1.7 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -181,31 +181,20 @@ process.zElElFilter = cms.EDFilter("CandViewCountFilter",
 
 # Run it
 
-process.p4 = cms.Path(process.zMuMuFilter*process.bFilter)
+#process.p4 = cms.Path(process.zMuMuFilter*process.bFilter)
 process.p5 = cms.Path(process.zMuMuFilter*process.CSVMbjets)
 #process.p5 = cms.Path(process.CSVbFilter)
-process.p6 = cms.Path(process.zElElFilter*process.bFilter)
+#process.p6 = cms.Path(process.zElElFilter*process.bFilter)
 process.p7 = cms.Path(process.zElElFilter*process.CSVMbjets)
 
-process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5','p6','p7'))
+#process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p4','p5','p6','p7'))
+process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p5','p7'))
 
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
 
-path = {"DY_MC"    : "/nfs/user/llbb/Pat_8TeV_532p4/DYjets_Summer12_V2/" ,
-        "TT_MC"    : "/nfs/user/llbb/Pat_8TeV_532p4/TTjets_Summer12/" ,
-        "Mu_DataA" : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012A_V3/" ,
-        "El_DataA" : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012A_V4/" ,
-        "Mu_DataB" : "/nfs/user/llbb/Pat_8TeV_532p4/Mu2012B_V3/" ,
-        "El_DataB" : "/nfs/user/llbb/Pat_8TeV_532p4/Ele2012B_V4/" ,
-        "ZZ_MC"    : "/nfs/user/llbb/Pat_8TeV_532p4/ZZ_Summer12_V2/" ,
-        "ZH115_MC" : "/nfs/user/llbb/Pat_8TeV_532p4/Fall11_ZHbb_115/" ,
-        "ZH120_MC" : "/nfs/user/llbb/Pat_8TeV_532p4/Fall11_ZHbb_120/" ,
-        "ZH125_MC" : "/nfs/user/llbb/Pat_8TeV_532p4/ZH125_Summer12_V2/" ,
-        "ZH130_MC" : "/nfs/user/llbb/Pat_8TeV_532p4/Fall11_ZHbb_130/" ,
-        "ZH135_MC" : "/nfs/user/llbb/Pat_8TeV_532p4/Fall11_ZHbb_135/" ,
-        }
-
+from globalLists import pathPAT
+path = pathPAT
 
 ### options ###
 sample = options.sample
@@ -234,7 +223,7 @@ process.source.fileNames = files
 
 process.maxEvents.input = -1
 
-if slice : process.out.fileName = 'file:/nfs/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
-else     : process.out.fileName = '/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/test/'+sample+'.root'
+if slice : process.out.fileName = 'file:/nfs/user/acaudron/skim537/'+sample+'/'+sample+'_'+str(slice)+'.root'
+else     : process.out.fileName = 'test'+sample+'.root'
 
 #process.options.wantSummary = False

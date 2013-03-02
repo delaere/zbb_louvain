@@ -67,8 +67,8 @@ btagAlgo="CSV"
 
 from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
 path = pathSkimEMu
-#outputDir=dirRDS[channel]
-outputDir=""
+outputDir=dirRDS
+#outputDir=""
 #checkTrigger[channel]=False
 
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
