@@ -13,10 +13,10 @@ import glob
 
 from optparse import OptionParser
 
-FarmDirectory = "FARM_RDSmaker"
+FarmDirectory = "FARM_RDSmaker_V4"
 
-from globalLists import listsamplesEMu
-processesToRun = listsamplesEMu
+from globalLists import listToProcessEMu
+processesToRun = listToProcessEMu
 
 print "I will run over ", len(processesToRun), "processes"
 
