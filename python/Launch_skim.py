@@ -14,8 +14,8 @@ import sys
 import LaunchOnCondor
 import glob
 
-from globalLists import listsamples, dirSkim
-samples = listsamples
+from globalLists import listToProcess, dirSkim
+samples = listToProcess
 
 FarmDirectory = "FARM_skim_V5"
 JobName = "Skim_pats"
