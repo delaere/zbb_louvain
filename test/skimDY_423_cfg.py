@@ -101,7 +101,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.8 $'),
+    version = cms.untracked.string('$Revision: 1.9 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -223,7 +223,7 @@ process.source.fileNames = files
 
 process.maxEvents.input = -1
 
-if slice : process.out.fileName = 'file:'+dirSkim+'+sample+'/'+sample+'_'+str(slice)+'.root'
+if slice : process.out.fileName = 'file:'+dirSkim+sample+'/'+sample+'_'+str(slice)+'.root'
 else     : process.out.fileName = 'test'+sample+'.root'
 
 #process.options.wantSummary = False
