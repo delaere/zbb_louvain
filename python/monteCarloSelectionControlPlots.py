@@ -19,7 +19,9 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
     def beginJob(self, genlabel=zbblabel.genlabel):
       # declare histograms
       self.add("eventType","Event Type (0,l,c,b)+Z",4,0,4)
-
+      
+      self.add("ZptSt3","PT of the first Z with status 3 in the list",500,0,500)
+      
       self.add("LepPosPx","Generator cuadrivector, LepPosPx", 400, -400, 400)
       self.add("LepPosPy","Generator cuadrivector, LepPosPy", 400, -400, 400)
       self.add("LepPosPz","Generator cuadrivector, LepPosPz", 400, -400, 400)
@@ -67,6 +69,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
      
       #Fill some gen information for the status 3 leptons and b, and bbar quarks
+      ZptSt3 = 0
       nLepPos = 0
       nLepNeg = 0
       nBottom = 0
@@ -97,6 +100,10 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       
       for part in particles:
 	if part.status()!=3: break;
+	
+	if part.pdgId() == 23 or part.pdgId() == -23:
+	  tlz = ROOT.TLorentzVector(part.px(),part.py(),part.pz(),part.energy())
+	  ZptSt3 = tlz.Pt() 
         
 	if part.pdgId() == -11 or part.pdgId() == -13 or part.pdgId() == -15  :
 	  if nLepPos == 0 :
@@ -135,6 +142,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
 
 
+      result["ZptSt3"] = ZptSt3
       result["NLepPos"] = nLepPos
       result["NLepNeg"] = nLepNeg
       result["NBottom"] = nBottom
