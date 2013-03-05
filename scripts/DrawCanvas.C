@@ -1,8 +1,10 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TH1F.h"
+#include "TMath.h"
 #include "THStack.h"
 #include "TObject.h"
+#include "TRandom.h"
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TPad.h"
@@ -191,8 +193,10 @@ TCanvas* DrawCanvasWithRatio(TCanvas* canvas, bool emptyBinsNoUnc = true)
   // create a new canvas with two pads
   TCanvas* c = new TCanvas(Form("%s_withRatio",canvas->GetName()),Form("%s with ratio",canvas->GetTitle()),500,640);
   TPad *canvas_1 = new TPad("canvas_1", canvas->GetTitle(),0,0.22,1.0,1.0);
+  canvas_1->SetNumber(1);
   canvas_1->Draw();
   TPad *canvas_2 = new TPad("canvas_2", Form("%s ratio",canvas->GetTitle()),0,0.,1.0,0.22);
+  canvas_2->SetNumber(2);
   canvas_2->Draw();
   // in pad 1, put a copy of the input
   canvas_1->cd();
@@ -250,7 +254,7 @@ void addErrorBand(TF1* errorFunction=NULL) {
       double err = errorFunction->Eval(systematics->GetBinCenter(i))*systematics->GetBinContent(i);
       // we add it in quadrature to the stat uncertainty
       double err2 = err*err + systematics->GetBinError(i)*systematics->GetBinError(i);
-      err = sqrt(err2);
+      err = TMath::Sqrt(err2);
       // set it
       systematics->SetBinError(i,err);
     }
@@ -309,15 +313,15 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
 
       // combining with statistical ---------------------------------------      
 
-      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES); //+ //systematics->GetBinError(i)*systematics->GetBinError(i));
-      double plusErrorTot = sqrt(plusErrorJES*plusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
+      double minusErrorTot = TMath::Sqrt(minusErrorJES*minusErrorJES); //+ //systematics->GetBinError(i)*systematics->GetBinError(i));
+      double plusErrorTot = TMath::Sqrt(plusErrorJES*plusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
         
       if(minusHistoBtag && plusHistoBtag){	
 	double minusErrorBtag = minusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i); 
 	double plusErrorBtag  = plusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i);
        
-	minusErrorTot = sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag );//+ systematics->GetBinError(i)*systematics->GetBinError(i));
-	plusErrorTot = sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag );// + systematics->GetBinError(i)*systematics->GetBinError(i));
+	minusErrorTot = TMath::Sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag );//+ systematics->GetBinError(i)*systematics->GetBinError(i));
+	plusErrorTot = TMath::Sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag );// + systematics->GetBinError(i)*systematics->GetBinError(i));
       }
 
       //setting the errors and the mean value --------------------------------
@@ -425,3 +429,109 @@ void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NU
   }
 
 }
+
+// Extension for generic uncertainty in the ratio plot
+void addErrorBandToRatioFromTH1(TH1* minusHisto=NULL, TH1* plusHisto=NULL, int color=kBlue) {
+  // find each of the two pads
+  TPad* histoPad = (TPad*)gPad->GetCanvas()->cd(1); 
+  TPad* ratioPad = (TPad*)gPad->GetCanvas()->cd(2); 
+  // find the stack
+  TIter next(histoPad->GetListOfPrimitives());
+  THStack* stack = NULL;
+  TObject* obj = NULL;
+  while((obj = next())) {
+    if(obj->InheritsFrom("THStack")) {
+      stack = (THStack*)obj;
+      break;
+    }
+  }
+  if(stack==NULL) {
+   std::cerr << "ERROR: MC histogram not found" << std::endl;
+   return;
+  }
+  // get the total histogram, clone it
+  TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
+  // histograms with the systematics up and down
+  TH1* H_systematicsP = (TH1*)systematics->Clone("systematicsPlus");
+  H_systematicsP->Reset();
+  H_systematicsP->SetLineColor(color);
+  H_systematicsP->SetFillStyle(0);
+  TH1* H_systematicsM = (TH1*)systematics->Clone("systematicsMinus");
+  H_systematicsM->Reset();
+  H_systematicsM->SetLineColor(color);
+  H_systematicsM->SetFillStyle(0);
+  for(int i=1; i<=systematics->GetNbinsX(); ++i) {
+    // extracting the errors ---------------------------------------
+    double minusError = minusHisto->GetBinContent(i)/systematics->GetBinContent(i);
+    double plusError  = plusHisto->GetBinContent(i)/systematics->GetBinContent(i);
+    if (TMath::IsNaN(minusError)) minusError = 1.;
+    if (TMath::IsNaN(plusError)) plusError = 1.;
+    //setting the errors and the mean value --------------------------------
+    H_systematicsP->SetBinContent(i,plusError);
+    H_systematicsM->SetBinContent(i,minusError);
+  }
+  // draw the uncertainty on top of everything in the ratio pad.
+  ratioPad->cd();
+  H_systematicsP->Draw("same");
+  H_systematicsM->Draw("same");
+}
+
+// function to extract the total MC from a file+path
+TH1* getHisto(TFile* file, TString& path) {
+  // save current pad and directory
+  TVirtualPad* pad = gPad;
+  TDirectory* dir = gDirectory;
+  // go to the TCanvas
+  TCanvas* thePad = (TCanvas*)file->Get(path);
+  // find the stack
+  TIter next(thePad->GetListOfPrimitives());
+  THStack* stack = NULL;
+  TObject* obj = NULL;
+  while((obj = next())) {
+    if(obj->InheritsFrom("THStack")) {
+      stack = (THStack*)obj;
+      break;
+    }
+  }
+  if(stack==NULL) {
+   std::cerr << "ERROR: MC histogram not found" << std::endl;
+   return NULL;
+  }
+  // get the total histogram, clone it
+  TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
+  // return to original location
+  dir->cd();
+  pad->cd();
+  // return result
+  return systematics;
+}
+
+// function to get the current path, including canvas name
+TString mypath()
+{
+  // path name
+  TString pathString(gDirectory->GetPath());
+  pathString.Replace(0,pathString.First(":")+1,"");
+  // canvas name
+  TString canvasName(gPad->GetCanvas()->GetName());
+  if (canvasName.Index("_withRatio")!=-1)
+    canvasName.Remove(canvasName.Index("_withRatio"));
+  else
+    std::cout << "Warning: this doesn't seem to be a canvas drawn with Ratio" << std::endl;
+  // all together
+  pathString.Append("/");
+  pathString.Append(canvasName);
+  return pathString;
+}
+
+// Extension for generic uncertainty in the ratio plot, directly from files
+void addErrorBandToRatioFromFiles(TFile* file_minus, TFile* file_plus, int color) {
+  // get the path
+  TString path = mypath();
+  // get the histograms for systematics
+  TH1* h_minus = getHisto(file_minus, path);
+  TH1* h_plus  = getHisto(file_plus, path);
+  // add to plot
+  addErrorBandToRatioFromTH1(h_minus, h_plus, color);
+}
+
