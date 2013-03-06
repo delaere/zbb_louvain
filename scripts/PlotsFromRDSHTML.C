@@ -65,7 +65,6 @@ void PlotCanvas(TString var = "th1_jetmetMETsignificance");
 void  PlotsFromRDSHTML();
 
 void  PlotsFromRDSHTML() {
-  outfile.open(outdir+"/index.html");
 
 
   printheader();
@@ -76,6 +75,7 @@ void  PlotsFromRDSHTML() {
 
 
   inputFile = TFile::Open(InputFile);
+  outfile.open(outdir+"/index.html");
  
   TList* listOfKeys = gDirectory->GetListOfKeys();
   TIter next(listOfKeys);
