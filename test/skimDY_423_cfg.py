@@ -101,9 +101,9 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.6 $'),
+    version = cms.untracked.string('$Revision: 1.6.2.1 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
-    name = cms.untracked.string('$Source: /cvs/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
+    name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
 )
 
@@ -206,6 +206,7 @@ path = {"DY_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwith
         "Mu_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Mu2011B/files/" ,
         "El_DataB" : "/storage/data/cms/users/llbb/Production_5fb/Data/Ele2011B/files/" ,
         "ZZ_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZZ_v2/" ,
+        "ZH110_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_110/" ,
         "ZH115_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_115/" ,
         "ZH120_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_120/" ,
         "ZH125_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_125/" ,
@@ -244,7 +245,7 @@ process.source.fileNames = files
 
 process.maxEvents.input = -1
 
-if slice : process.out.fileName = 'file:/nfs/user/acaudron/skim444/'+sample+'/'+sample+'_'+str(slice)+'.root'
-else     : process.out.fileName = '/home/fynu/acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/test/'+sample+'.root'
+if slice : process.out.fileName = 'file:/home/fynu/vizangarciaj/storage/skim444pt15/'+sample+'/'+sample+'_'+str(slice)+'.root'
+else     : process.out.fileName = './'+sample+'.root'
 
 #process.options.wantSummary = False
