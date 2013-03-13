@@ -101,7 +101,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.6.2.1 $'),
+    version = cms.untracked.string('$Revision: 1.6.2.2 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -214,7 +214,8 @@ path = {"DY_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwith
         "ZH135_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_ZHbb_135/" ,
         "Zbb_MC"   : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/zbbProd/" ,
         "tW_MC"    : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_T_tW_v3/" ,
-        "tbarW_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_Tbar_tW_v3/" 
+        "tbarW_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/Fall11_Tbar_tW_v3/", 
+	"DY_Pt100_MC" : "/storage/data/cms/users/llbb/productionJune2012_444/MCwithMatching/DYJetsPtZ100_Fall11/"
         }
 
 
