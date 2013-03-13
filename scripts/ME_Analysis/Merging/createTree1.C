@@ -2,13 +2,14 @@
 #include "TFile.h"
 #include "TRandom.h"
 #include "TTree.h"
+#include "TLorentzVector.h"
 //#include "RooDataSet.h"
 #include "rds_zbb.C"
 
 
 #include <iostream>
 #include <fstream>
-
+#include <iomanip>
 using namespace std;
 
 void CreateTree(TString InputFile){  
@@ -17,7 +18,7 @@ void CreateTree(TString InputFile){
   int runNumber;
   int eventNumber;
 
-  double E_j1;
+  double  E_j1;
   double E_j2;
   double Eta_j1;
   double Eta_j2;
@@ -28,38 +29,41 @@ void CreateTree(TString InputFile){
   double btag_j1;
   double btag_j2;
   double Mass_j1;
-  double Mass_j2;  
+  double Mass_j2;
+  
+  double deltaE_ajet;
+  double deltaE_jet;
+  double deltaEta_ajet;
+  double deltaEta_jet;  
+  double deltaPhi_ajet;
+  double deltaPhi_jet;    
 
   double llM;
   double bbM;
 
 
-  double E_mu1;
-  double E_mu2;
-  double Eta_mu1;
-  double Eta_mu2;
-  double phi_mu1;
-  double phi_mu2;
-  double Pt_mu1;
-  double Pt_mu2;
-  double Mass_mu1;
-  double Mass_mu2; 
-  double charge_mu1;
-  double charge_mu2; 
+  double E_l1;
+  double E_l2;
+  double Eta_l1;
+  double Eta_l2;
+  double phi_l1;
+  double phi_l2;
+  double Pt_l1;
+  double Pt_l2;
+  double Mass_l1;
+  double Mass_l2; 
+  int charge_l1;
+  int charge_l2; 
     
-  double E_el1;
-  double E_el2;
-  double Eta_el1;
-  double Eta_el2;
-  double phi_el1;
-  double phi_el2;
-  double Pt_el1;
-  double Pt_el2;  
-  double Mass_el1;
-  double Mass_el2; 
-  double charge_el1;
-  double charge_el2;
-     
+  double deltaElp;
+  double deltaElm;
+  double deltaEtalp;
+  double deltaEtalm;  
+  double deltaPhilp;
+  double deltaPhilm;
+  double deltaPtInvlp;
+  double deltaPtInvlm;  
+       
   double DR_jet;
 
   double Met;
@@ -115,8 +119,8 @@ void CreateTree(TString InputFile){
 
    rds_zbb* mc_RDS = new rds_zbb(t_RDS);
    
-   TFile *f_RDSME = new TFile("test.root", "RECREATE");
-   TTree *t_RDSME = new TTree("rds_zbb", "tree 1");   
+   TFile *f_RDSME = new TFile("tree1_"+InputFile+".root", "RECREATE");
+   TTree *t_RDSME = new TTree("tree1", "tree 1");   
    
    t_RDSME->Branch("runNumber", &runNumber, "runNumber/l");
    t_RDSME->Branch("eventNumber", &eventNumber, "eventNumber/l");
@@ -134,36 +138,40 @@ void CreateTree(TString InputFile){
    t_RDSME->Branch("Mass_j1",&Mass_j1,"Mass_j1/D");
    t_RDSME->Branch("Mass_j2",&Mass_j2,"Mass_j2/D");   
 
+   t_RDSME->Branch("deltaE_ajet",&deltaE_ajet,"deltaE_ajet/D");       
+   t_RDSME->Branch("deltaE_jet",&deltaE_jet,"deltaE_jet/D");          
+   t_RDSME->Branch("deltaEta_ajet",&deltaEta_ajet,"deltaEta_ajet/D"); 
+   t_RDSME->Branch("deltaEta_jet",&deltaEta_jet,"deltaEta_jet/D");    
+   t_RDSME->Branch("deltaPhi_ajet",&deltaPhi_ajet,"deltaPhi_ajet/D"); 
+   t_RDSME->Branch("deltaPhi_jet",&deltaPhi_jet,"deltaPhi_jet/D");    
+  
+  
    t_RDSME->Branch("llM",&llM,"llM/D");
    t_RDSME->Branch("bbM",&bbM,"bbM/D");
   
 
-   t_RDSME->Branch("E_mu1",&E_mu1,"E_mu1/D");
-   t_RDSME->Branch("E_mu2",&E_mu2,"E_mu2/D");
-   t_RDSME->Branch("Eta_mu1",&Eta_mu1,"Eta_mu1/D");
-   t_RDSME->Branch("Eta_mu2",&Eta_mu2,"Eta_mu2/D");
-   t_RDSME->Branch("phi_mu1",&phi_mu1,"phi_mu1/D");
-   t_RDSME->Branch("phi_mu2",&phi_mu2,"phi_mu2/D");
-   t_RDSME->Branch("Pt_mu1",&Pt_mu1,"Pt_mu1/D");
-   t_RDSME->Branch("Pt_mu2",&Pt_mu2,"Pt_mu2/D");
-   t_RDSME->Branch("Mass_mu1",&Mass_mu1,"Mass_mu1/D");
-   t_RDSME->Branch("Mass_mu2",&Mass_mu2,"Mass_mu2/D");  
-   t_RDSME->Branch("charge_mu1",&charge_mu1,"charge_mu1/D");
-   t_RDSME->Branch("charge_mu2",&charge_mu2,"charge_mu2/D");
+   t_RDSME->Branch("E_l1",&E_l1,"E_l1/D");
+   t_RDSME->Branch("E_l2",&E_l2,"E_l2/D");
+   t_RDSME->Branch("Eta_l1",&Eta_l1,"Eta_l1/D");
+   t_RDSME->Branch("Eta_l2",&Eta_l2,"Eta_l2/D");
+   t_RDSME->Branch("phi_l1",&phi_l1,"phi_l1/D");
+   t_RDSME->Branch("phi_l2",&phi_l2,"phi_l2/D");
+   t_RDSME->Branch("Pt_l1",&Pt_l1,"Pt_l1/D");
+   t_RDSME->Branch("Pt_l2",&Pt_l2,"Pt_l2/D");
+   t_RDSME->Branch("Mass_l1",&Mass_l1,"Mass_l1/D");
+   t_RDSME->Branch("Mass_l2",&Mass_l2,"Mass_l2/D");  
+   t_RDSME->Branch("charge_l1",&charge_l1,"charge_l1/I");
+   t_RDSME->Branch("charge_l2",&charge_l2,"charge_l2/I");
         
-   t_RDSME->Branch("E_el1",&E_el1,"E_el1/D");
-   t_RDSME->Branch("E_el2",&E_el2,"E_el2/D");
-   t_RDSME->Branch("Eta_el1",&Eta_el1,"Eta_el1/D");
-   t_RDSME->Branch("Eta_el2",&Eta_el2,"Eta_el2/D");
-   t_RDSME->Branch("phi_el1",&phi_el1,"phi_el1/D");
-   t_RDSME->Branch("phi_el2",&phi_el2,"phi_el2/D");
-   t_RDSME->Branch("Pt_el1",&Pt_el1,"Pt_el1/D");
-   t_RDSME->Branch("Pt_el2",&Pt_el2,"Pt_el2/D");   
-   t_RDSME->Branch("Mass_el1",&Mass_el1,"Mass_el1/D");
-   t_RDSME->Branch("Mass_el2",&Mass_el2,"Mass_el2/D"); 
-   t_RDSME->Branch("charge_el1",&charge_el1,"charge_el1/D");
-   t_RDSME->Branch("charge_el2",&charge_el2,"charge_el2/D");
-         
+   t_RDSME->Branch("deltaElp",&deltaElp,"deltaElp/D");      
+   t_RDSME->Branch("deltaElm",&deltaElm,"deltaElm/D");      
+   t_RDSME->Branch("deltaEtalp",&deltaEtalp,"deltaEtalp/D");
+   t_RDSME->Branch("deltaEtalm",&deltaEtalm,"deltaEtalm/D"); 
+   t_RDSME->Branch("deltaPhilp",&deltaPhilp,"deltaPhilp/D");
+   t_RDSME->Branch("deltaPhilm",&deltaPhilm,"deltaPhilm/D");
+   t_RDSME->Branch("deltaPtInvlp",&deltaPtInvlp,"deltaPtInvlp/D");
+   t_RDSME->Branch("deltaPtInvlm",&deltaPtInvlm,"deltaPtInvlm/D");
+          
    t_RDSME->Branch("DR_jet",&DR_jet,"DR_jet/D");
 
    t_RDSME->Branch("Met", &Met, "Met/D");
@@ -178,12 +186,15 @@ void CreateTree(TString InputFile){
    t_RDSME->Branch("nbr_PV", &nbr_PV, "nbr_PV/I");
 
    t_RDSME->Branch("nJets", &nJets, "nJets/I");
-   t_RDSME->Branch("nBjetsHE", &nBjetsHE, "nBjetsHE/I");
-   t_RDSME->Branch("nBjetsHP", &nBjetsHP, "nBjetsHP/I");
-   t_RDSME->Branch("nBjetsHEHP", &nBjetsHEHP, "nBjetsHEHP/I"); 
+   //t_RDSME->Branch("nBjetsHE", &nBjetsHE, "nBjetsHE/I");
+   //t_RDSME->Branch("nBjetsHP", &nBjetsHP, "nBjetsHP/I");
+   //t_RDSME->Branch("nBjetsHEHP", &nBjetsHEHP, "nBjetsHEHP/I"); 
    
-   t_RDSME->Branch("category", &category, "category/I"); 
+   //t_RDSME->Branch("category", &category, "category/I"); 
    
+   ofstream myfile2; 
+   myfile2.open (InputFile+".txt",ios::app); 
+   	  
    Long64_t nbytesRDS = 0, nbRDS = 0;
    for (Int_t iRDS=0;iRDS<t_RDS->GetEntries();iRDS++) {
 
@@ -194,18 +205,29 @@ void CreateTree(TString InputFile){
       
         runNumber   = mc_RDS->eventSelectionrun;
         eventNumber = mc_RDS->eventSelectionevent;
+	TLorentzVector tlj1(0,0,0,0);
+	TLorentzVector tlj2(0,0,0,0);
+	tlj1.SetPtEtaPhiM(mc_RDS->mebjet1pt, mc_RDS->mebjet1etapm, mc_RDS->mebjet1phi, mc_RDS->mebjet1mass);
+	tlj2.SetPtEtaPhiM(mc_RDS->mebjet2pt, mc_RDS->mebjet2etapm, mc_RDS->mebjet2phi, mc_RDS->mebjet2mass);
 
-        E_j1          = mc_RDS->jetmetjet1energy;
-        E_j2          = mc_RDS->jetmetjet1energy;
-        Eta_j1        = mc_RDS->jetmetjet1eta;
-        Eta_j2        = mc_RDS->jetmetjet2eta;
-        phi_j1        = mc_RDS->jetmetjet1phi;
-        phi_j2        = mc_RDS->jetmetjet2phi;
-        Pt_j1         = mc_RDS->jetmetjet1pt;
-	Pt_j2         = mc_RDS->jetmetjet2pt;
-        Mass_j1       = mc_RDS->jetmetjet1mass;
-	Mass_j2       = mc_RDS->jetmetjet2mass;	
+        E_j1          = tlj1.E();
+        E_j2          = tlj2.E();
+        Eta_j1        = mc_RDS->mebjet1etapm;
+        Eta_j2        = mc_RDS->mebjet2etapm;
+        phi_j1        = mc_RDS->mebjet1phi;
+        phi_j2        = mc_RDS->mebjet2phi;
+        Pt_j1         = mc_RDS->mebjet1pt;
+	Pt_j2         = mc_RDS->mebjet2pt;
+        Mass_j1       = mc_RDS->mebjet1mass;
+	Mass_j2       = mc_RDS->mebjet2mass;	
 	
+	deltaE_ajet   = mc_RDS->meDeltaE_ajet;
+	deltaE_jet    = mc_RDS->meDeltaE_jet;
+	deltaEta_ajet = mc_RDS->meDeltaEta_ajet;
+	deltaEta_jet  = mc_RDS->meDeltaEta_jet;
+	deltaPhi_ajet = mc_RDS->meDeltaphi_ajet;
+	deltaPhi_jet  = mc_RDS->meDeltaphi_jet;
+  	
         btag_j1       = mc_RDS->jetmetbjet1CSVdisc;
         btag_j2       = mc_RDS->jetmetbjet2CSVdisc;
 
@@ -215,36 +237,57 @@ void CreateTree(TString InputFile){
         bbM           = mc_RDS->eventSelectiondijetM;
 
 
-        E_el1         =0;
-        E_el2         =0;
-        Eta_el1       = mc_RDS->eventSelectionel1eta;
-        Eta_el2       = mc_RDS->eventSelectionel2eta;
-        phi_el1       = mc_RDS->eventSelectionel1phi;
-        phi_el2       = mc_RDS->eventSelectionel1phi;
-        Pt_el1        = mc_RDS->eventSelectionel1ptME;
-        Pt_el2        = mc_RDS->eventSelectionel2ptME;
-        Mass_el1      = mc_RDS->eventSelectionel1mass;
-        Mass_el2      = mc_RDS->eventSelectionel2mass;
-        charge_el1    = mc_RDS->eventSelectionel1charge;
-        charge_el2    = mc_RDS->eventSelectionel2charge;		
-	
-        E_mu1         = 0;
-        E_mu2         = 0;
-        Eta_mu1       = mc_RDS->eventSelectionmu1eta;
-        Eta_mu2       = mc_RDS->eventSelectionmu2eta;
-        phi_mu1       = mc_RDS->eventSelectionmu1phi;
-        phi_mu2       = mc_RDS->eventSelectionmu1phi;
-        Pt_mu1        = mc_RDS->eventSelectionmu1ptME;
-        Pt_mu2        = mc_RDS->eventSelectionmu2ptME;
-        Mass_mu1      = mc_RDS->eventSelectionmu1mass;
-        Mass_mu2      = mc_RDS->eventSelectionmu2mass;
-        charge_mu1    = mc_RDS->eventSelectionmu1charge;
-        charge_mu2    = mc_RDS->eventSelectionmu2charge;	
+	if (isMuChannel){
+	  TLorentzVector tlm1(0,0,0,0);
+	  TLorentzVector tlm2(0,0,0,0);
+	  tlm1.SetPtEtaPhiM(mc_RDS->memu1pt, mc_RDS->memu1etapm, mc_RDS->memu1phi, mc_RDS->memu1mass);
+	  tlm2.SetPtEtaPhiM(mc_RDS->memu2pt, mc_RDS->memu2etapm, mc_RDS->memu2phi, mc_RDS->memu2mass);
+          E_l1         = tlm1.E();
+          E_l2         = tlm2.E();
+          Eta_l1       = mc_RDS->memu1etapm;
+          Eta_l2       = mc_RDS->memu2etapm;
+          phi_l1       = mc_RDS->memu1phi;
+          phi_l2       = mc_RDS->memu2phi;
+          Pt_l1        = mc_RDS->memu1pt;
+          Pt_l2        = mc_RDS->memu2pt;
+          Mass_l1      = mc_RDS->memu1mass;
+          Mass_l2      = mc_RDS->memu2mass;
+          charge_l1    = mc_RDS->memu1charge;
+          charge_l2    = mc_RDS->memu2charge;	
+	}
+	else {
+	  TLorentzVector tle1(0,0,0,0);
+	  TLorentzVector tle2(0,0,0,0);
+	  tle1.SetPtEtaPhiM(mc_RDS->meel1pt, mc_RDS->meel1etapm, mc_RDS->meel1phi, mc_RDS->meel1mass);
+	  tle2.SetPtEtaPhiM(mc_RDS->meel2pt, mc_RDS->meel2etapm, mc_RDS->meel2phi, mc_RDS->meel2mass);
+
+          E_l1         = tle1.E();
+          E_l2         = tle2.E();
+          Eta_l1       = mc_RDS->meel1etapm;
+          Eta_l2       = mc_RDS->meel2etapm;
+          phi_l1       = mc_RDS->meel1phi;
+          phi_l2       = mc_RDS->meel2phi;
+          Pt_l1        = mc_RDS->meel1pt;
+          Pt_l2        = mc_RDS->meel2pt;
+          Mass_l1      = mc_RDS->meel1mass;
+          Mass_l2      = mc_RDS->meel2mass;
+          charge_l1    = mc_RDS->meel1charge;
+          charge_l2    = mc_RDS->meel2charge;		
+	}
 			
-	
+        deltaElp      = mc_RDS->meDeltaE_lp;
+        deltaElm      = mc_RDS->meDeltaE_lm;
+        deltaEtalp    = mc_RDS->meDeltaEta_lp;
+        deltaEtalm    = mc_RDS->meDeltaEta_lm; 
+        deltaPhilp    = mc_RDS->meDeltaphi_lp;
+        deltaPhilm    = mc_RDS->meDeltaphi_lm;
+        deltaPtInvlp  = mc_RDS->meDeltaPtInv_lp;
+        deltaPtInvlm  = mc_RDS->meDeltaPtInv_lm;
+  
+  
         DR_jet        = mc_RDS->eventSelectiondijetdR;
 
-        Met           = mc_RDS->jetmetMET_ME;
+        Met           = mc_RDS->jetmetMET;
         Met_phi       = mc_RDS->jetmetMETphi;
         Met_sig       = mc_RDS->jetmetMETsignificance;
 
@@ -290,38 +333,53 @@ void CreateTree(TString InputFile){
         nBjetsHEHP    = mc_RDS->jetmetnj;
 	
 	
-        category      = mc_RDS->rc_eventSelection_11_idx;
+        category      = mc_RDS->rc_eventSelection_10_idx;
 	
-	ofstream myfile2;
+
 	
 	if (category == 1 && Met_sig < 10 &&  Met_sig!= 0){
 	
-	  myfile2.open ("dumpEvents.txt",ios::app);
+
 	  myfile2 <<"0 "<<runNumber << " " <<eventNumber << endl;
 	  if (isMuChannel){
-	    myfile2 <<"1  2 " <<Eta_mu1<<" " <<phi_mu1<<" " <<Pt_mu1<< " " <<Mass_mu1<< " " <<charge_mu1<<" 0 0 0 0" <<endl;
-	    myfile2 <<"2  2 " <<Eta_mu2<<" " <<phi_mu2<<" " <<Pt_mu2<< " " <<Mass_mu2<< " " <<charge_mu2<<" 0 0 0 0" <<endl;	 
+	    myfile2 <<"1  2 " <<setprecision(9) <<Eta_l1<<" " <<phi_l1<<" " <<Pt_l1<< " " <<Mass_l1<< " " <<charge_l1<<" 0 0 0 0" <<endl;
+	    myfile2 <<"2  2 " <<setprecision(9) <<Eta_l2<<" " <<phi_l2<<" " <<Pt_l2<< " " <<Mass_l2<< " " <<charge_l2<<" 0 0 0 0" <<endl;	 
 	  }
 	  else{
-	    myfile2 <<cout <<"1  1 " <<Eta_el1<<" " <<phi_el1<<" " <<Pt_el1<< " " <<Mass_el1<< " " <<charge_el1<<" 0 0 0 0" <<endl;
-	    myfile2 <<cout <<"2  1 " <<Eta_el2<<" " <<phi_el2<<" " <<Pt_el2<< " " <<Mass_el2<< " " <<charge_el2<<" 0 0 0 0" <<endl;	
+	    myfile2 <<"1  1 " <<setprecision(9) <<Eta_l1<<" " <<phi_l1<<" " <<Pt_l1<< " " <<Mass_l1<< " " <<charge_l1<<" 0 0 0 0" <<endl;
+	    myfile2 <<"2  1 " <<setprecision(9) <<Eta_l2<<" " <<phi_l2<<" " <<Pt_l2<< " " <<Mass_l2<< " " <<charge_l2<<" 0 0 0 0" <<endl;	
 	  }
-	  myfile2 <<"3  4 " <<Eta_j1<<" " <<phi_j1 <<" " <<Pt_j1<< " " <<Mass_j1<< " " <<"0"<<" 2 0 0 0" <<endl;
-	  myfile2 <<"4  4 " <<Eta_j2<<" " <<phi_j2 <<" " <<Pt_j2<< " " <<Mass_j2<< " " <<"0"<<" 2 0 0 0" <<endl;
+	  myfile2 <<"3  4 " <<setprecision(9) <<Eta_j1<<" " <<phi_j1 <<" " <<Pt_j1<< " " <<Mass_j1<< " " <<"0"<<" 2 0 0 0" <<endl;
+	  myfile2 <<"4  4 " <<setprecision(9) <<Eta_j2<<" " <<phi_j2 <<" " <<Pt_j2<< " " <<Mass_j2<< " " <<"0"<<" 2 0 0 0" <<endl;
 	  myfile2 <<"5  6 " <<"0"   <<" " <<Met_phi<<" " <<Met  << " " <<"0 0 0 0 0 0" <<endl;
-	  
-	  myfile2.close();
-	}
-	
-	
-        t_RDSME->Fill();
-	
-	}
 
+
+          t_RDSME->Fill();
+	}
+      }
+	  
+      myfile2.close();
       f_RDSME->cd();
       t_RDSME->Write();
    
       delete mc_RDS;
       
       
+}
+void Loop(){
+
+CreateTree("Tree_File_rds_zbb_El_MC.root");
+CreateTree("Tree_File_rds_zbb_Mu_MC.root");
+CreateTree("Tree_File_rds_zbb_TT1_El_MC.root");
+CreateTree("Tree_File_rds_zbb_TT1_Mu_MC.root");
+CreateTree("Tree_File_rds_zbb_TT2_El_MC.root");
+CreateTree("Tree_File_rds_zbb_TT2_Mu_MC.root");
+CreateTree("Tree_File_rds_zbb_ZH115_El_MC.root");
+CreateTree("Tree_File_rds_zbb_ZH115_Mu_MC.root");
+CreateTree("Tree_File_rds_zbb_ZH125_El_MC.root");
+CreateTree("Tree_File_rds_zbb_ZH125_Mu_MC.root");
+CreateTree("Tree_File_rds_zbb_ZZ_El_MC.root");
+CreateTree("Tree_File_rds_zbb_ZZ_Mu_MC.root");
+
+
 }
