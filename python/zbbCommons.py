@@ -13,7 +13,7 @@ class zbblabel:
   metlabel="patType01SCorrectedPFMet"
   rholabel="kt6PFJets" #rholabel="kt6PFJetsForIsolation"
   genlabel="genParticles" #genlabel="prunedGen"
-  genjetlabel="prunedJets"
+  genjetlabel="ak5GenJets"
   genInfolabel="generator"
 
 class zbbsystematics:
