@@ -113,13 +113,13 @@ void CreateTree(TString InputFile){
    
    bool IsDATA = InputFile.Contains("DATA");
       
-   TFile* f_RDS  = new TFile(InputFile);
+   TFile* f_RDS  = new TFile("Tree_File_rds_zbb_"+InputFile+".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
 
 
    rds_zbb* mc_RDS = new rds_zbb(t_RDS);
    
-   TFile *f_RDSME = new TFile("tree1_"+InputFile+".root", "RECREATE");
+   TFile *f_RDSME = new TFile("outRDStoLHCO_"+InputFile+".root", "RECREATE");
    TTree *t_RDSME = new TTree("tree1", "tree 1");   
    
    t_RDSME->Branch("runNumber", &runNumber, "runNumber/l");
@@ -193,7 +193,7 @@ void CreateTree(TString InputFile){
    //t_RDSME->Branch("category", &category, "category/I"); 
    
    ofstream myfile2; 
-   myfile2.open (InputFile+".txt",ios::app); 
+   myfile2.open ("outRDStoLHCO_"+InputFile+".lhco",ios::app); 
    	  
    Long64_t nbytesRDS = 0, nbRDS = 0;
    for (Int_t iRDS=0;iRDS<t_RDS->GetEntries();iRDS++) {
@@ -368,18 +368,18 @@ void CreateTree(TString InputFile){
 }
 void Loop(){
 
-CreateTree("Tree_File_rds_zbb_El_MC.root");
-CreateTree("Tree_File_rds_zbb_Mu_MC.root");
-CreateTree("Tree_File_rds_zbb_TT1_El_MC.root");
-CreateTree("Tree_File_rds_zbb_TT1_Mu_MC.root");
-CreateTree("Tree_File_rds_zbb_TT2_El_MC.root");
-CreateTree("Tree_File_rds_zbb_TT2_Mu_MC.root");
-CreateTree("Tree_File_rds_zbb_ZH115_El_MC.root");
-CreateTree("Tree_File_rds_zbb_ZH115_Mu_MC.root");
-CreateTree("Tree_File_rds_zbb_ZH125_El_MC.root");
-CreateTree("Tree_File_rds_zbb_ZH125_Mu_MC.root");
-CreateTree("Tree_File_rds_zbb_ZZ_El_MC.root");
-CreateTree("Tree_File_rds_zbb_ZZ_Mu_MC.root");
+CreateTree("El_MC");
+CreateTree("Mu_MC");
+CreateTree("TT1_El_MC");
+CreateTree("TT1_Mu_MC");
+CreateTree("TT2_El_MC");
+CreateTree("TT2_Mu_MC");
+CreateTree("ZH115_El_MC");
+CreateTree("ZH115_Mu_MC");
+CreateTree("ZH125_El_MC");
+CreateTree("ZH125_Mu_MC");
+CreateTree("ZZ_El_MC");
+CreateTree("ZZ_Mu_MC");
 
 
 }
