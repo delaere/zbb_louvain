@@ -40,7 +40,7 @@ from optparse import OptionParser
 ################
 
 narguments = len(sys.argv)
-if narguments != 2:
+if narguments < 2:
   print "Usage: python ", sys.argv[0], " process"
   print "Examples"
 
@@ -57,8 +57,12 @@ if narguments != 2:
 print sys.argv
 channel = sys.argv[1]
 #channel = "DoubleEle_DataA" #"ZZ_El_MC" 
-jobNumber = 1
-Njobs = 1
+
+jobNumber = 0
+if narguments>2 : jobNumber = int(sys.argv[2])
+n=250000
+if jobNumber>0 : print "job number is ", jobNumber
+
 MonteCarloPUFileName=zbbfile.pileupMC
 DataPUFileName=zbbfile.pileupData
 btagPerfData=zbbfile.ssvperfData
@@ -69,6 +73,9 @@ from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
 path = pathSkimEMu
 outputDir=dirRDS
 #outputDir=""
+postfix=""
+if jobNumber>0 : postfix="_"+str(jobNumber)
+
 #checkTrigger[channel]=False
 
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
@@ -144,7 +151,10 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     t0 = time.time()
     
     for event in events:
-      #if i > 100: break;
+      if jobNumber>0 and i<(jobNumber-1)*n :
+        i += 1
+        continue
+      if jobNumber>0 and i>=jobNumber*n : break
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
@@ -210,11 +220,11 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws_ras,'import')(ras_zbb)
     ws_ras.Print()
     
-    ws_ras.writeToFile(outputDir+"File_rds_zbb_"+channel+".root")
+    ws_ras.writeToFile(outputDir+"File_rds_zbb_"+channel+postfix+".root")
     #ws_ras.writeToFile("test.root")
     gDirectory.Add(ws_ras)
 
-    f=TFile(outputDir+"File_rds_zbb_"+channel+".root","UPDATE")
+    f=TFile(outputDir+"File_rds_zbb_"+channel+postfix+".root","UPDATE")
     #f=TFile("test.root","UPDATE")
     tree_zbb = rds_zbb.tree()
     tree_zbb.Write()
