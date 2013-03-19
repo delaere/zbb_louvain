@@ -20,17 +20,15 @@ gSystem->Load("libEG")
 // $4 is the mass of the Higgs
 
 TString channel("$3")
-TString File("/home/fynu/arnaudp/scratch/MW_5/inputFiles/CSV_2011/tree2Files/");
-TString f1("DY_"+channel+"_TREE2.root")
-TString f2("TT_"+channel+"_TREE2.root")
-TString f3("ZZ_"+channel+"_TREE2.root")
+TString DIR("/nfs/user/acaudron/Tree2_53X/");
+TString f1("ME_zbb_DY_"+channel+"_MC.root")
+TString f2("ME_zbb_TT_"+channel+"_MC.root")
+TString f3("ME_zbb_ZZ_"+channel+"_MC.root")
 TString f4;
-if($4==115){f4="ZH115_"+channel+"_TREE2.root";}
-if($4==120){f4="ZH120_"+channel+"_TREE2.root";}
-if($4==125){f4="ZH125_"+channel+"_TREE2.root";}
-if($4==130){f4="ZH130_"+channel+"_TREE2.root";}
-
-
+if($4==115){f4="ME_zbb_ZH115_"+channel+"_MC.root";}
+if($4==120){f4="ME_zbb_ZH120_"+channel+"_MC.root";}
+if($4==125){f4="ME_zbb_ZH125_"+channel+"_MC.root";}
+if($4==130){f4="ME_zbb_ZH130_"+channel+"_MC.root";}
 
 cout<<f1<<endl;
 
@@ -53,23 +51,19 @@ cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 // Structure of the NN and nbr of iteration
 //TString NNStruct("$3")
 //TString NNStruct("5:6:4:3")
-//TString NNStruct("5:3");
-TString NNStruct("7:2");
-int iterations=10000;
+TString NNStruct("5:3");
+//TString NNStruct("7:2");
+int iterations=1000;
 cout<<iterations<<endl;
 
-
 // COmpilation and submission
-.L /home/fynu/cbeluffi/scratch/MEM_2012/NN_AN/include.h
-.L /home/fynu/cbeluffi/scratch/MEM_2012/NN_AN/Read_input_m.h 
-.L /home/fynu/cbeluffi/scratch/MEM_2012/NN_AN/Generic_NN_higgs_test.C+
+.L include.h
+.L Read_input.h 
+.L Generic_NN_higgs_test.C+
 
-Neural_net_E(File+f1,File+f2,File+f3,File+f4,NN,$1,$2,NNStruct,iterations)
-
-
+Neural_net_E(DIR+f1,DIR+f2,DIR+f3,DIR+f4,NN,$1,$2,NNStruct,iterations)
 
 .q
-
 EOF
 
 grep Epoch logroot_${1}_${2}_${3}_${4}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${1}_${2}_${3}_${4}.txt
@@ -100,10 +94,9 @@ int numberOfPoints=${NUMOFPOINTS}
 
 cout << "numberOfPoints=" << numberOfPoints << endl;
 
-
 TString arg1("$1");
 TString arg2("$2");
-TString arg2("$3");
+TString arg3("$3");
 TString epochinputtxt = "epoch_"+arg1+"_"+arg2+"_"+channel+arg3+".txt";
 
 TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+".root","UPDATE");

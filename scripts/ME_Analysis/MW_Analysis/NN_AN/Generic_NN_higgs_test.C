@@ -7,8 +7,8 @@
  *
  */
 
-#include "/home/fynu/arnaudp/scratch/MW_5/MW_Analysis/NN_AN/Template/include.h"
-#include "/home/fynu/arnaudp/scratch/MW_5/MW_Analysis/NN_AN/Template/Read_input_m.h"
+#include "include.h"
+#include "Read_input.h"
 
 void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag, int cut,TString NNStruct,int iterations)
 {
@@ -56,6 +56,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	N4=treetmp->GetEntries();
 	delete treetmp;
 
+	cout<<N1<<" "<<N2<<" "<<N3<<" "<<N4<<endl;
+
 	nn_vars *var1 = new nn_vars(N1);
 	if(tag==1){Input(dy,N1,var1,sim,simu,1,0,0,cut);}
 	nn_vars *var2 = new nn_vars(N2);
@@ -69,11 +71,12 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// Tree SIMU for NN training filled
 
 	// Declaration of multiplayer perceptron object. input variable = branch of simu tree. Not all at the same time. To add a branch as input add @branchname. then : intermediate layer node, put : to add new layer. Ended by : @type mean that outup is 1 or 0. Then we specify the number of entries for training and test samples.
-	TMultiLayerPerceptron *mlp;
+	TMultiLayerPerceptron *mlp = new TMultiLayerPerceptron();
 	int Dy=var1->evt_nbr[0];
 	int Tt=var2->evt_nbr[0];
 	int Zz=var3->evt_nbr[0];
 	int Hi=var4->evt_nbr[0];
+	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 	ostringstream osdy,ostt,oszz,oszh;
 	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;
 	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();
@@ -122,9 +125,10 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	zzh->SetDirectory(0);
 	zhh->SetDirectory(0);
 	tth->SetDirectory(0);
-	Double_t params[3];
-	if(tag==1 || tag==3){Double_t params[4];}// to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
-	int zbb=0;
+	int nParams = 3;
+	if(tag==1 || tag==3){nParams = 4;}// to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
+	Double_t params[nParams];
+	//int zbb=0;
 
 	//-------------------------------------------------------------------------
 	// FOR Zbb
@@ -154,13 +158,16 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// FOR ZZ
 	bool evt_ZZ[N3];
         for (int i=0;i<N3; ++i) {
-	evt_ZZ[i]=false;
+	  evt_ZZ[i]=false;
 	  if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
 	  if(cut==1 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 ){evt_ZZ[i]=true;}
-	  if(cut==0){evt_ZZ[i]=true;}                                                                                                                                                     
-	  if(evt_ZZ[i]==true){params[0] = var3->zz[i];params[1] = var3->zz3[i];params[2] = var3->hi[i];params[3] = var3->hi3[i];
-	  zzh->Fill(mlp->Evaluate(0,params));
-	  }
+	  if(cut==0){evt_ZZ[i]=true;}      
+	  if(evt_ZZ[i]==true){
+	    params[0] = var3->zz[i];
+	    params[1] = var3->zz3[i];
+	    params[2] = var3->hi[i];
+	    params[3] = var3->hi3[i];
+	    zzh->Fill(mlp->Evaluate(0,params));}
         }
         //-------------------------------------------------------------------------
 	// FOR ZH
