@@ -33,10 +33,10 @@ TString WP("${WP}")
 TString channel("${channel}")
 TString mass("${mass}")
 TString DIR("/nfs/user/acaudron/Tree2_53X/");
-TString f1("ME_zbb_DY_"+channel+"_MC.root")
-TString f2("ME_zbb_TT_"+channel+"_MC.root")
-TString f3("ME_zbb_ZZ_"+channel+"_MC.root")
-TString f4("ME_zbb_ZH"+mass+"_"+channel+"_MC.root")
+TString fDY("ME_zbb_DY_"+channel+"_MC.root")
+TString fTT("ME_zbb_TT_"+channel+"_MC.root")
+TString fZZ("ME_zbb_ZZ_"+channel+"_MC.root")
+TString fZH("ME_zbb_ZH"+mass+"_"+channel+"_MC.root")
 
 cout<<"Directory is "<<DIR<<endl;
 
@@ -60,42 +60,37 @@ cout<<"iterations "<<iterations<<endl;
 .L Generic_NN_higgs_test.C+
 cout<<"Start Neural_net_E"<<endl;
 
-Neural_net_E(DIR+f1,DIR+f2,DIR+f3,DIR+f4,NN,$1,$2,NNStruct,iterations)
+int s=1;
+if(sample=="TT") s=2;
+if(sample=="ZZ") s=3;
+int wp=2;
+if(WP=="MM") wp=1;
+if(WP=="ML") wp=0;
+Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,wp,NNStruct,iterations)
 
 .q
 EOF
 
-grep Epoch logroot_${1}_${2}_${3}_${4}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${1}_${2}_${3}_${4}.txt
+grep Epoch logroot_${sample}_${WP}_${channel}_${mass}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${sample}_${WP}_${channel}_${mass}.txt
 
-NUMOFPOINTS=$(cat epoch_${1}_${2}_${3}_${4}.txt| wc -l )
+NUMOFPOINTS=$(cat epoch_${sample}_${WP}_${channel}_${mass}.txt| wc -l )
 echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 
 root -l -b NN*.root << EOF
 
 //This part is copy and paste from the first time we call root
-TString N1,N2,N3;
-TString channel("$3")
-if($1==1){N1="DY_";}
-if($1==2){N1="TT_";}
-if($1==3){N1="ZZ_";}
-if($2==0){N2="ML_CSV_2011_"+channel+"";}
-if($2==1){N2="MM_CSV_2011_"+channel+"";}
-if($2==2){N2="MM_N_CSV_2011_"+channel+"";}
-if($4==115){N3="_ZH115";}
-if($4==120){N3="_ZH120";}
-if($4==125){N3="_ZH125";}
-if($4==130){N3="_ZH130";}
-
-TString NN=N1+N2+N3;
 
 int numberOfPoints=${NUMOFPOINTS}
 
 cout << "numberOfPoints=" << numberOfPoints << endl;
 
-TString arg1("$1");
-TString arg2("$2");
-TString arg3("$4");
-TString epochinputtxt = "epoch_"+arg1+"_"+arg2+"_"+channel+"_"+arg3+".txt";
+TString sample("${sample}")
+TString WP("${WP}")
+TString channel("${channel}")
+TString mass("${mass}")
+TString NN(sample+"_"+WP+"_CSV_2012_"+channel+"_ZH"+mass);
+
+TString epochinputtxt = "epoch_"+sample+"_"+WP+"_"+channel+"_"+mass+".txt";
 
 TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+".root","UPDATE");
 
