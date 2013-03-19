@@ -1,5 +1,16 @@
 #! /bin/sh
 
+#Check for correct number of arguments
+if [ $# -lt 4 ]
+then
+    echo "missing arguments, example : source NN_June.sh sample WP channel mass"
+    echo "sample is : DY, TT or ZZ"
+    echo "WP is : ML, MM or MM_N"
+    echo "channel is : Mu, El or comb"
+    echo "mass is : 110, 115, 120, 125, 130, 135, 140, 145 or 150. !!! for the moment use only 125 !!!"
+    exit
+fi
+
 export HOME=.
 export ROOTSYS=/nfs/soft/root/latest_sl5
 export PATH=$ROOTSYS/bin:$PATH
