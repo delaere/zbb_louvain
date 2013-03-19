@@ -30,20 +30,20 @@ if($4==120){f4="ME_zbb_ZH120_"+channel+"_MC.root";}
 if($4==125){f4="ME_zbb_ZH125_"+channel+"_MC.root";}
 if($4==130){f4="ME_zbb_ZH130_"+channel+"_MC.root";}
 
-cout<<f1<<endl;
+cout<<"Directory is "<<DIR<<endl;
 
 // Output name
 TString N1,N2,N3;
 if($1==1){N1="DY_";}
 if($1==2){N1="TT_";}
 if($1==3){N1="ZZ_";}
-if($2==0){N2="ML_CSV_2011_"+channel+"";}
-if($2==1){N2="MM_CSV_2011_"+channel+"";}
-if($2==2){N2="MM_N_CSV_2011_"+channel+"";}
-if($4==115){N3="ZH115_";}
-if($4==120){N3="ZH120_";}
-if($4==125){N3="ZH125_";}
-if($4==130){N3="ZH130_";}
+if($2==0){N2="ML_CSV_2012_"+channel+"";}
+if($2==1){N2="MM_CSV_2012_"+channel+"";}
+if($2==2){N2="MM_N_CSV_2012_"+channel+"";}
+if($4==115){N3="_ZH115";}
+if($4==120){N3="_ZH120";}
+if($4==125){N3="_ZH125";}
+if($4==130){N3="_ZH130";}
 NN=N1+N2+N3;
 cout<<" OUTPUT NAME : "<<NN<<endl;
 cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
@@ -53,13 +53,14 @@ cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 //TString NNStruct("5:6:4:3")
 TString NNStruct("5:3");
 //TString NNStruct("7:2");
-int iterations=1000;
+int iterations=50;
 cout<<iterations<<endl;
 
 // COmpilation and submission
 .L include.h
 .L Read_input.h 
 .L Generic_NN_higgs_test.C+
+cout<<"Start Neural_net_E"<<endl;
 
 Neural_net_E(DIR+f1,DIR+f2,DIR+f3,DIR+f4,NN,$1,$2,NNStruct,iterations)
 
@@ -82,11 +83,10 @@ if($1==3){N1="ZZ_";}
 if($2==0){N2="ML_CSV_2011_"+channel+"";}
 if($2==1){N2="MM_CSV_2011_"+channel+"";}
 if($2==2){N2="MM_N_CSV_2011_"+channel+"";}
-if($4==115){N3="ZH115_";}
-if($4==120){N3="ZH120_";}
-if($4==125){N3="ZH125_";}
-if($4==130){N3="ZH130_";}
-
+if($4==115){N3="_ZH115";}
+if($4==120){N3="_ZH120";}
+if($4==125){N3="_ZH125";}
+if($4==130){N3="_ZH130";}
 
 TString NN=N1+N2+N3;
 
@@ -96,12 +96,13 @@ cout << "numberOfPoints=" << numberOfPoints << endl;
 
 TString arg1("$1");
 TString arg2("$2");
-TString arg3("$3");
-TString epochinputtxt = "epoch_"+arg1+"_"+arg2+"_"+channel+arg3+".txt";
+TString arg3("$4");
+TString epochinputtxt = "epoch_"+arg1+"_"+arg2+"_"+channel+"_"+arg3+".txt";
 
 TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+".root","UPDATE");
 
-.L /home/fynu/arnaudp/scratch/MW_5/MW_Analysis/NN_AN/Template/ComputeGraphFromTrainTxt.C
+.L ComputeGraphFromTrainTxt.C
+cout<<"ComputeGraphFromTrainTxt"<<endl;
 ComputeGraphFromTrainTxt(foutput, epochinputtxt, numberOfPoints);
 .q
 << EOF
