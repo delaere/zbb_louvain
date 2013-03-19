@@ -32,7 +32,7 @@ from matrixElementControlPlots import *
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-from zbbCommons import zbbfile, isZbbSelection, zbbme
+from zbbCommons import zbbfile, isZbbSelection, zbbme, zbbsystematics
 from eventSelection import eventCategories, eventCategory, isInCategory
 from optparse import OptionParser
 
@@ -41,6 +41,7 @@ from optparse import OptionParser
 ###############
 ##  USAGE #####
 ################
+
 
 narguments = len(sys.argv)
 if narguments != 2:
@@ -52,6 +53,7 @@ if narguments != 2:
   print "python ", sys.argv[0], " Mu_MC"
   print "python ", sys.argv[0], " El_MC"
   exit()
+
 
 ###################
 ### Run options ###
@@ -85,6 +87,8 @@ muChannel = { "MuA_DATA"     : True ,
               "DY_Pt100_El_MC"        : False,
               "Zbb_Mu_MC"    : True ,
               "Zbb_El_MC"    : False,
+              "ZbbMG4F_Mu_MC"    : True ,
+              "ZbbMG4F_El_MC"    : False,
               "TT_Mu_MC"     : True ,
               "TT_El_MC"     : False,
               "TT_1of10_Mu_MC"     : True,
@@ -132,55 +136,58 @@ muChannel = { "MuA_DATA"     : True ,
               "ZA_El_MC" : False
               }
 
+
 path = { 
-  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
-  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
-  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
-  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
-  "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
-  "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
-  "DY_Pt100_Mu_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
-  "DY_Pt100_El_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
+  "MuA_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/Mu_DataA/" ,
+  "ElA_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/El_DataA/" ,
+  "MuB_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/Mu_DataB/" ,
+  "ElB_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/El_DataB/" ,
+  "Mu_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_MC/"    ,
+  "El_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_MC/"    ,
+  "DY_Pt100_Mu_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_Pt100_MC/"    ,
+  "DY_Pt100_El_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_Pt100_MC/"    ,
   #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
   #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
   "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
   "Zbb_El_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
-  "TT_Mu_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
-  "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
-  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
-  "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
-  "TT_1of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_1/"    ,
-  "TT_1of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_1/"    ,
-  "TT_2of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_2/"    ,
-  "TT_2of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_2/"    ,
-  "TT_3of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_3/"    ,
-  "TT_3of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_3/"    ,
-  "TT_4of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_4/"    ,
-  "TT_4of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_4/"    ,
-  "TT_5of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_5/"    ,
-  "TT_5of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_5/"    ,
-  "TT_6of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_6/"    ,
-  "TT_6of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_6/"    ,
-  "TT_7of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_7/"    ,
-  "TT_7of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_7/"    ,
-  "TT_8of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_8/"    ,
-  "TT_8of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_8/"    ,
-  "TT_9of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_9/"    ,
-  "TT_9of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_9/"    ,
-  "TT_10of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_10/"    ,
-  "TT_10of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_10/"    ,
-  "ZH110_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
-  "ZH110_El_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
-  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
-  "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
-  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
-  "ZH120_El_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
-  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
-  "ZH125_El_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
-  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
-  "ZH130_El_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
-  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
-  "ZH135_El_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "ZbbMG4F_Mu_MC"    : "/home/fynu/vizangarciaj/storage/skim444pt15/ZbbMG4F/"   ,
+  "ZbbMG4F_El_MC"    : "/home/fynu/vizangarciaj/storage/skim444pt15/ZbbMG4F/"   ,
+  "TT_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15/TT_MC/"    ,
+  "TT_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15/TT_MC/"    ,
+  "TT_1of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_1/"    ,
+  "TT_1of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_1/"    ,
+  "TT_2of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_2/"    ,
+  "TT_2of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_2/"    ,
+  "TT_3of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_3/"    ,
+  "TT_3of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_3/"    ,
+  "TT_4of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_4/"    ,
+  "TT_4of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_4/"    ,
+  "TT_5of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_5/"    ,
+  "TT_5of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_5/"    ,
+  "TT_6of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_6/"    ,
+  "TT_6of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_6/"    ,
+  "TT_7of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_7/"    ,
+  "TT_7of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_7/"    ,
+  "TT_8of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_8/"    ,
+  "TT_8of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_8/"    ,
+  "TT_9of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_9/"    ,
+  "TT_9of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_9/"    ,
+  "TT_10of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_10/"    ,
+  "TT_10of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15_TTsplitted/TT_MC_10/"    ,
+  "ZZ_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444pt15/ZZ_MC/"    ,
+  "ZH110_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH110_MC/" ,
+  "ZH110_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH110_MC/" ,
+  "ZH115_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/home/fynu/vizangarciaj/storage/skim444pt15/ZH135_MC/" ,
   "tW_Mu_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
   "tW_El_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
   "tbarW_Mu_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
@@ -193,6 +200,7 @@ path = {
   }
 
 
+print "JESfactor = ",zbbsystematics.JESfactor , "JERfactor = ",zbbsystematics.JERfactor
 ###############################
 ### Proxy for eventCategory ###
 ###############################
@@ -253,6 +261,8 @@ checkTrigger = {
   "DY_Pt100_El_MC"        : False,
   "Zbb_Mu_MC"    : False,
   "Zbb_El_MC"    : False,
+  "ZbbMG4F_Mu_MC"    : False,
+  "ZbbMG4F_El_MC"    : False,
   "TT_Mu_MC"     : False,
   "TT_El_MC"     : False,
   "TT_1of10_Mu_MC": False,
@@ -372,9 +382,18 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     
     for event in events:
       #if i > 400: break;
+
       if i%1000==1 :
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
+
+      #print "Processing... event", i
+
+      if i == 13448 and (channel=="TT_8of10_Mu_MC" or channel=="TT_8of10_El_MC") :
+        print "Skipping event ",i , " of channel ", channel
+        i += 1
+        continue;
+      
       categoryData = category(event,_muChan,ZjetFilter="bcl",checkTrigger=checkTrigger[channel],btagAlgo=btagAlgo)
       escp.setCategories(map(lambda c:isInCategory(c, categoryData),range(eventCategories())))
 
