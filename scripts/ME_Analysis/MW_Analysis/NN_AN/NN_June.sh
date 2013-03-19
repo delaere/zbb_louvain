@@ -11,51 +11,37 @@ then
     exit
 fi
 
-export HOME=.
-export ROOTSYS=/nfs/soft/root/latest_sl5
-export PATH=$ROOTSYS/bin:$PATH
-export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+#export HOME=.
+#export ROOTSYS=/nfs/soft/root/latest_sl5
+#export PATH=$ROOTSYS/bin:$PATH
+#export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
 
 echo ----------- Hello $USER -----------------------
-echo $1
-echo $2
-echo $3
-echo $4
+echo "bkg sample is "$1
+sample=$1
+echo "WP for b-tagging is "$2
+WP=$2
+echo "channel is "$3
+channel=$3
+echo "higgs mass is "$4
+mass=$4
 
-root -l -b > logroot_${1}_${2}_${3}_${4}.txt << EOF
+root -l -b > logroot_${sample}_${WP}_${channel}_${mass}.txt << EOF
 
-gSystem->Load("libPhysics")
-gSystem->Load("libEG")
-
-// Location of the input file $3 mean ee or mm or combined
-// $4 is the mass of the Higgs
-
-TString channel("$3")
+TString sample("${sample}")
+TString WP("${WP}")
+TString channel("${channel}")
+TString mass("${mass}")
 TString DIR("/nfs/user/acaudron/Tree2_53X/");
 TString f1("ME_zbb_DY_"+channel+"_MC.root")
 TString f2("ME_zbb_TT_"+channel+"_MC.root")
 TString f3("ME_zbb_ZZ_"+channel+"_MC.root")
-TString f4;
-if($4==115){f4="ME_zbb_ZH115_"+channel+"_MC.root";}
-if($4==120){f4="ME_zbb_ZH120_"+channel+"_MC.root";}
-if($4==125){f4="ME_zbb_ZH125_"+channel+"_MC.root";}
-if($4==130){f4="ME_zbb_ZH130_"+channel+"_MC.root";}
+TString f4("ME_zbb_ZH"+mass+"_"+channel+"_MC.root")
 
 cout<<"Directory is "<<DIR<<endl;
 
 // Output name
-TString N1,N2,N3;
-if($1==1){N1="DY_";}
-if($1==2){N1="TT_";}
-if($1==3){N1="ZZ_";}
-if($2==0){N2="ML_CSV_2012_"+channel+"";}
-if($2==1){N2="MM_CSV_2012_"+channel+"";}
-if($2==2){N2="MM_N_CSV_2012_"+channel+"";}
-if($4==115){N3="_ZH115";}
-if($4==120){N3="_ZH120";}
-if($4==125){N3="_ZH125";}
-if($4==130){N3="_ZH130";}
-NN=N1+N2+N3;
+TString NN(sample+"_"+WP+"_CSV_2012_"+channel+"_ZH"+mass);
 cout<<" OUTPUT NAME : "<<NN<<endl;
 cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 
@@ -65,7 +51,8 @@ cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 TString NNStruct("5:3");
 //TString NNStruct("7:2");
 int iterations=50;
-cout<<iterations<<endl;
+cout<<"NNStruct "<<NNStruct<<endl;
+cout<<"iterations "<<iterations<<endl;
 
 // COmpilation and submission
 .L include.h
