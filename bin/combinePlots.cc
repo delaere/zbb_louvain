@@ -9,6 +9,7 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TROOT.h>
+#include <TMath.h>
 #include <TSystem.h>
 #include <TCanvas.h>
 #include <THStack.h>
@@ -66,6 +67,7 @@ class plotCombiner {
      void CombineHistos(const char* name, std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output, std::string channel, std::string stage);
      void CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output);
      TH1* Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterator& style);
+     void showOverflow(TH1* h);
      std::vector<edm::ParameterSet> _dataInputs;
      std::vector<edm::ParameterSet> _mcInputs;
      std::vector<TDirectory*> _filesData;
@@ -253,24 +255,28 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it, ++mcConf) {
      TH1* h;
      (*it)->GetObject(data->GetName(),h);
+     if(!h) {delete c; return;}
 
      double rescaleCombined = 1;
      if(channel=="Combined"){
-       std::string MM = (*it)->GetName();
-       std::string MM2 = data->GetName();
+       //std::cout<<data->GetName()<<std::endl;
+       //std::string MM = (*it)->GetName();
+       //std::string MM2 = data->GetName();
        MM = "MuMuChannel/"+stage+"/"+MM+"/"+MM2;
        //std::cout<<MM<<std::endl;
        TH1F *mumu;
        _filesMC[nf]->GetObject(MM.c_str(),mumu);
+       if(mumu==NULL) mumu = (TH1F*) _filesMC[nf]->Get(MM.c_str());
        if(mumu==NULL) _filesMC[nf]->GetObject((MM+"Mu").c_str(),mumu);
+       if(mumu==NULL) mumu = (TH1F*) _filesMC[nf]->Get((MM+"Mu").c_str());
+       if(mumu==NULL) std::cout<<"ERROR : "<<_filesMC[nf]->GetName()<<std::endl;
        int nentries = mumu->GetEntries();
+       //std::cout<<data->GetName()<<std::endl;
        int Centries = h->GetEntries();
        if(Centries>0) rescaleCombined = double(Centries-nentries+nentries*_rescaleMu)/double(Centries);
        //std::cout<<rescaleCombined<<std::endl;
        nf++;
      }
-
-
 
      // title
      h->SetTitle(mcConf->getParameter<std::string>("role").c_str());
@@ -383,6 +389,8 @@ TH1* plotCombiner::Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterat
        double begin = style->second.getUntrackedParameter<double>("begin",0);
        double end   = style->second.getUntrackedParameter<double>("end",-1);
        double width = style->second.getUntrackedParameter<double>("width",1);
+       // option to show the overflow bin
+       bool showOverflowbin = style->second.getUntrackedParameter<bool>("overflow",0);
        // now, prepare the array of bins
        if(end>begin && bins.size()==0) {
          width = width>h->GetBinWidth(h->GetNbinsX()/2) ? width : h->GetBinWidth(h->GetNbinsX()/2) ;
@@ -398,15 +406,30 @@ TH1* plotCombiner::Rebin(TH1* h,std::map<std::string, edm::ParameterSet>::iterat
 	 }
 	 ngroup = bins.size()-1;
          TH1* hnew = h->Rebin(ngroup,h->GetName(),xbins); 
-	 //delete h;
 	 h=hnew;
 	 delete[] xbins;
+	 if(showOverflowbin) showOverflow(hnew);
 	 return hnew;
        } else {
          h->Rebin(ngroup);
+	 if(showOverflowbin) showOverflow(h);
          return h;
        }
        return h;
+}
+
+void plotCombiner::showOverflow(TH1* h)
+{
+	// add last bin and overflow
+	int nbins = h->GetNbinsX();
+	double newContent = h->GetBinContent(nbins) + h->GetBinContent(nbins+1);
+	double newError = TMath::Hypot(h->GetBinError(nbins), h->GetBinError(nbins+1));
+	// overwrite the content of the last bin by including the content of the overflow bin
+	h->SetBinContent(nbins,newContent);
+	h->SetBinError(nbins,newError);
+	// set the overflow to 0.
+	h->SetBinContent(nbins+1,0);
+	h->SetBinError(nbins+1,0);
 }
 
 void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDirectory*> mcdirs, TDirectory* output)
