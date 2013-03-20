@@ -260,8 +260,8 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      double rescaleCombined = 1;
      if(channel=="Combined"){
        //std::cout<<data->GetName()<<std::endl;
-       //std::string MM = (*it)->GetName();
-       //std::string MM2 = data->GetName();
+       std::string MM = (*it)->GetName();
+       std::string MM2 = data->GetName();
        MM = "MuMuChannel/"+stage+"/"+MM+"/"+MM2;
        //std::cout<<MM<<std::endl;
        TH1F *mumu;
