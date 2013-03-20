@@ -11,10 +11,16 @@ then
     exit
 fi
 
-#export HOME=.
-#export ROOTSYS=/nfs/soft/root/latest_sl5
-#export PATH=$ROOTSYS/bin:$PATH
-#export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+if [[ -d ${CMSSW_BASE} ]]
+then
+    echo 'running in CMSSW'
+else
+    export HOME=.
+    export ROOTSYS=/nfs/soft/root/latest_sl5
+    export PATH=$ROOTSYS/bin:$PATH
+    export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+    echo 'not running in CMSSW, setup root'
+fi
 
 echo ----------- Hello $USER -----------------------
 echo "bkg sample is "$1
