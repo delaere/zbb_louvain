@@ -95,7 +95,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	mlp->Export("MLP_Higgs_vs_"+name,"c++");
 	mlp->Write();
 
-
 	// Use TMLPAnalyzer to see what it looks for. INFO will be in the contro root file
 	TCanvas* mlpa_canvas = new TCanvas("mlpa_canvas","Network analysis"); // For NN output
 	TCanvas* kin = new TCanvas("kin","kin"); // for kin Variable
@@ -134,59 +133,64 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// FOR Zbb
 	bool evt_DY[N1];
 	for (int i=0;i<N1; ++i) {
-	evt_DY[i]=false;
-	  if(cut==2 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){evt_DY[i]=true;}
+	  evt_DY[i]=false;
+	  //if(cut==2 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){evt_DY[i]=true;}
+	  if(cut==2) {evt_DY[i]=true;}
 	  if(cut==1 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 ){evt_DY[i]=true;}
 	  if(cut==0){evt_DY[i]=true;}
-	  if(evt_DY[i]==true){ params[0] = var1->gg[i];params[1] = var1->qq[i];params[2] = var1->hi[i];params[3] = var1->hi3[i];
-	  zbbh->Fill(mlp->Evaluate(0, params));
+	  if(evt_DY[i]==true){ 
+	    params[0] = var1->gg[i];params[1] = var1->qq[i];params[2] = var1->hi[i];params[3] = var1->hi3[i];
+	    zbbh->Fill(mlp->Evaluate(0, params));
 	  }
 	}
+
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	bool evt_TT[N2];
 	for (int i=0;i<N2; ++i) {
-	evt_TT[i]=false;
-	  if(cut==2 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){evt_TT[i]=true;}
+	  evt_TT[i]=false;
+	  //if(cut==2 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){evt_TT[i]=true;}
+	  if(cut==2) {evt_TT[i]=true;}
 	  if(cut==1 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 ){evt_TT[i]=true;}
 	  if(cut==0){evt_TT[i]=true;}
-	  if(evt_TT[i]==true){ params[0] = var2->tt[i];params[1] = var2->hi[i];params[2] = var2->hi3[i];
-	  tth->Fill(mlp->Evaluate(0, params));
+	  if(evt_TT[i]==true){ 
+	    params[0] = var2->tt[i];params[1] = var2->hi[i];params[2] = var2->hi3[i];
+	    tth->Fill(mlp->Evaluate(0, params));
 	  }
 	}
+
         //-------------------------------------------------------------------------        
 	// FOR ZZ
 	bool evt_ZZ[N3];
         for (int i=0;i<N3; ++i) {
 	  evt_ZZ[i]=false;
-	  if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
+	  //if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
+	  if(cut==2) {evt_ZZ[i]=true;}
 	  if(cut==1 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 ){evt_ZZ[i]=true;}
 	  if(cut==0){evt_ZZ[i]=true;}      
 	  if(evt_ZZ[i]==true){
-	    params[0] = var3->zz[i];
-	    params[1] = var3->zz3[i];
-	    params[2] = var3->hi[i];
-	    params[3] = var3->hi3[i];
+	    params[0] = var3->zz[i]; params[1] = var3->zz3[i]; params[2] = var3->hi[i]; params[3] = var3->hi3[i];
 	    zzh->Fill(mlp->Evaluate(0,params));}
         }
+
         //-------------------------------------------------------------------------
 	// FOR ZH
 	bool evt_ZH[N4];
         for (int i=0;i<N4; ++i) {
-	evt_ZH[i]=false;
-	  if(cut==2 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>76. && var4-> Mll[i]<106.){evt_ZH[i]=true;}
+	  evt_ZH[i]=false;
+	  //if(cut==2 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>76. && var4-> Mll[i]<106.){evt_ZH[i]=true;}
+	  if(cut==2) {evt_ZH[i]=true;}
 	  if(cut==1 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 ){evt_ZH[i]=true;}
 	  if(cut==0){evt_ZH[i]=true;}  
 	  if(evt_ZH[i]==true){
 	  	if(tag==1){params[0] = var4->gg[i];params[1] = var4->qq[i];params[2] = var4->hi[i];params[3] = var4->hi3[i];}
           	if(tag==2){params[0] = var4->tt[i];params[1] = var4->hi[i];params[2] = var4->hi3[i];}
           	if(tag==3){params[0] = var4->zz[i];params[1] = var4->zz3[i];params[2] = var4->hi[i];params[3] = var4->hi3[i];}
-	  zhh->Fill(mlp->Evaluate(0, params));
+		zhh->Fill(mlp->Evaluate(0, params));
 	  }
 	}
 
 //-------------------------------------------------------------------------                                                                                             
-
 	cout<<"  DY   ALL "<<zbbh->Integral()<<endl;
 	cout<<"  TT   ALL "<<tth->Integral()<<endl;
 	cout<<"  ZZ   ALL "<<zzh->Integral()<<endl;
@@ -194,9 +198,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 
 //------------------------------------------------------------------------- 
 //-------------------Normalisation and plot ------------------------------------------------------
-//-------------------------------------------------------------------------                                                                                                                                       
-
-
+//-------------------------------------------------------------------------                                                                                                                                      
 	tth->SetLineColor(kBlue);
 	zzh->SetLineColor(kGreen);
 	tth->SetFillColor(kBlue);
@@ -258,4 +260,5 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	mlpa_canvas->Write();
 
 	file.Close();
+	cout<<"close root file"<<endl;
 }
