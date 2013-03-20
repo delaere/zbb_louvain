@@ -4,6 +4,11 @@ import FWCore.ParameterSet.Config as cms
 from UserCode.zbb_louvain.zbbCommons import zbbnorm
 lumi=zbbnorm.lumi_totEle2011*1000 #in pb-1
 
+flow="overflow"
+#flow=""
+if flow=="overflow" : overflow = cms.untracked.bool(True)
+else : overflow = cms.untracked.bool(False)
+
 class EColor:
  """ROOT colors taken from RTypes.h"""
  kWhite  = 0
@@ -27,61 +32,60 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-    outputFile = cms.string('mergedPlots_bsub_5210pb_2011AB_V7.root'),
+    outputFile = cms.string('mergedPlots_5050pb_2011AB_V2_overflow.root'),
     
   data = cms.VPSet (
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V7/ControlPlots_Ele2011A/Ele2011A_Fall11_final.root')
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp444/ControlPlots_V4/ControlPlots_Ele2011A/Ele2011A_Fall11_final.root')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V7/ControlPlots_Ele2011B/Ele2011B_Fall11_final.root')
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp444/ControlPlots_V4/ControlPlots_Ele2011B/Ele2011B_Fall11_final.root')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V7/ControlPlots_Mu2011A/Mu2011A_Fall11_final.root') 
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp444/ControlPlots_V4/ControlPlots_Mu2011A/Mu2011A_Fall11_final.root') 
                                           ),
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V7/ControlPlots_Mu2011B/Mu2011B_Fall11_final.root')    
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp444/ControlPlots_V4/ControlPlots_Mu2011B/Mu2011B_Fall11_final.root')    
             ),   
         
   ),
     
-    
   mc   = cms.VPSet (
         
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_ZZ/ZZ_Fall11_final.root'),
+            fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_ZZ/CP_ZZ_v5_combined.root'),
             color = cms.uint32(EColor.kMagenta+palette),
             scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('ZZ')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_TT/TT_Fall11_final.root'),
+            fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_TT/CP_TTbar_v5_combined.root'),
             color = cms.uint32(EColor.kYellow+palette),
             scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('t#bar{t}')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zb/Zb_Fall11_final.root'),
+            fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zb/CP_Zb_v5_combined.root'),
             color = cms.uint32(EColor.kRed+palette),
             scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
             role = cms.string('Z+b')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zc/Zc_Fall11_final.root'),
+            fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zc/CP_Zc_v5_combined.root'),
             color = cms.uint32(EColor.kGreen+palette),
             scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
             role = cms.string('Z+c')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zl/Zl_Fall11_final.root'),
+            fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_V5/ControlPlots_Zl/CP_Zl_v5_combined.root'),
             color = cms.uint32(EColor.kBlue+palette),
             scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11),#3048.*5051./35907791.), #NLO MCFM
             role = cms.string('Z+l')
             ),
         #cms.PSet(
-        #    fileName = cms.string('/home/fynu/acaudron/scratch/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZH_125/ZH125_Fall11_all.root'),
+        #    fileName = cms.string('/home/fynu/rcastello/Physics/Zbb/Aug2012_full2011/upgrade_version/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/ControlPlots_ZH_125/ZH125_Fall11_all.root'),
         #    color = cms.uint32(EColor.kWhite),#EColor.kAzure+palette),
         #    scale = cms.double(50*zbbnorm.xsec_ZH125_7TeV*lumi/zbbnorm.nev_ZH125_fall11), #Xs 
         #    role = cms.string('50*ZH_125')
@@ -95,6 +99,7 @@ process.CombinePlots = cms.PSet(
   formating = cms.VPSet (
     cms.PSet(
       name = cms.string('bestzmass'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -104,6 +109,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('bestzmassMu'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -113,6 +119,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('bestzmassEle'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -122,6 +129,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('bjet1pt'),
+      overflow=overflow,
       begin = cms.untracked.double(0),
       end = cms.untracked.double(265),
       width = cms.untracked.double(10),
@@ -132,6 +140,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('bjet2pt'),
+      overflow=overflow,
       begin = cms.untracked.double(0),
       end = cms.untracked.double(265),
       width = cms.untracked.double(10),
@@ -143,6 +152,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jet1pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -156,6 +166,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jet2pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -164,6 +175,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('nvertices'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -172,6 +184,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('nj'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -180,6 +193,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
           name = cms.string('el1pt'),
+          overflow=overflow,
 	  rebin = cms.untracked.uint32(5),
 	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{e_{1}} (GeV)"),
@@ -202,6 +216,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
           name = cms.string('el2pt'),
+          overflow=overflow,
 	  rebin = cms.untracked.uint32(5),
 	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{e_{2}} (GeV)"),
@@ -224,6 +239,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
           name = cms.string('mu1pt'),
+          overflow=overflow,
 	  rebin = cms.untracked.uint32(5),
 	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{#mu_{1}} (GeV)"),
@@ -246,6 +262,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
           name = cms.string('mu2pt'),
+          overflow=overflow,
 	  rebin = cms.untracked.uint32(5),
 	  #logy = cms.untracked.bool(True),
 	  labelx = cms.untracked.string("p_{T}^{#mu_{2}} (GeV)"),
@@ -268,6 +285,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('MET'),
+      overflow=overflow,
       logy = cms.untracked.bool(True),
       rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("MEt (GeV)"),
@@ -283,24 +301,28 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('ZbM'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(50),
       labelx = cms.untracked.string("M_{Zb} (GeV)"),
       labely = cms.untracked.string("Events/50GeV")
     ),
     cms.PSet(
       name = cms.string('ZbPt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       labelx = cms.untracked.string("p_{T}^{Zb} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
     cms.PSet(
       name = cms.string('dijetM'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(50),
       labelx = cms.untracked.string("M_{bb} (GeV)"),
       labely = cms.untracked.string("Events/50GeV")
     ),
     cms.PSet(
       name = cms.string('dijetPt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       labelx = cms.untracked.string("p_{T}^{bb} (GeV)"),
       labely = cms.untracked.string("Events/20GeV")
@@ -343,30 +365,35 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('ZbbM'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(50),
       labelx = cms.untracked.string("M_{Zbb} (GeV)"),
       labely = cms.untracked.string("Events/50GeV")
     ),
     cms.PSet(
       name = cms.string('ZbbPt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       labelx = cms.untracked.string("p_{T}^{Zbb} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
     cms.PSet(
       name = cms.string('bestzpt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),          ####### /2 rebining
       labely = cms.untracked.string("Events/20GeV")
     ),
     cms.PSet(
       name = cms.string('bestzptMu'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),
       labely = cms.untracked.string("Events/20GeV")
     ),
     cms.PSet(
       name = cms.string('bestzptEle'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(20),
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),
       labely = cms.untracked.string("Events/20GeV")
@@ -379,6 +406,7 @@ process.CombinePlots = cms.PSet(
 #    ),
     cms.PSet(
       name = cms.string('SVpT'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(2),
       labelx = cms.untracked.string("Secondary vertex pT (GeV)"),
       labely = cms.untracked.string("Events/2")
@@ -427,6 +455,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('METsignificance'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("METsignificance"),
       labely = cms.untracked.string("Events/0.5")
