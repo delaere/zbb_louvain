@@ -134,8 +134,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_DY[N1];
 	for (int i=0;i<N1; ++i) {
 	  evt_DY[i]=false;
-	  //if(cut==2 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){evt_DY[i]=true;}
-	  if(cut==2) {evt_DY[i]=true;}
+	  if(cut==2 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){evt_DY[i]=true;}
+	  //if(cut==2) {evt_DY[i]=true;}
 	  if(cut==1 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 ){evt_DY[i]=true;}
 	  if(cut==0){evt_DY[i]=true;}
 	  if(evt_DY[i]==true){ 
@@ -149,8 +149,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_TT[N2];
 	for (int i=0;i<N2; ++i) {
 	  evt_TT[i]=false;
-	  //if(cut==2 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){evt_TT[i]=true;}
-	  if(cut==2) {evt_TT[i]=true;}
+	  if(cut==2 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){evt_TT[i]=true;}
+	  //if(cut==2) {evt_TT[i]=true;}
 	  if(cut==1 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 ){evt_TT[i]=true;}
 	  if(cut==0){evt_TT[i]=true;}
 	  if(evt_TT[i]==true){ 
@@ -164,8 +164,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_ZZ[N3];
         for (int i=0;i<N3; ++i) {
 	  evt_ZZ[i]=false;
-	  //if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
-	  if(cut==2) {evt_ZZ[i]=true;}
+	  if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
+	  //if(cut==2) {evt_ZZ[i]=true;}
 	  if(cut==1 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 ){evt_ZZ[i]=true;}
 	  if(cut==0){evt_ZZ[i]=true;}      
 	  if(evt_ZZ[i]==true){
@@ -178,8 +178,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_ZH[N4];
         for (int i=0;i<N4; ++i) {
 	  evt_ZH[i]=false;
-	  //if(cut==2 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>76. && var4-> Mll[i]<106.){evt_ZH[i]=true;}
-	  if(cut==2) {evt_ZH[i]=true;}
+	  if(cut==2 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>76. && var4-> Mll[i]<106.){evt_ZH[i]=true;}
+	  //if(cut==2) {evt_ZH[i]=true;}
 	  if(cut==1 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 ){evt_ZH[i]=true;}
 	  if(cut==0){evt_ZH[i]=true;}  
 	  if(evt_ZH[i]==true){

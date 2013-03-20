@@ -98,6 +98,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
   double Pt_lep2plus,Eta_lep2plus,Phi_lep2plus,Pt_lep2minus,Eta_lep2minus,Phi_lep2minus;
   double Ej1,Ej2,Ptj1,Ptj2;
   double btagj1,btagj2;
+  double Mll;
   double Wgg,Wqq,Wtt,Wzz,Wzz3,Whi,Whi3;
   int Flavor_j1,Flavor_j2;
   int multiplicity;
@@ -134,6 +135,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
   tree->SetBranchAddress("Pt_j1",&Ptj1);
   tree->SetBranchAddress("btagj1",&btagj1);
   tree->SetBranchAddress("btagj2",&btagj2);
+  tree->SetBranchAddress("Inv_Mass_lept",&Mll);
   if(sig2==1 || sig2==2){
     tree->SetBranchAddress("Flavor_j2",&Flavor_j2);
     tree->SetBranchAddress("Flavor_j1",&Flavor_j1);
@@ -159,10 +161,10 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
     b1.SetPtEtaPhiE(Ptj1,Eta_j1,Phi_j1,Ej1);
     b2.SetPtEtaPhiE(Ptj2,Eta_j2,Phi_j2,Ej2);  
     
-    if(cutt==2 && MeTsig<10. &&multiplicity<3&&(b1+b2).M()>80 && (b1+b2).M()<150&& btagj1>0.679 && btagj2>0.679 && ((l1+l2).M()>76.) && ((l1+l2).M()<106.)){evt[i]=true;}
-    if(cutt==1 && MeTsig<10. &&multiplicity<3&&(b1+b2).M()>80 && (b1+b2).M()<150&& btagj1>0.679 && btagj2>0.679 ) {evt[i]=true;}
-    if(cutt==0 && MeTsig<10. &&multiplicity<3&&((b1+b2).M())>80 && ((b1+b2).M())<150){evt[i]=true;}
-    evt[i]=true;
+    if(cutt==2 && MeTsig<10. && btagj1>0.679 && btagj2>0.679 && (Mll>76.) && (Mll<106.)){evt[i]=true;}
+    if(cutt==1 && MeTsig<10. && btagj1>0.679 && btagj2>0.679 ) {evt[i]=true;}
+    if(cutt==0 && MeTsig<10.){evt[i]=true;}
+
     if(evt[i]==true){      
       sim->gg_weight=Wgg;
       sim->qq_weight=Wqq;
@@ -196,7 +198,8 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
       var->deta[i]=10./(pow((pow(((l1+l2).M()),2) - pow(91.,2)),2)+10);//fabs(Eta_j1-Eta_j2);
       sim-> ptZ=(l1+l2).Pt();
       sim->ptbb=(b1+b2).Pt();
-      sim->Mll=(l1+l2).M();
+      //sim->Mll=(l1+l2).M();
+      sim->Mll=Mll;
       sim->Mbb=(b1+b2).M();
       var->Mll[i]=sim->Mll;
       var->Mbb[i]=sim->Mbb;
