@@ -20,11 +20,5 @@ universe       = vanilla
 requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = 120 comb
+arguments = comb 125
 queue
-
-# arguments = 2 2 comb
-# queue
-
-# arguments = 3 2 comb
-# queue

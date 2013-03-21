@@ -142,7 +142,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
     
   }
   
-  int entryy=0;
+  int entry=0;
   bool evt[N1];
   for (int i=0;i<N1; ++i){	
     evt[i]=false;
@@ -213,11 +213,11 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
       if(multiplicity>2){sim->Multi=1;}
       if(multiplicity<3){sim->Multi=0;}
       var->multi[i]=sim->Multi; 
-      if(fill==1 && sig2==0){simu->Fill();entryy+=1;}
-      if(fill==1 && sig2==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
-      if(fill==1 && sig2==2 && (abs(Flavor_j2)!=5 || abs(Flavor_j1)!=5)){simu->Fill();entryy+=1;}
+      if(fill==1 && sig2==0){simu->Fill();entry+=1;}
+      if(fill==1 && sig2==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entry+=1;}     
+      if(fill==1 && sig2==2 && (abs(Flavor_j2)!=5 || abs(Flavor_j1)!=5)){simu->Fill();entry+=1;}
     }   
   }
-  var->evt_nbr[0]=entryy;
-  cout<<"outtt "<<entryy<<endl;
+  var->evt_nbr[0]=entry;
+  cout<<"n entries "<<entry<<endl;
 }

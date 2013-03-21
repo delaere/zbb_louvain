@@ -15,8 +15,8 @@ if [[ -d ${CMSSW_BASE} ]]
 then
     echo 'running in CMSSW'
 else
-    export HOME=.
-    export ROOTSYS=/nfs/soft/root/latest_sl5
+    export ROOTSYS=/nfs/soft/root/root-5.34.05-sl5_amd64_gcc41
+    #export ROOTSYS=/nfs/soft/root/latest_sl5
     export PATH=$ROOTSYS/bin:$PATH
     export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
     echo 'not running in CMSSW, setup root'
@@ -56,14 +56,14 @@ cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 //TString NNStruct("5:6:4:3")
 TString NNStruct("5:3");
 //TString NNStruct("7:2");
-int iterations=50;
+int iterations=2000;
 cout<<"NNStruct "<<NNStruct<<endl;
 cout<<"iterations "<<iterations<<endl;
 
 // COmpilation and submission
-.L include.h
-.L Read_input.h 
-.L Generic_NN_higgs_test.C+
+.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/include.h
+.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Read_input.h 
+.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Generic_NN_higgs_test.C+
 cout<<"Start Neural_net_E"<<endl;
 
 int s=1;
@@ -82,7 +82,7 @@ grep Epoch logroot_${sample}_${WP}_${channel}_${mass}.txt | sed -e 's/Epoch: //'
 NUMOFPOINTS=$(cat epoch_${sample}_${WP}_${channel}_${mass}.txt| wc -l )
 echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 
-root -l -b NN*.root << EOF
+root -l -b NN*${sample}*${WP}*${channel}*${mass}*.root << EOF
 
 //This part is copy and paste from the first time we call root
 
@@ -100,7 +100,7 @@ TString epochinputtxt = "epoch_"+sample+"_"+WP+"_"+channel+"_"+mass+".txt";
 
 TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+".root","UPDATE");
 
-.L ComputeGraphFromTrainTxt.C
+.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/ComputeGraphFromTrainTxt.C
 cout<<"ComputeGraphFromTrainTxt"<<endl;
 ComputeGraphFromTrainTxt(foutput, epochinputtxt, numberOfPoints);
 .q
