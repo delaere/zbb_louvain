@@ -147,19 +147,24 @@ class MatrixElementControlPlots(BaseControlPlots):
       """matrixElementControlPlots"""
       result = { }      
       
-      event.getByLabel (self.genlabel,self.genHandle)
       event.getByLabel (self.metlabel,self.metHandle)      
       event.getByLabel(self.zmulabel,self.zmuHandle)
       event.getByLabel(self.zelelabel,self.zeleHandle)
       event.getByLabel(self.vertexlabel,self.vertexHandle)
       event.getByLabel(self.jetlabel,self.jetHandle)
       
-      particles = self.genHandle.product()
+      #print "is this real data  = ",
+      isrealdata = event.object().event().eventAuxiliary().isRealData()
+      
+      if not isrealdata:
+        event.getByLabel (self.genlabel,self.genHandle)
+        particles = self.genHandle.product()
       met = self.metHandle.product()  
       zCandidatesMu = self.zmuHandle.product()
       zCandidatesEle = self.zeleHandle.product()
       vertices = self.vertexHandle.product()  
       jets = self.jetHandle.product()
+      
             
       ## First initialize generator level infor for Transfer Function if MC sample\
       
@@ -181,10 +186,10 @@ class MatrixElementControlPlots(BaseControlPlots):
       dRpn=10
       dRnp=10
 
-      #print "is this real data  = ",event.object().event().eventAuxiliary().isRealData()
+      
       result["FilledJetTF"]=0
       result["FilledLepTF"]=0      
-      if not event.object().event().eventAuxiliary().isRealData():
+      if not isrealdata:
         #particles = event.genParticles
 	for partg in particles:
 	  #if partg.status() ==3: print "st3 partid=",partg.pdgId()
