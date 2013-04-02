@@ -138,10 +138,10 @@ muChannel = { "MuA_DATA"     : True ,
 
 
 path = { 
-  "MuA_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/Mu_DataA/" ,
-  "ElA_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/El_DataA/" ,
-  "MuB_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/Mu_DataB/" ,
-  "ElB_DATA"     : "/home/fynu/vizangarciaj/storage/skim444pt15/El_DataB/" ,
+  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
   "Mu_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_MC/"    ,
   "El_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_MC/"    ,
   "DY_Pt100_Mu_MC"        : "/home/fynu/vizangarciaj/storage/skim444pt15/DY_Pt100_MC/"    ,
