@@ -41,7 +41,7 @@ from optparse import OptionParser
 ###############
 ##  USAGE #####
 ################
-
+useskimpt15 = False#choose input the skims with ptjet > 15 or > 20 GeV
 
 narguments = len(sys.argv)
 if narguments != 2:
@@ -136,8 +136,70 @@ muChannel = { "MuA_DATA"     : True ,
               "ZA_El_MC" : False
               }
 
+path_skimpt20 = { 
+  "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
+  "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
+  "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
+  "ElB_DATA"     : "/nfs/user/acaudron/skim444/El_DataB/" ,
+  "Mu_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  "El_MC"        : "/nfs/user/acaudron/skim444/DY_MC/"    ,
+  "DY_Pt100_Mu_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
+  "DY_Pt100_El_MC"        : "/nfs/user/acaudron/skim444/DY_Pt100_MC/"    ,
+  #"Mu_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  #"El_MC"        : "/storage/data/cms/store/user/acaudron/Torino/DYJets_MCMatched_00.root"    , 
+  "Zbb_Mu_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "Zbb_El_MC"    : "/storage/data/cms/store/user/acaudron/Fall11MC_444/zbbProd/"   ,
+  "ZbbMG4F_Mu_MC"    : "/home/fynu/vizangarciaj/storage/skim444pt15/ZbbMG4F/"   ,
+  "ZbbMG4F_El_MC"    : "/home/fynu/vizangarciaj/storage/skim444pt15/ZbbMG4F/"   ,
+  "TT_Mu_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "TT_El_MC"     : "/nfs/user/acaudron/skim444/TT_MC/"    ,
+  "ZZ_Mu_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "ZZ_El_MC"     : "/nfs/user/acaudron/skim444/ZZ_MC/"    ,
+  "TT_1of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_1/"    ,
+  "TT_1of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_1/"    ,
+  "TT_2of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_2/"    ,
+  "TT_2of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_2/"    ,
+  "TT_3of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_3/"    ,
+  "TT_3of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_3/"    ,
+  "TT_4of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_4/"    ,
+  "TT_4of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_4/"    ,
+  "TT_5of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_5/"    ,
+  "TT_5of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_5/"    ,
+  "TT_6of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_6/"    ,
+  "TT_6of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_6/"    ,
+  "TT_7of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_7/"    ,
+  "TT_7of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_7/"    ,
+  "TT_8of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_8/"    ,
+  "TT_8of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_8/"    ,
+  "TT_9of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_9/"    ,
+  "TT_9of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_9/"    ,
+  "TT_10of10_Mu_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_10/"    ,
+  "TT_10of10_El_MC"     : "/home/fynu/vizangarciaj/storage/skim444_TTsplitted/TT_MC_10/"    ,
+  "ZH110_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
+  "ZH110_El_MC"  : "/nfs/user/acaudron/skim444/ZH110_MC/" ,
+  "ZH115_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH115_El_MC"  : "/nfs/user/acaudron/skim444/ZH115_MC/" ,
+  "ZH120_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH120_El_MC"  : "/nfs/user/acaudron/skim444/ZH120_MC/" ,
+  "ZH125_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH125_El_MC"  : "/nfs/user/acaudron/skim444/ZH125_MC/" ,
+  "ZH130_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH130_El_MC"  : "/nfs/user/acaudron/skim444/ZH130_MC/" ,
+  "ZH135_Mu_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "ZH135_El_MC"  : "/nfs/user/acaudron/skim444/ZH135_MC/" ,
+  "tW_Mu_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tW_El_MC"     : "/nfs/user/acaudron/skim444/tW_MC/"    ,
+  "tbarW_Mu_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "tbarW_El_MC"  : "/nfs/user/acaudron/skim444/tbarW_MC/" ,
+  "evtgen_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/evtgen/",
+  "herwig_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/herwig/",
+  "pythia_MC"    : "/storage/data/cms/users/tdupree/zbb_2011/pythia/",
+  "ZA_Mu_MC" : "/nfs/user/acaudron/ZApat/",
+  "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
+  }
 
-path = { 
+
+path_skimpt15 = { 
   "MuA_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataA/" ,
   "ElA_DATA"     : "/nfs/user/acaudron/skim444/El_DataA/" ,
   "MuB_DATA"     : "/nfs/user/acaudron/skim444/Mu_DataB/" ,
@@ -199,6 +261,12 @@ path = {
   "ZA_El_MC" : "/nfs/user/acaudron/ZApat/"
   }
 
+path = path_skimpt20
+if useskimpt15 == True:
+  path = path_skimpt15
+  print "using path_skimpt15"
+else:
+  print "using path_skimpt20"
 
 print "JESfactor = ",zbbsystematics.JESfactor , "JERfactor = ",zbbsystematics.JERfactor
 ###############################
