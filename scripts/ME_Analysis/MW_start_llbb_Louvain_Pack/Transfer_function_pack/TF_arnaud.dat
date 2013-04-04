@@ -109,14 +109,14 @@
           prov2=(#4+#5*dsqrt(pexp(0))+#6*pexp(0))
           prov5=(#13+#14*dsqrt(pexp(0))+#15*pexp(0))
 
-          width=5.0*max(prov2,prov5)
+          width=max(prov2,prov5)
 	ENDIF
 
         IF (ABS(eta(pexp)) .GE. 1.6)  THEN
           prov2=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
           prov5=(#28+#29*dsqrt(pexp(0))+#30*pexp(0))
 
-          width=5.0*max(prov2,prov5)
+          width=max(prov2,prov5)
         ENDIF
 </width>
 
@@ -168,14 +168,14 @@ c
           prov7=(#34+#35*dsqrt(pexp(0))+#36*pexp(0))
           prov10=(#43+#44*dsqrt(pexp(0))+#45*pexp(0))
 
-          width=5.0*max(prov7,prov10)
+          width=max(prov7,prov10)
 	ENDIF
 
         IF (ABS(eta(pexp)) .GE. 1.5)  THEN
           prov7=(#49+#50*dsqrt(pexp(0))+#51*pexp(0))
           prov10=(#58+#59*dsqrt(pexp(0))+#60*pexp(0))
 
-          width=5.0*max(prov7,prov10)
+          width=max(prov7,prov10)
         ENDIF
      </width>
 	
