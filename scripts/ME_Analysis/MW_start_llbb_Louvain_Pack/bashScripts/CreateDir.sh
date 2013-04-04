@@ -84,7 +84,7 @@ output madweight ZZ_C0_ee
 ### zz_C3 #####
 define p = g u c d s u~ c~ d~ s~
 generate p p > z z , z > e+ e- , z > b b~
-output madweight ZH_C3_ee
+output madweight ZZ_C3_ee
 
 #### zh_C0_123 ####
 define p = g u c d s u~ c~ d~ s~
