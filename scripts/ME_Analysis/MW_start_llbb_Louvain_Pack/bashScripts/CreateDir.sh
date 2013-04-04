@@ -76,15 +76,25 @@ define p = g u c d s u~ c~ d~ s~
 generate p p > t t~ , ( t > b w+ , w+ > e+ ve ) , ( t~ > b~ w- , w- > e- ve~ )
 output madweight ttbar_ee
 
-### zz_C0_123 #####
+### zz_C0 #####
 define p = g u c d s u~ c~ d~ s~
 generate p p > z z , z > e+ e- , z > b b~
-output madweight ZZ_C0_123_ee
+output madweight ZZ_C0_ee
 
-### zz_C3_123 #####
+### zz_C3 #####
 define p = g u c d s u~ c~ d~ s~
 generate p p > z z , z > e+ e- , z > b b~
-output madweight ZZ_C3_123_ee
+output madweight ZH_C3_ee
+
+#### zh_C0_123 ####
+define p = g u c d s u~ c~ d~ s~
+generate p p > z h , z > e+ e- , h > b b~
+output madweight ZH_C0_123_ee
+
+#### zh_C3_123 ####
+define p = g u c d s u~ c~ d~ s~
+generate p p > z h , z > e+ e- , h > b b~
+output madweight ZH_C3_123_ee
 
 #### zh_C0_456 ####
 define p = g u c d s u~ c~ d~ s~
