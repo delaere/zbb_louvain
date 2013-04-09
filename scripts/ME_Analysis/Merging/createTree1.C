@@ -320,7 +320,7 @@ void CreateTree(TString InputFile){
 	
     if (category == 1 && Met_sig < 10 &&  Met_sig!= 0){
 
-      myfile2 <<"0 "<<runNumber << " " <<eventNumber << endl;
+      myfile2 <<"0 "<<eventNumber << " " <<runNumber << endl;
       if (isMuChannel){
 	myfile2 <<"1  2 " <<setprecision(9) <<Eta_l1<<" " <<phi_l1<<" " <<Pt_l1<< " " <<Mass_l1<< " " <<charge_l1<<" 0 0 0 0" <<endl;
 	myfile2 <<"2  2 " <<setprecision(9) <<Eta_l2<<" " <<phi_l2<<" " <<Pt_l2<< " " <<Mass_l2<< " " <<charge_l2<<" 0 0 0 0" <<endl;	 
@@ -345,10 +345,10 @@ void CreateTree(TString InputFile){
 }
 
 void Loop(){
-  CreateTree("DoubleMu_DataA");
-  CreateTree("DoubleEle_DataA");
-  /*  CreateTree("DY_El_MC");
-  CreateTree("DY_Mu_MC");
+  //CreateTree("DoubleMu_DataA");
+  //CreateTree("DoubleEle_DataA");
+  CreateTree("DY_El_MC");
+  /*CreateTree("DY_Mu_MC");
   CreateTree("TT_El_MC");
   CreateTree("TT_Mu_MC");
   CreateTree("ZZ_El_MC");
