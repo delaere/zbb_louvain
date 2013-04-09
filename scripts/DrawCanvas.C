@@ -16,6 +16,8 @@
 #include <string>
 #include <iostream>
 
+const char* addLabel=NULL;
+
 void setTDRStyle() {
   // For the canvas:
   gStyle->SetCanvasBorderMode(0);
@@ -83,7 +85,7 @@ void setTDRStyle() {
   gStyle->SetTitleFont(42, "XYZ");
   gStyle->SetTitleSize(0.05, "XYZ");
   gStyle->SetTitleXOffset(1.1);
-  gStyle->SetTitleYOffset(1.25);
+  gStyle->SetTitleYOffset(1.34);
   // For the axis labels:
   gStyle->SetLabelColor(1, "XYZ");
   gStyle->SetLabelFont(42, "XYZ");
@@ -133,8 +135,30 @@ void DrawCanvas(TCanvas* canvas)
     legend->SetX1NDC(label->GetX());
     legend->SetX2NDC(label->GetX()+0.3);
     legend->SetY1NDC(0.65 - 0.04);
-    legend->SetY2NDC(0.85 - 0.04);
+    legend->SetY2NDC(0.95 - 0.04);
     legend->Draw();
+  }
+  // add the label
+  TLatex lat;
+  //TFrame frame;
+  lat.SetTextSize(0.04);
+  TFrame* frame = (TFrame*) canvas->FindObject("TFrame");
+  bool logx = canvas->GetLogx();
+  bool logy = canvas->GetLogy();
+  canvas->SetLogx(false);
+  canvas->SetLogy(false);
+  canvas->Modified();
+  canvas->Update();
+  float x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.03;
+  float y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.1;
+  canvas->UseCurrentStyle();
+  canvas->SetLogx(logx);
+  canvas->SetLogy(logy);
+  lat.DrawLatex(x,y,"#splitline{CMS Preliminary}{#sqrt{s} = 7 TeV, L = 5.0 fb^{-1}}");
+  if(addLabel) {
+    x = frame->GetX1() + (frame->GetX2()-frame->GetX1())*0.53;
+    y = frame->GetY2() - (frame->GetY2()-frame->GetY1())*0.5;
+    lat.DrawLatex(x,y,addLabel);
   }
   // redraw the axis on top of everything
   canvas->RedrawAxis();
@@ -276,26 +300,50 @@ void addErrorBand(TF1* errorFunction=NULL) {
     legend->Draw();
     
   }
-
-
 }
 
 // Extension for JES + Btag efficiency uncertainty
+//Here are my files for systematics :
+//file_JES = /home/fynu/lceard/scratch/4_4_4_V2/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/combined_Plots_JES_final_V_SaveHisto_Combined.root
+//file_B = /home/fynu/lceard/scratch/4_4_4_V2/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/combined_Plots_BMMM_harcoded_RDS_V_HistoSaved_Combined.root
+
 void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* minusHistoBtag=NULL, TH1* plusHistoBtag=NULL) {
   // finds the stack
-  TIter next(gPad->GetListOfPrimitives());
+  TPad* histoPad = (TPad*)gPad->GetCanvas()->cd(1); 
+  //TPad* ratioPad = (TPad*)gPad->GetCanvas()->cd(2); 
+  histoPad->cd();
+
+  TIter next(histoPad->GetListOfPrimitives());
+  histoPad->ls();
   THStack* stack = NULL;
+  TH1F* data = NULL;
+  TLegend* legend = NULL; 
   TObject* obj = NULL;
   while((obj = next())) {
-    if(obj->InheritsFrom("THStack")) {
+    if(obj->InheritsFrom("THStack") && !stack) {
       stack = (THStack*)obj;
-      break;
     }
+    if(obj->InheritsFrom("TH1") && !data) {
+      data = (TH1F*)obj;
+    }
+    if(obj->InheritsFrom("TLegend") && !legend) {
+      legend = (TLegend*)obj;
+    }
+    if(stack && data && legend) break;
   }
   if(stack==NULL) {
    std::cerr << "ERROR: MC histogram not found" << std::endl;
    return;
   }
+  if(data==NULL) {
+   std::cerr << "ERROR: data histogram not found" << std::endl;
+   return;
+  }
+  if(legend==NULL) {
+   std::cerr << "ERROR: Legend not found" << std::endl;
+   return;
+  }
+
   // get the total histogram, clone it
   TH1* systematics = (TH1*)stack->GetStack()->Last()->Clone("systematics");
   // add the syst uncertainty in quadrature to the stat uncertainty
@@ -313,21 +361,22 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
 
       // combining with statistical ---------------------------------------      
 
-      double minusErrorTot = TMath::Sqrt(minusErrorJES*minusErrorJES); //+ //systematics->GetBinError(i)*systematics->GetBinError(i));
-      double plusErrorTot = TMath::Sqrt(plusErrorJES*plusErrorJES);// + systematics->GetBinError(i)*systematics->GetBinError(i));
+      double minusErrorTot = sqrt(minusErrorJES*minusErrorJES + systematics->GetBinError(i)*systematics->GetBinError(i));
+    double plusErrorTot = sqrt(plusErrorJES*plusErrorJES + systematics->GetBinError(i)*systematics->GetBinError(i));
         
       if(minusHistoBtag && plusHistoBtag){	
 	double minusErrorBtag = minusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i); 
 	double plusErrorBtag  = plusHistoBtag->GetBinContent(i)- systematics->GetBinContent(i);
        
-	minusErrorTot = TMath::Sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag );//+ systematics->GetBinError(i)*systematics->GetBinError(i));
-	plusErrorTot = TMath::Sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag );// + systematics->GetBinError(i)*systematics->GetBinError(i));
+	minusErrorTot = sqrt(minusErrorJES*minusErrorJES + minusErrorBtag*minusErrorBtag + systematics->GetBinError(i)*systematics->GetBinError(i));
+	plusErrorTot = sqrt(plusErrorJES*plusErrorJES + plusErrorBtag*plusErrorBtag + systematics->GetBinError(i)*systematics->GetBinError(i));
       }
 
       //setting the errors and the mean value --------------------------------
       // Errors along x-axis, just for aesthetics  ----------------------------
-      TG_systematics ->SetPointEXhigh(i-1,(systematics->GetBinWidth(i)/2)*0.75);   
-      TG_systematics ->SetPointEXlow(i-1,(systematics->GetBinWidth(i)/2)*0.75);  
+      //TG_systematics ->SetPointEXhigh(i-1,(systematics->GetBinWidth(i)/2)*0.75);   
+      TG_systematics ->SetPointEXhigh(i-1,(systematics->GetBinWidth(i)/2)*1.05);   
+      TG_systematics ->SetPointEXlow(i-1,(systematics->GetBinWidth(i)/2)*0.95);  
       
       // Errors along y-axis ----------------------------------------
       TG_systematics ->SetPointEYhigh(i-1,plusErrorTot);
@@ -336,23 +385,23 @@ void addErrorBandFromTH1(TH1* minusHistoJES=NULL, TH1* plusHistoJES=NULL, TH1* m
   }
   // draw the uncertainty on top of everything.
   // Note: we have to change the ErrorX, which impacts the data as well.
-  TG_systematics->SetFillColor(1);
-  TG_systematics->SetFillStyle(3001); 
-  gStyle->SetErrorX(0.4); 
-  TG_systematics->Draw("E2,same");
+  // 2012 Style for uncertainties band
+  //  TG_systematics->SetFillColor(1);
+  //TG_systematics->SetFillStyle(3001); 
   
-  TLegend* legend = new TLegend(0.1,0.7,0.48,0.9);
-  if(legend) {
-    //legend->AddEntry(TG_systematics," JES Uncertainty","f");
-    legend->AddEntry(TG_systematics," B Uncertainty","f");
-    //legend->AddEntry(TG_systematics," JES + B-Tag Uncertainties","f");
-    legend->SetFillColor(kWhite);
-    legend->SetBorderSize(0);
-    legend->Draw();    
-  }
+  // 2013 "Wbb" Style for uncertainties band
+  //gStyle->SetHatchesSpacing(1.0);
+  //gStyle->SetHatchesLineWidth(2);
+  TG_systematics->SetLineColor(0);
+  TG_systematics->SetFillColor(kBlack);
+  TG_systematics->SetFillStyle(3004); 
+  gStyle->SetErrorX(0.4);
+  TG_systematics->Draw("E2,same");
+  data->Draw("p,same");
 
+  legend->AddEntry(TG_systematics,"JES + BTag + Stat.","f");
+  legend->Draw();    
 }
-
 
 void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NULL) {
   //define functions
@@ -427,7 +476,6 @@ void addErrorBandFromTF1(TF1* errorFunctionMinus=NULL, TF1* errorFunctionPlus=NU
     legend->SetBorderSize(0);
     legend->Draw();    
   }
-
 }
 
 // Extension for generic uncertainty in the ratio plot
@@ -523,6 +571,20 @@ TString mypath()
   pathString.Append(canvasName);
   return pathString;
 }
+
+// Extension for generic uncertainty in the MAIN plot, directly from files
+void addErrorBandFromFiles(TFile* file_minusJES, TFile* file_plusJES,TFile* file_minusBtag, TFile* file_plusBtag) {
+  // get the path
+  TString path = mypath();
+  // get the histograms for systematics
+  TH1* h_minusJES = getHisto(file_minusJES, path);
+  TH1* h_plusJES  = getHisto(file_plusJES, path);
+  TH1* h_minusBtag = getHisto(file_minusBtag, path);
+  TH1* h_plusBtag  = getHisto(file_plusBtag, path);
+
+  addErrorBandFromTH1(h_minusJES,h_plusJES,h_minusBtag,h_plusBtag);
+}
+
 
 // Extension for generic uncertainty in the ratio plot, directly from files
 void addErrorBandToRatioFromFiles(TFile* file_minus, TFile* file_plus, int color) {
