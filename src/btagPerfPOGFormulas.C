@@ -72,8 +72,8 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
     }
   }
 
-  // prescription for the first bin: use the upper bound.
-  if(index==0) pt = ptmax[0];
+  // prescription for the first bin: use the upper bound.if not light jets 
+  if( (abs(flavor)==5||abs(flavor)==4) && index==0) pt = ptmax[0];
   
   // compute the scale factor and its uncertainty
   double SFb = 1.0;
