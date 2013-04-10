@@ -47,8 +47,9 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-  lumi_totEle2011=5.217 #in fb-1
-  lumi_totMu2011=5.275
+
+  lumi_totEle2011=4.99 #in fb-1
+  lumi_totMu2011=5.05
 
   lumi_tot2012=0.809 #only A for the moment
   
