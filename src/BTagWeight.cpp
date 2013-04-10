@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include "UserCode/zbb_louvain/interface/BTagWeight.h"
 #include "UserCode/zbb_louvain/interface/btagPerfPOGformulas.h"
+#include "UserCode/zbb_louvain/interface/btagPerfPOGformulas_CSV.h"
 #include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
 
 using namespace std; 
@@ -14,6 +15,8 @@ using namespace std;
 JetSet::JetSet(std::string themode, const char* infile) {
   if(themode=="hardcoded")
     interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas());
+  else if(themode=="hardcodedCSV")
+    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas_CSV(infile)); 
   else if(themode=="database")
     interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile)); 
   else {
@@ -33,7 +36,8 @@ JetSet::~JetSet() { }
 // add a jet to the set. 
 // Efficiencies and scale factors are automatically extracted from the db,
 // and the jet is added to the set only if meaningful data can be obtained.
-void JetSet::addJet(std::string uncert, int flavor, double et, double eta) { 
+void JetSet::addJet(std::string uncert, int flavor, double et, double eta) {
+  //std::cout<<"enter in addjet : "<<uncert<<" "<<flavor<<" "<<et<<" "<<eta<<std::endl;
   btagPerfBase::SystematicVariation mode = btagPerfBase::MEAN;
   if(uncert=="min") mode = btagPerfBase::MIN;
   if(uncert=="max") mode = btagPerfBase::MAX;
@@ -118,17 +122,21 @@ bool BTagWeight::filter(int t1, int t2) const {
 float BTagWeight::weight2(vector<JetInfo> jets, int ntags1, int ntags2) const {
   // check that the event passes the selection
   if(!filter(ntags1,ntags2)) return 0; //shouldn't be 1 ? No, we are safe, with the event selection.
+  //std::cout<<"start "<<ntags1<<" "<<ntags2<<std::endl;
   int njets=jets.size();
   int comb = pow(3,njets);
   float pMC=0;
   float pData=0;
+  //std::cout<<"comb loop "<<njets<<" comb "<<comb<<std::endl;
   for(int i=0;i < comb; i++) {
     float mc=1.;
     float data=1.;
     int ntagged1=0;
     int ntagged2=0;
+    //std::cout<<"jets loop "<<i<<std::endl;
     for(int j=0;j<njets;j++) {
       int tagged = int(i/pow(3,j)+0.5)%3;
+      //std::cout<<"jet "<<j<<" "<<tagged<<std::endl;
       switch(tagged) {
         case 0: { // no tag
           mc*=(1.-jets[j].eff_SSVHEM);
