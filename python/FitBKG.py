@@ -1,5 +1,7 @@
 from ROOT import *
 gROOT.SetStyle("Plain")
+
+
   
 ###############################################
 
@@ -8,15 +10,15 @@ gROOT.SetStyle("Plain")
 
 channelList   = ["Mu","El"]
 
-dataLabel = "2011"
+dataLabel = "2012"
 
 frac      = False
 WP        = "HPHPMETsig"
-extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvszbb_125_comb_ML<0.5"
+extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvszbb_125_comb_MM_N<0.5"
 keys      = False
 
-extraCutList = {"mwnn"     : "jetmetMETsignificance < 10",#mlphiggsvsbkg_125_comb_ML>-0.1&mlphiggsvsbkg_125_comb_ML<0.5",
-                "mmumu"    : "jetmetMETsignificance < 10",#mlphiggsvsbkg_125_comb_ML>-0.1&mlphiggsvsbkg_125_comb_ML<0.5",
+extraCutList = {"mwnn"     : "jetmetMETsignificance < 10&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5",
+                "mmumu"    : "jetmetMETsignificance < 10&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5",
 		}
 		
 ttbarVarList  = ["mwnn"]
@@ -150,20 +152,21 @@ C={}
 myFrame={}
 
 #path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
-path = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/"
+path = "/nfs/user/acaudron/Tree2_537/"
+pathData = "/nfs/user/acaudron/Tree2_537/"
 fileNameList = {}
 
-
 for chan in channelList:
-    fileNameList["2011A"+chan] = path+"RDS_rdsME_"+chan+"A_DATA.root"
-    fileNameList["2011B"+chan] = path+"RDS_rdsME_"+chan+"B_DATA.root"
-    fileNameList["ref"+chan] = path+"RDS_rdsME_"+chan+"_MC.root"
-    fileNameList["DY"+chan] = path+"RDS_rdsME_"+chan+"_MC.root"
+    if chan=="El" : chanData="Ele"
+    else : chanData=chan
+    fileNameList["2012"+chan] = pathData+"RDS_rdsME_Double"+chanData+"_Data.root"
+    fileNameList["ref"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
+    fileNameList["DY"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
     fileNameList["TT"+chan] = path+"RDS_rdsME_TT_"+chan+"_MC.root"
     fileNameList["ZZ"+chan] = path+"RDS_rdsME_ZZ_"+chan+"_MC.root"
-    fileNameList["Zbb"+chan] = path+"RDS_rdsME_"+chan+"_MC.root"
-    fileNameList["Zbx"+chan] = path+"RDS_rdsME_"+chan+"_MC.root"
-    fileNameList["Zxx"+chan] = path+"RDS_rdsME_"+chan+"_MC.root"
+    fileNameList["Zbb"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
+    fileNameList["Zbx"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
+    fileNameList["Zxx"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
     fileNameList["ZH125"+chan] = path+"RDS_rdsME_ZH125_"+chan+"_MC.root"	
 for name in fileNameList:
 	print name		    		  
@@ -171,28 +174,28 @@ for name in fileNameList:
 				  
 from zbbCommons import zbbnorm
 
-lumi = { "DATAMu"   : zbbnorm.lumi_totMu2011,
-         "DATAEl"     : zbbnorm.lumi_totEl2011,
-         "TTEl"       : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
-         "ZbbEl"       : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZbxEl"       : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZxxEl"       : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZZEl"       : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
-         "TTMu"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
-         "ZbbMu"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZbxMu"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZxxMu"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZZMu"     : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
-	 "ZH115El"    : zbbnorm.nev_ZH115_fall11/zbbnorm.xsec_ZH115_7TeV_El/1000.,
-         "ZH120El"    : zbbnorm.nev_ZH120_fall11/zbbnorm.xsec_ZH120_7TeV_El/1000.,
-	 "ZH115Mu"  : zbbnorm.nev_ZH115_fall11/zbbnorm.xsec_ZH115_7TeV_Mu/1000.,
-         "ZH120Mu"  : zbbnorm.nev_ZH120_fall11/zbbnorm.xsec_ZH120_7TeV_Mu/1000.,
-	 "ZH125El"    : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV_El/1000.,
-	 "ZH125Mu"  : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV_Mu/1000.,
-         "ZH130El"    : zbbnorm.nev_ZH130_fall11/zbbnorm.xsec_ZH130_7TeV_El/1000.,
-         "ZH135El"    : zbbnorm.nev_ZH135_fall11/zbbnorm.xsec_ZH135_7TeV_El/1000.,
-         "ZH130Mu"  : zbbnorm.nev_ZH130_fall11/zbbnorm.xsec_ZH130_7TeV_Mu/1000.,
-         "ZH135Mu"  : zbbnorm.nev_ZH135_fall11/zbbnorm.xsec_ZH135_7TeV_Mu/1000.
+lumi = { "DATAMu"   : zbbnorm.lumi_tot2012,
+         "DATAEl"     : zbbnorm.lumi_tot2012,
+         "TTEl"       : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "ZbbEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZbxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZxxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZZEl"       : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000.,
+         "TTMu"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "ZbbMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZbxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZxxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "ZZMu"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000.,
+	 "ZH115El"    : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
+         "ZH120El"    : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
+	 "ZH115Mu"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
+         "ZH120Mu"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
+	 "ZH125El"    : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000.,
+	 "ZH125Mu"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000.,
+         "ZH130El"    : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
+         "ZH135El"    : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.,
+         "ZH130Mu"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
+         "ZH135Mu"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.
 	         }
 		 
 		 
@@ -225,30 +228,22 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList,channel) :
 
     for name in dataAndMCNameList :
         print "name = ", name
-        if name=="2011":
-            print "making 2011 dataset"
-            file["2011A"+channel]  = TFile.Open(fileNameList["2011A"+channel])
-            myRDS["2011A"+channel] = file["2011A"+channel].Get("rds_zbb")
-            print "A.numEntries() = ", myRDS["2011A"+channel].numEntries()
-            file["2011B"+channel]  = TFile.Open(fileNameList["2011B"+channel])
-            myRDS["2011B"+channel] = file["2011B"+channel].Get("rds_zbb")
-            print "B.numEntries() = ", myRDS["2011B"+channel].numEntries()
-            myRDS["2011"+channel]=myRDS["2011A"+channel]
-            print "2011.numEntries() = ", myRDS["2011"+channel].numEntries()
-            myRDS["2011"+channel].append(myRDS["2011B"+channel])
-            print "2011.numEntries() = ", myRDS["2011"+channel].numEntries()
+        if name=="2012":
+            print "making 2012 dataset"
+            file["2012"+channel]  = TFile.Open(fileNameList["2012"+channel])
+            tree_zbb = file["2012"+channel].Get("rds_zbb")
+            ws_zbb = file["2012"+channel].Get("ws_ras")
+            ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+            myRDS["2012"+channel] = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
+            print "Data numEntries() = ", myRDS["2012"+channel].numEntries()
         else :
             print "fileNameList[name+channel] = ", fileNameList[name+channel]
             file[name+channel]  = TFile.Open(fileNameList[name+channel])
-            ws[name+channel]    = file[name+channel].Get("ws")
-            if ws[name+channel]:
-                print "getting RDS from RooWorkspace"
-                ws[name+channel].data("rds_zbb")
-		myRDS[name+channel].SetName(name+channel)
-            else :   
-                print "No ws, getting RDS directly"
-                myRDS[name+channel] = file[name+channel].Get("rds_zbb")
-		myRDS[name+channel].SetName(name+channel)
+            tree_zbb = file[name+channel].Get("rds_zbb")
+            ws_zbb = file[name+channel].Get("ws_ras")
+            ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+            myRDS[name+channel] = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
+            myRDS[name+channel].SetName(name+channel)
         print "*** Going to reduce RDS ", name        
 	print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name+channel].numEntries() 
 	myRDS[name+channel] = myRDS[name+channel].reduce(category[WP]+"==1"+extraCut)
@@ -327,7 +322,7 @@ def main():
     for channel in channelList:
         getDataAndMC(dataAndMCNameList, AlldataAndMCList,channel)
         getDataAndMC(["ref"], dataAndMCListZH,channel)
-    
+        print "AlldataAndMCList", AlldataAndMCList
     print " pass get Data and MC "
     
     for channel in channelList:
@@ -341,7 +336,7 @@ def main():
     for channel in channelList:   
         weight = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(vars["w_lep"],vars["w_lumi"],vars["w_b_"+WP]))
         setWeights(AlldataAndMCList,MCNameList,weight,channel)
-
+        print "AlldataAndMCList", AlldataAndMCList
     print "pass reweighting" 
 
 
@@ -364,14 +359,16 @@ def main():
 	"ZxxMu":SF_zxx,
 	"ZZMu":SF_zz
 	}
-    
-    flavor = RooCategory()
+
+    flavor = RooCategory("El","El")
     flavor.defineType("El")
-    flavor.defineType("Mu")   
     flavor.setLabel("El")
-    AlldataAndMCList["2011El"].addColumn(flavor)
-    flavor.setLabel("Mu")
-    AlldataAndMCList["2011Mu"].addColumn(flavor)    
+    print flavor, AlldataAndMCList["2012El"]
+    AlldataAndMCList["2012El"].addColumn(flavor)
+    flavorMu = RooCategory("Mu","Mu")
+    flavorMu.defineType("Mu")   
+    flavorMu.setLabel("Mu")
+    AlldataAndMCList["2012Mu"].addColumn(flavorMu)    
     
     Pdf2D={}
     N={}
@@ -421,13 +418,14 @@ def main():
     for channel in channelList:
         simPdf.addPdf(Pdf2D[channel],channel)
         
-    DATA = RooDataSet("DATA","DATA",AlldataAndMCList["2011El"],AlldataAndMCList["2011El"].get())
+    DATA = RooDataSet("DATA","DATA",AlldataAndMCList["2012El"],AlldataAndMCList["2012El"].get())
     print "before appending nbr data :",DATA.numEntries()
-    DATA.append(AlldataAndMCList["2011Mu"])
+    DATA.append(AlldataAndMCList["2012Mu"])
     print "after appending nbr data :",DATA.numEntries()
    
     print "reach fit level"
     simPdf.fitTo(DATA)#,Verbose(true))
+    
     #for channel in channelList:
     #	Pdf2D[channel].fitTo(AlldataAndMCList[dataLabel+channel])
 
