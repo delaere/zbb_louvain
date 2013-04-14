@@ -20,7 +20,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
     def beginJob(self, sigcut = 2.):
       self.sigcut = sigcut
       # declare histograms
-      self.add("nvertices","nvertices",30,0,30)
+      self.add("nvertices","nvertices",60,-0.5,59.5)
       self.add("vx","vx",400,-0.2,0.2)
       self.add("vy","vy",400,-0.2,0.2)
       self.add("vz","vz",100,-25,25)
