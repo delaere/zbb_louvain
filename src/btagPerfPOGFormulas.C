@@ -84,20 +84,20 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
 
   // values for Moriond 2013, see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
   int index=999;
-  float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
-  float ptmax[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800, 1000};
+  float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600;
+  float ptmax[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
-  if(pt>1000) pt=1000;
+  if(pt>800) pt=800;
 
   // determine the index
-  for(int ind = 0; ind < 17 ; ind++) {
+  for(int ind = 0; ind < 16 ; ind++) {
     if(pt>ptmin[ind] && pt<ptmax[ind]) {
       index=ind;
     }
   }
 
   // prescription for the first bin: use the upper bound.
-  if(index==0) pt = ptmax[0];
+  //if(index==0) pt = ptmax[0];
   
   // compute the scale factor and its uncertainty
   double SFb = 1.0;

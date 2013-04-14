@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include "UserCode/zbb_louvain/interface/BTagWeight.h"
 #include "UserCode/zbb_louvain/interface/btagPerfPOGformulas.h"
+#include "UserCode/zbb_louvain/interface/btagPerfPOGformulas_nofit.h"
 #include "UserCode/zbb_louvain/interface/btagPerfFWLiteInterface.h"
 
 using namespace std; 
@@ -14,6 +15,8 @@ using namespace std;
 JetSet::JetSet(std::string themode, const char* infile) {
   if(themode=="hardcoded")
     interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas());
+  else if(themode=="hardcoded_nofit")
+    interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfPOGFormulas_nofit(infile)); 
   else if(themode=="database")
     interface_ = boost::shared_ptr<btagPerfBase>(new btagPerfFWLiteInterface(infile)); 
   else {
@@ -137,6 +140,7 @@ float BTagWeight::weight2(vector<JetInfo> jets, int ntags1, int ntags2) const {
         }
         case 1: { // HE tag (and not HP)
           ntagged1++;
+	  //if(jets[j].flavor<4||jets[j].flavor>5) std::cout<<"efficiency on Mc for Loose is "<<jets[j].eff_SSVHEM<<std::endl;
           mc*=(jets[j].eff_SSVHEM-jets[j].eff_SSVHPT);
           data*=(jets[j].eff_SSVHEM*jets[j].sf_SSVHEM-jets[j].eff_SSVHPT*jets[j].sf_SSVHPT);
           break;
