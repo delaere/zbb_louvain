@@ -4,6 +4,7 @@ class zbblabel:
   muonlabel="tightMuons"
   allelectronslabel="allElectrons"
   electronlabel="tightElectrons"
+  #jetlabel="smearedPatJetsResDown"
   jetlabel="cleanPatJets"
   zmumulabel="zmuTightmuTight"
   zelelabel="zelTightelTight"
@@ -11,7 +12,7 @@ class zbblabel:
   pulabel="addPileupInfo"
   triggerlabel="patTriggerEvent"
   metlabel="patType01SCorrectedPFMet"
-  rholabel="kt6PFJets" #rholabel="kt6PFJetsForIsolation"
+  rholabel="kt6PFJets"
   genlabel="genParticles" #genlabel="prunedGen"
   genjetlabel="ak5GenJets"
   genInfolabel="generator"
@@ -19,7 +20,7 @@ class zbblabel:
 class zbbsystematics:
   # btagging reweighting
   SF_uncert="mean" ## choose among min/max/mean
-  SF_running_mode= "hardcoded" ## choose between hardcoded/database
+  SF_running_mode= "hardcoded_nofit" ## choose between hardcoded/database
   #SF_running_mode= "database" ## choose between "hardcoded" and "database"
   # Jet Energy corrections for MC. For data, these factors must be (forced to) zero!
   JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
@@ -64,7 +65,10 @@ class zbbnorm:
   #https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSectionsat8TeV
   xsec_DYjets_8TeV=3503.71  #Ml+l->50, NNLO for Z->ll
   xsec_TTjets_8TeV=225.197  #NLO inclusive
-  xsec_ZZ_8TeV= 8.25561     #NLO inclusive Ml+l->12
+  xsec_TTFullLept_8TeV = xsec_TTjets_8TeV*(0.308)*(0.308) #0.308 is W to lnu with l = e, mu, tau from PDG
+  xsec_TTSemiLept_8TeV = xsec_TTjets_8TeV*(0.308*3)*(1-0.308)
+  xsec_ZZ_8TeV = 8.25561    #NLO inclusive Ml+l->12
+  xsec_Zbb_8TeV = 76.75     #LO form MCFM : Ml+l->50, massive b-quark
   xsec_ZH110_8TeV=0.0454    #xsec=0.5869
   xsec_ZH115_8TeV=0.0374    #xsec=0.5117 
   xsec_ZH120_8TeV=0.0302    #xsec=0.4483
@@ -88,15 +92,18 @@ class zbbnorm:
   nev_tbarW_fall11    =   809984 # updated
   
   #summer 12 number of events processed for the PATtuple production
-  nev_DYjets_summer12   = 30459503 # OK, inclusive sample
-  nev_TTjets_summer12   =  6923750 # MassiveBinDecay S10, OK
-  nev_ZZ_summer12       =  9799908 # OK
-  nev_ZH110_summer12    =   998514 # OK
-  nev_ZH115_summer12    =   999699 # OK
-  nev_ZH120_summer12    =  1000215 # OK
-  nev_ZH125_summer12    =   999462 # OK
-  nev_ZH130_summer12    =  1000000 # OK
-  nev_ZH135_summer12    =  1000000 # OK
+  nev_DYjets_summer12     = 30459503 # OK, inclusive sample
+  nev_TTjets_summer12     =  6923750 # MassiveBinDecay S10, OK
+  nev_TTFullLept_summer12 = 12119013 # Full leptonic decay, OK
+  nev_TTSemiLept_summer12 = 10997349 # Semi leptonic decay, OK
+  nev_ZZ_summer12         =  9799908 # OK
+  nev_Zbb_summer12        = 14129304 # OK 
+  nev_ZH110_summer12      =   998514 # OK
+  nev_ZH115_summer12      =   999699 # OK
+  nev_ZH120_summer12      =  1000215 # OK
+  nev_ZH125_summer12      =   999462 # OK
+  nev_ZH130_summer12      =  1000000 # OK
+  nev_ZH135_summer12      =  1000000 # OK
                   
 class zbbme:
   doMEcontrolPlots = True # if false nobody else of this class matters
