@@ -14,16 +14,16 @@ dataLabel = "2012"
 
 frac      = False
 WP        = "HPHPMETsig"
-extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvszbb_125_comb_MM_N<0.5"
+extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>0."
 keys      = False
 
-extraCutList = {"mwnn"     : "jetmetMETsignificance < 10&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5",
-                "mmumu"    : "jetmetMETsignificance < 10&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5",
+extraCutList = {"mwnn"     : "jetmetMETsignificance < 10",#&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5&mlpZbbvsTT_mu_MM_N>-0.1",
+                "mmumu"    : "jetmetMETsignificance < 10",#&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5&mlpZbbvsTT_mu_MM_N>-0.1",
 		}
 		
 ttbarVarList  = ["mwnn"]
 mistagVarList = ["msv2"]
-#if channel=="Mu": ttbarVarList  = [ "mmumu" ]
+#if channel=="Mu": ttbarVarList  = [ "mmumu" ]>-0.1
 #if channel=="El": ttbarVarList  = [ "melel" ]
 
 totVarList = ttbarVarList+mistagVarList
@@ -121,11 +121,11 @@ max = {"msv1" :    250,
        }
 
 bins = {"msv1" :   8,
-        "msv2" :   8,
+        "msv2" :   4,
         "msv"  :   20,
         "melel":   34,
         "mmumu":   5,
-        "mwnn" :   5,
+        "mwnn" :   4,
         "mwnn_1"   : 20,
         "mwnn_2"   : 16,
         "w_b_HE"    : 100, 
@@ -203,9 +203,9 @@ def getVariables(varNamesList,varName,dataAndMCListZH) :
     var=varNamesList[varName]
     #y=dataAndMCList["Zl"]
     y=dataAndMCListZH["refMu"]
-    print "var = ", var
-    print "ras = ", y.get()
-    print "var = ", y.get()[var]
+    #print "var = ", var
+    #print "ras = ", y.get()
+    #print "var = ", y.get()[var]
     x = y.get()[var]
     if x :
         x.setMin(min[varName])
@@ -275,8 +275,8 @@ def makePdfList(dataAndMCList, mcName, var, RDH, RHP, var2, channel ) :
     varName=var.GetName()
     name=mcName
 
-    print "mcName    = ", mcName
-    print "varName   = ", varName
+    #print "mcName    = ", mcName
+    #print "varName   = ", varName
     print "name      = ", name
 
     print "**** before cut: number of entries = " , dataAndMCList[mcName].numEntries()
@@ -341,11 +341,11 @@ def main():
 
 
 	
-    SF_zbb=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 2.)
-    SF_zbx=RooRealVar("SF_zxx","SF_zbx",1.,0.5, 2.)
-    SF_zxx=RooRealVar("SF_zxx","SF_zxx",0.8,0.5, 0.9)
-    SF_tt_e=RooRealVar("SF_tt_m","SF_tt",1.6,1.5, 2.)
-    SF_tt_m=RooRealVar("SF_tt_m","SF_tt",1.6,1.5, 2.)    
+    SF_zbb=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 3.)
+    SF_zbx=RooRealVar("SF_zxx","SF_zbx",1.,0.5, 3.)
+    SF_zxx=RooRealVar("SF_zxx","SF_zxx",1.,0.5, 3.)
+    SF_tt_e=RooRealVar("SF_tt_m","SF_tt",1.,0.5, 3.)
+    SF_tt_m=RooRealVar("SF_tt_m","SF_tt",1.,0.5, 3.)    
     SF_zz=RooRealVar("SF_zz","SF_zz",1.,1. , 1.)
 
     SF={"TTEl":SF_tt_m,
@@ -363,7 +363,7 @@ def main():
     flavor = RooCategory("El","El")
     flavor.defineType("El")
     flavor.setLabel("El")
-    print flavor, AlldataAndMCList["2012El"]
+    #print flavor, AlldataAndMCList["2012El"]
     AlldataAndMCList["2012El"].addColumn(flavor)
     flavorMu = RooCategory("Mu","Mu")
     flavorMu.defineType("Mu")   
@@ -404,14 +404,13 @@ def main():
 						     
 		        N[mcnames+channel] = RooFormulaVar("N_"+mcnames,"N_"+mcnames+channel,"@0*@1",RooArgList(N_exp[mcnames+channel],SF[mcnames+channel]))
 		  
-		        print "yields expected for ",mcnames+channel,N_exp[mcnames+channel]
+		        print "yields expected for ",mcnames+channel,N_exp[mcnames+channel].getValV()
 		      		    
 		        YieldList2D[channel].add(N[mcnames+channel])
 				          
         print "make pdf"
-        print PdfList2D[channel],YieldList2D[channel]
+        #print PdfList2D[channel],YieldList2D[channel]
         Pdf2D[channel] = RooAddPdf("Pdf2D"+channel,"Pdf2D"+channel,PdfList2D[channel],YieldList2D[channel])
-
  
  
     simPdf = RooSimultaneous("sim","sim",flavor)
@@ -424,14 +423,14 @@ def main():
     print "after appending nbr data :",DATA.numEntries()
    
     print "reach fit level"
-    simPdf.fitTo(DATA)#,Verbose(true))
+    #simPdf.fitTo(DATA)#,Verbose(true))
     
-    #for channel in channelList:
-    #	Pdf2D[channel].fitTo(AlldataAndMCList[dataLabel+channel])
+    for channel in channelList:
+    	Pdf2D[channel].fitTo(AlldataAndMCList[dataLabel+channel])
 
     ttframe={}
     mistagframe={}
-
+    newfile = TFile("test.root","RECREATE") 
     CANVAS = TCanvas("CANVAS","CANVAS",1200,600)
     CANVAS.Divide(4)
     
