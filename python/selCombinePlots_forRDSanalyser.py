@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from UserCode.zbb_louvain.zbbCommons import zbbnorm
 lumi=zbbnorm.lumi_tot2012*1000 #in pb-1
-from UserCode.zbb_louvain.listForRDS import nev_DYjets_summer12
+#from UserCode.zbb_louvain.listForRDS import nev_DYjets_summer12
 
 flow="overflow"
 #flow=""
@@ -107,7 +107,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{Z} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzmassMu'),
@@ -117,7 +117,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{#mu^{+}#mu^{-}} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzmassEle'),
@@ -127,7 +127,7 @@ process.CombinePlots = cms.PSet(
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("M_{e^{+}e^{-}} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
-      rangex = cms.untracked.vdouble(60.,120.)
+      rangex = cms.untracked.vdouble(76.,106.)
     ),
     cms.PSet(
       name = cms.string('jetmetbjet1pt'),
@@ -244,6 +244,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetMET'),
+      overflow=overflow,
       logy = cms.untracked.bool(False),
       #rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("MET (GeV)"),
@@ -251,6 +252,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetMETsignificance'),
+      overflow=overflow,
       logy = cms.untracked.bool(False),
       #rebin = cms.untracked.uint32(5),
       labelx = cms.untracked.string("MET significance"),
@@ -279,31 +281,44 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('eventSelectiondijetM'),
       #rebin = cms.untracked.uint32(50),
+      overflow=overflow,
       labelx = cms.untracked.string("M_{bb} (GeV)"),
       labely = cms.untracked.string("Events/50GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectiondijetPt'),
       #rebin = cms.untracked.uint32(20),
+      overflow=overflow,
       labelx = cms.untracked.string("p_{T}^{bb} (GeV)"),
       labely = cms.untracked.string("Events/20GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectiondijetdR'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
       labelx = cms.untracked.string("Delta_R(b^{1}b^{2})"),
       labely = cms.untracked.string("Events/0.5")
     ),
     cms.PSet(
-      name = cms.string('eventSelectiondrmumu'),
+      name = cms.string('eventSelectiondrll'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
+      labelx = cms.untracked.string("Delta_R(#l^{1}#l^{2})"),
+      labely = cms.untracked.string("Events/0.5"),
+      rangex = cms.untracked.vdouble(0.,5.)
+    ),
+    cms.PSet(
+      name = cms.string('eventSelectiondrllMu'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
       labelx = cms.untracked.string("Delta_R(#mu^{1}#mu^{2})"),
       labely = cms.untracked.string("Events/0.5"),
       rangex = cms.untracked.vdouble(0.,5.)
     ),
     cms.PSet(
-      name = cms.string('eventSelectiondrelel'),
+      name = cms.string('eventSelectiondrllEle'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
       labelx = cms.untracked.string("Delta_R(e^{1}e^{2}) (GeV)"),
       labely = cms.untracked.string("Events/0.5"),
       rangex = cms.untracked.vdouble(0.,5.)
@@ -317,17 +332,20 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('eventSelectionZbbM'),
       #rebin = cms.untracked.uint32(50),
+      overflow=overflow,
       labelx = cms.untracked.string("M_{Zbb} (GeV)"),
       labely = cms.untracked.string("Events/50GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectionZbbPt'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
       labelx = cms.untracked.string("p_{T}^{Zbb} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzpt'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(20),
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),     
       labely = cms.untracked.string("Events/20GeV")
@@ -335,12 +353,14 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('eventSelectionbestzptMu'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzptEle'),
       #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
       labelx = cms.untracked.string("p_{T}^{Z} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
@@ -402,6 +422,125 @@ process.CombinePlots = cms.PSet(
       rebin = cms.untracked.uint32(10),
       labelx = cms.untracked.string("#Delta Pt(Z,bb)"),
       labely = cms.untracked.string("Events/10 GeV")
+    ),
+    cms.PSet(
+      name = cms.string('Wgg'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{ggtoZbb})"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Wqq'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{qqtoZbb})"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Wtt'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{ttbar})"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Wzz0'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{zz}) E-p conservation"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Wzz3'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{zz}) no E-p conservation"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Whi_125'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{higgs125}) E-p conservation"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('Whi_125'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("-log_{10}(W_{higgs125}) no E-p conservation"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('jetmetbjet1CSVdisc'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("CSV value for the leading b-jet"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('jetmetbjet2CSVdisc'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("CSV value for the sub-leading b-jet"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('jetmetbjetMinCSVdisc'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("minimum CSV value from the two tagged jets"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('jetmetbjetMaxCSVdisc'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("maximum CSV value from the two tagged jets"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('jetmetbjetProdCSVdisc'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("CSV_{j1}*CSV_{j2}"),
+      labely = cms.untracked.string("Events")
+    ),    
+    cms.PSet(
+      name = cms.string('mlpZbbvsTT_mu_MM_N'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("NN Zbb vs TTbar"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('mlphiggsvsbkg_125_comb_MM_N'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("NN ZH vs Background"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('mlphiggsvszbb_125_comb_MM_N'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("NN ZH vs Zbb"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('mlphiggsvstt_125_comb_MM_N'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("NN ZH vs TTbar"),
+      labely = cms.untracked.string("Events")
+    ),
+    cms.PSet(
+      name = cms.string('mlphiggsvszz_125_comb_MM_N'),
+      #rebin = cms.untracked.uint32(10),
+      overflow=overflow,      
+      labelx = cms.untracked.string("NN ZH vs ZZ"),
+      labely = cms.untracked.string("Events")
     ),
   )
 )
