@@ -2,11 +2,11 @@
 
 dataPeriods = [
     "A",
-    #"A06aug",
+    "A06aug",
     "B",
-    #"C-v1",
-    #"C-v2",
-    #"D",
+    "C-v1",
+    "C-v2",
+    "D",
     ]
 
 sampleList = [
@@ -21,9 +21,9 @@ totsampleList  = [
     "DATA",
     "TT",
     "ZZ",
-    "Zb",
-    "Zc",
-    "Zl",
+    "Zbb",
+    "Zbx",
+    "Zxx",
     "ZH125"
     ]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 
@@ -37,11 +37,15 @@ for sample in totsampleList :
     if not sample in sigMCsampleList : bkgMCsampleList.append(sample)
 
 from zbbCommons import zbbnorm
-lumi = { "DATA"   : 4.429+0.808, #zbbnorm.lumi_tot2012,
+nev_DYjets_summer12=29310189 # to be used on events produced in 532p4
+lumi = { "DATA"   : zbbnorm.lumi_tot2012,
          "TT"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
-         "Zb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "Zc"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "Zl"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zbb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zbx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zxx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+#         "Zbb"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+#         "Zbx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+#         "Zxx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "ZZ"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000.,
          "ZH110"  : zbbnorm.nev_ZH110_summer12/zbbnorm.xsec_ZH110_8TeV/1000.,
          "ZH115"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
@@ -52,36 +56,56 @@ lumi = { "DATA"   : 4.429+0.808, #zbbnorm.lumi_tot2012,
          }
 
 
-MuCorrFact = (1148.+225.)/(225.+1507.)
+MuCorrFact = 1.0
 Extra_norm={ "MuMuChannelDATA"  : 1.0,
              "EEChannelDATA"    : 1.0,
-             "MuMuChannelTT"    : (2984./4412.)/MuCorrFact,
+             "MuMuChannelTT"    : 1.0,#(2984./4412.)/MuCorrFact,
              "EEChannelTT"      : 1.0,
-	     "MuMuChannelZb"    : 1.0/MuCorrFact,
-             "EEChannelZb"      : 1.0,
-	     "MuMuChannelZc"    : 1.0/MuCorrFact,
-             "EEChannelZc"      : 1.0,
-	     "MuMuChannelZl"    : 1.0/MuCorrFact,
-             "EEChannelZl"      : 1.0,
-	     "MuMuChannelZZ"    : 1.0/MuCorrFact,
-             "EEChannelZZ"      : 1.0,
-	     "MuMuChannelZH125" : (10000./66716.)/MuCorrFact,
-             "EEChannelZH125"   : 10000./45878.,
+	     "MuMuChannelZbb"    : 1.0/MuCorrFact,
+             "EEChannelZbb"      : 1.0,
+	     "MuMuChannelZbx"    : 1.0/MuCorrFact,
+             "EEChannelZbx"      : 1.0,
+	     "MuMuChannelZxx"    : 1.0/MuCorrFact,
+             "EEChannelZxx"      : 1.0,
+	     "MuMuChannelZZ"    : (10000./16986.)/MuCorrFact,
+             "EEChannelZZ"      : 10000./11936.,
+	     "MuMuChannelZH125" : (10000./65412.)/MuCorrFact,
+             "EEChannelZH125"   : 10000./48726.,
             }
 
+SFs_fit={ "MuMuChannelDATA"  : 1.0,
+          "EEChannelDATA"    : 1.0,
+          "MuMuChannelTT"    : 1.01,#(2984./4412.)/MuCorrFact,
+          "EEChannelTT"      : 1.01,
+          "MuMuChannelZbb"    : 0.89,
+          "EEChannelZbb"      : 0.89,
+          "MuMuChannelZbx"    : 1.1,
+          "EEChannelZbx"      : 1.1,
+          "MuMuChannelZxx"    : 1.1,
+          "EEChannelZxx"      : 1.1,
+          "MuMuChannelZZ"    : 1.0,
+          "EEChannelZZ"      : 1.0,
+          "MuMuChannelZH125" : 1.0,
+          "EEChannelZH125"   : 1.0,
+          }
+
+PlotForCLs = [
+    "mlphiggsvsbkg_125_comb_MM_N",
+    #"mlphiggsvsbkg_125_comb_MM_N_2011",
+    ]
 
 namePlotList = [
 ##     "eventSelectionbestzmassMu"  , 
 ##     "eventSelectionbestzmassEle" ,
-##     "eventSelectionbestzptMu",    
-##     "eventSelectionbestzptEle"   ,
+     "eventSelectionbestzptMu",    
+     "eventSelectionbestzptEle"   ,
 ##     "jetmetbjet1pt"              ,   
 ##     "jetmetbjet2pt"              ,   
 ##     "jetmetbjet1CSVdisc"              ,   
 ##     "jetmetbjet2CSVdisc"              ,   
 ##     "jetmetbjetMinCSVdisc"              ,   
 ##     "jetmetbjetMaxCSVdisc"              ,
-##     "jetmetbjetProdCSVdisc"              ,   
+     "jetmetbjetProdCSVdisc"              ,   
 ##     "jetmetMET"                  ,
 ##     "eventSelectiondphiZbb"      ,
 ##     "eventSelectiondphiZbj1"     , 
@@ -97,7 +121,7 @@ namePlotList = [
     "Wgg"           
     ,"Wqq"           
     ,"Wtt"           
-#    ,"Wtwb"           
+#    ,"Wtwb"           #to be added in the merged RDS (ttbar isr=0)
     ,"Wzz3"          
     ,"Wzz0"           
     ,"Whi3_125"           
@@ -105,40 +129,45 @@ namePlotList = [
     #,"jetmetMETsignificance"
     # ,"jetmetMET"
 
-    ,"mlpZbbvsTT_MM"
-    ,"mlpZbbvsTT_MM_N"
-    ,"mlpZbbvsTT_ML"
-    ,"mlpZbbvsTT_mu_MM"
+#    ,"mlpZbbvsTT_MM"
+#    ,"mlpZbbvsTT_MM_N"
+#    ,"mlpZbbvsTT_ML"
+#    ,"mlpZbbvsTT_mu_MM"
     ,"mlpZbbvsTT_mu_MM_N"
-    ,"mlpZbbvsTT_mu_ML"
-    ,"mlphiggsvszbb_125_MM"
-    ,"mlphiggsvstt_125_MM"
-    ,"mlphiggsvszz_125_MM"
-    ,"mlphiggsvsbkg_125_MM"
-    ,"mlphiggsvszbb_125_ML"
-    ,"mlphiggsvstt_125_ML"
-    ,"mlphiggsvszz_125_ML"
-    ,"mlphiggsvsbkg_125_ML"
-    ,"mlphiggsvszbb_125_MM_N"
-    ,"mlphiggsvstt_125_MM_N"
-    ,"mlphiggsvszz_125_MM_N"
-    ,"mlphiggsvsbkg_125_MM_N"
-    ,"mlphiggsvszbb_125_mu_MM"
-    ,"mlphiggsvstt_125_mu_MM"
-    ,"mlphiggsvszz_125_mu_MM"
-    ,"mlphiggsvsbkg_125_mu_MM"
-    ,"mlphiggsvszbb_125_mu_ML"
-    ,"mlphiggsvstt_125_mu_ML"
-    ,"mlphiggsvszz_125_mu_ML"
-    ,"mlphiggsvsbkg_125_mu_ML"
-    ,"mlphiggsvszbb_125_mu_MM_N"
-    ,"mlphiggsvstt_125_mu_MM_N"
-    ,"mlphiggsvszz_125_mu_MM_N"
-    ,"mlphiggsvsbkg_125_mu_MM_N"
+#    ,"mlpZbbvsTT_mu_ML"
+#    ,"mlphiggsvszbb_125_MM"
+#   ,"mlphiggsvstt_125_MM"
+#    ,"mlphiggsvszz_125_MM"
+#    ,"mlphiggsvsbkg_125_MM"
+#    ,"mlphiggsvszbb_125_ML"
+#    ,"mlphiggsvstt_125_ML"
+#    ,"mlphiggsvszz_125_ML"
+#    ,"mlphiggsvsbkg_125_ML"
+#    ,"mlphiggsvszbb_125_MM_N"
+#    ,"mlphiggsvstt_125_MM_N"
+#    ,"mlphiggsvszz_125_MM_N"
+#    ,"mlphiggsvsbkg_125_MM_N"
+#    ,"mlphiggsvszbb_125_mu_MM"
+#    ,"mlphiggsvstt_125_mu_MM"
+#    ,"mlphiggsvszz_125_mu_MM"
+#    ,"mlphiggsvsbkg_125_mu_MM"
+#    ,"mlphiggsvszbb_125_mu_ML"
+#    ,"mlphiggsvstt_125_mu_ML"
+#    ,"mlphiggsvszz_125_mu_ML"
+#    ,"mlphiggsvsbkg_125_mu_ML"
+#    ,"mlphiggsvszbb_125_mu_MM_N"
+#    ,"mlphiggsvstt_125_mu_MM_N"
+#    ,"mlphiggsvszz_125_mu_MM_N"
+#    ,"mlphiggsvsbkg_125_mu_MM_N"
+   ,"mlphiggsvsbkg_125_comb_MM_N_2011"
+   ,"mlphiggsvszbb_125_comb_MM_N_2011"
+   ,"mlphiggsvszz_125_comb_MM_N_2011"
+   ,"mlphiggsvstt_125_comb_MM_N_2011"
    ,"mlphiggsvsbkg_125_comb_MM_N"
    ,"mlphiggsvszbb_125_comb_MM_N"
    ,"mlphiggsvszz_125_comb_MM_N"
    ,"mlphiggsvstt_125_comb_MM_N"
+
     ]
 
 ################
@@ -216,6 +245,10 @@ min = {
     ,"mlphiggsvstt_125_mu_MM_N" : 0
     ,"mlphiggsvszz_125_mu_MM_N" : 0
     ,"mlphiggsvsbkg_125_mu_MM_N" : 0
+    ,"mlphiggsvsbkg_125_comb_MM_N_2011" : 0
+    ,"mlphiggsvszbb_125_comb_MM_N_2011" : 0
+    ,"mlphiggsvstt_125_comb_MM_N_2011" : 0
+    ,"mlphiggsvszz_125_comb_MM_N_2011" : 0
     ,"mlphiggsvsbkg_125_comb_MM_N" : 0
     ,"mlphiggsvszbb_125_comb_MM_N" : 0
     ,"mlphiggsvstt_125_comb_MM_N" : 0
@@ -297,6 +330,10 @@ max = {
     ,"mlphiggsvstt_125_mu_MM_N" : 1
     ,"mlphiggsvszz_125_mu_MM_N" : 1
     ,"mlphiggsvsbkg_125_mu_MM_N" : 1
+    ,"mlphiggsvsbkg_125_comb_MM_N_2011" : 1
+    ,"mlphiggsvszbb_125_comb_MM_N_2011" : 1
+    ,"mlphiggsvstt_125_comb_MM_N_2011" : 1
+    ,"mlphiggsvszz_125_comb_MM_N_2011" : 1
     ,"mlphiggsvsbkg_125_comb_MM_N" : 1
     ,"mlphiggsvszbb_125_comb_MM_N" : 1
     ,"mlphiggsvstt_125_comb_MM_N" : 1
@@ -378,6 +415,10 @@ binning = {
     ,"mlphiggsvstt_125_mu_MM_N" : 20
     ,"mlphiggsvszz_125_mu_MM_N" : 20
     ,"mlphiggsvsbkg_125_mu_MM_N" : 20
+    ,"mlphiggsvsbkg_125_comb_MM_N_2011" : 20
+    ,"mlphiggsvszbb_125_comb_MM_N_2011" : 20
+    ,"mlphiggsvstt_125_comb_MM_N_2011" : 20
+    ,"mlphiggsvszz_125_comb_MM_N_2011" : 20
     ,"mlphiggsvsbkg_125_comb_MM_N" : 20
     ,"mlphiggsvszbb_125_comb_MM_N" : 20
     ,"mlphiggsvstt_125_comb_MM_N" : 20

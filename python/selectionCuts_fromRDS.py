@@ -17,7 +17,7 @@
 
 from ROOT import *
 from eventSelection import categoryNames
-from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, min, max, binning
+from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, min, max, binning, PlotForCLs, SFs_fit
 from globalLists import pathMergedRDS, pathRDS
 import os
 
@@ -26,6 +26,10 @@ import os
 #####################################################
 
 runOnMergedRDS = True
+goTotCLS = False
+DirOut="hist_cuts"
+doRew = False
+useSFs = False
 
 btagWP = "HPHP" #choose between HE, HP, HEHE, HEHP, HPHP
 llMassWP = "" #"" or "wide"
@@ -49,15 +53,15 @@ channels  = [
 #choose you set of cuts
 extraCuts = [
     "",
-    ## "eventSelectiondijetdR<1.",
-##     "eventSelectiondijetdR<0.75",
-##     "((eventSelectiondrllMu<1.&&eventSelectiondrllMu>0.)||(eventSelectiondrllEle<1.&&eventSelectiondrllEle>0.))",
-##     "eventSelectiondijetPt>50",
-##     "eventSelectiondijetPt>100",
-##     "eventSelectiondijetPt>150",
-##     "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
-##     "(eventSelectionbestzptEle>100||eventSelectionbestzptMu>100)",
-##     "(eventSelectionbestzptEle>150||eventSelectionbestzptMu>150)",
+    "(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+    "(eventSelectiondijetM>80&eventSelectiondijetM<150)",
+    "mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0.",
+    "mlphiggsvsbkg_125_comb_MM_N>=0.5&mlphiggsvsbkg_125_comb_MM_N<=1",
+    "jetmetbjet1pt>30",
+    "jetmetbjet2pt>30",
+    "jetmetbjet1pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+    "jetmetbjet2pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+    "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
 ##     "(eventSelectionbestzptEle>225||eventSelectionbestzptMu>225)",
 
     ]
@@ -115,12 +119,12 @@ for sample in sampleList :
         
         nEntries = rds_zbb.numEntries()
         if sample == "DY" :
-                myRDS[channel+"Zb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==3")
-                myRDS[channel+"Zc"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==2")
-                myRDS[channel+"Zl"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==1")
-                print "myRDS.numEntries() for ", "Zb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zb"].numEntries()
-                print "myRDS.numEntries() for ", "Zc" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zc"].numEntries()
-                print "myRDS.numEntries() for ", "Zl" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zl"].numEntries()
+                myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==6")
+                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType>=4&mcSelectioneventType<6")
+                myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4")
+                print "myRDS.numEntries() for ", "Zbb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbb"].numEntries()
+                print "myRDS.numEntries() for ", "Zbx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbx"].numEntries()
+                print "myRDS.numEntries() for ", "Zxx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zxx"].numEntries()
         else :
             myRDS[channel+sample] = rds_zbb.reduce(redStage)
             print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+sample].numEntries()
@@ -178,13 +182,23 @@ for b in btagRew:
         break
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
 rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
-
+rrv_w_ptz = {
+    "MuMuChannel" : ras_zbb["eventSelectionbestzptMu"],
+    "EEChannel" : ras_zbb["eventSelectionbestzptEle"]
+}
 w = {}
+rewFormula = {}
 for channel in channels :
+    if doRew :
+        if channel=="EEChannel" : rewFormula[channel] = "*(1172.93/1391.86)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
+        else : rewFormula[channel] = "*(1606.22/1913.74)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
+    else : rewFormula[channel] = ""
     for sample in totsampleList :
         rescale=1./Extra_norm[channel+sample]
-        w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale), RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
-
+        if not runOnMergedRDS : rescale=1.
+        if useSFs : rescale*=SFs_fit[channel+sample]
+        if sample!="Zbb" : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale), RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
+        else : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale)+rewFormula[channel], RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptz[channel]))
 #############
 ### PLOTS ###
 #############
@@ -207,6 +221,7 @@ sumbkgMC = {}
 sumsigMC = {}
 sumDATA = {}
 nevts = {}
+rdh = {}
 
 for channel in channels :
     print "channel ... ", channel
@@ -252,10 +267,42 @@ for channel in channels :
             if sample=="DATA":
                 sumDATA[channel+cut]=myRDS_red_w.numEntries()
             for name in namePlotList:
-                if channel=="EEChannel" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
-                if channel=="MuMuChannel" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue
-                th1[channel+sample+name+cut] = TH1D(name,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
-                myRDS_red_w.fillHistogram(th1[channel+sample+name+cut], RooArgList(var[name]))
+                if not goTotCLS :
+                    th1[channel+sample+name+cut] = TH1D(name,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+                    myRDS_red_w.fillHistogram(th1[channel+sample+name+cut], RooArgList(var[name]))
+                else :
+                    if not name in PlotForCLs : continue
+                    m1=name.replace("mlphiggsvsbkg_","")
+                    mass=m1.replace("_comb_MM_N","")
+                    samp=sample
+                    if sample == "DATA" : samp="data_obs"
+                    if "ZH" in sample : samp = sample.replace("ZH","signal")
+                    if not "ZH" in sample : samp=samp+mass
+                    th1[channel+sample+name+cut] = TH1D(name+samp,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+                    myRDS_red_w.fillHistogram(th1[channel+sample+name+cut], RooArgList(var[name]))
+                    
+                    rdh[channel+sample+name+cut] = RooDataHist("rdh_"+channel+sample+name+cut, "rdh_"+channel+sample+name+cut, RooArgSet(var[name]),myRDS_red)
+				      
+                    for bin in range(0,var[name].getBins()):       
+                        binras = rdh[channel+sample+name+cut].get(bin)
+                        a, b = Double(1), Double(1)
+                        rdh[channel+sample+name+cut].weightError(a,b)
+                        aw = rdh[channel+sample+name+cut].weight()
+                        print "factor",a,b , "nbr entries= ",aw 
+                        if aw>0 : a=a/aw
+                        if aw>0 : b=b/aw
+                        th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"]= TH1D(name+samp+"_"+samp+"stat_bin"+str(bin+1)+"Up",name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+                        myRDS_red_w.fillHistogram(th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"], RooArgList(var[name]))
+                        th1[channel+sample+name+cut+"stat"+str(bin+1)+"Down"]= TH1D(name+samp+"_"+samp+"stat_bin"+str(bin+1)+"Down",name,var[name].getBins(),var[name].getMin(),var[name].getMax())
+                        myRDS_red_w.fillHistogram(th1[channel+sample+name+cut+"stat"+str(bin+1)+"Down"], RooArgList(var[name]))
+                        tmp = th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"].GetBinContent(bin+1)
+                        if aw>0 :
+                            th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"].SetBinContent(bin+1,tmp*(1.+b))
+                            th1[channel+sample+name+cut+"stat"+str(bin+1)+"Down"].SetBinContent(bin+1,tmp*(1.-a))
+                        else :
+                            th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"].SetBinContent(bin+1,tmp+b)	    
+                            print "bin", bin+1 ,"--- nominal =",tmp," --- variation Up =",b, th1[channel+sample+name+cut+"stat"+str(bin+1)+"Up"].GetBinContent(bin+1)," --- variation Down =",a, th1[channel+sample+name+cut+"stat"+str(bin+1)+"Down"].GetBinContent(bin+1)
+		
             
 #################
 ### printouts ###
@@ -342,20 +389,36 @@ print " "
 #################
    
 file={}
-#her you could choose the root ouput filenames
-DirOut="Weights"
+#her you could choose the root ouput dir
 os.system('mkdir '+DirOut)
-for sample in totsampleList:
-    file[sample]=TFile(DirOut+"/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
+
+if goTotCLS :
+    file["Out"]=TFile(DirOut+"/histoStage"+WP+"extraCuts.root","RECREATE")
     for channel in channels:
         if channel=="Combined" : continue
-        chDir=file[sample].mkdir(channel,channel)
-        for cut in extraCuts:
-            chDir.mkdir(stringCut[cut],stringCut[cut])
-            chDir.cd(stringCut[cut])
+        chDir=file["Out"].mkdir(channel,channel)
+        file["Out"].cd(channel)
+        for sample in totsampleList:
             for name in namePlotList:
-                if channel=="EEChannel" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
-                if channel=="MuMuChannel" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue
+                if not name in PlotForCLs : continue
+                if not sample == "DATA" : th1[channel+sample+name+cut].Scale(lumi["DATA"]/lumi[sample])
                 th1[channel+sample+name+cut].Write()
-    file[sample].Close()
-
+                Nbin=th1[channel+sample+name+cut].GetNbinsX();
+                for bin in range(1,Nbin+1):
+                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Down"].Scale(lumi["DATA"]/lumi[sample])
+                    th1[channel+sample+name+cut+"stat"+str(bin)+"Down"].Write()
+                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Up"].Scale(lumi["DATA"]/lumi[sample])
+                    th1[channel+sample+name+cut+"stat"+str(bin)+"Up"].Write()
+    file["Out"].Close()
+else :
+    for sample in totsampleList:
+        file[sample]=TFile(DirOut+"/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
+        for channel in channels:
+            if channel=="Combined" : continue
+            chDir=file[sample].mkdir(channel,channel)
+            for cut in extraCuts:
+                chDir.mkdir(stringCut[cut],cut)
+                chDir.cd(stringCut[cut])
+                for name in namePlotList:
+                    th1[channel+sample+name+cut].Write()
+        file[sample].Close()
