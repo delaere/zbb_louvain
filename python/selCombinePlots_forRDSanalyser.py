@@ -1,10 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
 from UserCode.zbb_louvain.zbbCommons import zbbnorm
-lumi=zbbnorm.lumi_tot2011*1000 #in pb-1  
+lumi=zbbnorm.lumi_tot2012*1000 #in pb-1
+from UserCode.zbb_louvain.listForRDS import nev_DYjets_summer12
 
-DIR="Higgs1"
-WP="17"
+flow="overflow"
+#flow=""
+if flow=="overflow" : overflow = cms.untracked.bool(True)
+else : overflow = cms.untracked.bool(False)
+
+DIR="hist_afterFit_zptrew"
+WP="18"
 
 class EColor:
  """ROOT colors taken from RTypes.h"""
@@ -29,7 +35,7 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string(DIR+'/MERGED.root'),
+  outputFile = cms.string(DIR+'/MERGEDoverflow.root'),
   data = cms.VPSet (
    cms.PSet(
      fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsDATA.root')
@@ -39,32 +45,32 @@ process.CombinePlots = cms.PSet(
    cms.PSet(
      fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZZ.root'),
      color = cms.uint32(EColor.kMagenta+palette),
-     scale = cms.double(zbbnorm.xsec_ZZ_7TeV*lumi/zbbnorm.nev_ZZ_fall11), 
+     scale = cms.double(zbbnorm.xsec_ZZ_8TeV*lumi/zbbnorm.nev_ZZ_summer12), 
      role = cms.string('ZZ')
    ),
    cms.PSet(
      fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsTT.root'),
      color = cms.uint32(EColor.kYellow+palette),
-     scale = cms.double(zbbnorm.xsec_TTjets_7TeV*lumi/zbbnorm.nev_TTjets_fall11), #NLO k=1.67
+     scale = cms.double(zbbnorm.xsec_TTjets_8TeV*lumi/zbbnorm.nev_TTjets_summer12), #NLO k=1.67
      role = cms.string('ttbar'),
    ),
    cms.PSet(
-     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZb.root'),
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZbb.root'),
      color = cms.uint32(EColor.kRed+palette),
-     scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
-     role = cms.string('Z+b')
+     scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12), 
+     role = cms.string('Z+bb')
    ),
    cms.PSet(
-    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZc.root'),
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZbx.root'),
     color = cms.uint32(EColor.kGreen+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
-    role = cms.string('Z+c')
+    scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12), 
+    role = cms.string('Z+bx')
    ),
    cms.PSet(
-    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZl.root'),
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZxx.root'),
     color = cms.uint32(EColor.kBlue+palette),
-    scale = cms.double(zbbnorm.xsec_DYjets_7TeV*lumi/zbbnorm.nev_DYjets_fall11), 
-    role = cms.string('Z+l')
+    scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12), 
+    role = cms.string('Z+xx')
    ),
    #cms.PSet(
    #  fileName = cms.string('histoStage'+WP+'extraCutsZA.root'),
@@ -73,13 +79,13 @@ process.CombinePlots = cms.PSet(
    #  role = cms.string('100*ZA'),
    #  stacked = cms.untracked.bool(False)
    #),
-   cms.PSet(
-    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZH125.root'),
-    color = cms.uint32(1),
-    scale = cms.double(10*zbbnorm.xsec_ZH125_7TeV*lumi/zbbnorm.nev_ZH125_fall11), 
-    role = cms.string('10*ZH M_H=125'),
-    stacked = cms.untracked.bool(False)
-   ),
+#   cms.PSet(
+#    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZH125.root'),
+#    color = cms.uint32(1),
+#    scale = cms.double(100*zbbnorm.xsec_ZH125_8TeV*lumi/zbbnorm.nev_ZH125_summer12), 
+#    role = cms.string('100*ZH M_H=125'),
+#    stacked = cms.untracked.bool(False)
+#   ),
   ),
   options = cms.PSet (
           # nostack: if set, none of the curves will be stacked. That overrides the mc set option
@@ -89,11 +95,13 @@ process.CombinePlots = cms.PSet(
                 # if autoLumiScaling is set, luminosity will multiply each mc scale.
           autoLumiScaling = cms.untracked.bool(False),
                 # label to be set on plots
-          label = cms.untracked.string("#splitline{CMS}{#sqrt{s} = 7 TeV, L = 5.051 fb^{-1}}"),
+          label = cms.untracked.string(""),
+          #label = cms.untracked.string("#splitline{CMS}{#sqrt{s} = 8 TeV, L = 4.2 - 5.2 fb^{-1}}"),
           ),
   formating = cms.VPSet (
     cms.PSet(
       name = cms.string('eventSelectionbestzmass'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -103,6 +111,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzmassMu'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -112,6 +121,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('eventSelectionbestzmassEle'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -121,6 +131,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetbjet1pt'),
+      overflow=overflow,
       begin = cms.untracked.double(25),
       end = cms.untracked.double(265),
       width = cms.untracked.double(10),
@@ -131,6 +142,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetbjet2pt'),
+      overflow=overflow,
       #rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -139,6 +151,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetjet1pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -152,6 +165,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetjet2pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -160,6 +174,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('nvertices'),
+      overflow=overflow,
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("number of Reco Vertex"),
@@ -167,6 +182,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('jetmetnj'),
+      overflow=overflow,
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("number of jets"),
@@ -174,6 +190,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('el1pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(5),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("p_{T}^{e_{1}} (GeV)"),
@@ -187,6 +204,7 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('el2pt'),
+      overflow=overflow,
       rebin = cms.untracked.uint32(5),
       logy = cms.untracked.bool(True),
       labelx = cms.untracked.string("p_{T}^{e_{2}} (GeV)"),

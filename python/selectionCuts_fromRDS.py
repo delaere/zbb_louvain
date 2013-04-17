@@ -119,9 +119,12 @@ for sample in sampleList :
         
         nEntries = rds_zbb.numEntries()
         if sample == "DY" :
-                myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==6")
-                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType>=4&mcSelectioneventType<6")
-                myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4")
+                #myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==6")
+                #myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType>=4&mcSelectioneventType<6")
+                #myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4")
+                myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
+                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) ||(abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
+                myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)!=5")
                 print "myRDS.numEntries() for ", "Zbb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbb"].numEntries()
                 print "myRDS.numEntries() for ", "Zbx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbx"].numEntries()
                 print "myRDS.numEntries() for ", "Zxx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zxx"].numEntries()
