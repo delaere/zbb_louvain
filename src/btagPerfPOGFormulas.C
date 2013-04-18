@@ -27,7 +27,6 @@ float btagPerfPOGFormulas::SFb_error_CSVL[] = {
   0.0392831,
   0.0481008,
   0.0474291,
-  2*0.0474291
 };
 
 float btagPerfPOGFormulas::SFb_error_CSVM[] = {
@@ -47,27 +46,6 @@ float btagPerfPOGFormulas::SFb_error_CSVM[] = {
   0.0474666,
   0.0718173,
   0.0717567,
-  2*0.0717567
-};
-
-float btagPerfPOGFormulas::SFb_error_CSVT[] = {
-  0.0567059,
-  0.0266907,
-  0.0263491,
-  0.0342831,
-  0.0303327,
-  0.024608,
-  0.0333786,
-  0.0317642,
-  0.031102,
-  0.0295603,
-  0.0474663,
-  0.0503182,
-  0.0580424,
-  0.0575776,
-  0.0769779,
-  0.0898199,
-  2*0.0898199
 };
 
 
@@ -84,7 +62,7 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
 
   // values for Moriond 2013, see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
   int index=999;
-  float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600;
+  float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
   float ptmax[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
   if(pt>800) pt=800;

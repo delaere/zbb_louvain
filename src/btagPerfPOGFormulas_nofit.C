@@ -27,7 +27,6 @@ float btagPerfPOGFormulas_nofit::SFb_error_CSVL[] = {
   0.0392831,
   0.0481008,
   0.0474291,
-  2*0.0474291
 };
 
 float btagPerfPOGFormulas_nofit::SFb_error_CSVM[] = {
@@ -47,7 +46,6 @@ float btagPerfPOGFormulas_nofit::SFb_error_CSVM[] = {
   0.0474666,
   0.0718173,
   0.0717567,
-  2*0.0717567
 };
 
 float btagPerfPOGFormulas_nofit::SFb_error_CSVT[] = {
@@ -67,7 +65,6 @@ float btagPerfPOGFormulas_nofit::SFb_error_CSVT[] = {
   0.0575776,
   0.0769779,
   0.0898199,
-  2*0.0898199
 };
 
 
