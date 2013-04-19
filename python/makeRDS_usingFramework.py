@@ -76,7 +76,8 @@ from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
 path = pathSkimEMu
 outputDir=dirRDS
 #outputDir=""
-postfix="_newdefMC_btagSFs"
+postfix=""
+#postfix="_newdefMC_btagSFs"
 if jobNumber>0 : postfix=postfix+"_"+str(jobNumber)
 
 #checkTrigger[channel]=False
