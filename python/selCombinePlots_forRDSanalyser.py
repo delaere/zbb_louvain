@@ -9,7 +9,7 @@ flow="overflow"
 if flow=="overflow" : overflow = cms.untracked.bool(True)
 else : overflow = cms.untracked.bool(False)
 
-DIR="hist_afterFit_zptrew"
+DIR="hist_binbybin"
 WP="18"
 
 class EColor:
@@ -35,7 +35,7 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string(DIR+'/MERGEDoverflow.root'),
+  outputFile = cms.string(DIR+'/MERGEDoverflowWithHiggs.root'),
   data = cms.VPSet (
    cms.PSet(
      fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsDATA.root')
@@ -49,9 +49,11 @@ process.CombinePlots = cms.PSet(
      role = cms.string('ZZ')
    ),
    cms.PSet(
-     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsTT.root'),
+     #fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsTT.root'),
+     fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsTT-FullLept.root'),
      color = cms.uint32(EColor.kYellow+palette),
-     scale = cms.double(zbbnorm.xsec_TTjets_8TeV*lumi/zbbnorm.nev_TTjets_summer12), #NLO k=1.67
+     #scale = cms.double(zbbnorm.xsec_TTjets_8TeV*lumi/zbbnorm.nev_TTjets_summer12), #NLO k=1.67
+     scale = cms.double(zbbnorm.xsec_TTFullLept_8TeV*lumi/zbbnorm.nev_TTFullLept_summer12), #NLO k=1.67
      role = cms.string('ttbar'),
    ),
    cms.PSet(
@@ -79,13 +81,13 @@ process.CombinePlots = cms.PSet(
    #  role = cms.string('100*ZA'),
    #  stacked = cms.untracked.bool(False)
    #),
-#   cms.PSet(
-#    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZH125.root'),
-#    color = cms.uint32(1),
-#    scale = cms.double(100*zbbnorm.xsec_ZH125_8TeV*lumi/zbbnorm.nev_ZH125_summer12), 
-#    role = cms.string('100*ZH M_H=125'),
-#    stacked = cms.untracked.bool(False)
-#   ),
+   cms.PSet(
+    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZH125.root'),
+    color = cms.uint32(1),
+    scale = cms.double(100*zbbnorm.xsec_ZH125_8TeV*lumi/zbbnorm.nev_ZH125_summer12), 
+    role = cms.string('100*ZH M_H=125'),
+    stacked = cms.untracked.bool(False)
+   ),
   ),
   options = cms.PSet (
           # nostack: if set, none of the curves will be stacked. That overrides the mc set option
@@ -132,8 +134,8 @@ process.CombinePlots = cms.PSet(
     cms.PSet(
       name = cms.string('jetmetbjet1pt'),
       overflow=overflow,
-      begin = cms.untracked.double(25),
-      end = cms.untracked.double(265),
+#      begin = cms.untracked.double(25),
+#      end = cms.untracked.double(265),
       width = cms.untracked.double(10),
       logx = cms.untracked.bool(False),
       logy = cms.untracked.bool(True),
@@ -280,10 +282,10 @@ process.CombinePlots = cms.PSet(
     ),
     cms.PSet(
       name = cms.string('eventSelectiondijetM'),
-      #rebin = cms.untracked.uint32(50),
+      rebin = cms.untracked.uint32(10),
       overflow=overflow,
       labelx = cms.untracked.string("M_{bb} (GeV)"),
-      labely = cms.untracked.string("Events/50GeV")
+      labely = cms.untracked.string("Events/10GeV")
     ),
     cms.PSet(
       name = cms.string('eventSelectiondijetPt'),

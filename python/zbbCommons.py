@@ -65,8 +65,8 @@ class zbbnorm:
   #https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSectionsat8TeV
   xsec_DYjets_8TeV=3503.71  #Ml+l->50, NNLO for Z->ll
   xsec_TTjets_8TeV=225.197  #NLO inclusive
-  xsec_TTFullLept_8TeV = xsec_TTjets_8TeV*(0.308)*(0.308) #0.308 is W to lnu with l = e, mu, tau from PDG
-  xsec_TTSemiLept_8TeV = xsec_TTjets_8TeV*(0.308*3)*(1-0.308)
+  xsec_TTFullLept_8TeV = xsec_TTjets_8TeV*(1/3.)*(1/3.) #0.308 is W to lnu with l = e, mu, tau from PDG
+  xsec_TTSemiLept_8TeV = xsec_TTjets_8TeV*(1/3.)*(2/3.)*2
   xsec_ZZ_8TeV = 8.25561    #NLO inclusive Ml+l->12
   xsec_Zbb_8TeV = 76.75     #LO form MCFM : Ml+l->50, massive b-quark
   xsec_ZH110_8TeV=0.0454    #xsec=0.5869

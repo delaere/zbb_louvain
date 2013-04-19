@@ -60,11 +60,14 @@ channel = sys.argv[1]
 
 jobNumber = 0
 if narguments>2 : jobNumber = int(sys.argv[2])
+#n=10000
 n=250000
 if jobNumber>0 : print "job number is ", jobNumber
 
 MonteCarloPUFileName=zbbfile.pileupMC
 DataPUFileName=zbbfile.pileupData
+PUsyst=0
+#PUsyst=-1
 btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
@@ -73,8 +76,8 @@ from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
 path = pathSkimEMu
 outputDir=dirRDS
 #outputDir=""
-postfix=""
-if jobNumber>0 : postfix="_"+str(jobNumber)
+postfix="_newdefMC_btagSFs"
+if jobNumber>0 : postfix=postfix+"_"+str(jobNumber)
 
 #checkTrigger[channel]=False
 
@@ -105,7 +108,7 @@ events = AnalysisEvent (files)
 prepareAnalysisEvent(events, btagging=btagAlgo,ZjetFilter="bcl",checkTrigger=checkTrigger[channel])
 
 if channel[-2:] == "MC":
-  events.addWeight("PileUp",LumiReWeighting(MonteCarloFileName=MonteCarloPUFileName, DataFileName=DataPUFileName, systematicShift=0))
+  events.addWeight("PileUp",LumiReWeighting(MonteCarloFileName=MonteCarloPUFileName, DataFileName=DataPUFileName, systematicShift=PUsyst))
   events.addWeight("Btagging",btaggingWeight(0,999,0,999,file=btagPerfData))
   events.addWeight("Leptons",LeptonsReWeighting())
 

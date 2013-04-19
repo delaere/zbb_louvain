@@ -11,7 +11,8 @@ dataPeriods = [
 
 sampleList = [
     "DATA",
-    "TT",
+    #"TT",
+    "TT-FullLept",
     "ZZ",
     "DY",
     "ZH125"
@@ -19,7 +20,8 @@ sampleList = [
 
 totsampleList  = [
     "DATA",
-    "TT",
+    #"TT",
+    "TT-FullLept",
     "ZZ",
     "Zbb",
     "Zbx",
@@ -40,6 +42,7 @@ from zbbCommons import zbbnorm
 nev_DYjets_summer12=29310189 # to be used on events produced in 532p4
 lumi = { "DATA"   : zbbnorm.lumi_tot2012,
          "TT"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "TT-FullLept" : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000.,
          "Zbb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zbx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zxx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
@@ -61,6 +64,8 @@ Extra_norm={ "MuMuChannelDATA"  : 1.0,
              "EEChannelDATA"    : 1.0,
              "MuMuChannelTT"    : 1.0,#(2984./4412.)/MuCorrFact,
              "EEChannelTT"      : 1.0,
+             "MuMuChannelTT-FullLept"    : (15000./62506.)/MuCorrFact,
+             "EEChannelTT-FullLept"      : 15000./46492.,
 	     "MuMuChannelZbb"    : 1.0/MuCorrFact,
              "EEChannelZbb"      : 1.0,
 	     "MuMuChannelZbx"    : 1.0/MuCorrFact,
@@ -75,14 +80,16 @@ Extra_norm={ "MuMuChannelDATA"  : 1.0,
 
 SFs_fit={ "MuMuChannelDATA"  : 1.0,
           "EEChannelDATA"    : 1.0,
-          "MuMuChannelTT"    : 1.01,#(2984./4412.)/MuCorrFact,
-          "EEChannelTT"      : 1.01,
-          "MuMuChannelZbb"    : 0.89,
-          "EEChannelZbb"      : 0.89,
-          "MuMuChannelZbx"    : 1.1,
-          "EEChannelZbx"      : 1.1,
-          "MuMuChannelZxx"    : 1.1,
-          "EEChannelZxx"      : 1.1,
+          "MuMuChannelTT"    : 1.03,
+          "EEChannelTT"      : 1.03,
+          "MuMuChannelTT-FullLept"    : 1.03,
+          "EEChannelTT-FullLept"      : 1.03,
+          "MuMuChannelZbb"    : 0.86,
+          "EEChannelZbb"      : 0.86,
+          "MuMuChannelZbx"    : 1.93,
+          "EEChannelZbx"      : 1.93,
+          "MuMuChannelZxx"    : 0.94,
+          "EEChannelZxx"      : 0.94,
           "MuMuChannelZZ"    : 1.0,
           "EEChannelZZ"      : 1.0,
           "MuMuChannelZH125" : 1.0,
@@ -95,45 +102,46 @@ PlotForCLs = [
     ]
 
 namePlotList = [
-##     "eventSelectionbestzmassMu"  , 
-##     "eventSelectionbestzmassEle" ,
+     "eventSelectionbestzmassMu"  , 
+     "eventSelectionbestzmassEle" ,
      "eventSelectionbestzptMu",    
      "eventSelectionbestzptEle"   ,
-##     "jetmetbjet1pt"              ,   
-##     "jetmetbjet2pt"              ,   
-##     "jetmetbjet1CSVdisc"              ,   
-##     "jetmetbjet2CSVdisc"              ,   
-##     "jetmetbjetMinCSVdisc"              ,   
-##     "jetmetbjetMaxCSVdisc"              ,
+     "jetmetbjet1pt"              ,   
+     "jetmetbjet2pt"              ,   
+     "jetmetbjet1CSVdisc"              ,   
+     "jetmetbjet2CSVdisc"              ,   
+     "jetmetbjetMinCSVdisc"              ,   
+     "jetmetbjetMaxCSVdisc"              ,
      "jetmetbjetProdCSVdisc"              ,   
-##     "jetmetMET"                  ,
-##     "eventSelectiondphiZbb"      ,
+     "jetmetMET"                  ,
+     "jetmetMETsignificance"                  ,
+     "eventSelectiondphiZbb"      ,
 ##     "eventSelectiondphiZbj1"     , 
-##     "eventSelectiondijetPt"      ,
-##     "eventSelectiondijetM"       ,
-##     "eventSelectiondijetdR"      ,
+     "eventSelectiondijetPt"      ,
+     "eventSelectiondijetM"       ,
+     "eventSelectiondijetdR"      ,
 ##  #   "eventSelectiondijetSVdR"    ,
 ##     "eventSelectionZbbM"         ,
-##  #   "eventSelectiondrmumu"       ,
-## #   "eventSelectiondrelel"       ,
+     "eventSelectiondrllMu"       ,
+     "eventSelectiondrllEle"       ,
 ##     "eventSelectionZbM"
-##      ,"jetmetnj",
-    "Wgg"           
-    ,"Wqq"           
-    ,"Wtt"           
-#    ,"Wtwb"           #to be added in the merged RDS (ttbar isr=0)
-    ,"Wzz3"          
-    ,"Wzz0"           
-    ,"Whi3_125"           
-    ,"Whi0_125"
-    #,"jetmetMETsignificance"
+     "jetmetnj",
+     "Wgg"           
+     ,"Wqq"           
+     ,"Wtt"           
+     #    ,"Wtwb"           #to be added in the merged RDS (ttbar isr=0)
+     ,"Wzz3"          
+     ,"Wzz0"           
+     ,"Whi3_125"           
+     ,"Whi0_125"
+     #,"jetmetMETsignificance"
     # ,"jetmetMET"
 
 #    ,"mlpZbbvsTT_MM"
 #    ,"mlpZbbvsTT_MM_N"
 #    ,"mlpZbbvsTT_ML"
 #    ,"mlpZbbvsTT_mu_MM"
-    ,"mlpZbbvsTT_mu_MM_N"
+     ,"mlpZbbvsTT_mu_MM_N"
 #    ,"mlpZbbvsTT_mu_ML"
 #    ,"mlphiggsvszbb_125_MM"
 #   ,"mlphiggsvstt_125_MM"
@@ -159,15 +167,15 @@ namePlotList = [
 #    ,"mlphiggsvstt_125_mu_MM_N"
 #    ,"mlphiggsvszz_125_mu_MM_N"
 #    ,"mlphiggsvsbkg_125_mu_MM_N"
-   ,"mlphiggsvsbkg_125_comb_MM_N_2011"
-   ,"mlphiggsvszbb_125_comb_MM_N_2011"
-   ,"mlphiggsvszz_125_comb_MM_N_2011"
-   ,"mlphiggsvstt_125_comb_MM_N_2011"
-   ,"mlphiggsvsbkg_125_comb_MM_N"
-   ,"mlphiggsvszbb_125_comb_MM_N"
-   ,"mlphiggsvszz_125_comb_MM_N"
-   ,"mlphiggsvstt_125_comb_MM_N"
-
+#     ,"mlphiggsvsbkg_125_comb_MM_N_2011"
+#     ,"mlphiggsvszbb_125_comb_MM_N_2011"
+#     ,"mlphiggsvszz_125_comb_MM_N_2011"
+#     ,"mlphiggsvstt_125_comb_MM_N_2011"
+     ,"mlphiggsvsbkg_125_comb_MM_N"
+     ,"mlphiggsvszbb_125_comb_MM_N"
+     ,"mlphiggsvszz_125_comb_MM_N"
+     ,"mlphiggsvstt_125_comb_MM_N"
+     
     ]
 
 ################
@@ -180,13 +188,13 @@ min = {
     "eventSelectionbestzptEle"  :    0 ,
     "eventSelectiondijetPt"     :    0 ,
     "eventSelectiondrZbj1"      :    0 ,
-    "jetmetbjet1pt"             :    5 ,
-    "jetmetbjet2pt"             :    5 ,   
-    "jetmetbjet1CSVdisc"             :    0 ,
-    "jetmetbjet2CSVdisc"             :    0 ,   
-    "jetmetbjetMinCSVdisc"             :    0 ,
-    "jetmetbjetMaxCSVdisc"             :    0 ,
-    "jetmetbjetProdCSVdisc"             :    0 ,
+    "jetmetbjet1pt"             :    0 ,
+    "jetmetbjet2pt"             :    0 ,   
+    "jetmetbjet1CSVdisc"             :    0.679 ,
+    "jetmetbjet2CSVdisc"             :    0.679 ,   
+    "jetmetbjetMinCSVdisc"             :    0.679 ,
+    "jetmetbjetMaxCSVdisc"             :    0.679 ,
+    "jetmetbjetProdCSVdisc"             :    0.679*0.679 ,
     "jetmetMET"                 :    0 , 
     "eventSelectiondphiZbj1"    :    0 ,
     "eventSelectiondphiZbb"     :    0 ,
@@ -201,8 +209,8 @@ min = {
     "jetmetjet1SSVHEdisc"       :    0 ,
     "jetmetjet1SSVHPdisc"       :    0 ,
     "jetmetjet1SVmass"          :    0 ,
-    "eventSelectiondrmumu"      :    0 ,
-    "eventSelectiondrelel"      :    0 
+    "eventSelectiondrllMu"      :    0 ,
+    "eventSelectiondrllEle"      :    0 
     ,"jetmetnj":2
     ,"Wgg"      :    16 
     ,"Wqq"      :    16 
@@ -265,8 +273,8 @@ max = {
     "eventSelectionbestzptEle"  :  500 ,
     "eventSelectiondijetPt"     :  360 ,
     "eventSelectiondrZbj1"      :    5 ,
-    "jetmetbjet1pt"             :  265 ,
-    "jetmetbjet2pt"             :  265 ,   
+    "jetmetbjet1pt"             :  260 ,
+    "jetmetbjet2pt"             :  260 ,   
     "jetmetbjet1CSVdisc"             :  1 ,
     "jetmetbjet2CSVdisc"             :  1 ,   
     "jetmetbjetMinCSVdisc"             :    1 ,
@@ -286,8 +294,8 @@ max = {
     "jetmetjet1SSVHEdisc"       :    8 ,
     "jetmetjet1SSVHPdisc"       :    8 ,
     "jetmetjet1SVmass"          :    5 ,
-    "eventSelectiondrmumu"      :    5 ,
-    "eventSelectiondrelel"      :    5 
+    "eventSelectiondrllMu"      :    5 ,
+    "eventSelectiondrllEle"      :    5 
     ,"jetmetnj":8
     ,"Wgg"      :    24 
     ,"Wqq"      :    24 
@@ -352,17 +360,17 @@ binning = {
     "eventSelectiondrZbj1"      :   10 , #0.5
     "jetmetbjet1pt"             :   26 , #10GeV
     "jetmetbjet2pt"             :   26 ,   
-    "jetmetbjet1CSVdisc"             :  50  ,
-    "jetmetbjet2CSVdisc"             :  50  ,
-    "jetmetbjetMinCSVdisc"             : 50 ,
-    "jetmetbjetMaxCSVdisc"             :   50 ,
-    "jetmetbjetProdCSVdisc"             :  50 ,   
+    "jetmetbjet1CSVdisc"             :  20  ,
+    "jetmetbjet2CSVdisc"             :  20  ,
+    "jetmetbjetMinCSVdisc"             : 20 ,
+    "jetmetbjetMaxCSVdisc"             :   20 ,
+    "jetmetbjetProdCSVdisc"             :  20 ,   
     "jetmetMET"                 :   20 , #10GeV 
     "eventSelectiondphiZbj1"    :   16 , #0.2
     "eventSelectiondphiZbb"     :   16 ,
     "eventSelectiondrZbb"       :   10 , #0.5
     "eventSelectionscaldptZbj1" :   50 , #10GeV
-    "eventSelectiondijetM"      :   120 , #50GeV
+    "eventSelectiondijetM"      :   240 , #50GeV
     "eventSelectiondijetdR"     :   10 , #0.5
     "eventSelectiondijetSVdR"   :   10 ,
     "eventSelectionZbbM"        :   20 , #50GeV
@@ -371,8 +379,8 @@ binning = {
     "jetmetjet1SSVHEdisc"       :   16 , #0.5
     "jetmetjet1SSVHPdisc"       :   16 ,
     "jetmetjet1SVmass"          :   20 , #0.25GeV
-    "eventSelectiondrmumu"      :   10 , #0.5
-    "eventSelectiondrelel"      :   10
+    "eventSelectiondrllMu"      :   10 , #0.5
+    "eventSelectiondrllEle"      :   10
     ,"jetmetnj" : 6
     ,"Wgg"      :    20 
     ,"Wqq"      :    20 
@@ -382,7 +390,7 @@ binning = {
     ,"Wzz0"      :    20 
     ,"Whi3_125"      :    20 
     ,"Whi0_125"      :    20
-    ,"jetmetMETsignificance" : 80
+    ,"jetmetMETsignificance" : 40
     ,"jetmetMET" : 20
 
     ,"mlpZbbvsTT_MM" : 20

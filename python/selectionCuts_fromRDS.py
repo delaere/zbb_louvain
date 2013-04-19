@@ -26,10 +26,10 @@ import os
 #####################################################
 
 runOnMergedRDS = True
-goTotCLS = False
-DirOut="hist_cuts"
+goTotCLS = True
+DirOut="hist_CLS"
 doRew = False
-useSFs = False
+useSFs = True
 useMCTruth = True
 
 btagWP = "HPHP" #choose between HE, HP, HEHE, HEHP, HPHP
@@ -54,15 +54,15 @@ channels  = [
 #choose you set of cuts
 extraCuts = [
     "",
-    "(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-    "(eventSelectiondijetM>80&eventSelectiondijetM<150)",
-    "mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0.",
-    "mlphiggsvsbkg_125_comb_MM_N>=0.5&mlphiggsvsbkg_125_comb_MM_N<=1",
-    "jetmetbjet1pt>30",
-    "jetmetbjet2pt>30",
-    "jetmetbjet1pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-    "jetmetbjet2pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-    "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
+#    "(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+#    "(eventSelectiondijetM>80&eventSelectiondijetM<150)",
+#    "mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0.",
+#    "mlphiggsvsbkg_125_comb_MM_N>=0.5&mlphiggsvsbkg_125_comb_MM_N<=1",
+#    "jetmetbjet1pt>30",
+#    "jetmetbjet2pt>30",
+#    "jetmetbjet1pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+#    "jetmetbjet2pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+#    "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
 ##     "(eventSelectionbestzptEle>225||eventSelectionbestzptMu>225)",
 
     ]
@@ -126,7 +126,7 @@ for sample in sampleList :
                 myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4")
             else :
                 myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
-                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) ||(abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
+                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&((abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) ||(abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5))")
                 myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)!=5")
             print "myRDS.numEntries() for ", "Zbb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbb"].numEntries()
             print "myRDS.numEntries() for ", "Zbx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbx"].numEntries()
@@ -170,7 +170,7 @@ for channel in channels:
 ###############
 ### weights ###
 ###############
-tmp=myRDS["EEChannelTT"].reduce("mcSelectioneventType==1")
+tmp=myRDS["EEChannelZZ"].reduce("mcSelectioneventType==1")
 ras_zbb = tmp.get()
 tmp=0
 
@@ -194,17 +194,25 @@ rrv_w_ptz = {
 }
 w = {}
 rewFormula = {}
+zptNorm = {
+    "EEChannelZbb" : "(937.45/1085.03)",#"(937.45/1058.79)",
+    "MuMuChannelZbb" : "(1356.25/1583.79)",#"(1356.25/1538.45)",
+    "EEChannelZbx" : "(626.32/645.07)",#"(626.32/645.26)",
+    "MuMuChannelZbx" : "(893.65/927.98)",#"(893.65/923.54)",
+    }
+from binByBinRew import zptRew
 for channel in channels :
-    if doRew :
-        if channel=="EEChannel" : rewFormula[channel] = "*(1172.93/1391.86)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
-        else : rewFormula[channel] = "*(1606.22/1913.74)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
-    else : rewFormula[channel] = ""
     for sample in totsampleList :
+        if doRew and "Zb" in sample :
+            #rewFormula[channel+sample] = "*"+zptNorm[channel+sample]+"*((0.96+0.0019*20)*(@3<20)+(0.96+0.0019*@3)*(@3>20)*(@3<200)+(0.96+0.0019*200.)*(@3>200))"
+            #rewFormula[channel+sample] = "*"+zptNorm[channel+sample]+"*((0.82+0.0048*20)*(@3<20)+(0.82+0.0048*@3)*(@3>20)*(@3<120)+(0.82+0.0048*120.)*(@3>120))"
+            rewFormula[channel+sample] = "*"+zptRew[channel]
+        else : rewFormula[channel+sample] = ""
         rescale=1./Extra_norm[channel+sample]
         if not runOnMergedRDS : rescale=1.
         if useSFs : rescale*=SFs_fit[channel+sample]
-        if sample!="Zbb" : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale), RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
-        else : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale)+rewFormula[channel], RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptz[channel]))
+        if sample!="Zbb" and sample!="Zbx": w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale), RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
+        else : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale)+rewFormula[channel+sample], RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptz[channel]))
 #############
 ### PLOTS ###
 #############

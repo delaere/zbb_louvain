@@ -658,9 +658,14 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFi
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
   if not ZjetFilter=="bcl":
-    if monteCarloSelection.isZbEvent(event) and not ('b' in ZjetFilter): return [-1]
-    if (monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
-    if (not monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('l' in ZjetFilter): return [-1]
+    if ('bb' in ZjetFilter) or ('bx' in ZjetFilter) or ('xx' in ZjetFilter) :
+      if monteCarloSelection.isZbbEvent(event) and not ('bb' in ZjetFilter): return [-1]
+      if (monteCarloSelection.isZbcEvent(event) or monteCarloSelection.isZblEvent(event)) and not ('bx' in ZjetFilter): return [-1]
+      if not monteCarloSelection.isZbEvent(event) and not ('xx' in ZjetFilter): return [-1]
+    else :
+      if monteCarloSelection.isZbEvent(event) and not ('b' in ZjetFilter): return [-1]
+      if (monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
+      if (not monteCarloSelection.isZcEvent(event) and not monteCarloSelection.isZbEvent(event)) and not ('l' in ZjetFilter): return [-1]
   output = []
   if muChannel and eleChannel:
     bestZcandidate = event.bestZcandidate

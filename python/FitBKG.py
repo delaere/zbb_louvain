@@ -14,7 +14,8 @@ dataLabel = "2012"
 
 frac      = False
 WP        = "HPHPMETsig"
-extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>0."
+#extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0."
+extraCut  = "&jetmetMETsignificance < 10 &(eventSelectiondijetM<80.||eventSelectiondijetM>150)"
 keys      = False
 
 extraCutList = {"mwnn"     : "jetmetMETsignificance < 10",#&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5&mlpZbbvsTT_mu_MM_N>-0.1",
@@ -121,11 +122,11 @@ max = {"msv1" :    250,
        }
 
 bins = {"msv1" :   8,
-        "msv2" :   4,
+        "msv2" :   7,
         "msv"  :   20,
         "melel":   34,
         "mmumu":   5,
-        "mwnn" :   4,
+        "mwnn" :   5,
         "mwnn_1"   : 20,
         "mwnn_2"   : 16,
         "w_b_HE"    : 100, 
@@ -162,7 +163,8 @@ for chan in channelList:
     fileNameList["2012"+chan] = pathData+"RDS_rdsME_Double"+chanData+"_Data.root"
     fileNameList["ref"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
     fileNameList["DY"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    fileNameList["TT"+chan] = path+"RDS_rdsME_TT_"+chan+"_MC.root"
+    #fileNameList["TT"+chan] = path+"RDS_rdsME_TT_"+chan+"_MC.root"
+    fileNameList["TT"+chan] = path+"RDS_rdsME_TT-FullLept_"+chan+"_MC.root"
     fileNameList["ZZ"+chan] = path+"RDS_rdsME_ZZ_"+chan+"_MC.root"
     fileNameList["Zbb"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
     fileNameList["Zbx"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
@@ -176,22 +178,24 @@ from zbbCommons import zbbnorm
 
 lumi = { "DATAMu"   : zbbnorm.lumi_tot2012,
          "DATAEl"     : zbbnorm.lumi_tot2012,
-         "TTEl"       : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         #"TTEl"       : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "TTEl"       : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000./(46492./15000.),
          "ZbbEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "ZbxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "ZxxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZZEl"       : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(10000./11936.),
-         "TTMu"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "ZZEl"       : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(11936./10000.),
+         #"TTMu"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
+         "TTMu"     : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000./(62506./15000.), 
          "ZbbMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "ZbxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "ZxxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZZMu"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(10000./16986.),
+         "ZZMu"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(16986./10000.),
 	 "ZH115El"    : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
          "ZH120El"    : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
 	 "ZH115Mu"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
          "ZH120Mu"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
-	 "ZH125El"    : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(10000./48726.),
-	 "ZH125Mu"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(10000./65412.),
+	 "ZH125El"    : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(48726./10000.),
+	 "ZH125Mu"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(65412./10000.),
          "ZH130El"    : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
          "ZH135El"    : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.,
          "ZH130Mu"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
@@ -342,7 +346,7 @@ def main():
 
 	
     SF_zbb=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 3.)
-    SF_zbx=RooRealVar("SF_zxx","SF_zbx",1.,0.5, 3.)
+    SF_zbx=RooRealVar("SF_zbx","SF_zbx",1.,0.5, 3.)
     SF_zxx=RooRealVar("SF_zxx","SF_zxx",1.,0.5, 3.)
     SF_tt_e=RooRealVar("SF_tt_m","SF_tt",1.,0.5, 3.)
     SF_tt_m=RooRealVar("SF_tt_m","SF_tt",1.,0.5, 3.)    
@@ -501,7 +505,7 @@ def main():
 	    		 RooFit.Components(myRHP_2D["ZZ"+channel].GetName()),
 	                 RooFit.DrawOption("F"),
                          RooFit.LineColor(kBlack),
-                         RooFit.FillColor(kBlack-7),
+                         RooFit.FillColor(kBlack),
                          RooFit.LineWidth(1)
 	    		)			
 	        AlldataAndMCList[dataLabel+channel].plotOn(ttframe[channel])
@@ -551,7 +555,7 @@ def main():
 	    		 RooFit.Components(myRHP_2D["ZZ"+channel].GetName()),
 	                 RooFit.DrawOption("F"),
                          RooFit.LineColor(kBlack),
-                         RooFit.FillColor(kBlack-7),
+                         RooFit.FillColor(kBlack),
                          RooFit.LineWidth(1)
 	    		)
 	        AlldataAndMCList[dataLabel+channel].plotOn(mistagframe[channel])
