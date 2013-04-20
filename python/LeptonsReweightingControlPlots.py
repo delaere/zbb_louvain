@@ -1,56 +1,34 @@
-#! /usr/bin/env python
-
 import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from LeptonsReweighting import *
-#from myFuncTimer import print_timing
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 
 class LeptonsReweightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None, muChannel=True, dataset=None, mode="plots"):
+    def __init__(self, dir=None, category=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="LeptonsReweighting", dataset=dataset, mode=mode)
-      self.muChannel = muChannel
+      self.category = [int(s) for s in dir.GetName().split('_') if s.isdigit()]
+      if len(self.category): self.category=self.category[0] 
+      else: self.category=None
     
-    def beginJob(self):
+    def beginJob(self, muChannel = None):
+      self._muChannel = muChannel
       # declare histograms
       self.add("weight","weight",200,0,2)
-      # reweighting engine
-      self.engine = LeptonsReWeighting()
 
-    #@print_timing
-    def process(self, event):
+    def process(self, event, muChannel=None):
       """LeptonsReweightingControlPlots"""
       result = { }
-      w = self.engine.weight(fwevent=event, muChannel=self.muChannel)
-      result["weight"] = w
+      if muChannel is None:
+        result["weight"] = event.weight(weightList=["Leptons"], category=self.category)
+      elif muChannel == False:
+        result["weight"] = event.weight(weightList=["Leptons"], category=self.category, forceMode="Electron")
+      elif muChannel == True:
+        result["weight"] = event.weight(weightList=["Leptons"], category=self.category, forceMode="Muon")
       return result
 
-
-def runTest(path="../testfiles/"):
-  controlPlots = LeptonsReweightingControlPlots()
-
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], LeptonsReweightingControlPlots())
 

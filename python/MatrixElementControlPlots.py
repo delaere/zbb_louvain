@@ -1,15 +1,10 @@
-#! /usr/bin/env python
 import ROOT
-import sys
-import os
 import array
 from math import sqrt, pi
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
+from PatAnalysis.EventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbbme
-#from myFuncTimer import print_timing
+from zbbCommons import zbbme,zbbsystematics
 
 class MatrixElementControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -31,14 +26,19 @@ class MatrixElementControlPlots(BaseControlPlots):
     var_met = array.array('f', [0])
     var_rho = array.array('f', [0])
 
-    def __init__(self, dir=None, muChannel=True, checkTrigger=False, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
-      self.muChannel = muChannel
-      self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
+      # guess muChannel from dir
+      if dir is None:
+        self.muChannel = None
+      else:
+        self.muChannel = dir.GetPath().find("Muon")!=-1
     
-    def beginJob(self):
+    def beginJob(self, muChannel=None):
+      if muChannel is not None:
+        self.muChannel = muChannel
       # declare histograms
       self.add("bjet1pt","leading bjet Pt",1,0.,99999.)
       self.add("bjet1ptNNCorr","leading bjet Pt NNCorr",1,0.,99999.)
@@ -156,12 +156,12 @@ class MatrixElementControlPlots(BaseControlPlots):
         self.readerREG.AddVariable("rho"       ,self.var_rho)
         self.readerREG.BookMVA("BDT_REG","/home/fynu/vizangarciaj/storage/TMVA/factoryJetReg_BDT.weights.xml")
       
-
-
-    #@print_timing
     def process(self, event):
       """matrixElementControlPlots"""
       result = { }
+      if event.object().event().eventAuxiliary().isRealData():
+        zbbsystematics.JERfactor = 0
+        zbbsystematics.JESfactor = 0
       ## First initialize generator level infor for Transfer Function if MC sample\
       
       # partonic information for the b-quark matching
@@ -503,30 +503,15 @@ class MatrixElementControlPlots(BaseControlPlots):
       
       return result
 
-def runTest(path='../testfiles/'):
-  controlPlots = MatrixElementControlPlots(muChannel=True)
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
-
 def Delta(par1,par2):
   delta_phi=abs(par2.phi()-par1.phi())
   if delta_phi>pi:
     delta_phi=(2*pi)-delta_phi;
   delta=sqrt((delta_phi)**2 + (par1.eta()-par2.eta())**2)
   return delta
+
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], MatrixElementControlPlots())
+

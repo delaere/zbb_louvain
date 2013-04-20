@@ -2,8 +2,7 @@ import ROOT
 import sys
 import os 
 from AnalysisEvent import AnalysisEvent
-from eventSelection import *
-from LumiReWeighting import *
+from EventSelection import *
 from zbbCommons import zbblabel,zbbfile
 
 def btagEfficiencyTreeProducer(stageName="Z+jet", muChannel=True, path='../testfiles/'):
@@ -40,20 +39,19 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", muChannel=True, path='../testf
   else:
     files=[]
   events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,btagging="CSV",ZjetFilter="bcl",checkTrigger=False)
-  weight_engine = LumiReWeighting(zbbfile.pileupMC, zbbfile.pileupData)
+  EventSelection.prepareAnalysisEvent(events,btagging="CSV",ZjetFilter="bcl",checkTrigger=False)
   # event loop
   eventCnt = 0
   print "starting loop on events"
   for event in events:
     categoryData = event.catMu if muChannel else event.catEle
     goodJets = event.goodJets_mu if muChannel else event.goodJets_ele
-    if isInCategory(stage, categoryData):
+    if EventSelection.isInCategory(stage, categoryData):
       eventCnt = eventCnt +1
       if eventCnt%100==0 : print ".",
       if eventCnt%1000==0 : print ""
       # event weight
-      mystruct.eventWeight = weight_engine.weight( event=event )
+      mystruct.eventWeight = event.weight(weightList=["PileUp"])
       # that's where we access the jets
       for index,jet in enumerate(event.jets):
         if not goodJets[index]: continue

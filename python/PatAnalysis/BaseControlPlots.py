@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import ROOT 
-from zbbCommons import zbbfile
+from CPconfig import configuration
 
 def getArgSet(controlplots):
   assert isinstance(controlplots,list)
@@ -9,9 +9,36 @@ def getArgSet(controlplots):
     merged.add(ctrlplot._obsSet)
   return merged
 
+def runTest(path='../testfiles/', controlPlots=None):
+  # these modules are only needed in that function, used for debugging.
+  # so we only import them here.
+  import CMSSW
+  import os
+  import AnalysisEvent
+  import EventSelection
+  assert isinstance(controlPlots, BaseControlPlots)
+  if os.path.isdir(path):
+    dirList=os.listdir(path)
+    files=[]
+    for fname in dirList:
+      files.append(path+fname)
+  elif os.path.isfile(path):
+    files=[path]
+  else:
+    files=[]
+  events = AnalysisEvent.AnalysisEvent(files)
+  EventSelection.prepareAnalysisEvent(events)
+  controlPlots.beginJob()
+  i = 0
+  for event in events:
+    if i%100==0 : print "Processing... event ", i
+    controlPlots.processEvent(event)
+    i += 1
+  controlPlots.endJob()
+
 class BaseControlPlots:
     """A class to create control plots"""
-
+    
     def __init__(self, dir=None, purpose="generic", dataset=None, mode="plots"):
       """Initialize the ControlPlots, creating output file if needed. If no file is given, it means it is delegated."""
       self._mode = mode
@@ -20,7 +47,7 @@ class BaseControlPlots:
       if self._mode=="plots":
         # create output file if needed. If no file is given, it means it is delegated
         if dir is None:
-          self._f = ROOT.TFile(zbbfile.controlPlots, "RECREATE")
+          self._f = ROOT.TFile(configuration.defaultFilename+".root", "RECREATE")
           self._dir = self._f.mkdir(purpose)
         else :
           self._f = None
@@ -30,7 +57,7 @@ class BaseControlPlots:
       if self._mode=="dataset":
         self._obsSet = ROOT.RooArgSet()
         if dataset is None:
-          self._rds = ROOT.RooDataSet("rds_zbb",  "rds_zbb", self._obsSet) # Q: is that ok, or do we have to create the rds once the ArgSet is fully defined?
+          self._rds = ROOT.RooDataSet(configuration.RDSname, configuration.RDSname, self._obsSet)
 	  self._ownedRDS = True
 	else:
 	  self._rds = dataset
@@ -46,7 +73,7 @@ class BaseControlPlots:
       """Define the categories, given a list of names. Only works for datasets"""
       if self._mode!="dataset": return
       for i, name in enumerate(categories):
-        rc = ROOT.RooCategory("rc_"+self._purpose+"_"+str(i),name)
+        rc = ROOT.RooCategory("rc_"+self._purpose+"_"+str(i),name.split('/')[-1])
 	rc.defineType("not_acc",0)
 	rc.defineType("acc",1)
 	self._rooCategories[i] = rc
@@ -134,6 +161,6 @@ class BaseControlPlots:
           self._f.Close()
       else:
         if self._ownedRDS:
-          ws  = RooWorkspace(self._purpose,self._purpose) # need a way to share a workspace (as we do for dirs)
+          ws  = ROOT.RooWorkspace(self._purpose,self._purpose)
           getattr(ws,'import')(self._rds) 
-          ws.writeToFile("File_rds_zbb_"+self._purpose+".root") 
+          ws.writeToFile(configuration.defaultFilename+"_"+self._purpose+".root") 

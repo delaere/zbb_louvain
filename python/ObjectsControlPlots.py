@@ -1,16 +1,9 @@
-#! /usr/bin/env python
-
 import ROOT
-import sys
-import os
 import array
 from math import sin, sqrt
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel,zbbfile
-#from myFuncTimer import print_timing
+from zbbCommons import zbblabel,zbbfile,zbbsystematics
 
 ############
 #ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -47,7 +40,6 @@ class MuonsControlPlots(BaseControlPlots):
       self.muonType = muonType
       self.muonList = muonList
     
-    #@print_timing
     def process(self, event):
       """objectsControlPlots"""
       result = { }
@@ -132,7 +124,6 @@ class ElectronsControlPlots(BaseControlPlots):
       self.electronType   = electronType
       self.electronList   = electronList
 
-    #@print_timing
     def process(self, event):
       """ElectronsControlPlots"""
       result = { }
@@ -200,14 +191,20 @@ class JetmetControlPlots(BaseControlPlots):
     var_rho = array.array('f', [0])
 
 
-    def __init__(self, dir=None, dataset=None, muChannel=True, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
 
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
-      self.muChannel = muChannel
+      # guess muChannel from dir
+      if dir is None:
+        self.muChannel = None
+      else:
+        self.muChannel = dir.GetPath().find("Muon")!=-1
     
-    def beginJob(self, btagging="CSV"):
+    def beginJob(self, btagging="CSV", muChannel=None):
+      if muChannel is not None:
+        self.muChannel = muChannel
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,0,10)
@@ -358,12 +355,12 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       self.add("rho", "Rho Variable",100,0,100)
 
-
-    
-    #@print_timing
     def process(self, event):
       """JetmetControlPlots"""
       result = { }
+      if event.object().event().eventAuxiliary().isRealData():
+        zbbsystematics.JERfactor = 0
+        zbbsystematics.JESfactor = 0
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]
@@ -401,11 +398,17 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      dijet =  event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+      if self.muChannel is None:
+        dijet = event.dijet_all
+      else:
+        dijet =  event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
       for index,jet in enumerate(event.jets):
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
-        goodJets = event.goodJets_mu if self.muChannel else event.goodJets_ele
+        if self.muChannel is None:
+          goodJets = event.goodJets_all
+        else:
+          goodJets = event.goodJets_mu if self.muChannel else event.goodJets_ele
         if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
@@ -605,36 +608,13 @@ class JetmetControlPlots(BaseControlPlots):
 
       return result
 
-def runTest(path="../testfiles/"):
-  output = ROOT.TFile(zbbfile.controlPlots, "RECREATE")
-  jetmetPlots = JetmetControlPlots(output.mkdir("jetmet"))
-  electronsPlots = ElectronsControlPlots(output.mkdir("electrons"))
-  muonsPlots = MuonsControlPlots(output.mkdir("muons"))
-
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-
-  muonsPlots.beginJob()
-  electronsPlots.beginJob()
-  jetmetPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    jetmetPlots.processEvent(event)
-    muonsPlots.processEvent(event)
-    electronsPlots.processEvent(event)
-    i += 1
-  jetmetPlots.endJob()
-  muonsPlots.endJob()
-  electronsPlots.endJob()
-  output.Close()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  if sys.argv[2]=="Jetmet":
+    runTest(sys.argv[1], JetmetControlPlots())
+  elif sys.argv[2]=="Electrons":
+    runTest(sys.argv[1], ElectronsControlPlots())
+  elif sys.argv[2]=="Muons":
+    runTest(sys.argv[1], MuonsControlPlots())
 

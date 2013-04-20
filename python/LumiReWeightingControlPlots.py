@@ -1,14 +1,6 @@
-#! /usr/bin/env python
-
 import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from eventSelection import prepareAnalysisEvent
-from baseControlPlots import BaseControlPlots
-from LumiReWeighting import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 from zbbCommons import zbblabel,zbbfile
-#from myFuncTimer import print_timing
 
 class LumiReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
@@ -27,7 +19,6 @@ class LumiReWeightingControlPlots(BaseControlPlots):
         self.h_weightSetup = ROOT.TH1F("weightSetup","weightSetup",50,0,50)
       self.first = True
     
-    #@print_timing
     def process(self, event):
       """LumiReWeightingControlPlots"""
       if self.first:
@@ -44,27 +35,8 @@ class LumiReWeightingControlPlots(BaseControlPlots):
       result["pv"]= event.vertices.size()
       return result
 
-def runTest(path="../testfiles/"):
-  controlPlots = LumiReWeightingControlPlots()
-
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  events.addWeight("PileUp",LumiReWeighting(systematicShift=0))
-
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], LumiReWeightingControlPlots())
 

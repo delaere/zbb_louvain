@@ -1,9 +1,5 @@
-from AnalysisEvent import AnalysisEvent
-from eventSelection import *
 from zbbCommons import zbblabel, zbbsystematics
 from math import sqrt
-
-#from myFuncTimer import print_timing
 
 class PtEtaMap:
    """A binned map in pt and eta.
@@ -249,8 +245,7 @@ class LeptonsReWeighting:
      else:
        return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
-   #@print_timing
-   def weight( self, fwevent=None, electrons=None, muons=None, muChannel=True):
+   def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
      # if fwevent is defined, get electrons and muons from there
      if not(fwevent is None):
@@ -264,11 +259,24 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
+         if forceMode is None:
+           if category is not None:
+             catname = EventSelection.categoryName(category)
+             muChannel = catname.find("Electron")==-1
+             bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
+           else:
+             bestZcandidate = fwevent.bestZcandidate
+         else:
+           if forceMode == "Muon":
+             bestZcandidate = fwevent.bestZmumuCandidate
+           elif forceMode == "Electron":
+             bestZcandidate = fwevent.bestZelelCandidate
+           else:
+             bestZcandidate = fwevent.bestZcandidate
          if not bestZcandidate is None:
-           if muChannel :
+           if zCandidate.daughter(0).isMuon():
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
-           else :
+           else:
              electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
      # sanity check
      if not(electrons is None) and not(muons is None):

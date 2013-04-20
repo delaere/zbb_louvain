@@ -1,26 +1,24 @@
-#! /usr/bin/env python
 import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
-#event_list = open("eventlist.txt","w")
+from zbbCommons import zbblabel, zbbsystematics
 
 class EventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, muChannel=True, checkTrigger=False, dataset=None, mode="plots"):
+    def __init__(self, dir=None, muChannel=True, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
-      self.muChannel = muChannel
-      self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
+      # guess muChannel from dir
+      if dir is None:
+        self.muChannel = None
+      else:
+        self.muChannel = dir.GetPath().find("Muon")!=-1
     
-    def beginJob(self):
+    def beginJob(self, muChannel=None):
+      if muChannel is not None:
+        self.muChannel = muChannel
       # declare histograms
       self.add("run","Run number",50000,160000,210000)
       self.add("event","Event number",1000,0,5e9)
@@ -66,12 +64,17 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
       self.add("drllEle","drllEle",100,0,5)
 
-    #@print_timing
     def process(self, event):
       """eventSelectionControlPlots"""
       result = { }
+      if event.object().event().eventAuxiliary().isRealData():
+        checkTrigger = True
+        zbbsystematics.JERfactor = 0
+        zbbsystematics.JESfactor = 0
+      else:
+        checkTrigger = False
       ## trigger
-      result["triggerSelection"] = self.checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
+      result["triggerSelection"] = checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       ## event category
       categoryData = event.catMu if self.muChannel else event.catEle
@@ -172,40 +175,8 @@ class EventSelectionControlPlots(BaseControlPlots):
       
       return result
 
-def runTest(path='../testfiles/'):
-  controlPlots = EventSelectionControlPlots(muChannel=True)
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], EventSelectionControlPlots())
 
-def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  for event in events:
-    categoryData = event.catMu if muChannel else event.catEle
-    if isInCategory(stage, categoryData):
-      print >> event_list , "Run", event.run(), ", Lumisection", event.lumi(), ", Event", event.event()

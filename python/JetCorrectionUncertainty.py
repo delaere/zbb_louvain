@@ -1,11 +1,9 @@
 import os
 import ROOT
+import PatAnalysis.CMSSW
 from math import sqrt
 from random import gauss
 from zbbCommons import zbbfile,zbbsystematics
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.AutoLibraryLoader.enable()
-ROOT.gSystem.Load("libCondFormatsJetMETObjects.so")
 
 class JetCorrectionUncertaintyProxy:
   """A class to access JEC uncertainties"""

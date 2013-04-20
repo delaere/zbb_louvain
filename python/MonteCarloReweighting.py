@@ -1,26 +1,26 @@
 import ROOT
 import math
 from copy import deepcopy
-from AnalysisEvent import AnalysisEvent
 from zbbCommons import zbblabel,zbbfile
-#from myFuncTimer import print_timing
 
 class MonteCarloReWeighting:
    """A class to reweight MC according to kinematic uncertainties."""
 
-   def __init__(self, shift=0):
+   def __init__(self, shift=0, MCmode="none"):
      # do we reweight or not, by how much ?
      self._shift = shift 
      self._modes = [ "sign", "mc", "bpt", "zpt", "all", "none" ]
-   #@print_timing
-   def weight( self, fwevent=None, MCmode="none"):
+     if not MCmode in self._modes:
+       print "ERROR: ", MCmode, " is not a recognized mode for MonteCarloReWeighting."
+       self._MCmode="none"
+     else:
+       self._MCmode=MCmode
+
+   def weight( self, fwevent=None ):
      """MC shape reweighting, computed from the MC truth"""
      # returns the weight computed from the MC truth only if needed. 
      if self._shift==0:
        return 1.
-     if not MCmode in self._modes:
-        print "ERROR: ", MCmode, " is not a recognized mode for MonteCarloReWeighting."
-        return 1.
      # apply systematic shift ?
      if not fwevent is None:
        # for data, immediately return 1.
@@ -28,7 +28,9 @@ class MonteCarloReWeighting:
          return 1.
        else: 
          # check that fwevent and npu were not specified at the same time.
-         return _eventWeight(fwevent, MCmode)
+         return _eventWeight(fwevent, self._MCmode)
+     else: 
+       return 1.
 
    def _eventWeight( self, fwevent=None, mode="none"):
      """(Internal) actual function to compute the event weight"""

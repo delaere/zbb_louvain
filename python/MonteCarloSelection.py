@@ -134,6 +134,3 @@ def isZcEvent(event):
 def isZbEvent(event):
   """Classify events according to genjets matched with final state hadrons"""
   return isZbbEvent(event) or isZbcEvent(event) or isZblEvent(event)
-
-def prepareAnalysisEvent(event):
-  event.addProducer("sortedGenJets",genjetCollectionsProducer,ptcut=0, etacut=10)

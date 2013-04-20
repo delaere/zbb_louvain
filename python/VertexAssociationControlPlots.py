@@ -1,14 +1,7 @@
-#! /usr/bin/env python
-
 import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import prepareAnalysisEvent
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 from vertexAssociation import *
 from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
 
 class VertexAssociationControlPlots(BaseControlPlots):
     """A class to create control plots for vertex association"""
@@ -32,7 +25,6 @@ class VertexAssociationControlPlots(BaseControlPlots):
       self.add("l2v_dz","z distance between lepton and vertex",100,0,1.)
       self.add("lvertex","index of the lepton vertex",20,-0.5,19.5)
 
-    #@print_timing
     def process(self,event):
       """vertexAssociationControlPlots"""
       result = { }
@@ -56,26 +48,8 @@ class VertexAssociationControlPlots(BaseControlPlots):
       result["lvertex"] = findPrimaryVertexIndex(bestZ,event.vertices)
       return result
 
-def runTest(path="../testfiles/ttbar/"):
-  controlPlots = VertexAssociationControlPlots()
-
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    controlPlots.processEvent(event)
-    if i%1000==0 : print "Processing... event ", i
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], VertexAssociationControlPlots())
 
