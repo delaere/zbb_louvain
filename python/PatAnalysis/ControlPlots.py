@@ -32,11 +32,7 @@ parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
 
 #special treatment of the config file... the rest of the options will be parsed in main.
 if options.conf is not None:
-  try:
     theUserConf = __import__(os.path.splitext(options.conf)[0])
-  except:
-    raise ImportError("%s is not a valid configuration file."%options.conf)
-  else:
     os.environ["PatAnalysisCfg"]=options.conf
 from CPconfig import configuration
 if options.outputname is None:
@@ -46,7 +42,6 @@ import CMSSW
 import ROOT
 import itertools
 import time
-from importlib import import_module
 from AnalysisEvent import AnalysisEvent
 from BaseControlPlots import getArgSet
 import EventSelection
@@ -124,11 +119,11 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
     for levelDir in leafList:
       levelPlots=[]
       for cp in configuration.controlPlots:
-        levelPlots.append(getattr(import_module(cp.module),cp.classname)(dir=levelDir.mkdir(cp.label),mode="plots"))
+        levelPlots.append(getattr(__import__(cp.module),cp.classname)(dir=levelDir.mkdir(cp.label),mode="plots"))
       controlPlots.append(levelPlots)
   else:
     for cp in configuration.controlPlots:
-      controlPlots.append(getattr(import_module(cp.module),cp.classname)(dir=None, mode="dataset", dataset=rds))
+      controlPlots.append(getattr(__import__(cp.module),cp.classname)(dir=None, mode="dataset", dataset=rds))
 
   # book histograms (separate iteration for clarity)
   if configuration.runningMode=="plots":

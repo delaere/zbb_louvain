@@ -1,7 +1,7 @@
 import ROOT
 import MonteCarloSelection
 from ObjectSelection import *
-from zbbCommon import zbbsystematics
+from zbbCommons import zbbsystematics
 
 #########################################################################
 #  Standard methods  ####################################################
@@ -12,14 +12,6 @@ from zbbCommon import zbbsystematics
 # and the final (public) methods work by concatenating/splitting 
 
 channels = [ "Muon", "Electron" ]
-
-categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
-
-def isInCategory(category, categoryTuple):
-  if category<len(categories):
-    return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
-  else:
-    return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
 
 categories = [ 
   "Trigger", 
@@ -42,6 +34,14 @@ categories = [
   "Z+bb (HEHP+MET significance)", 
   "Z+bb (HPHP+MET significance)",
 ]
+
+categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
+
+def isInCategory(category, categoryTuple):
+  if category<len(categories):
+    return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
+  else:
+    return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
 
 def isInCategoryChannel(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""

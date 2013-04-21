@@ -1,7 +1,7 @@
 import ROOT
 import string
 import intervalmap
-from vertexAssociation import zVertex
+from VertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
 

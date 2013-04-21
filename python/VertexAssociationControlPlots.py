@@ -1,6 +1,6 @@
 import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
-from vertexAssociation import *
+from VertexAssociation import *
 from zbbCommons import zbblabel
 
 class VertexAssociationControlPlots(BaseControlPlots):
@@ -8,7 +8,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
 
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="vertexAssociation", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose="VertexAssociation", dataset=dataset, mode=mode)
     
     def beginJob(self, sigcut = 2.):
       self.sigcut = sigcut
@@ -26,7 +26,7 @@ class VertexAssociationControlPlots(BaseControlPlots):
       self.add("lvertex","index of the lepton vertex",20,-0.5,19.5)
 
     def process(self,event):
-      """vertexAssociationControlPlots"""
+      """VertexAssociationControlPlots"""
       result = { }
       result["nvertices"] = event.vertices.size()
       if event.vertices.size()==0 : return result

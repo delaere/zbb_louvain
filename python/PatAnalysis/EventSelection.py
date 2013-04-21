@@ -1,5 +1,4 @@
 from CPconfig import configuration
-from importlib import import_module
 
 # A proper implementation of the event selection will at least 
 # define the following:
@@ -55,7 +54,7 @@ def prepareAnalysisEvent(event):
   for coll in configuration.eventCollections:
     event.addCollection(coll.label,coll.collection)
   for prod in configuration.eventProducers:
-    event.addProducer(prod.label,getattr(import_module(prod.module),prod.function),**prod.kwargs)
+    event.addProducer(prod.label,getattr(__import__(prod.module),prod.function),**prod.kwargs)
   for weight in configuration.eventWeights:
-    events.addWeight(weight.label,getattr(import_module(weight.module),weight.classname)(**weight.kwargs))
+    events.addWeight(weight.label,getattr(__import__(weight.module),weight.classname)(**weight.kwargs))
 
