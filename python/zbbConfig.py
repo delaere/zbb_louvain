@@ -80,7 +80,7 @@ class configuration:
 
   eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":zbbfile.ssvperfData,"btagging":btagging}),
                        eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
-                       eventWeight("MonteCarlo","MonteCarloReWeighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
+                       eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
                        eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":zbbfile.pileupMC, "DataFileName":zbbfile.pileupData, "systematicShift":0})
                      ]
 

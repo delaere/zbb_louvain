@@ -20,7 +20,9 @@ class EventSelectionControlPlots(BaseControlPlots):
  
     def beginJob(self):
       # declare histograms
-      self.add("event","Event number",1000,0,100000)
+      self.add("run","Run number",50000,160000,210000)
+      self.add("event","Event number",1000,0,5e9)
+      self.add("ls","Lumi section",2000,0,2000)
       self.add("category","event category",self.eventCategories+1,0,self.eventCategories+1)
 
     def process(self, event):
@@ -32,7 +34,9 @@ class EventSelectionControlPlots(BaseControlPlots):
       for category in range(self.eventCategories):
         if EventSelection.isInCategory(category, categoryData):
           result["category"].append(category)
+      result["run"] = event.run()
       result["event"] = event.event()
+      result["ls"] = event.lumi()
       return result
 
 if __name__=="__main__":

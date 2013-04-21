@@ -3,7 +3,7 @@ from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import zbblabel, zbbsystematics
 
-class EventSelectionControlPlots(BaseControlPlots):
+class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
     def __init__(self, dir=None, muChannel=True, dataset=None, mode="plots"):
@@ -20,9 +20,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       if muChannel is not None:
         self.muChannel = muChannel
       # declare histograms
-      self.add("run","Run number",50000,160000,210000)
-      self.add("event","Event number",1000,0,5e9)
-      self.add("ls","Lumi section",2000,0,2000)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("zmassMu","zmassMu",10000,0,1000)
@@ -48,7 +45,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("ZbPt","Zb Pt",500,0,500)
       self.add("ZbbM","Zbb invariant mass",1000,0,1000)
       self.add("ZbbPt","Zbb Pt",500,0,500)
-      self.add("category","event category",eventCategories()+1,0,eventCategories()+1)  
       self.add("mu1pt","leading muon Pt",500,0,500)
       self.add("mu2pt","subleading muon Pt",500,0,500)
       self.add("mu1eta","leading muon Eta",25,0,2.5)
@@ -78,13 +74,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       ## event category
       categoryData = event.catMu if self.muChannel else event.catEle
-      result["category"] = [ ]
-      for category in range(eventCategories()):
-        if isInCategory(category, categoryData):
-          result["category"].append(category)
-      result["run"] = event.run()
-      result["event"] = event.event()
-      result["ls"] = event.lumi()
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]

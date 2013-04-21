@@ -2,7 +2,9 @@
 # that class also fills automatically the efficiency and SF.
 import ROOT
 import PatAnalysis.CMSSW
-from PatAnalysis.EventSelection import categoryName, goodJets, isBjet
+from PatAnalysis.EventSelection import categoryName
+from ObjectSelection import isBJet
+
 from zbbCommons import zbbfile,zbbsystematics
 
 class BtaggingWeight:
@@ -49,7 +51,7 @@ class BtaggingWeight:
     elif catname.find("Muon")==0 :
       theGoodJets = event.goodJets_mu
     else:
-      theGoodJets = goodJets(event, muChannel, eleChannel)
+      theGoodJets = event.goodJets_all
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
