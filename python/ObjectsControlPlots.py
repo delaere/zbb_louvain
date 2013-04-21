@@ -3,6 +3,7 @@ import array
 from math import sin, sqrt
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from ObjectSelection import *
 from zbbCommons import zbblabel,zbbfile,zbbsystematics
 
 ############

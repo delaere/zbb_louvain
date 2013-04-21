@@ -50,58 +50,58 @@ def isInCategoryChannel(category, categoryTuple):
     return categoryTuple[0]==1
   # category 1: Z candidate (wide mass window)
   elif category==1:
-    return isInCategory( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<30.
+    return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<30.
   # category 2: Z candidate (narrow mass window)
   elif category==2:
-    return isInCategory( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<15.
+    return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[2]<15.
   # category 3: Z+jet
   elif category==3:
-    return isInCategory( 2, categoryTuple) and categoryTuple[3]>0
+    return isInCategoryChannel( 2, categoryTuple) and categoryTuple[3]>0
   # category 4:  Z+b (HE), wide mass window
   elif category==4:
-    return isInCategory( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[4]>0
+    return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[4]>0
   # category 5:  Z+b (HP), wide mass window
   elif category==5:
-    return isInCategory( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[5]>0
+    return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0 and categoryTuple[5]>0
   # category 6:  Z+b (HE)
   elif category==6:
-    return isInCategory( 3, categoryTuple) and categoryTuple[4]>0
+    return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>0
   # category 7:  Z+b (HP)
   elif category==7:
-    return isInCategory( 3, categoryTuple) and categoryTuple[5]>0
+    return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>0
   # category 8:  Z+b (HE+MET_significance)
   elif category==8:
-    return isInCategory( 6, categoryTuple) and categoryTuple[8]>0
+    return isInCategoryChannel( 6, categoryTuple) and categoryTuple[8]>0
   # category 9:  Z+b (HP+MET_significance)
   elif category==9:
-    return isInCategory( 7, categoryTuple) and categoryTuple[8]>0
+    return isInCategoryChannel( 7, categoryTuple) and categoryTuple[8]>0
   # categoty 10: Z+bb (HEHE), wide mass window
   elif category==10:
-    return isInCategory( 4, categoryTuple) and categoryTuple[4]>1
+    return isInCategoryChannel( 4, categoryTuple) and categoryTuple[4]>1
   # categoty 11: Z+bb (HEHP), wide mass window
   elif category==11:
-    return isInCategory( 5, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1
+    return isInCategoryChannel( 5, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1
   # categoty 12: Z+bb (HPHP), wide mass window
   elif category==12:
-    return isInCategory( 5, categoryTuple) and categoryTuple[5]>1
+    return isInCategoryChannel( 5, categoryTuple) and categoryTuple[5]>1
   # categoty 13: Z+bb (HEHE)
   elif category==13:
-    return isInCategory( 3, categoryTuple) and categoryTuple[4]>1
+    return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>1
   # categoty 14: Z+bb (HEHP)
   elif category==14:
-    return isInCategory( 3, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1 and categoryTuple[5] > 0
+    return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]+categoryTuple[5]-categoryTuple[6] > 1 and categoryTuple[5] > 0
   # categoty 15: Z+bb (HPHP)
   elif category==15:
-    return isInCategory( 3, categoryTuple) and categoryTuple[5]>1
+    return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>1
   # categoty 16: Z+bb (HEHE+MET_significance)
   elif category==16:
-    return isInCategory(13, categoryTuple) and categoryTuple[8]>0
+    return isInCategoryChannel(13, categoryTuple) and categoryTuple[8]>0
   # categoty 17: Z+bb (HEHP+MET_significance)
   elif category==17:
-    return isInCategory(14, categoryTuple) and categoryTuple[8]>0
+    return isInCategoryChannel(14, categoryTuple) and categoryTuple[8]>0
   # categoty 18: Z+bb (HPHP+MET_significance)
   elif category==18:
-    return isInCategory(15, categoryTuple) and categoryTuple[8]>0
+    return isInCategoryChannel(15, categoryTuple) and categoryTuple[8]>0
   # other does not exist
   else:
     return False

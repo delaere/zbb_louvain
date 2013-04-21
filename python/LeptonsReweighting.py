@@ -1,3 +1,4 @@
+from PatAnalysis.EventSelection import categoryName
 from zbbCommons import zbblabel, zbbsystematics
 from math import sqrt
 import pickle
@@ -430,7 +431,7 @@ class LeptonsReWeighting:
        else :
          if forceMode is None:
            if category is not None:
-             catname = EventSelection.categoryName(category)
+             catname = categoryName(category)
              muChannel = catname.find("Electron")==-1
              bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
            else:
@@ -443,7 +444,7 @@ class LeptonsReWeighting:
            else:
              bestZcandidate = fwevent.bestZcandidate
          if not bestZcandidate is None:
-           if zCandidate.daughter(0).isMuon():
+           if bestZcandidate.daughter(0).isMuon():
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
            else:
              electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]

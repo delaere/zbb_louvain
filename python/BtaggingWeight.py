@@ -38,9 +38,9 @@ class BtaggingWeight:
       if category is None:
         catname = ""
       else:
-        catname = EventSelection.categoryName(category)
+        catname = categoryName(category)
     else: catname = forceMode
-    Bmode=btaggingWeightMode(catname)
+    Bmode=self.btaggingWeightMode(catname)
     if event.object().event().eventAuxiliary().isRealData() or Bmode=="None":
       return 1.
     if not Bmode is None: 

@@ -1,6 +1,7 @@
 import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from ObjectSelection import selectedTriggers
 from zbbCommons import zbblabel, zbbsystematics
 
 class ZbbEventSelectionControlPlots(BaseControlPlots):
@@ -72,8 +73,6 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       ## trigger
       result["triggerSelection"] = checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
-      ## event category
-      categoryData = event.catMu if self.muChannel else event.catEle
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]
