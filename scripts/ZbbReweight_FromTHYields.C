@@ -12,10 +12,14 @@
 bool doMuChannel = true;//reweighiting histogram based only on muon channel
 bool doElChannel = true;//reweighiting histogram based only on electron channel
 bool doBothChannel = true;//reweighiting histogram based on both the muon and electron channel
-TString fileMu = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_2jets.root";
-TString fileEl = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_2eejets.root";
 //TString fileMu = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_2jets.root";
 //TString fileEl = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_2eejets.root";
+//TString fileMu = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_3jets.root";
+//TString fileEl = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_3eejets.root";
+TString fileMu = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_mm_2jets.root";
+TString fileEl = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_ee_2jets.root";
+//TString fileMu = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_mm_M2jets.root";
+//TString fileEl = "/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/THYields_ee_M2jets.root";
 
 //*************************************************
 //*************************************************
@@ -115,7 +119,15 @@ void ZbbReweightVarChannel(TString varname, TString channel, TString varSuffixEl
   
   }
   else return;
-  
+
+// Not necessary since Sumw2 is already done for the .root files in THYields.root
+//   h_TT->Sumw2();
+//   h_Zb->Sumw2();
+//   h_Zc->Sumw2();
+//   h_Zl->Sumw2();
+//   h_ZZ->Sumw2();
+//   h_DATA->Sumw2();
+      
   int nbins = h_DATA->GetNbinsX()+1;
   //h_DATA->Draw();
   
@@ -177,12 +189,14 @@ void ZbbReweightVarChannel(TString varname, TString channel, TString varSuffixEl
   std::cout << "  h_ZZ->Integral() = " << h_ZZ->Integral() << std::endl;
   std::cout << "  h_DATA->Integral() = " << h_DATA->Integral() << std::endl << std::endl;
   
-
+  //Notice that before we used to substract also the Zbx contribution
+  // h_DATAminusBkg->Add(h_Zc, -1.) and h_den = h_Zb
   TH1F* h_DATAminusBkg = (TH1F*)h_DATA->Clone();
   h_DATAminusBkg->Add(h_TT, -1.);
-  h_DATAminusBkg->Add(h_Zc, -1.);
   h_DATAminusBkg->Add(h_Zl, -1.);
   h_DATAminusBkg->Add(h_ZZ, -1.);
+  TH1F* h_den = (TH1F*)h_Zb->Clone();
+  h_den->Add(h_Zc);
   
   TH1F* h_Reweight = (TH1F*)h_DATAminusBkg->Clone();
 
@@ -190,10 +204,10 @@ void ZbbReweightVarChannel(TString varname, TString channel, TString varSuffixEl
 
   
   h_Reweight->Write(varname+"_NUM_"+channel);
-  h_Zb->Write(varname+"_DEN_"+channel);
+  h_den->Write(varname+"_DEN_"+channel);
 
   
-  h_Reweight->Divide(h_Zb);
+  h_Reweight->Divide(h_den);
   
    h_Reweight->Write(varname+"_"+channel);
 
@@ -205,6 +219,7 @@ void ZbbReweightVarChannel(TString varname, TString channel, TString varSuffixEl
   delete h_ZZ;
   delete h_DATA;
   delete h_DATAminusBkg;
+  delete h_den;
   delete h_Reweight;
   
 }
