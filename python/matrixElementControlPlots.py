@@ -345,7 +345,7 @@ class MatrixElementControlPlots(BaseControlPlots):
             self.var_jetBtag[0] = dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[0].eta()
-            self.var_jetMetPhi[0] = abs(dijet[0].phi()-event.METNNregression[0].phi())
+            self.var_jetMetPhi[0] = abs(dijet[0].phi()-event.MET[0].phi())
             self.var_jetChf[0] = dijet[0].chargedHadronEnergyFraction()
             self.var_jetPhf[0] = dijet[0].photonEnergyFraction()
             self.var_jetNhf[0] = dijet[0].neutralHadronEnergyFraction()
@@ -355,7 +355,7 @@ class MatrixElementControlPlots(BaseControlPlots):
             self.var_jetVtxPt[0] = jetVtxPt(dijet[0])
             self.var_jetVtx3dL[0] = jetVtx3dL(dijet[0])
             self.var_jetVtx3deL[0] = jetVtx3deL(dijet[0])
-            self.var_met[0] = event.METNNregression[0].pt()
+            self.var_met[0] = event.MET[0].pt()
             self.var_rho[0] = event.rho[0]
             corrDijet0 = self.readerREG.EvaluateRegression("BDT_REG")[0]/jetPt
 #            print "Corr1ME =",corr," evt=",event.event()
@@ -392,7 +392,7 @@ class MatrixElementControlPlots(BaseControlPlots):
             self.var_jetBtag[0] = dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[1].eta()
-            self.var_jetMetPhi[0] = abs(dijet[1].phi()-event.METNNregression[0].phi())
+            self.var_jetMetPhi[0] = abs(dijet[1].phi()-event.MET[0].phi())
             self.var_jetChf[0] = dijet[1].chargedHadronEnergyFraction()
             self.var_jetPhf[0] = dijet[1].photonEnergyFraction()
             self.var_jetNhf[0] = dijet[1].neutralHadronEnergyFraction()
@@ -402,7 +402,7 @@ class MatrixElementControlPlots(BaseControlPlots):
             self.var_jetVtxPt[0] = jetVtxPt(dijet[1])
             self.var_jetVtx3dL[0] = jetVtx3dL(dijet[1])
             self.var_jetVtx3deL[0] = jetVtx3deL(dijet[1])
-            self.var_met[0] = event.METNNregression[0].pt()
+            self.var_met[0] = event.MET[0].pt()
             self.var_rho[0] = event.rho[0]
             corrDijet1 = self.readerREG.EvaluateRegression("BDT_REG")[0]/jetPt
 #            print "Corr2ME =",corr," evt=",event.event()
