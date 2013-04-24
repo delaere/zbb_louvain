@@ -3,7 +3,7 @@
 import ROOT
 import sys
 import os
-from math import sin, sqrt
+from math import sin, sqrt, fabs
 from DataFormats.FWLite import Events, Handle
 from baseControlPlots import BaseControlPlots
 from eventSelection import *
@@ -112,7 +112,7 @@ class MuonsControlPlots(BaseControlPlots):
 
 class ElectronsControlPlots(BaseControlPlots):
     """A class to create control plots for electrons"""
-
+    
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="electrons", dataset=dataset, mode=mode)
@@ -203,6 +203,8 @@ class ElectronsControlPlots(BaseControlPlots):
 
 class JetmetControlPlots(BaseControlPlots):
     """A class to create control plots for jets and MET"""
+
+    masspoints=[110,115,120,125,130,135]#needed for isrjet
 
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
@@ -324,6 +326,23 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("nch","charged multiplicity",50,0,50)
       self.add("cef","charged EmEnergy fraction",101,0,1.01)
       self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
+      self.add("isrjetpt","isr jet Pt",500,15,515)
+      self.add("isrjetetapm","isr jet Eta",50,-2.5,2.5)
+      self.add("isrjetphi","isr jet Phi",25,-4,4)
+      self.add("isrjetmass","isr jet mass",10,0,99999.)
+      self.add("fsrjetDRpt","jet Pt jet closet in DR to b or bbar",500,15,515)
+      self.add("fsrjetDRetapm","jet Eta jet closet in DR to b or bbar",50,-2.5,2.5)
+      self.add("fsrjetDRphi","jet Phi jet closet in DR to b or bbar",25,-4,4)
+      self.add("fsrjetDRmass","jet mass jet closet in DR to b or bbar",10,0,99999.)
+      self.add("fsrDR","closest DR between a third jet and b or bbar",100,0,5)
+      self.add("trijetMdr","invariant mass of b+bbar+fsrjetDR",1000,0,1000)
+      for imass in range(len(self.masspoints)):
+         self.add("fsrjetpt_"+str(self.masspoints[imass]),"fsr jet Pt for mH="+str(self.masspoints[imass])+"GeV",500,15,515)
+         self.add("fsrjetetapm_"+str(self.masspoints[imass]),"fsr jet Eta for mH="+str(self.masspoints[imass])+"GeV",50,-2.5,2.5)
+         self.add("fsrjetphi_"+str(self.masspoints[imass]),"fsr jet Phi for mH="+str(self.masspoints[imass])+"GeV",25,-4,4)
+         self.add("fsrjetmass_"+str(self.masspoints[imass]),"fsr jet mass for mH="+str(self.masspoints[imass])+"GeV",10,0,99999.)
+         self.add("trijetM_"+str(self.masspoints[imass]),"invariant mass of b+bbar+fsrjet (mH="+str(self.masspoints[imass])+"GeV)",1000,0,1000)
+
       # prepare handles
       self.jetHandle = Handle("vector<pat::Jet>")
       self.metHandle = Handle("vector<pat::MET>")
@@ -384,11 +403,19 @@ class JetmetControlPlots(BaseControlPlots):
       result["nch"] = [ ]
       result["cef"] = [ ]
       result["jetid"] = [ ]
+      
+      
       # jets 
       nj  = 0
       nb  = 0
       nbP = 0
-      indexDijet = 0
+      indexDijet = 0#actually not an index but a counter of how many goog b-jets
+      indexFirstJet = -1
+      indexSecondJet = -1
+      b1 = ROOT.TLorentzVector(0,0,0,0)
+      b2 = ROOT.TLorentzVector(0,0,0,0)
+      ijet = 0
+      
       maxbdiscSSVHE = -1
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
@@ -489,6 +516,8 @@ class JetmetControlPlots(BaseControlPlots):
 	  if isBJet(jet,"HE",self.btagging) and ( isZbbSelection or (not isZbbSelection and jet in dijet) ) :
 	    indexDijet += 1
             if indexDijet==1:
+	      indexFirstJet = ijet
+	      b1.SetPtEtaPhiM(jetPt,jet.eta(),jet.phi(),jet.mass())
               result["bjet1pt"] = jetPt
               result["bjet1ptME"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -512,6 +541,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet1beta"] = jet.userFloat("beta")
               result["bjet1betaStar"] = jet.userFloat("betaStar")
             elif indexDijet==2:
+              indexSecondJet = ijet
+	      b2.SetPtEtaPhiM(jetPt,jet.eta(),jet.phi(),jet.mass())
               result["bjet2pt"] = jetPt
               result["bjet2ptME"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -534,6 +565,96 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet2beta"] = jet.userFloat("beta")
               result["bjet2betaStar"] = jet.userFloat("betaStar")
           if isBJet(jet,"HP",self.btagging): nbP += 1
+        ijet+=1
+      
+      #second loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
+      fsrjet={}
+      #init diffmass to huge number
+      diffmass={}
+      trijetM={}
+      for imass in range(len(self.masspoints)):
+        diffmass[self.masspoints[imass]] = 1.0e+18
+	fsrjet[self.masspoints[imass]] = None
+	trijetM[self.masspoints[imass]] = 0.0
+      ijet = 0
+      firstJet = True
+      isrjet = None
+      fsrjetDR  = None#closest jet in DR to b or bbar
+      fsrDR = 999.9
+      fsrjet4vec = ROOT.TLorentzVector(0,0,0,0)
+      if nj > 2 and  indexFirstJet != -1 and indexSecondJet != -1: #if there are 3 good jets and we select 2 b-jets
+        for jet in jets:
+	  
+	
+          if isGoodJet(jet,bestZcandidate) and ijet != indexFirstJet and ijet != indexSecondJet:
+ 	    #print "there is isrjet"
+	    if firstJet == True:
+	      isrjet = jet
+	      firstJet = False
+	      #print "assigning isr jet to jet with pt=", jet.pt()
+	
+      
+            extrajet4vec = ROOT.TLorentzVector(0,0,0,0)
+	    extrajet4vec.SetPtEtaPhiM(self._JECuncertainty.jetPt(jet), jet.eta(), jet.phi(), jet.mass())
+	    
+	    #setting fsr jet based on DR criteria
+	    tmpdr = min(extrajet4vec.DeltaR(b1), extrajet4vec.DeltaR(b2))
+	    if (tmpdr < fsrDR):
+	      fsrDR = tmpdr
+	      fsrjetDR = jet
+	      fsrjet4vec = extrajet4vec
+	    
+	    #setting fsr jet based on closest invariant mass of 3 jet system to a given higgs mass criteria
+	    threejet4vec = b1 + b2 + extrajet4vec
+	    for imass in range(len(self.masspoints)):
+              #print "masspoint[",imass,"]=",self.masspoints[imass]
+	      if fabs(threejet4vec.M() - self.masspoints[imass]) < diffmass[self.masspoints[imass]]:
+	        diffmass[self.masspoints[imass]] = fabs(threejet4vec.M() - self.masspoints[imass])
+	        fsrjet[self.masspoints[imass]] = jet
+		trijetM[self.masspoints[imass]] = threejet4vec.M()
+       	  ijet+=1
+
+      if not isrjet is None:
+        result["isrjetpt"] = self._JECuncertainty.jetPt(isrjet)
+	result["isrjetetapm"] = isrjet.eta()
+	result["isrjetphi"] = isrjet.phi()
+	result["isrjetmass"] = isrjet.mass()
+      else:
+        result["isrjetpt"] = 0
+	result["isrjetetapm"] = 0
+	result["isrjetphi"] = 0
+	result["isrjetmass"] = 0
+     	
+      if not fsrjetDR is None:
+        result["fsrjetDRpt"] = self._JECuncertainty.jetPt(fsrjetDR)
+	result["fsrjetDRetapm"] = fsrjetDR.eta()
+	result["fsrjetDRphi"] = fsrjetDR.phi()
+	result["fsrjetDRmass"] = fsrjetDR.mass()
+	result["fsrDR"] = fsrDR
+	result["trijetMdr"] = (b1 + b2 + fsrjet4vec).M()
+      else:
+        result["fsrjetDRpt"] = 0
+	result["fsrjetDRetapm"] = 0
+	result["fsrjetDRphi"] = 0
+	result["fsrjetDRmass"] = 0
+	result["fsrDR"] = 0
+	result["trijetMdr"] = 0
+     	
+      for imass in range(len(self.masspoints)):
+        if not fsrjet[self.masspoints[imass]] is None:
+          result["fsrjetpt_"+str(self.masspoints[imass])] = self._JECuncertainty.jetPt(fsrjet[self.masspoints[imass]])
+	  result["fsrjetetapm_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].eta()
+	  result["fsrjetphi_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].phi()
+	  result["fsrjetmass_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].mass()
+	  result["trijetM_"+str(self.masspoints[imass])] = trijetM[self.masspoints[imass]]
+        else:
+          result["fsrjetpt_"+str(self.masspoints[imass])] = 0
+	  result["fsrjetetapm_"+str(self.masspoints[imass])] = 0
+	  result["fsrjetphi_"+str(self.masspoints[imass])] = 0
+	  result["fsrjetmass_"+str(self.masspoints[imass])] = 0
+	  result["trijetM_"+str(self.masspoints[imass])] = 0
+	
+	
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP
       result["CSVdiscDisc1"] = maxbdiscCSV
