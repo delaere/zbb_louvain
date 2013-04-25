@@ -2,6 +2,7 @@ import ROOT
 import MonteCarloSelection
 from ObjectSelection import *
 from zbbCommons import zbbsystematics
+from PatAnalysis.CPconfig import configuration
 
 #########################################################################
 #  Standard methods  ####################################################
@@ -110,8 +111,8 @@ def eventCategory(event,btagging="CSV", ZjetFilter="bcl"):
   if event.object().event().eventAuxiliary().isRealData():
     zbbsystematics.JERfactor = 0
     zbbsystematics.JESfactor = 0
-  return eventCategoryChannel(event, muChannel=True, eleChannel=False,btagging=btagging, ZjetFilter=ZjetFilter) + \
-         eventCategoryChannel(event, muChannel=False, eleChannel=True,btagging=btagging, ZjetFilter=ZjetFilter)
+  return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, ZjetFilter=ZjetFilter) + \
+         eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, ZjetFilter=ZjetFilter)
   
 def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFilter="bcl"):
   """Check analysis requirements for various steps."""
@@ -121,15 +122,12 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (MonteCarloSelection.isZcEvent(event) and not MonteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
     if (not MonteCarloSelection.isZcEvent(event) and not MonteCarloSelection.isZbEvent(event)) and not ('l' in ZjetFilter): return [-1]
   output = []
-  if muChannel and eleChannel:
-    bestZcandidate = event.bestZcandidate
-    goodJets = event.goodJets_all
-  elif muChannel:
-    bestZcandidate = event.bestZmumuCandidate
-    goodJets = event.goodJets_mu
-  elif eleChannel:
-    bestZcandidate = event.bestZelelCandidate
-    goodJets = event.goodJets_ele
+  # find the best Z candidate, and make sure it is of the proper type.
+  bestZcandidate = event.bestZcandidate
+  goodJets = event.goodJets_all
+  if bestZcandidate is not None:
+    if (bestZcandidate.daughter(0).isMuon() and not muChannel) or \
+       (bestZcandidate.daughter(0).isElectron() and not eleChannel): bestZcandidate = None
   # output[0]: Trigger
   checkTrigger = event.object().event().eventAuxiliary().isRealData()
   if checkTrigger==False or (event.isMuTriggerOK and muChannel) or (event.isEleTriggerOK and eleChannel):
@@ -178,7 +176,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     output.append(bestZcandidate.pt())
   # output[10] : delta R (bb)
   # output[11] : delta R (bb) via SV
-  dijet = findDijetPair(event, btagging, muChannel, eleChannel)
+  dijet = event.dijet_all
   if dijet[0] is None or dijet[1] is None: 
     output.append(-1)
     output.append(-1)

@@ -7,19 +7,12 @@ from zbbCommons import zbblabel, zbbsystematics
 class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, muChannel=True, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
-      # guess muChannel from dir
-      if dir is None:
-        self.muChannel = None
-      else:
-        self.muChannel = dir.GetPath().find("Muon")!=-1
     
-    def beginJob(self, muChannel=None):
-      if muChannel is not None:
-        self.muChannel = muChannel
+    def beginJob(self):
       # declare histograms
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
@@ -71,7 +64,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       else:
         checkTrigger = False
       ## trigger
-      result["triggerSelection"] = checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
+      result["triggerSelection"] = checkTrigger==False or event.isTriggerOK
       result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       ## Z boson
       result["zmassMu"] = [ ]
@@ -84,7 +77,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       for z in event.Zelel:
         result["zmassEle"].append(z.mass())
         result["zptEle"].append(z.pt())
-      bestZcandidate = event.bestZmumuCandidate if self.muChannel else event.bestZelelCandidate
+      bestZcandidate = event.bestZcandidate
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
@@ -125,7 +118,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       # when two bjets are present, these are the two.
       # later on, variables are refering to b-jets, even if some are light jets
       if not bestZcandidate is None:
-        dijet = event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+        dijet = event.dijet_all
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
           b1 = self._JECuncertainty.jet(dijet[0])

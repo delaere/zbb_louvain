@@ -22,7 +22,8 @@ class configuration:
 
   # my variables
   btagging = "CSV" 
-
+  muChannel = True
+  eleChannel = True
 
   # control plot classes
   controlPlots = [ 

@@ -508,13 +508,13 @@ def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
   if muChannel and eleChannel:
-    goodJets = event.goodJets_common
+    goodJets = event.goodJets_all
   elif muChannel:
     goodJets = event.goodJets_mu
   elif eleChannel:
     goodJets = event.goodJets_ele
   else:
-    goodJets = event.goodJets
+    goodJets = event.goodJets_none
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
