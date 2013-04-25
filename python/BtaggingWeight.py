@@ -33,18 +33,17 @@ class BtaggingWeight:
 
   def weight(self,event, category=None, forceMode=None):
     """btag eff weight"""
+    # set the mode
+    if forceMode is None and  category is not None:
+      Bmode=self.btaggingWeightMode(categoryName(category))
+    elif forceMode is not None: 
+      Bmode=forceMode
+    else:
+      Bmode="None"
     # for data, immediately return 1.
-    if forceMode is None:
-      if category is None:
-        catname = ""
-      else:
-        catname = categoryName(category)
-    else: catname = forceMode
-    Bmode=self.btaggingWeightMode(catname)
     if event.object().event().eventAuxiliary().isRealData() or Bmode=="None":
       return 1.
-    if not Bmode is None: 
-      self.setMode(Bmode)
+    self.setMode(Bmode)
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
@@ -76,7 +75,8 @@ class BtaggingWeight:
     return max(self.getWeight(self.myJetSet,ntagsHE,ntagsHP),0.)
 
   def getWeight(self,jetset, ntags1, ntags2):
-    return self.engine.weight2(jetset, ntags1, ntags2)
+    result = self.engine.weight2(jetset, ntags1, ntags2)
+    return result
 
   def btaggingWeightMode(self,catName):
     if catName.find("(HEHE") != -1:
