@@ -45,13 +45,6 @@ class BtaggingWeight:
       return 1.
     if not Bmode is None: 
       self.setMode(Bmode)
-    # catname -> muChannel, eleChannel, or both (not none)
-    if catname.find("Electron")==0 : 
-      theGoodJets = event.goodJets_ele
-    elif catname.find("Muon")==0 :
-      theGoodJets = event.goodJets_mu
-    else:
-      theGoodJets = event.goodJets_all
     # initialize counters
     self.myJetSet.reset()
     ntagsHE = 0
@@ -59,6 +52,7 @@ class BtaggingWeight:
     ntagsNoFlvavorHE = 0
     ntagsNoFlvavorHP = 0
     # retrieve the jets
+    theGoodJets = event.goodJets_all
     for index,jet in enumerate(event.jets):
       # apply selection
       if not theGoodJets[index]: continue
