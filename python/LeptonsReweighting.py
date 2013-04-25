@@ -429,20 +429,12 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         if forceMode is None:
-           if category is not None:
-             catname = categoryName(category)
-             muChannel = catname.find("Electron")==-1
-             bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
-           else:
-             bestZcandidate = fwevent.bestZcandidate
+         if forceMode == "Muon":
+           bestZcandidate = fwevent.bestZmumuCandidate
+         elif forceMode == "Electron":
+           bestZcandidate = fwevent.bestZelelCandidate
          else:
-           if forceMode == "Muon":
-             bestZcandidate = fwevent.bestZmumuCandidate
-           elif forceMode == "Electron":
-             bestZcandidate = fwevent.bestZelelCandidate
-           else:
-             bestZcandidate = fwevent.bestZcandidate
+           bestZcandidate = fwevent.bestZcandidate
          if not bestZcandidate is None:
            if bestZcandidate.daughter(0).isMuon():
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
