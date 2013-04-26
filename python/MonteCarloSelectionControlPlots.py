@@ -1,5 +1,5 @@
 from PatAnalysis.BaseControlPlots import BaseControlPlots
-from MonteCarloSelection import isZbEvent, isZcEvent, isZlEvent
+from MonteCarloSelection import isZbbEvent, isZbcEvent, isZblEvent, isZccEvent, isZclEvent, isZlEvent
 
 class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
