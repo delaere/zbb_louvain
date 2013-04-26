@@ -1,7 +1,5 @@
-import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from MonteCarloSelection import isZbEvent, isZcEvent, isZlEvent
-from zbbCommons import zbblabel
 
 class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
@@ -47,10 +45,12 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       self.bjet = 0
       self.ljet = 0
       self.i = 0
+      self._ran = False
 
     def process(self,event):
       """monteCarloSelectionControlPlots"""
       result = { }
+      self._ran = True
      
       #Fill some gen information for the status 3 leptons and b, and bbar quarks
       nLepPos = 0
@@ -165,7 +165,8 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
     def endJob(self):
       BaseControlPlots.endJob(self)
-      print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
+      if self._ran:
+        print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
 
 if __name__=="__main__":
   import sys

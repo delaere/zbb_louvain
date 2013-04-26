@@ -197,15 +197,8 @@ class JetmetControlPlots(BaseControlPlots):
 
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
-      # guess muChannel from dir
-      if dir is None:
-        self.muChannel = None
-      else:
-        self.muChannel = dir.GetPath().find("Muon")!=-1
     
-    def beginJob(self, btagging="CSV", muChannel=None):
-      if muChannel is not None:
-        self.muChannel = muChannel
+    def beginJob(self, btagging="CSV"):
       self.btagging=btagging
       # declare histograms
       self.add("SSVHEdisc","SSVHEdisc",200,0,10)
@@ -399,17 +392,11 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      if self.muChannel is None:
-        dijet = event.dijet_all
-      else:
-        dijet =  event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+      dijet = event.dijet_all
+      goodJets = event.goodJets_all
       for index,jet in enumerate(event.jets):
         #jetPt = jet.pt()
         jetPt = self._JECuncertainty.jetPt(jet)
-        if self.muChannel is None:
-          goodJets = event.goodJets_all
-        else:
-          goodJets = event.goodJets_mu if self.muChannel else event.goodJets_ele
         if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
           result["jetpt"].append(jetPt)
