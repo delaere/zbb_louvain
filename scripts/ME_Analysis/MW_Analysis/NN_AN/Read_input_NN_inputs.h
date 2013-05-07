@@ -315,7 +315,9 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
 	if(var->DY_flag[i]==1){entryy2+=1;}							
 	if(var->DY_flag[i]==2){entryy3+=1;}							
       }												
-      if(typ==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
+      
+      //If you want to train only for Zbb (instead of DY inclusive) events you could do something like
+      //if(typ==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
       
     }   
 
