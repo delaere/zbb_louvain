@@ -98,7 +98,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;osdy0<<Dy0;osdy1<<Dy1;osdy2<<Dy2;
 	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();TString normdyflag0= osdy0.str();TString normdyflag1= osdy1.str();TString normdyflag2= osdy2.str();
 
-	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
+	cout<<"DY="<<Dy<<" TT="<<Tt<<" ZZ="<<Zz<<" Higgs="<<Hi<<endl;
 	
 	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","(0.9*(type2==1)/3*((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
 
