@@ -1,6 +1,6 @@
 
 # here goes your shell script
-executable     = NN_June_HVSB.sh
+executable     = NN_HvsBkg.sh
 
 # here you specify where to put .log, .out and .err files
 output         = condor/condor.out.$(Cluster).$(Process)
