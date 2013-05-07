@@ -100,7 +100,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 
 	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 	
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","((type2==1)/3*((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==4)*(1.25/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","(0.9*(type2==1)/3*((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
 
 	mlp->Train(iterations, "text,graph,update=2");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
@@ -125,14 +125,16 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	// This will give approx. the same result as DrawNetwork.
 	// All entries are used, while DrawNetwork focuses on 
 	// the test sample. Also the xaxis range is manually set.
-	TH1F *zbbh = new TH1F("zbbh", "NN output", 25, -.5, 1.5);
-	TH1F *zzh = new TH1F("zzh", "NN output", 25, -.5, 1.5);
-	TH1F *zhh = new TH1F("zhhh", "NN output", 25, -.5, 1.5);	
-	TH1F *tth = new TH1F("tth", "NN output", 25, -.5, 1.5);
+	
+	//we used to use 25 bins between -0.5 and 1.5 for the non-constrained (in [0-1]) performance plots
+	TH1F *zbbh = new TH1F("zbbh", "NN output", 28, -.2, 1.2);
+	TH1F *zzh = new TH1F("zzh", "NN output", 28, -.2, 1.2);
+	TH1F *zhh = new TH1F("zhhh", "NN output", 28, -.2, 1.2);	
+	TH1F *tth = new TH1F("tth", "NN output", 28, -.2, 1.2);
 
 	// histo of efficiency
-	TH1F *bg_eff = new TH1F("bgh", "NN output", 25, -.5, 1.5);
-	TH1F *sig_eff = new TH1F("sigh", "NN output", 25, -.5, 1.5);
+	TH1F *bg_eff = new TH1F("bgh", "NN output", 28, -.2, 1.2);
+	TH1F *sig_eff = new TH1F("sigh", "NN output", 28, -.2, 1.2);
 
 	zbbh->SetDirectory(0);
 	zzh->SetDirectory(0);
