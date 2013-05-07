@@ -108,6 +108,15 @@ double gg_weight;
 	int dyflag;	
 };
 
+double ptj1_cut = 20;
+double ptj2_cut = 20;
+double ptz_cut = -1.0;
+
+double setPtJ1Cut(double x) {ptj1_cut = x;}
+double setPtJ2Cut(double x) {ptj2_cut = x;}
+double setPtZCut(double x) {ptz_cut = x;}
+
+
 
 void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2, int multi)
 {
@@ -174,7 +183,9 @@ tree->Add(rootFile);
  //  tree->SetBranchAddress("Flavor_j1",&Flavor_j1);
  //}
 
-
+ cout << "ptj1_cut=" << ptj1_cut << " ptj2_cut=" << ptj2_cut << " ptz_cut=" << ptz_cut << endl;  
+ 
+ 
  int entryy=0, entryy1=0, entryy2=0, entryy3=0;
  bool evt[N1];
  for (int i=0;i<N1; ++i){	
@@ -272,13 +283,14 @@ tree->Add(rootFile);
    var->multi[i]=sim->Multi;
    var->DY_flag[i]=DY_flag_tree;
    sim->dyflag=var->DY_flag[i];
-   if(fill==1 && sig2==0 && var->DY_flag[i]!=0 && var->DY_flag[i]!=2){
+   if(fill==1 && sig2==0){
    	simu->Fill();entryy+=1;
 	if(var->DY_flag[i]==0){entryy1+=1;}
 	if(var->DY_flag[i]==1){entryy2+=1;}
 	if(var->DY_flag[i]==2){entryy3+=1;}
    }
-   if(fill==1 && sig2==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
+   //For the moment we only accept the option sig2=0.
+   //if(fill==1 && sig2==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
    //if(fill==1 && sig2==2 && (abs(Flavor_j2)!=5 || abs(Flavor_j1)!=5)){simu->Fill();entryy+=1;}
    }   
  }

@@ -96,7 +96,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
         cout << "(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+" + (dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))"<<endl;
 
 	if(tag==1){
-	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)*((dyflag==1)/"+normdyflag1+"))",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
 	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	
 	}
 	if(tag==2){
