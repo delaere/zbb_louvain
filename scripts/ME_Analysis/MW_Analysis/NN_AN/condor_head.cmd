@@ -13,7 +13,7 @@ log            = condor/condor.log.$(Cluster).$(Process)
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
 
-transfer_input_files=include.h,Read_input.h,Read_input_NN_inputs.h,Generic_NN_higgs_test.C,Generic_NN_higgs_NN_inputs_m.C,ComputeGraphFromTrainTxt.C
+transfer_input_files=include.h,Read_input.h,Generic_NN_higgs_test.C,ComputeGraphFromTrainTxt.C
 
 # the following two parameters are required for the ingrid cluster
 universe       = vanilla
