@@ -48,6 +48,25 @@ float btagPerfPOGFormulas::SFb_error_CSVM[] = {
   0.0717567,
 };
 
+float btagPerfPOGFormulas::SFb_error_CSVT[] = {
+  0.0567059,
+  0.0266907,
+  0.0263491,
+  0.0342831,
+  0.0303327,
+  0.024608,
+  0.0333786,
+  0.0317642,
+  0.031102,
+  0.0295603,
+  0.0474663,
+  0.0503182,
+  0.0580424,
+  0.0575776,
+  0.0769779,
+  0.0898199,
+};
+
 
 btagPerfPOGFormulas::btagPerfPOGFormulas() {
   // just a sigmoid. Used to parametrize the efficiencies
