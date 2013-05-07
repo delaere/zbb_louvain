@@ -22,8 +22,28 @@ class nn_vars {
   double *hzbb;
   double *htt;
   double *hzz;
+  double *tagj1;
+  double *tagj2;
+  int *flavor_j1;
+  int *flavor_j2;
+  int *evt_nbr;
+  double *trijetM;
+  double *DR_fsr;
+  double *trijetMdr;
+  double *fsr_DR;  
+  double *bb_dr;
+  double *Leading_b;
+  double *subLeading_b;
+  int *DY_flag;
   nn_vars(int size) {
     N = size;
+    DY_flag= new int[size];
+    subLeading_b = new double[size];    
+    Leading_b = new double[size];
+    bb_dr=new double[size];
+    evt_nbr = new int[4];
+    tagj1 = new double[size];
+    tagj2 = new double[size];
     gg = new double[size];
     qq = new double[size];
     tt = new double[size];
@@ -44,7 +64,13 @@ class nn_vars {
     hzz = new double[size];
     Metsig = new double[size];
     multi = new int[size];
-  }
+    flavor_j1 = new int[size];
+    flavor_j2 = new int[size];
+    trijetM = new double[size];
+    DR_fsr = new double[size];
+    trijetMdr = new double[size];
+    fsr_DR = new double[size];    
+    }
 };
 
 
@@ -66,14 +92,24 @@ double gg_weight;
 	double ptZ,ptbb;
 	int type1;
 	int type2;
+	double btag_prod;
 	double HvsZbb;
 	double HvsTT;
 	double HvsZZ;
 	int Multi;
+	double Mbbj;
+	double DRFSR;
+	double Mbbjdr;
+	double FSRDR;
+	double bbDR;
+	double leadingb;
+	int Fj1;
+	int Fj2;
+	int dyflag;	
 };
 
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2)
+void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2, int multi)
 {
 
 // input file : read ttree
@@ -81,21 +117,26 @@ TChain *chain;
 TChain *tree = new TChain("tree2");
 tree->Reset();
 tree->Add(rootFile);
-
+ double DR_jets;
  double Eta_j1,Eta_j2,Phi_j1,Phi_j2,MeTPhi,MeT,MeTsig;
-double Pt_lepplus,Eta_lepplus,Phi_lepplus,Pt_lepminus,Eta_lepminus,Phi_lepminus;
-double Pt_lep2plus,Eta_lep2plus,Phi_lep2plus,Pt_lep2minus,Eta_lep2minus,Phi_lep2minus;
-double Ej1,Ej2,Ptj1,Ptj2;
+ double Pt_lepplus,Eta_lepplus,Phi_lepplus,Pt_lepminus,Eta_lepminus,Phi_lepminus;
+ double Pt_lep2plus,Eta_lep2plus,Phi_lep2plus,Pt_lep2minus,Eta_lep2minus,Phi_lep2minus;
+ double Ej1,Ej2,Ptj1,Ptj2;
+ double btagj1,btagj2;
  double Wgg,Wqq,Wtt,Wzz,Wzz3,Whi,Whi3;
+ double mbbj,drfsr,mbbjdr,fsrdr;
+ int Flavor_j1,Flavor_j2;
  int multiplicity;
+ int DY_flag_tree;
  tree->SetBranchAddress("multiplicity",&multiplicity);
+ tree->SetBranchAddress("DY_flag",&DY_flag_tree);
  tree->SetBranchAddress("Wgg",&Wgg);
  tree->SetBranchAddress("Wqq",&Wqq);
  tree->SetBranchAddress("Wtt",&Wtt);
  tree->SetBranchAddress("Wzz0",&Wzz);
  tree->SetBranchAddress("Wzz3",&Wzz3);
- tree->SetBranchAddress("Whi0",&Whi);
- tree->SetBranchAddress("Whi3",&Whi3);
+ tree->SetBranchAddress("Whi0_125",&Whi);
+ tree->SetBranchAddress("Whi3_125",&Whi3);
  tree->SetBranchAddress("MeTPhi",&MeTPhi);
  tree->SetBranchAddress("MeT",&MeT);
  tree->SetBranchAddress("Met_signi",&MeTsig);
@@ -115,15 +156,29 @@ double Ej1,Ej2,Ptj1,Ptj2;
  tree->SetBranchAddress("Phi_j2",&Phi_j2);
  tree->SetBranchAddress("Eta_j1",&Eta_j1);
  tree->SetBranchAddress("Phi_j1",&Phi_j1);
+ tree->SetBranchAddress("DR_jets",&DR_jets);
  tree->SetBranchAddress("E_j2",&Ej2);
  tree->SetBranchAddress("Pt_j2",&Ptj2);
  tree->SetBranchAddress("E_j1",&Ej1);
  tree->SetBranchAddress("Pt_j1",&Ptj1);
+ tree->SetBranchAddress("btagj1",&btagj1);
+ tree->SetBranchAddress("btagj2",&btagj2);
+ tree->SetBranchAddress("trijetM_125",&mbbj);
+ tree->SetBranchAddress("DRfsr",&drfsr); 
+ tree->SetBranchAddress("trijetMdr",&mbbjdr);
+ tree->SetBranchAddress("fsrDR",&fsrdr); 
+ tree->SetBranchAddress("Flavor_j1",&Flavor_j1); 
+ tree->SetBranchAddress("Flavor_j2",&Flavor_j2);
+ //if(sig2==1 || sig2==2){
+ //  tree->SetBranchAddress("Flavor_j2",&Flavor_j2);
+ //  tree->SetBranchAddress("Flavor_j1",&Flavor_j1);
+ //}
 
 
-  double entryy=0.0;
-
+ int entryy=0, entryy1=0, entryy2=0, entryy3=0;
+ bool evt[N1];
  for (int i=0;i<N1; ++i){	
+   evt[i]=false;
    tree->GetEntry(i); // read tree Zbb 
    double dphi1 = MeTPhi-Phi_j1;
    double dphi2 = MeTPhi-Phi_j2;
@@ -139,19 +194,32 @@ double Ej1,Ej2,Ptj1,Ptj2;
    b1.SetPtEtaPhiE(Ptj1,Eta_j1,Phi_j1,Ej1);
    b2.SetPtEtaPhiE(Ptj2,Eta_j2,Phi_j2,Ej2);
 
-   if(MeTsig<10. && ((l1+l2).M())>76. && ((l1+l2).M())<106.){
+   double tagmax=max(btagj1,btagj2);
+   double tagmin=min(btagj1,btagj2);
+   double bmax=max(Ptj1,Ptj2);
+   double bmin=min(Ptj1,Ptj2);
+   if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity==2&&(b1+b2).M()>80 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multi==0){evt[i]=true;}
+   if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity>2&&(b1+b2).M()>50 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multi==1){evt[i]=true;}
 
+   if(evt[i]==true){
+   
    sim->gg_weight=Wgg;
    sim->qq_weight=Wqq;
-   //if(sig==0){sim->gg_weight=Wgg;}
-   //if(sig==0){sim->qq_weight=Wqq;}
-   //if(sig==1){sim->qq_weight=Wgg;}
-   //if(sig==1){sim->gg_weight=Wqq;}
    sim->tt_weight=Wtt;
    sim->zz_weight=Wzz;
    sim->zz3_weight=Wzz3;
    sim->hi_weight=Whi;
    sim->hi3_weight=Whi3;
+   sim->bbDR=DR_jets;
+   var->bb_dr[i]=DR_jets;
+   sim->Mbbj=mbbj;
+   sim->DRFSR=drfsr;
+   var->DR_fsr[i]=drfsr;
+   var->trijetM[i]=mbbj;
+   sim->Mbbjdr=mbbjdr;
+   sim->FSRDR=fsrdr;
+   var->fsr_DR[i]=fsrdr;
+   var->trijetMdr[i]=mbbjdr;   
    if(sim->gg_weight>300.0){sim->gg_weight=666;}
    if(sim->qq_weight>300.0){sim->qq_weight=666;}
    if(sim->tt_weight>300.0){sim->tt_weight=666;}
@@ -159,6 +227,12 @@ double Ej1,Ej2,Ptj1,Ptj2;
    if(sim->zz3_weight>300.0){sim->zz3_weight=666;}
    if(sim->hi_weight>300.0){sim->hi_weight=666;}
    if(sim->hi3_weight>300.0){sim->hi3_weight=666;}
+   //var->tagj1[i]=btagj1;
+   //var->tagj2[i]=btagj2;
+   var->flavor_j1[i]=Flavor_j1;
+   var->flavor_j2[i]=Flavor_j2;
+   sim->Fj1=fabs(Flavor_j1);
+   sim->Fj2=fabs(Flavor_j2);   
    var->gg[i]=sim->gg_weight;
    var->qq[i]=sim->qq_weight;
    var->zz[i]=sim->zz_weight;
@@ -168,6 +242,7 @@ double Ej1,Ej2,Ptj1,Ptj2;
    var->tt[i]=sim->tt_weight;
    sim->type1=sig1;
    sim->type2=sig2;
+   //sim->btag_prod=btagj1*btagj2;
    sim->deta = 10./(pow((pow(((l1+l2).M()),2) - pow(91.,2)),2)+10);//fabs(Eta_j1-Eta_j2);
    var->deta[i]=10./(pow((pow(((l1+l2).M()),2) - pow(91.,2)),2)+10);//fabs(Eta_j1-Eta_j2);
    sim-> ptZ=(l1+l2).Pt();
@@ -183,14 +258,34 @@ double Ej1,Ej2,Ptj1,Ptj2;
    sim->metsig=MeTsig;   
    sim->Met=MeT;
    var->met[i]=sim->Met;
-   if(multiplicity>2){sim->Multi=1.;}
-   if(multiplicity<3){sim->Multi=0.;}
+   if(Ptj1>Ptj2){var->Leading_b[i]=Ptj1;}
+   if(Ptj1>Ptj2){sim->leadingb=Ptj1;}
+   if(Ptj2>Ptj1){var->Leading_b[i]=Ptj2;}
+   if(Ptj2>Ptj1){sim->leadingb=Ptj2;} 
+   if(Ptj1>Ptj2){var->subLeading_b[i]=Ptj2;}   
+   if(Ptj2>Ptj1){var->subLeading_b[i]=Ptj1;}    
+   if(Ptj2>Ptj1){var->tagj1[i]=btagj2;var->tagj2[i]=btagj1;}
+   if(Ptj1>Ptj2){var->tagj1[i]=btagj1;var->tagj2[i]=btagj2;} 
+   if(multiplicity>2){sim->Multi=1;}
+   if(multiplicity<3){sim->Multi=0;}
+   sim->btag_prod=btagj1*btagj2;
    var->multi[i]=sim->Multi;
-   //if(fill==1){simu->Fill();}
-   //if(ptbb >100. && ptZ>100.){simu->Fill();}  
-   if(fill==1){simu->Fill();entryy+=1;}  
+   var->DY_flag[i]=DY_flag_tree;
+   sim->dyflag=var->DY_flag[i];
+   if(fill==1 && sig2==0 && var->DY_flag[i]!=0 && var->DY_flag[i]!=2){
+   	simu->Fill();entryy+=1;
+	if(var->DY_flag[i]==0){entryy1+=1;}
+	if(var->DY_flag[i]==1){entryy2+=1;}
+	if(var->DY_flag[i]==2){entryy3+=1;}
+   }
+   if(fill==1 && sig2==1 && abs(Flavor_j2)==5 && abs(Flavor_j1)==5){simu->Fill();entryy+=1;}     
+   //if(fill==1 && sig2==2 && (abs(Flavor_j2)!=5 || abs(Flavor_j1)!=5)){simu->Fill();entryy+=1;}
    }   
  }
-cout<<entryy<<endl;
+ var->evt_nbr[1]=entryy1;
+ var->evt_nbr[2]=entryy2;
+ var->evt_nbr[3]=entryy3;
  
+ var->evt_nbr[0]=entryy;
+ cout<<"outtt "<<entryy<<endl;
 }

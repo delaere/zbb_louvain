@@ -13,18 +13,30 @@ log            = condor/condor.log.$(Cluster).$(Process)
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
 
+transfer_input_files=include.h,Read_input.h,Read_input_NN_inputs_m.h,Generic_NN_higgs_test.C,Generic_NN_higgs_NN_inputs_m.C,ComputeGraphFromTrainTxt.C
+
 # the following two parameters are required for the ingrid cluster
 universe       = vanilla
-#requirements   = (CMSFARM =?= TRUE)
+requirements   = (CMSFARM =?= TRUE)
 # for Madgraph users replace the previous line by:
-requirements   = (MADGRAPH =?= TRUE)
+#requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = 3 2 comb 130
+arguments = DY ML comb 125 multi2 4:3 800
 queue
 
-arguments = 2 2 comb 130
+arguments = DY ML comb 125 multiPlus2 7:4 5000
 queue
 
-arguments = 1 2 comb 130
+arguments = TT ML comb 125 multi2 4:3 2000
 queue
+
+arguments = TT ML comb 125 multiPlus2 7:4 5000
+queue
+
+arguments = ZZ ML comb 125 multi2 4:3 2000
+queue
+
+arguments = ZZ ML comb 125 multiPlus2 4:3 1000
+queue
+

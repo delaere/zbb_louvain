@@ -7,14 +7,16 @@
  *
  */
 
-#include "/home/fynu/arnaudp/scratch/MW_5/MW_Analysis/NN_AN/Template/include.h"
-#include "/home/fynu/arnaudp/scratch/MW_5/MW_Analysis/NN_AN/Template/Read_input_m.h"
+#include "include.h"
+#include "Read_input.h"
 
-void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag, int cut,TString NNStruct,int iterations)
+void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag,TString NNStruct,int iterations, int multiplicity)
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
 		gSystem->Load("libMLP");
 	}
+	
+	std::cout << "[Neural_net_E] tag=" << tag << " NNStruct=" << NNStruct << " iterations=" << iterations << " multiplicity=" << multiplicity << std::endl;
 
 	// output file : control of the NN
         TFile file("NN_Higgs_vs_"+name+".root","RECREATE");
@@ -38,9 +40,18 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	simu->Branch("Met",&sim->Met,"Met/D");
 	simu->Branch("Mll",&sim->Mll,"Mll/D");
 	simu->Branch("Mbb",&sim->Mbb,"Mbb/D");
-
+	simu->Branch("bbDR",&sim->bbDR,"bbDR/D");
+	simu->Branch("Mbbj",&sim->Mbbj,"Mbbj/D");
+	simu->Branch("DRFSR",&sim->DRFSR,"DRFSR/D");
+	simu->Branch("Mbbjdr",&sim->Mbbjdr,"Mbbjdr/D");
+	simu->Branch("FSRDR",&sim->FSRDR,"FSRDR/D");	
+	simu->Branch("leadingb",&sim->leadingb,"leadingb/D");
+	simu->Branch("Fj1",&sim->Fj1,"Fj1/I");
+	simu->Branch("Fj2",&sim->Fj2,"Fj2/I");
+	simu->Branch("dyflag",&sim->dyflag,"dyflag/I");	
+	
 	// open file to get nbres of entries
-	int N1,N2, N3,N4;
+	int N1,N2,N3,N4;
 	TChain *treetmp =new TChain("tree2");
 	treetmp->Reset();
 	treetmp->Add(dy);
@@ -57,13 +68,13 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	delete treetmp;
 
 	nn_vars *var1 = new nn_vars(N1);
-	if(tag==1){Input(dy,N1,var1,sim,simu,1,0,0,cut);}
+	if(tag==1){Input(dy,N1,var1,sim,simu,1,0,0,multiplicity);}
 	nn_vars *var2 = new nn_vars(N2);
-	if(tag==2){Input(tt,N2,var2,sim,simu,1,0,0,cut);}
+	if(tag==2){Input(tt,N2,var2,sim,simu,1,0,0,multiplicity);}
 	nn_vars *var3 = new nn_vars(N3);
-	if(tag==3){Input(zz,N3,var3,sim,simu,1,0,0,cut);}
+	if(tag==3){Input(zz,N3,var3,sim,simu,1,0,0,multiplicity);}
 	nn_vars *var4 = new nn_vars(N4);
-	Input(zh,N4,var4,sim,simu,1,1,0,cut);
+	Input(zh,N4,var4,sim,simu,1,1,0,multiplicity);
 
 	simu->Write();
 	// Tree SIMU for NN training filled
@@ -71,15 +82,27 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// Declaration of multiplayer perceptron object. input variable = branch of simu tree. Not all at the same time. To add a branch as input add @branchname. then : intermediate layer node, put : to add new layer. Ended by : @type mean that outup is 1 or 0. Then we specify the number of entries for training and test samples.
 	TMultiLayerPerceptron *mlp;
 	int Dy=var1->evt_nbr[0];
-	int Tt=var2->evt_nbr[0];
+	int Dy0=var1->evt_nbr[1];
+	int Dy1=var1->evt_nbr[2];
+	int Dy2=var1->evt_nbr[3];
+	cout<<Dy<<endl;
+        int Tt=var2->evt_nbr[0];
 	int Zz=var3->evt_nbr[0];
 	int Hi=var4->evt_nbr[0];
-	ostringstream osdy,ostt,oszz,oszh;
-	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;
-	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();
+	ostringstream osdy,ostt,oszz,oszh,osdy0,osdy1,osdy2;
+	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;osdy0<<Dy0;osdy1<<Dy1;osdy2<<Dy2;
+	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();TString normdyflag0= osdy0.str();TString normdyflag1= osdy1.str();TString normdyflag2= osdy2.str();
 
-	if(tag==1){mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	if(tag==2){mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+        cout << "(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+" + (dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))"<<endl;
+
+	if(tag==1){
+	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)*((dyflag==1)/"+normdyflag1+"))",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	
+	}
+	if(tag==2){
+	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
+	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
+	}
 	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
 	
 	mlp->Train(iterations, "text,graph,update=2");
@@ -122,8 +145,8 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	zzh->SetDirectory(0);
 	zhh->SetDirectory(0);
 	tth->SetDirectory(0);
-	Double_t params[3];
-	if(tag==1 || tag==3){Double_t params[4];}// to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
+	Double_t params[7];
+	//if(tag==2){Double_t params[3];}// to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
 	int zbb=0;
 
 	//-------------------------------------------------------------------------
@@ -131,35 +154,58 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_DY[N1];
 	for (int i=0;i<N1; ++i) {
 	evt_DY[i]=false;
-	  if(cut==2 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){evt_DY[i]=true;}
-	  if(cut==1 && var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 ){evt_DY[i]=true;}
-	  if(cut==0){evt_DY[i]=true;}
-	  if(evt_DY[i]==true){ params[0] = var1->gg[i];params[1] = var1->qq[i];params[2] = var1->hi[i];params[3] = var1->hi3[i];
-	  zbbh->Fill(mlp->Evaluate(0, params));
+	  if(var1->DY_flag[i]==1&&var1->Leading_b[i]>20&&var1->subLeading_b[i]>20&&var1->Mll[i]>76.&&var1->Mll[i]<106.&&var1->Mbb[i]<150.){
+	    if (multiplicity==1 && var1->multi[i]==1&&var1->Mbb[i]>50.)evt_DY[i]=true;
+	    else if (multiplicity==0 && var1->multi[i]==0&&var1->Mbb[i]>80.)evt_DY[i]=true;
 	  }
+	  if(evt_DY[i]==true){ 
+	    if (multiplicity==0)params[0] = var1->gg[i];params[1]=var1->qq[i];params[2]=var1->hi[i];params[3]=var1->hi3[i];
+	    if (multiplicity==1)params[0] = var1->gg[i];params[1]=var1->qq[i];params[2]=var1->hi[i];params[3]=var1->hi3[i];params[4]=var1->trijetMdr[i];params[5]=var1->bb_dr[i];params[6]=var1->fsr_DR[i];
+
+	    zbbh->Fill(mlp->Evaluate(0, params));
+
+	  }
+// 	  cout << "zbbh: " << mlp->Evaluate(0, params)
+// 	                   << " for var1->DY_flag[i]= " << var1->DY_flag[i]
+// 	                   << " for var1->Leading_b[i]= " << var1->Leading_b[i]
+// 	                   << " for var1->subLeading_b[i]= " << var1->subLeading_b[i]
+// 	                   << " for var1->Mll[i]= " << var1->Mll[i]
+// 	                   << " for var1->Mbb[i]= " << var1->Mbb[i] << endl;
+	  
+	  
+	  //if(var1->ptZ[i]<100){zbbh->Fill(mlp->Evaluate(0, params));}
+	  //if(var1->ptZ[i]>100){zbbh->Fill(mlp->Evaluate(0, params),(15.85/50));}	  
+	  
 	}
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	bool evt_TT[N2];
 	for (int i=0;i<N2; ++i) {
 	evt_TT[i]=false;
-	  if(cut==2 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){evt_TT[i]=true;}
-	  if(cut==1 && var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 ){evt_TT[i]=true;}
-	  if(cut==0){evt_TT[i]=true;}
-	  if(evt_TT[i]==true){ params[0] = var2->tt[i];params[1] = var2->hi[i];params[2] = var2->hi3[i];
-	  tth->Fill(mlp->Evaluate(0, params));
+	  if(var2->Leading_b[i]>20&&var2->subLeading_b[i]>20&&var2->Mll[i]>76.&&var2->Mll[i]<106.&&var2->Mbb[i]<150.){
+	    if (multiplicity==1 && var2->multi[i]==1&&var2->Mbb[i]>50.)evt_TT[i]=true;
+	    else if (multiplicity==0 && var2->multi[i]==0&&var2->Mbb[i]>80.)evt_TT[i]=true;
 	  }
+	  if(evt_TT[i]==true){ 
+	    if (multiplicity==0)params[0] = var2->tt[i];params[1]=var2->hi[i];params[2]=var2->hi3[i];
+	    if (multiplicity==1)params[0] = var2->tt[i];params[1]=var2->hi[i];params[2]=var2->hi3[i];params[3]=var2->trijetMdr[i];params[4]=var2->bb_dr[i];params[5]=var2->fsr_DR[i];
+            tth->Fill(mlp->Evaluate(0, params));
+	  }
+
+	  
 	}
         //-------------------------------------------------------------------------        
 	// FOR ZZ
 	bool evt_ZZ[N3];
         for (int i=0;i<N3; ++i) {
 	evt_ZZ[i]=false;
-	  if(cut==2 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>76. && var3-> Mll[i]<106.){evt_ZZ[i]=true;}
-	  if(cut==1 && var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 ){evt_ZZ[i]=true;}
-	  if(cut==0){evt_ZZ[i]=true;}                                                                                                                                                     
-	  if(evt_ZZ[i]==true){params[0] = var3->zz[i];params[1] = var3->zz3[i];params[2] = var3->hi[i];params[3] = var3->hi3[i];
-	  zzh->Fill(mlp->Evaluate(0,params));
+	  if(var3->Leading_b[i]>20&&var3->subLeading_b[i]>20&&var3->Mll[i]>76.&&var3->Mll[i]<106.&&var3->Mbb[i]<150.){
+	    if (multiplicity==1 && var3->multi[i]==1&&var3->Mbb[i]>50.)evt_ZZ[i]=true;
+	    else if (multiplicity==0 && var3->multi[i]==0&&var3->Mbb[i]>80.)evt_ZZ[i]=true;
+	  }	
+	  if(evt_ZZ[i]==true){
+	    params[0] = var3->zz[i];params[1] = var3->zz3[i];params[2] = var3->hi[i];params[3] = var3->hi3[i];
+	    zzh->Fill(mlp->Evaluate(0,params));
 	  }
         }
         //-------------------------------------------------------------------------
@@ -167,14 +213,21 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bool evt_ZH[N4];
         for (int i=0;i<N4; ++i) {
 	evt_ZH[i]=false;
-	  if(cut==2 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>76. && var4-> Mll[i]<106.){evt_ZH[i]=true;}
-	  if(cut==1 && var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 ){evt_ZH[i]=true;}
-	  if(cut==0){evt_ZH[i]=true;}  
+	  if(var4->Leading_b[i]>20&&var4->subLeading_b[i]>20&&var4->Mll[i]>76.&&var4->Mll[i]<106.&&var4->Mbb[i]<150.){
+	    if (multiplicity==1 && var4->multi[i]==1&&var4->Mbb[i]>50.)evt_ZH[i]=true;
+	    else if (multiplicity==0 && var4->multi[i]==0&&var4->Mbb[i]>80.)evt_ZH[i]=true;
+	  }	
 	  if(evt_ZH[i]==true){
-	  	if(tag==1){params[0] = var4->gg[i];params[1] = var4->qq[i];params[2] = var4->hi[i];params[3] = var4->hi3[i];}
-          	if(tag==2){params[0] = var4->tt[i];params[1] = var4->hi[i];params[2] = var4->hi3[i];}
-          	if(tag==3){params[0] = var4->zz[i];params[1] = var4->zz3[i];params[2] = var4->hi[i];params[3] = var4->hi3[i];}
-	  zhh->Fill(mlp->Evaluate(0, params));
+            if(tag==3)params[0] = var4->zz[i];params[1] = var4->zz3[i];params[2] = var4->hi[i];params[3] = var4->hi3[i];
+            if(tag==2){
+	      if (multiplicity==0)params[0] = var4->tt[i];params[1] = var4->hi[i];params[2] = var4->hi3[i];
+	      if (multiplicity==1)params[0] = var4->tt[i];params[1] = var4->hi[i];params[2] = var4->hi3[i];params[3]=var4->trijetMdr[i];params[4]=var4->bb_dr[i];params[5]=var4->fsr_DR[i];
+            } 
+	    if(tag==1){
+	      if (multiplicity==0)params[0] = var4->gg[i];params[1] =var4->qq[i];params[2]=var4->hi[i];params[3]=var4->hi3[i];
+	      if (multiplicity==1)params[0] = var4->gg[i];params[1] =var4->qq[i];params[2]=var4->hi[i];params[3]=var4->hi3[i];params[4]=var4->trijetMdr[i];params[5]=var4->bb_dr[i];params[6]=var4->fsr_DR[i];
+	    }
+	    zhh->Fill(mlp->Evaluate(0, params));
 	  }
 	}
 
