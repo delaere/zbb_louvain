@@ -166,7 +166,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	// FOR tt
 	bool evt_TT[N2];
 	for (int i=0;i<N2; ++i) {
-	  evt_TT[i]==false;
+	  evt_TT[i]=false;
 	  if(var2->Leading_b[i]>20&&var2->subLeading_b[i]>20&&var2->Mll[i]>76.&&var2->Mll[i]<106.&&var2->Mbb[i]<150.){
 	    if (multiplicity==1 && var2->multi[i]==1&&var2->Mbb[i]>50.)evt_TT[i]=true;
 	    else if (multiplicity==0 && var2->multi[i]==0&&var2->Mbb[i]>80.)evt_TT[i]=true;
