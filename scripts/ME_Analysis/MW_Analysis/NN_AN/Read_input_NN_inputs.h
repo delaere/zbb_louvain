@@ -121,7 +121,6 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
 {
   
   // input file : read ttree
-  TChain *chain;
   TChain *tree = new TChain("tree2");
   tree->Reset();
   tree->Add(rootFile);
