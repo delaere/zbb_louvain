@@ -81,9 +81,9 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;
 	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();
 
-	if(tag==1){mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	if(tag==2){mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	if(tag==1){mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	if(tag==2){mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
 	
 	mlp->Train(iterations, "text,graph,update=2");
 	
@@ -111,14 +111,14 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// This will give approx. the same result as DrawNetwork.
 	// All entries are used, while DrawNetwork focuses on 
 	// the test sample. Also the xaxis range is manually set.
-	TH1F *zbbh = new TH1F("zbbh", "NN output", 25, -.5, 1.5);
-	TH1F *zzh = new TH1F("zzh", "NN output", 25, -.5, 1.5);
-	TH1F *zhh = new TH1F("zhhh", "NN output", 25, -.5, 1.5);	
-	TH1F *tth = new TH1F("tth", "NN output", 25, -.5, 1.5);
+	TH1F *zbbh = new TH1F("zbbh", "NN output", 14, -0.2, 1.2);
+	TH1F *zzh = new TH1F("zzh", "NN output", 14, -0.2, 1.2);
+	TH1F *zhh = new TH1F("zhhh", "NN output", 14, -0.2, 1.2);	
+	TH1F *tth = new TH1F("tth", "NN output", 14, -0.2, 1.2);
 
 	// histo of efficiency
-	TH1F *bg_eff = new TH1F("bgh", "NN output", 25, -.5, 1.5);
-	TH1F *sig_eff = new TH1F("sigh", "NN output", 25, -.5, 1.5);
+	TH1F *bg_eff = new TH1F("bgh", "NN output", 14, -0.2, 1.2);
+	TH1F *sig_eff = new TH1F("sigh", "NN output", 14, -0.2, 1.2);
 
 	zbbh->SetDirectory(0);
 	zzh->SetDirectory(0);
@@ -234,18 +234,18 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// efficiency computation signal VS background
 	
 	mlpa_canvas->cd(3);
-	double efficiency_sig[25];
-	double efficiency_bg[25];
-	for(int b=1;b<26;b++){
-	  if(tag==1){bg_eff->SetBinContent(b,((zbbh->Integral(b,26))/(zbbh->Integral())));}
-	  if(tag==2){bg_eff->SetBinContent(b,((tth->Integral(b,26))/(tth->Integral())));}
-	  if(tag==3){bg_eff->SetBinContent(b,((zzh->Integral(b,26))/(zzh->Integral())));}
-	  sig_eff->SetBinContent(b,(zhh->Integral(b,26)/zhh->Integral())); // here signal is zbb
+	double efficiency_sig[14];
+	double efficiency_bg[14];
+	for(int b=1;b<15;b++){
+	  if(tag==1){bg_eff->SetBinContent(b,((zbbh->Integral(b,15))/(zbbh->Integral())));}
+	  if(tag==2){bg_eff->SetBinContent(b,((tth->Integral(b,15))/(tth->Integral())));}
+	  if(tag==3){bg_eff->SetBinContent(b,((zzh->Integral(b,15))/(zzh->Integral())));}
+	  sig_eff->SetBinContent(b,(zhh->Integral(b,15)/zhh->Integral())); // here signal is zbb
 	  
-	  efficiency_sig[b-1]=(zhh->Integral(b,26)/zhh->Integral());
-	  if(tag==1){efficiency_bg[b-1]=(zbbh->Integral(b,26)/zbbh->Integral());}
-	  if(tag==2){efficiency_bg[b-1]=(tth->Integral(b,26)/tth->Integral());}
-	  if(tag==3){efficiency_bg[b-1]=(zzh->Integral(b,26)/zzh->Integral());}	  
+	  efficiency_sig[b-1]=(zhh->Integral(b,15)/zhh->Integral());
+	  if(tag==1){efficiency_bg[b-1]=(zbbh->Integral(b,15)/zbbh->Integral());}
+	  if(tag==2){efficiency_bg[b-1]=(tth->Integral(b,15)/tth->Integral());}
+	  if(tag==3){efficiency_bg[b-1]=(zzh->Integral(b,15)/zzh->Integral());}	  
 	}
 	bg_eff->SetLineColor(kBlue);
 	sig_eff->SetLineColor(kRed);
@@ -254,7 +254,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	bg_eff->Draw();
 	sig_eff->Draw("same");
 	mlpa_canvas->cd(4);
-	TGraph *Eff = new TGraph(25,efficiency_sig,efficiency_bg);
+	TGraph *Eff = new TGraph(14,efficiency_sig,efficiency_bg);
 	Eff->Draw("AP");
 	Eff->Write();
 	mlpa_canvas->Write();

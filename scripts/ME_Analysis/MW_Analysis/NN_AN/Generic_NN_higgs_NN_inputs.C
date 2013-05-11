@@ -88,7 +88,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 
 	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:"+NNStruct+":type","(type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:"+NNStruct+":type!","(type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
 	mlp->Train(iterations, "text,graph,update=2");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
 	mlp->Export("MLP_Higgs_vs_Bkg_"+name,"python");
@@ -111,14 +111,14 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// This will give approx. the same result as DrawNetwork.
 	// All entries are used, while DrawNetwork focuses on
 	// the test sample. Also the xaxis range is manually set.
-	TH1F *zbbh = new TH1F("zbbh", "NN output", 25, -.5, 1.5);
-	TH1F *zzh = new TH1F("zzh", "NN output", 25, -.5, 1.5);
-	TH1F *zhh = new TH1F("zhhh", "NN output", 25, -.5, 1.5);	
-	TH1F *tth = new TH1F("tth", "NN output", 25, -.5, 1.5);
+	TH1F *zbbh = new TH1F("zbbh", "NN output", 28, -0.2, 1.2);
+	TH1F *zzh = new TH1F("zzh", "NN output", 28, -0.2, 1.2);
+	TH1F *zhh = new TH1F("zhhh", "NN output", 28, -0.2, 1.2);	
+	TH1F *tth = new TH1F("tth", "NN output", 28, -0.2, 1.2);
 
 	// histo of efficiency
-	TH1F *bg_eff = new TH1F("bgh", "NN output", 25, -.5, 1.5);
-	TH1F *sig_eff = new TH1F("sigh", "NN output", 25, -.5, 1.5);
+	TH1F *bg_eff = new TH1F("bgh", "NN output", 28, -0.2, 1.2);
+	TH1F *sig_eff = new TH1F("sigh", "NN output", 28, -0.2, 1.2);
 
 	zbbh->SetDirectory(0);
 	zzh->SetDirectory(0);
@@ -221,16 +221,16 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	// efficiency computation signal VS background
 	
 	mlpa_canvas->cd(3);
-	double efficiency_sig[25];
-	double efficiency_bg[25];
-	for(int b=1;b<26;b++){
-	  bg_eff->SetBinContent(b,((zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))/(zbbh->Integral()+tth->Integral()+zzh->Integral())));
-	  sig_eff->SetBinContent(b,(zhh->Integral(b,26)/zhh->Integral())); // here signal is zbb
+	double efficiency_sig[28];
+	double efficiency_bg[28];
+	for(int b=1;b<29;b++){
+	  bg_eff->SetBinContent(b,((zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))/(zbbh->Integral()+tth->Integral()+zzh->Integral())));
+	  sig_eff->SetBinContent(b,(zhh->Integral(b,29)/zhh->Integral())); // here signal is zbb
 	  
 	  
-	  efficiency_sig[b-1]=(zhh->Integral(b,26)/zhh->Integral());
-          efficiency_bg[b-1]=((zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))/(zbbh->Integral()+tth->Integral()+zzh->Integral()));
-	  cout<<"S/sqrt(B) "<<zhh->Integral(b,26)/sqrt(zbbh->Integral(b,26)+tth->Integral(b,26)+zzh->Integral(b,26))<<endl;
+	  efficiency_sig[b-1]=(zhh->Integral(b,29)/zhh->Integral());
+          efficiency_bg[b-1]=((zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))/(zbbh->Integral()+tth->Integral()+zzh->Integral()));
+	  cout<<"S/sqrt(B) "<<zhh->Integral(b,29)/sqrt(zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))<<endl;
 	}
 	bg_eff->SetLineColor(kBlue);
 	sig_eff->SetLineColor(kRed);
@@ -243,7 +243,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	legend2->AddEntry(sig_eff, "Zbb");
 	legend2->Draw();
 	mlpa_canvas->cd(4);
-	TGraph *Eff = new TGraph(25,efficiency_sig,efficiency_bg);
+	TGraph *Eff = new TGraph(28,efficiency_sig,efficiency_bg);
 	Eff->Draw("AP");
 	Eff->Write();
 

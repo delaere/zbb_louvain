@@ -1,7 +1,7 @@
 
-#include "MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125.cxx"
-#include "MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125.cxx"
-#include "MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125.cxx"
+#include "MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500.cxx"
+#include "MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600.cxx"
+#include "MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000.cxx"
 
 class nn_vars {
   public:
@@ -135,20 +135,20 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
   tree->SetBranchAddress("Inv_Mass_lept",&Mll);
 
   // NN declaration -------------------------------------
-  //!gROOT->GetClass("MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125");
-  MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125 *HZbb=new MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125(); 
+  //!gROOT->GetClass("MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600");
+  MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600 *HZbb=new MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600(); 
   if (!gROOT->GetClass("TMultiLayerPerceptron")) { 
     gSystem->Load("libMLP");
   }                                                                                                                                                                    
 
-  //!gROOT->GetClass("MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125");  
-  MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125 *HTT=new MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125();    
+  //!gROOT->GetClass("MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500");  
+  MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500 *HTT=new MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500();    
   if (!gROOT->GetClass("TMultiLayerPerceptron")){
     gSystem->Load("libMLP");
   }
 
-  //!gROOT->GetClass("MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125");
-  MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125 *HZZ=new MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125();
+  //!gROOT->GetClass("MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000");
+  MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000 *HZZ=new MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000();
   if (!gROOT->GetClass("TMultiLayerPerceptron")) {
     gSystem->Load("libMLP");                                                                                                                          
   }          

@@ -20,5 +20,61 @@ universe       = vanilla
 requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = comb 125
+arguments = comb 125 3_2_3 5000
+queue
+
+# run the program
+arguments = comb 125 3_2 5000
+queue
+
+# run the program
+arguments = comb 125 5_2_3 5000
+queue
+
+# run the program
+arguments = comb 125 2_4 5000
+queue
+
+# run the program
+arguments = comb 125 4_6_2 5000
+queue
+
+# run the program
+arguments = comb 125 6 5000
+queue
+
+# run the program
+arguments = comb 125 2_3_2 5000
+queue
+
+# run the program
+arguments = comb 125 2_5_3 5000
+queue
+
+# run the program
+arguments = comb 125 8_5_3 5000
+queue
+
+# run the program
+arguments = comb 125 8_5_3 5000
+queue
+
+# run the program
+arguments = comb 125 10_7_5_3 5000
+queue
+
+# run the program
+arguments = comb 125 7_10_3 5000
+queue
+
+# run the program
+arguments = comb 125 1 5000
+queue
+
+# run the program
+arguments = comb 125 2 5000
+queue
+
+# run the program
+arguments = comb 125 3 5000
 queue
