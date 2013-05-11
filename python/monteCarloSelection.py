@@ -1,6 +1,7 @@
 # OLD methods to classify the DY events, based on parton-level information. Renamed to avoid name conflict with new methods.
 
 import math
+from ROOT import TLorentzVector
 
 def isGenZlEvent(genParticles,ptcut=15, onlyStatus3=False):
   """Select events with at least one light parton > ptcut. isZlEvent != not(isZbEvent or isZcEvent) """
@@ -82,7 +83,8 @@ def genjetCollectionsProducer(fwevent, ptcut=0, etacut=10):
   bhads = [part for part in fwevent.genParticles if is_final_Bhad(part)]
   chads = [part for part in fwevent.genParticles if is_final_Dhad(part)]
   # list of genjets passing the pt,eta cuts
-  genjets = [ jet for jet in fwevent.genJets if (jet.pt()>ptcut and abs(jet.eta())<etacut) ]
+  #genjets = [ jet for jet in fwevent.genJets if (jet.pt()>ptcut and abs(jet.eta())<etacut) ]
+  genjets = [ jet.genJet() for index,jet in enumerate(fwevent.jets) if (fwevent.goodJets_all[index] and jet.genJet()) ]
   # now divide it in three independant collections
   (bjets, nonbjets)  = match_GenToHad(genjets,  bhads, 0.5)
   (cjets, lightjets) = match_GenToHad(nonbjets, chads, 0.5)
@@ -121,7 +123,8 @@ def isZllEvent(event):
   """Classify events according to genjets matched with final state hadrons"""
   bjets = event.sortedGenJets[0]
   cjets = event.sortedGenJets[1]
-  return len(bjets)==0 and len(cjets)==0
+  lightjets = event.sortedGenJets[2]
+  return len(bjets)==0 and len(cjets)==0 and len(lightjets)>0
 
 def isZlEvent(event):
   """Classify events according to genjets matched with final state hadrons"""
@@ -135,5 +138,52 @@ def isZbEvent(event):
   """Classify events according to genjets matched with final state hadrons"""
   return isZbbEvent(event) or isZbcEvent(event) or isZblEvent(event)
 
+def LHEinfo(event):
+  if event.lheParticles is None :
+    out = {
+      "isZ"  : -1,
+      "nLep" : -1,
+      "llpt" : -1,
+      "nj"   : -1,
+      "nb"   : -1,
+      "nc"   : -1,
+      }      
+    return out
+  hepeup = event.lheParticles.hepeup()
+  pup = hepeup.PUP
+  idup = hepeup.IDUP
+  istup = hepeup.ISTUP
+  nup = hepeup.NUP
+  isZ=False
+  lep=[]
+  nj = 0
+  nb = 0
+  nc = 0
+  for index,p in enumerate(pup) :
+    if idup[index]==23 : isZ=True
+    if abs(idup[index]) in [11,13,15] : lep.append(index)
+    if istup[index]==1 and abs(idup[index]) in [1,2,3,4,5,21] : nj+=1
+    if istup[index]==1 and abs(idup[index])==5 : nb+=1
+    if istup[index]==1 and abs(idup[index])==4 : nc+=1
+    #print "status ", istup[index], "PID ", idup[index]
+  if len(lep)>1:
+    if len(lep)>2 : print "Error, too much lhe leptons : ", len(lep)
+    if not (idup[lep[0]]+idup[lep[1]])==0 : "Error, lhe leptons have same charge"
+    l1=TLorentzVector(pup[lep[0]][0],pup[lep[0]][1],pup[lep[0]][2],pup[lep[0]][3])
+    l2=TLorentzVector(pup[lep[1]][0],pup[lep[1]][1],pup[lep[1]][2],pup[lep[1]][3])
+    zcand=l1+l2
+    llpt = zcand.Pt()
+  else :
+    llpt=-1
+  out = {
+    "isZ"  : isZ,
+    "nLep" : len(lep),
+    "llpt" : llpt,
+    "nj"   : nj,
+    "nb"   : nb,
+    "nc"   : nc,
+    }
+  return out
+
 def prepareAnalysisEvent(event):
-  event.addProducer("sortedGenJets",genjetCollectionsProducer,ptcut=0, etacut=10)
+  event.addProducer("sortedGenJets",genjetCollectionsProducer,ptcut=20,etacut=2.4)

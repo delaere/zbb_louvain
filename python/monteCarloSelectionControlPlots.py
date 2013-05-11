@@ -21,6 +21,13 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       # declare histograms
       self.add("eventType","Event Type (0,ll,cl,cc,bl,bc,bb)+Z",10,-0.5,9.5)
 
+      self.add("isZ","is Z at ME",2,-0.5,1.5)
+      self.add("nLeptons","number of leptons at ME",5,-0.5,4.5)
+      self.add("llpt","pt of ll pair",1001,-1,1000)
+      self.add("nJets","number of jets at ME",8,-0.5,7.5)
+      self.add("nbJets","number of b-jets at ME",5,-0.5,4.5)
+      self.add("ncJets","number of c-jets at ME",5,-0.5,4.5)
+
       self.add("LepPosPx","Generator cuadrivector, LepPosPx", 400, -400, 400)
       self.add("LepPosPy","Generator cuadrivector, LepPosPy", 400, -400, 400)
       self.add("LepPosPz","Generator cuadrivector, LepPosPz", 400, -400, 400)
@@ -156,6 +163,15 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       
       #Clasify the event in Zbb,Zbc,Zbl,Zcc, Zcl, or Zll
       self.i += 1
+      lhe = LHEinfo(event)
+      #print "nLep", lhe
+      result["isZ"]=lhe["isZ"]
+      result["nLeptons"]=lhe["nLep"]
+      result["llpt"]=lhe["llpt"]
+      result["nJets"]=lhe["nj"]
+      result["nbJets"]=lhe["nb"]
+      result["ncJets"]=lhe["nc"]
+      
       if isZbbEvent(event):
         self.bjet += 1
         result["eventType"] = 6

@@ -745,6 +745,7 @@ def eventCategory(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFi
 
 def prepareAnalysisEvent(event, btagging="CSV",ZjetFilter="bcl",checkTrigger=True):
   # collections
+  event.addCollection("lheParticles","LHEEventProduct","source")
   event.addCollection("genParticles","vector<reco::GenParticle>",zbblabel.genlabel)
   event.addCollection("genJets","vector<reco::GenJet>",zbblabel.genjetlabel)
   event.addCollection("genInfo","GenEventInfoProduct",zbblabel.genInfolabel)
