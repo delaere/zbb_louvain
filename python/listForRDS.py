@@ -26,6 +26,7 @@ totsampleList  = [
     "Zbb",
     "Zbx",
     "Zxx",
+    #"Zno",
     "ZH125"
     ]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 
@@ -46,6 +47,7 @@ lumi = { "DATA"   : zbbnorm.lumi_tot2012,
          "Zbb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zbx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zxx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
+         "Zno"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
 #         "Zbb"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
 #         "Zbx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
 #         "Zxx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
@@ -72,6 +74,8 @@ Extra_norm={ "MuMuChannelDATA"  : 1.0,
              "EEChannelZbx"      : 1.0,
 	     "MuMuChannelZxx"    : 1.0/MuCorrFact,
              "EEChannelZxx"      : 1.0,
+	     "MuMuChannelZno"    : 1.0/MuCorrFact,
+             "EEChannelZno"      : 1.0,
 	     "MuMuChannelZZ"    : (10000./16986.)/MuCorrFact,
              "EEChannelZZ"      : 10000./11936.,
 	     "MuMuChannelZH125" : (10000./65412.)/MuCorrFact,
@@ -90,6 +94,8 @@ SFs_fit={ "MuMuChannelDATA"  : 1.0,
           "EEChannelZbx"      : 1.93,
           "MuMuChannelZxx"    : 0.94,
           "EEChannelZxx"      : 0.94,
+          "MuMuChannelZno"    : 0.94,
+          "EEChannelZno"      : 0.94,
           "MuMuChannelZZ"    : 1.0,
           "EEChannelZZ"      : 1.0,
           "MuMuChannelZH125" : 1.0,
@@ -97,24 +103,79 @@ SFs_fit={ "MuMuChannelDATA"  : 1.0,
           }
 
 PlotForCLs = [
+    "mlphiggsvsbkg_125_comb_MM_N_2011",
+
     "mlphiggsvsbkg_125_comb_MM_N",
-    #"mlphiggsvsbkg_125_comb_MM_N_2011",
+
+    "SumNN",
+    "ProdNN",
+    "SumWeightedNN",
+
+    "newmlphiggsvszbb_125_comb_MM_N",
+    "newmlphiggsvszz_125_comb_MM_N",
+    "newmlphiggsvstt_125_comb_MM_N",
+    "newmlphiggsvsbkg_125_comb_MM_N",
+
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000",
+    ]
+
+blindList = [
+    "mlphiggsvstt_125_comb_MM_N_2011",
+    "mlphiggsvszz_125_comb_MM_N_2011",
+    "mlphiggsvszbb_125_comb_MM_N_2011",
+    "mlphiggsvsbkg_125_comb_MM_N_2011",
+
+    "mlphiggsvszbb_125_comb_MM_N",
+    "mlphiggsvszz_125_comb_MM_N",
+    "mlphiggsvstt_125_comb_MM_N",
+    "mlphiggsvsbkg_125_comb_MM_N",
+
+    "SumNN",
+    "ProdNN",
+    "SumWeightedNN",
+    
+ 
+    "newmlphiggsvszbb_125_comb_MM_N",
+    "newmlphiggsvstt_125_comb_MM_N",
+    "newmlphiggsvszz_125_comb_MM_N",
+    "newmlphiggsvsbkg_125_comb_MM_N",
+
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000",    
     ]
 
 namePlotList = [
      "eventSelectionbestzmassMu"  , 
      "eventSelectionbestzmassEle" ,
-     "eventSelectionbestzptMu",    
+     "eventSelectionbestzptMu"    ,    
      "eventSelectionbestzptEle"   ,
      "jetmetbjet1pt"              ,   
      "jetmetbjet2pt"              ,   
-     "jetmetbjet1CSVdisc"              ,   
-     "jetmetbjet2CSVdisc"              ,   
-     "jetmetbjetMinCSVdisc"              ,   
-     "jetmetbjetMaxCSVdisc"              ,
-     "jetmetbjetProdCSVdisc"              ,   
+     "jetmetbjet1CSVdisc"         ,   
+     "jetmetbjet2CSVdisc"         ,
+     "jetmetbjet1JPdisc"         ,
+     "jetmetbjet2JPdisc"         ,
+     "jetmetbjet1SSVHEdisc"         ,
+     "jetmetbjet2SSVHEdisc"         ,
      "jetmetMET"                  ,
-     "jetmetMETsignificance"                  ,
+     "jetmetMETsignificance"      ,
      "eventSelectiondphiZbb"      ,
 ##     "eventSelectiondphiZbj1"     , 
      "eventSelectiondijetPt"      ,
@@ -123,9 +184,21 @@ namePlotList = [
 ##  #   "eventSelectiondijetSVdR"    ,
 ##     "eventSelectionZbbM"         ,
      "eventSelectiondrllMu"       ,
-     "eventSelectiondrllEle"       ,
-##     "eventSelectionZbM"
-     "jetmetnj",
+     "eventSelectiondrllEle"      ,
+##     "eventSelectionZbM"          ,
+     "jetmetnj"                   ,
+     "vertexAssociationnvertices" ,
+     "jetmetbjet1beta" ,
+     "jetmetbjet1betaStar" ,
+     "jetmetbjet2beta" ,
+     "jetmetbjet2betaStar",
+     
+     ]
+
+namePlotListOnMerged = [
+     "jetmetbjetMinCSVdisc"   ,   
+     "jetmetbjetMaxCSVdisc"   ,
+     "jetmetbjetProdCSVdisc"  ,   
      "Wgg"           
      ,"Wqq"           
      ,"Wtt"           
@@ -167,15 +240,32 @@ namePlotList = [
 #    ,"mlphiggsvstt_125_mu_MM_N"
 #    ,"mlphiggsvszz_125_mu_MM_N"
 #    ,"mlphiggsvsbkg_125_mu_MM_N"
-#     ,"mlphiggsvsbkg_125_comb_MM_N_2011"
-#     ,"mlphiggsvszbb_125_comb_MM_N_2011"
-#     ,"mlphiggsvszz_125_comb_MM_N_2011"
-#     ,"mlphiggsvstt_125_comb_MM_N_2011"
+     ,"mlphiggsvsbkg_125_comb_MM_N_2011"
+     ,"mlphiggsvszbb_125_comb_MM_N_2011"
+     ,"mlphiggsvszz_125_comb_MM_N_2011"
+     ,"mlphiggsvstt_125_comb_MM_N_2011"
      ,"mlphiggsvsbkg_125_comb_MM_N"
      ,"mlphiggsvszbb_125_comb_MM_N"
      ,"mlphiggsvszz_125_comb_MM_N"
      ,"mlphiggsvstt_125_comb_MM_N"
-     
+     ,"newmlphiggsvsbkg_125_comb_MM_N"
+     ,"newmlphiggsvszbb_125_comb_MM_N"
+     ,"newmlphiggsvszz_125_comb_MM_N"
+     ,"newmlphiggsvstt_125_comb_MM_N"
+     ,"SumNN"
+     ,"ProdNN"
+     ,"SumWeightedNN",
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000",
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000",
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000",
+
     ]
 
 ################
@@ -190,11 +280,15 @@ min = {
     "eventSelectiondrZbj1"      :    0 ,
     "jetmetbjet1pt"             :    0 ,
     "jetmetbjet2pt"             :    0 ,   
-    "jetmetbjet1CSVdisc"             :    0.679 ,
-    "jetmetbjet2CSVdisc"             :    0.679 ,   
-    "jetmetbjetMinCSVdisc"             :    0.679 ,
-    "jetmetbjetMaxCSVdisc"             :    0.679 ,
-    "jetmetbjetProdCSVdisc"             :    0.679*0.679 ,
+    "jetmetbjet1CSVdisc"        :    0.679 ,
+    "jetmetbjet2CSVdisc"        :    0.679 ,   
+    "jetmetbjet1JPdisc"        :    0. ,
+    "jetmetbjet2JPdisc"        :    0. ,
+    "jetmetbjet1SSVHEdisc"        :    0. ,
+    "jetmetbjet2SSVHEdisc"        :    0. , 
+    "jetmetbjetMinCSVdisc"      :    0.679 ,
+    "jetmetbjetMaxCSVdisc"      :    0.679 ,
+    "jetmetbjetProdCSVdisc"     :    0.679*0.679 ,
     "jetmetMET"                 :    0 , 
     "eventSelectiondphiZbj1"    :    0 ,
     "eventSelectiondphiZbb"     :    0 ,
@@ -206,12 +300,17 @@ min = {
     "eventSelectionZbbM"        :    0 ,
     "eventSelectionZbM"         :    0 ,
     "eventSelectionZbbPt"       :    0 ,
-    "jetmetjet1SSVHEdisc"       :    0 ,
     "jetmetjet1SSVHPdisc"       :    0 ,
     "jetmetjet1SVmass"          :    0 ,
     "eventSelectiondrllMu"      :    0 ,
-    "eventSelectiondrllEle"      :    0 
-    ,"jetmetnj":2
+    "eventSelectiondrllEle"     :    0 
+    ,"jetmetnj" : 2
+    ,"vertexAssociationnvertices" : -0.5
+    ,"jetmetbjet1beta" : -1
+    ,"jetmetbjet1betaStar" : -1
+    ,"jetmetbjet2beta" : -1
+    ,"jetmetbjet2betaStar" : -1
+    
     ,"Wgg"      :    16 
     ,"Wqq"      :    16 
     ,"Wtt"      :    20 
@@ -261,6 +360,24 @@ min = {
     ,"mlphiggsvszbb_125_comb_MM_N" : 0
     ,"mlphiggsvstt_125_comb_MM_N" : 0
     ,"mlphiggsvszz_125_comb_MM_N" : 0
+    ,"newmlphiggsvsbkg_125_comb_MM_N" : 0
+    ,"newmlphiggsvszbb_125_comb_MM_N" : 0
+    ,"newmlphiggsvstt_125_comb_MM_N" : 0
+    ,"newmlphiggsvszz_125_comb_MM_N" : 0
+    ,"SumNN" : 0
+    ,"ProdNN" : 0
+    ,"SumWeightedNN" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 0,
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 0,
+
     }
 
 ################
@@ -277,6 +394,10 @@ max = {
     "jetmetbjet2pt"             :  260 ,   
     "jetmetbjet1CSVdisc"             :  1 ,
     "jetmetbjet2CSVdisc"             :  1 ,   
+    "jetmetbjet1JPdisc"             :  2.5 ,
+    "jetmetbjet2JPdisc"             :  2.5 ,   
+    "jetmetbjet1SSVHEdisc"             :  10 ,
+    "jetmetbjet2SSVHEdisc"             :  10 ,   
     "jetmetbjetMinCSVdisc"             :    1 ,
     "jetmetbjetMaxCSVdisc"             :    1 ,
     "jetmetbjetProdCSVdisc"             :    1 ,
@@ -291,12 +412,16 @@ max = {
     "eventSelectionZbbM"        : 1000 ,
     "eventSelectionZbM"         :  800 ,
     "eventSelectionZbbPt"       :  500 ,
-    "jetmetjet1SSVHEdisc"       :    8 ,
     "jetmetjet1SSVHPdisc"       :    8 ,
     "jetmetjet1SVmass"          :    5 ,
     "eventSelectiondrllMu"      :    5 ,
     "eventSelectiondrllEle"      :    5 
-    ,"jetmetnj":8
+    ,"jetmetnj" :  8
+    ,"vertexAssociationnvertices" : 59.5
+    ,"jetmetbjet1beta" : 1
+    ,"jetmetbjet1betaStar" : 1
+    ,"jetmetbjet2beta" : 1
+    ,"jetmetbjet2betaStar" : 1
     ,"Wgg"      :    24 
     ,"Wqq"      :    24 
     ,"Wtt"      :    30 
@@ -346,6 +471,24 @@ max = {
     ,"mlphiggsvszbb_125_comb_MM_N" : 1
     ,"mlphiggsvstt_125_comb_MM_N" : 1
     ,"mlphiggsvszz_125_comb_MM_N" : 1
+    ,"newmlphiggsvsbkg_125_comb_MM_N" : 1
+    ,"newmlphiggsvszbb_125_comb_MM_N" : 1
+    ,"newmlphiggsvstt_125_comb_MM_N" : 1
+    ,"newmlphiggsvszz_125_comb_MM_N" : 1
+    ,"SumNN" : 1
+    ,"ProdNN" : 1
+    ,"SumWeightedNN" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 1,
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 1,
+
     }
 
 ################
@@ -362,6 +505,10 @@ binning = {
     "jetmetbjet2pt"             :   26 ,   
     "jetmetbjet1CSVdisc"             :  20  ,
     "jetmetbjet2CSVdisc"             :  20  ,
+    "jetmetbjet1JPdisc"             :  20  ,
+    "jetmetbjet2JPdisc"             :  20  ,
+    "jetmetbjet1SSVHEdisc"             :  60  , 
+   "jetmetbjet2SSVHEdisc"             :  60  ,
     "jetmetbjetMinCSVdisc"             : 20 ,
     "jetmetbjetMaxCSVdisc"             :   20 ,
     "jetmetbjetProdCSVdisc"             :  20 ,   
@@ -376,12 +523,16 @@ binning = {
     "eventSelectionZbbM"        :   20 , #50GeV
     "eventSelectionZbM"         :   16 ,
     "eventSelectionZbbPt"       :   50 , #10GeV
-    "jetmetjet1SSVHEdisc"       :   16 , #0.5
     "jetmetjet1SSVHPdisc"       :   16 ,
     "jetmetjet1SVmass"          :   20 , #0.25GeV
     "eventSelectiondrllMu"      :   10 , #0.5
     "eventSelectiondrllEle"      :   10
     ,"jetmetnj" : 6
+    ,"vertexAssociationnvertices" : 60
+    ,"jetmetbjet1beta" : 20
+    ,"jetmetbjet1betaStar" : 20
+    ,"jetmetbjet2beta" : 20
+    ,"jetmetbjet2betaStar" : 20
     ,"Wgg"      :    20 
     ,"Wqq"      :    20 
     ,"Wtt"      :    25 
@@ -431,5 +582,22 @@ binning = {
     ,"mlphiggsvszbb_125_comb_MM_N" : 20
     ,"mlphiggsvstt_125_comb_MM_N" : 20
     ,"mlphiggsvszz_125_comb_MM_N" : 20
+    ,"newmlphiggsvsbkg_125_comb_MM_N" : 20
+    ,"newmlphiggsvszbb_125_comb_MM_N" : 20
+    ,"newmlphiggsvstt_125_comb_MM_N" : 20
+    ,"newmlphiggsvszz_125_comb_MM_N" : 20
+    ,"SumNN" : 20
+    ,"ProdNN" : 20
+    ,"SumWeightedNN" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_1_10000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_1_5000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_10000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_3_5000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_4_10000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 20,
+    "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 20,
     }
     

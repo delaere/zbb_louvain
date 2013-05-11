@@ -17,7 +17,7 @@
 
 from ROOT import *
 from eventSelection import categoryNames
-from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, min, max, binning, PlotForCLs, SFs_fit
+from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, namePlotListOnMerged, min, max, binning, PlotForCLs, SFs_fit, blindList
 from globalLists import pathMergedRDS, pathRDS
 import os
 
@@ -25,9 +25,9 @@ import os
 ### sample/wp/selection of interest
 #####################################################
 
-runOnMergedRDS = True
+runOnMergedRDS = False
 goTotCLS = False
-DirOut="hist_cuts_jetsOnly"
+DirOut="hist_newznothing"
 doRew = False
 useSFs = False
 useMCTruth = True
@@ -54,17 +54,32 @@ channels  = [
 #choose you set of cuts
 extraCuts = [
     "",
-##     "(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-##     "(eventSelectiondijetM>80&eventSelectiondijetM<150)",
-##     "mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0.",
-##     "mlphiggsvsbkg_125_comb_MM_N>=0.5&mlphiggsvsbkg_125_comb_MM_N<=1",
-##    "jetmetbjet1pt>30 & jetmetbjet2pt>30 & jetmetbjet1CSVdisc>0.898 & jetmetbjet2CSVdisc>0.898",
-    "jetmetbjet1pt>30 & jetmetbjet2pt>30",
-
-##     "jetmetbjet1pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-##     "jetmetbjet2pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
-##     "(eventSelectionbestzptEle>50||eventSelectionbestzptMu>50)",
-##     "(eventSelectionbestzptEle>225||eventSelectionbestzptMu>225)",
+<<<<<<< selectionCuts_fromRDS.py
+    #"jetmetbjet1pt>40&jetmetbjet2pt>25",
+    #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
+    #"jetmetnj==2",
+    #"jetmetnj==2&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    #"jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    #"jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    #"jetmetnj>2",
+    #"jetmetnj>2&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    #"jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    #"jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
+    #"vertexAssociationnvertices<13",
+    #"vertexAssociationnvertices>=13&vertexAssociationnvertices<=17",
+    #"vertexAssociationnvertices>17",
+#    "(eventSelectiondijetM>80&eventSelectiondijetM<150)",
+    #"newmlphiggsvsbkg_125_comb_MM_N<0.5&newmlphiggsvsbkg_125_comb_MM_N>=0.",
+    #"newmlphiggsvsbkg_125_comb_MM_N>=0.5&newmlphiggsvsbkg_125_comb_MM_N<=1",
+    #"ProdNN<0.5&ProdNN>=0.",
+    #"ProdNN>=0.5&ProdNN<=1",
+    #"SumWeightedNN<0.5&SumWeightedNN>=0.",
+    #"SumWeightedNN>=0.5&SumWeightedNN<=1",
+#    "jetmetbjet1pt>30",
+#    "jetmetbjet2pt>30",
+#    "jetmetbjet1pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
+#    "jetmetbjet2pt>30&(eventSelectiondijetM<80||eventSelectiondijetM>150)",
 
     ]
 
@@ -124,7 +139,8 @@ for sample in sampleList :
             if not useMCTruth :
                 myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==6")
                 myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType>=4&mcSelectioneventType<6")
-                myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4")
+                myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&mcSelectioneventType<4&mcSelectioneventType>0")
+                myRDS[channel+"Zno"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==0")
             else :
                 myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
                 myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) ||(abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
@@ -132,6 +148,7 @@ for sample in sampleList :
             print "myRDS.numEntries() for ", "Zbb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbb"].numEntries()
             print "myRDS.numEntries() for ", "Zbx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbx"].numEntries()
             print "myRDS.numEntries() for ", "Zxx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zxx"].numEntries()
+            if not useMCTruth : print "myRDS.numEntries() for ", "Zno" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zno"].numEntries()
         else :
             myRDS[channel+sample] = rds_zbb.reduce(redStage)
             print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+sample].numEntries()
@@ -159,13 +176,9 @@ for channel in channels:
         ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
         tmp = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
         rds_zbb.append(tmp)
-    
     nEntries = rds_zbb.numEntries()
-    
     myRDS[channel+"DATA"] = rds_zbb.reduce(redStage)
-    
-    print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"DATA"].numEntries()
-
+    print "myRDS.numEntries() for DATA = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"DATA"].numEntries()
     for period in dataPeriods : file[period].Close()
     
 ###############
@@ -209,7 +222,8 @@ for channel in channels :
 #############
 ### PLOTS ###
 #############
-
+        
+if runOnMergedRDS : namePlotList+=namePlotListOnMerged
 var = {}
 for name in namePlotList:
     print "name = ", name
@@ -277,10 +291,18 @@ for channel in channels :
                 if not goTotCLS :
                     th1[channel+sample+name+cut] = TH1D(name,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
                     myRDS_red_w.fillHistogram(th1[channel+sample+name+cut], RooArgList(var[name]))
+                    if name in blindList and sample=="DATA":
+                        overflow=0
+                        for bin in range(1,th1[channel+sample+name+cut].GetNbinsX()+1) :
+                            if th1[channel+sample+name+cut].GetBinCenter(bin) > 0.5:
+                                overflow+=th1[channel+sample+name+cut].GetBinContent(bin)
+                                th1[channel+sample+name+cut].SetBinContent(bin,0)
+                        th1[channel+sample+name+cut].SetBinContent(th1[channel+sample+name+cut].GetNbinsX(),overflow)
                 else :
                     if not name in PlotForCLs : continue
-                    m1=name.replace("mlphiggsvsbkg_","")
-                    mass=m1.replace("_comb_MM_N","")
+                    #m1=name.replace("_","")
+                    #mass=m1.replace("_comb_MM_N","")
+                    mass="125"
                     samp=sample
                     if sample == "DATA" : samp="data_obs"
                     if "ZH" in sample : samp = sample.replace("ZH","signal")
