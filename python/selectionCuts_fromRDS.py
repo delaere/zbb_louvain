@@ -54,7 +54,6 @@ channels  = [
 #choose you set of cuts
 extraCuts = [
     "",
-<<<<<<< selectionCuts_fromRDS.py
     #"jetmetbjet1pt>40&jetmetbjet2pt>25",
     #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
     #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
