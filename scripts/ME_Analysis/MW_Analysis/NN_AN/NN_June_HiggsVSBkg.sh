@@ -33,13 +33,32 @@ echo "struct fo the NN is "$3
 struct=$3
 echo "number of iterations is "$4
 iter=$4
+echo "extra cuts are "$5
+s_cuts=$5
 
-root -l -b > logroot_${mass}_${channel}_${struct}_${iter}.txt << EOF
+#s_cuts=ini'-'${cuts//'-'/'-minus-'}
+#s_cuts=${s_cuts//'>'/'-sup-'}
+#s_cuts=${s_cuts//'='/'-eq-'}
+#s_cuts=${s_cuts//'!'/'-dif-'}
+#s_cuts=${s_cuts//'<'/'-inf-'}
+#s_cuts=${s_cuts//'('/'-ipar-'}
+#s_cuts=${s_cuts//')'/'-epar-'}
+#s_cuts=${s_cuts//'&&'/'-and-'}
+#s_cuts=${s_cuts//'||'/'-or-'}
+#s_cuts=${s_cuts//' '/'-spa-'}
+#s_cuts=${s_cuts//'+'/'-plus-'}
+#s_cuts=${s_cuts//'*'/'-mult-'}
+#s_cuts=${s_cuts//'/'/'-div-'}
+#s_cuts=${s_cuts}-end
+#echo "extra string cut is "${s_cuts}
+
+root -l -b > logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
 
 TString channel("${channel}")
 TString mass("${mass}")
 TString struct("${struct}")
-TString iter("$iter") 
+TString iter("${iter}") 
+TString s_cuts("${s_cuts}")
 TString DIR("/nfs/user/acaudron/Tree2_537/");
 TString fDY("ME_zbb_Zbb_"+channel+"_MC.root")
 TString fTT("ME_zbb_TT-FullLept_"+channel+"_MC.root")
@@ -49,33 +68,41 @@ TString fZH("ME_zbb_ZH"+mass+"_"+channel+"_MC.root")
 cout<<"Directory is "<<DIR<<endl;
 
 // Output name
-TString NN("ZH"+mass+"_"+channel+"_"+struct+"_"+iter);
+TString NN("ZH"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts);
 cout<<" OUTPUT NAME : "<<NN<<endl;
-cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_Bkg_"<<NN<<endl;
 
 // Structure of the NN and nbr of iteration
-TString NNStruct=struct.ReplaceAll("_",":");
+TString NNStruct0=struct.ReplaceAll("-",":");
+TString NNStruct=NNStruct0.ReplaceAll("_",",@");
 int iterations=$4;
 cout<<"NNStruct "<<NNStruct<<endl;
 cout<<"iterations "<<iterations<<endl;
+
+//choose the cuts
+TString cuts("")
+if(s_cuts.Contains("Mbb80-160")) cuts+=" && (Inv_Mass_bb>70 && Inv_Mass_bb<160)";
+if(s_cuts.Contains("Nj2")) cuts+=" && multiplicity==2";
+if(s_cuts.Contains("Nj3")) cuts+=" && multiplicity>2";
+if(s_cuts.Contains("Ptll20")) cuts+=" && Inv_Mass_lept>20";
+cout<<"extra cuts : "<<cuts<<endl;
 
 // COmpilation and submission
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/include.h
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Read_input_NN_inputs.h 
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Generic_NN_higgs_NN_inputs.C+
 
-Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,NNStruct,iterations)
+Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,NNStruct,iterations,cuts)
 
 .q
 
 EOF
 
-grep Epoch logroot_${mass}_${channel}_${struct}_${iter}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${mass}_${channel}_${struct}_${iter}.txt
+grep Epoch logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
-NUMOFPOINTS=$(cat epoch_${mass}_${channel}_${struct}_${iter}.txt| wc -l )
+NUMOFPOINTS=$(cat epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt| wc -l )
 echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 
-root -l -b NN*${mass}*${channel}*${struct}*${iter}*.root << EOF
+root -l -b NN*${mass}*${channel}*${struct}*${iter}*${s_cuts}.root << EOF
 
 //This part is copy and paste from the first time we call root
 
@@ -83,13 +110,14 @@ TString channel("${channel}")
 TString mass("${mass}")
 TString struct("${struct}")
 TString iter("$iter") 
-TString NN("ZH"+mass+"_"+channel+"_"+struct+"_"+iter);
+TString s_cuts("${s_cuts}")
+TString NN("ZH"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts);
 
 int numberOfPoints=${NUMOFPOINTS}
 
 cout << "numberOfPoints=" << numberOfPoints << endl;
 
-TString epochinputtxt = "epoch_"+mass+"_"+channel+"_"+struct+"_"+iter+".txt";
+TString epochinputtxt = "epoch_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts+".txt";
 
 TFile* foutput = TFile::Open("NN_Higgs_vs_Bkg_"+NN+".root","UPDATE");
 

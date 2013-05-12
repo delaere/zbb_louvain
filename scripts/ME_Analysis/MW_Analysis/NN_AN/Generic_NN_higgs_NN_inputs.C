@@ -10,7 +10,7 @@
 #include "include.h"
 #include "Read_input_NN_inputs.h"
 
-void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name, TString NNStruct,int iterations)
+void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh, TString name, TString NNStruct, int iterations, TString cuts)
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
 		gSystem->Load("libMLP");
@@ -47,32 +47,49 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 
 
 	// open file to get nbres of entries
-	int N1,N2, N3,N4;
+
+	TString totcuts("Met_signi<10.0 && Inv_Mass_lept>76. && Inv_Mass_lept<106. && btagj1>0.679 && btagj2>0.679");
+	totcuts+=cuts;
+	cout<<"cut on : "<<totcuts<<endl;
+
+	int N1,N2,N3,N4;
 	TChain *treetmp =new TChain("tree2");
 	treetmp->Reset();
 	treetmp->Add(dy);
-	N1=treetmp->GetEntries();
+	TTree *ttmp = treetmp->CopyTree(totcuts);
+	N1=ttmp->GetEntries();
+	cout<<"dy N1 is "<<N1<<endl;
 	treetmp->Reset();
+	ttmp->Reset();
 	treetmp->Add(tt);
-	N2=treetmp->GetEntries();
+	ttmp = treetmp->CopyTree(totcuts);
+	N2=ttmp->GetEntries();
+	cout<<"tt N2 is "<<N2<<endl;
 	treetmp->Reset();
+	ttmp->Reset();
 	treetmp->Add(zz);
-	N3=treetmp->GetEntries();
+	ttmp = treetmp->CopyTree(totcuts);
+	N3=ttmp->GetEntries();
+	cout<<"zz N3 is "<<N3<<endl;
 	treetmp->Reset();
+	ttmp->Reset();
 	treetmp->Add(zh);
-	N4=treetmp->GetEntries();
+	ttmp = treetmp->CopyTree(totcuts);
+	N4=ttmp->GetEntries();
+	cout<<"zh N4 is "<<N4<<zh<<treetmp->GetEntries()<<endl;
 	delete treetmp;
+	delete ttmp;
 
 	cout<<N1<<" "<<N2<<" "<<N3<<" "<<N4<<endl;
 
 	nn_vars *var1 = new nn_vars(N1);
-	Input(dy,N1,var1,sim,simu,1,0,1);
+	Input(dy,var1,sim,simu,1,0,1,totcuts);
 	nn_vars *var2 = new nn_vars(N2);
-	Input(tt,N2,var2,sim,simu,1,0,2);
+	Input(tt,var2,sim,simu,1,0,2,totcuts);
 	nn_vars *var3 = new nn_vars(N3);
-	Input(zz,N3,var3,sim,simu,1,0,3);
+	Input(zz,var3,sim,simu,1,0,3,totcuts);
 	nn_vars *var4 = new nn_vars(N4);
-	Input(zh,N4,var4,sim,simu,1,1,5);
+	Input(zh,var4,sim,simu,1,1,5,totcuts);
 
 	simu->Write();
 	// Tree SIMU for NN training filled
@@ -88,11 +105,11 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 
 	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT:"+NNStruct+":type!","(type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT"+NNStruct+":type!","(type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
 	mlp->Train(iterations, "text,graph,update=2");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("MLP_Higgs_vs_Bkg_"+name,"python");
-	mlp->Export("MLP_Higgs_vs_Bkg_"+name,"c++");
+	mlp->Export("Final/MLP_Higgs_vs_Bkg_"+name,"python");
+	mlp->Export("Final/MLP_Higgs_vs_Bkg_"+name,"c++");
 	mlp->Write();
 
 	// Use TMLPAnalyzer to see what it looks for. INFO will be in the contro root file
@@ -130,42 +147,34 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	//-------------------------------------------------------------------------
 	// FOR Zbb
 	for (int i=0;i<N1; ++i) {
-	  if(var1->tagj1[i]>0.679 && var1->tagj2[i]>0.679 && var1-> Mll[i]>76. && var1-> Mll[i]<106.){
           params[0] = var1->hzbb[i];
           params[2] = var1->htt[i];
           params[1] = var1->hzz[i];
 	  zbbh->Fill(mlp->Evaluate(0, params));
-	  }
 	}
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	for (int i=0;i<N2; ++i) {
-          if(var2->tagj1[i]>0.679 && var2->tagj2[i]>0.679 && var2-> Mll[i]>76. && var2-> Mll[i]<106.){
-	    params[0] = var2->hzbb[i];
-	    params[2] = var2->htt[i];
-	    params[1] = var2->hzz[i];
+	  params[0] = var2->hzbb[i];
+	  params[2] = var2->htt[i];
+	  params[1] = var2->hzz[i];
 	  tth->Fill(mlp->Evaluate(0, params));
-	  }
 	}
         //-------------------------------------------------------------------------        
 	// FOR ZZ
         for (int i=0;i<N3; ++i) {
-          if(var3->tagj1[i]>0.679 && var3->tagj2[i]>0.679 && var3-> Mll[i]>60. && var3-> Mll[i]<106.){
 	  params[0] = var3->hzbb[i];
           params[2] = var3->htt[i];
           params[1] = var3->hzz[i];
 	  zzh->Fill(mlp->Evaluate(0,params));
-	  }
         }
         //-------------------------------------------------------------------------
 	// FOR ZH
         for (int i=0;i<N4; ++i) {
-          if(var4->tagj1[i]>0.679 && var4->tagj2[i]>0.679 && var4-> Mll[i]>60. && var4-> Mll[i]<106.){
-	    params[0] = var4->hzbb[i];
-	    params[2] = var4->htt[i];
-	    params[1] = var4->hzz[i];
+	  params[0] = var4->hzbb[i];
+	  params[2] = var4->htt[i];
+	  params[1] = var4->hzz[i];
           zhh->Fill(mlp->Evaluate(0, params));
-	  }
         }
 //-------------------------------------------------------------------------                                                                                             
 

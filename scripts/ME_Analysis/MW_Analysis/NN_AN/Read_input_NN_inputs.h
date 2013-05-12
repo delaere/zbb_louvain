@@ -1,7 +1,7 @@
 
-#include "MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500.cxx"
-#include "MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600.cxx"
-#include "MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000.cxx"
+#include "NN_537/MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500.cxx"
+#include "NN_537/MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600.cxx"
+#include "NN_537/MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000.cxx"
 
 class nn_vars {
   public:
@@ -82,22 +82,23 @@ class tree_in {
 };
 
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig,int typ2)
+void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fill, int sig, int typ2, TString totcuts)
 {
 
   // input file : read ttree
   //TChain *chain;
-  TChain *tree = new TChain("tree2");
-  tree->Reset();
-  tree->Add(rootFile);
-  
+  TChain *treeIn = new TChain("tree2");
+  treeIn->Reset();
+  treeIn->Add(rootFile);
+  TTree *tree = treeIn->CopyTree(totcuts);
+
   double Eta_j1,Eta_j2,Phi_j1,Phi_j2,MeTPhi,MeT,MeTsig;
   double Pt_lepplus,Eta_lepplus,Phi_lepplus,Pt_lepminus,Eta_lepminus,Phi_lepminus;
   double Pt_lep2plus,Eta_lep2plus,Phi_lep2plus,Pt_lep2minus,Eta_lep2minus,Phi_lep2minus;
   double Ej1,Ej2,Ptj1,Ptj2;
   double Wgg,Wqq,Wtt,Wzz,Wzz3,Whi,Whi3;
   double btagj1,btagj2;
-  double Mll;
+  double Mll, Mbb;
   int multiplicity;
   tree->SetBranchAddress("multiplicity",&multiplicity);
   tree->SetBranchAddress("Wgg",&Wgg);
@@ -133,6 +134,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
   tree->SetBranchAddress("btagj1",&btagj1);
   tree->SetBranchAddress("btagj2",&btagj2);
   tree->SetBranchAddress("Inv_Mass_lept",&Mll);
+  tree->SetBranchAddress("Inv_Mass_bb",&Mbb);
 
   // NN declaration -------------------------------------
   //!gROOT->GetClass("MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600");
@@ -156,7 +158,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
   // ----------------------------------------------------
   
   double entry=0.0;
-  for (int i=0;i<N1; ++i){	
+  for (int i=0;i<tree->GetEntries(); ++i){	
     tree->GetEntry(i); // read tree Zbb 
     double dphi1 = MeTPhi-Phi_j1;
     double dphi2 = MeTPhi-Phi_j2;
@@ -171,66 +173,58 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, i
     if(Pt_lep2plus>0.0 && Pt_lep2minus>0.0){l2.SetPtEtaPhiM(Pt_lep2minus,Eta_lep2minus,Phi_lep2minus,0.105);}
     b1.SetPtEtaPhiE(Ptj1,Eta_j1,Phi_j1,Ej1);
     b2.SetPtEtaPhiE(Ptj2,Eta_j2,Phi_j2,Ej2);
-    if(MeTsig<10. && Mll>76. && Mll<106. && btagj1>0.679 && btagj2>0.679){
-      sim->gg_weight=Wgg;
-      sim->qq_weight=Wqq;
-      //if(sig==0){sim->gg_weight=Wgg;}
-      //if(sig==0){sim->qq_weight=Wqq;}
-      //if(sig==1){sim->qq_weight=Wgg;}
-      //if(sig==1){sim->gg_weight=Wqq;}
-      sim->tt_weight=Wtt;
-      sim->zz_weight=Wzz;
-      sim->zz3_weight=Wzz3;
-      sim->hi_weight=Whi;
-      sim->hi3_weight=Whi3;
-      sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
-      //   sim->HvsTT=HTT->Value(0,Whi,Whi3,Wtt);
-      //   sim->HvsZZ=HZZ->Value(0,Whi,Whi3,Wzz,Wzz3);
-      sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
-      sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
-      var->hzbb[i] = sim->HvsZbb;
-      var->htt[i] = sim->HvsTT;
-      var->hzz[i] = sim->HvsZZ;
-      if(sim->gg_weight>300.0){sim->gg_weight=666;}
-      if(sim->qq_weight>300.0){sim->qq_weight=666;}
-      if(sim->tt_weight>300.0){sim->tt_weight=666;}
-      if(sim->zz_weight>300.0){sim->zz_weight=666;}
-      if(sim->zz3_weight>300.0){sim->zz3_weight=666;}
-      if(sim->hi_weight>300.0){sim->hi_weight=666;}
-      if(sim->hi3_weight>300.0){sim->hi3_weight=666;}
-      var->gg[i]=sim->gg_weight;
-      var->qq[i]=sim->qq_weight;
-      var->zz[i]=sim->zz_weight;
-      var->zz3[i]=sim->zz3_weight;
-      var->hi[i]=sim->hi_weight;
-      var->hi3[i]=sim->hi3_weight;
-      var->tt[i]=sim->tt_weight;
-      var->tagj1[i]=btagj1;
-      var->tagj2[i]=btagj2;
-      sim->type=sig;
-      sim->type2=typ2;
-      sim->deta = fabs(Eta_j1-Eta_j2);
-      var->deta[i]=fabs(Eta_j1-Eta_j2);
-      sim->ptZ=(l1+l2).Pt();
-      sim->ptbb=(b1+b2).Pt();
-      sim->Mll=Mll;//(l1+l2).M();
-      sim->Mbb=(b1+b2).M();
-      var->Mll[i]=sim->Mll;
-      var->Mbb[i]=sim->Mbb;
-      var->dphi[i]=sim->dphi;
-      var->ptZ[i]=sim->ptZ;
-      var->ptbb[i]=sim->ptbb;
-      var->Metsig[i]=MeTsig;
-      sim->metsig=MeTsig;   
-      sim->Met=MeT;
-      var->met[i]=sim->Met;
-      if(multiplicity>2){sim->Multi=1.;}
-      if(multiplicity<3){sim->Multi=0.;}
-      var->multi[i]=sim->Multi;
-      //if(fill==1){simu->Fill();}
-      //if(ptbb >100. && ptZ>100.){simu->Fill();}  
-      if(fill==1){simu->Fill();entry+=1;}  
-    }   
+    //fill
+    if(btagj2<0.679) cout<<"ERROR, cut bad"<<endl;
+    sim->gg_weight=Wgg;
+    sim->qq_weight=Wqq;
+    sim->tt_weight=Wtt;
+    sim->zz_weight=Wzz;
+    sim->zz3_weight=Wzz3;
+    sim->hi_weight=Whi;
+    sim->hi3_weight=Whi3;
+    sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
+    sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
+    sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
+    var->hzbb[i] = sim->HvsZbb;
+    var->htt[i] = sim->HvsTT;
+    var->hzz[i] = sim->HvsZZ;
+    if(sim->gg_weight>300.0){sim->gg_weight=50;}
+    if(sim->qq_weight>300.0){sim->qq_weight=50;}
+    if(sim->tt_weight>300.0){sim->tt_weight=50;}
+    if(sim->zz_weight>300.0){sim->zz_weight=50;}
+    if(sim->zz3_weight>300.0){sim->zz3_weight=50;}
+    if(sim->hi_weight>300.0){sim->hi_weight=50;}
+    if(sim->hi3_weight>300.0){sim->hi3_weight=50;}
+    var->gg[i]=sim->gg_weight;
+    var->qq[i]=sim->qq_weight;
+    var->zz[i]=sim->zz_weight;
+    var->zz3[i]=sim->zz3_weight;
+    var->hi[i]=sim->hi_weight;
+    var->hi3[i]=sim->hi3_weight;
+    var->tt[i]=sim->tt_weight;
+    var->tagj1[i]=btagj1;
+    var->tagj2[i]=btagj2;
+    sim->type=sig;
+    sim->type2=typ2;
+    sim->deta = fabs(Eta_j1-Eta_j2);
+    var->deta[i]=fabs(Eta_j1-Eta_j2);
+    sim->ptZ=(l1+l2).Pt();
+    sim->ptbb=(b1+b2).Pt();
+    sim->Mll=Mll;//(l1+l2).M();
+    sim->Mbb=Mbb;//(b1+b2).M();
+    var->Mll[i]=sim->Mll;
+    var->Mbb[i]=sim->Mbb;
+    var->dphi[i]=sim->dphi;
+    var->ptZ[i]=sim->ptZ;
+    var->ptbb[i]=sim->ptbb;
+    var->Metsig[i]=MeTsig;
+    sim->metsig=MeTsig;   
+    sim->Met=MeT;
+    var->met[i]=sim->Met;
+    if(multiplicity>2){sim->Multi=1.;}
+    if(multiplicity<3){sim->Multi=0.;}
+    var->multi[i]=sim->Multi;
+    if(fill==1){simu->Fill();entry+=1;}     
   }
   var->evt_nbr[0]=entry;
   cout<<entry<<endl; 
