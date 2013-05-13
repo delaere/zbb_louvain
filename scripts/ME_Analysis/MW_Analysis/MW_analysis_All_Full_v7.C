@@ -30,7 +30,7 @@ Float_t Theta_Star(TLorentzVector v1, TLorentzVector v2){
 }
 
 
-void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFile3,const char *inputFile4,const char *inputFile5,const char *inputFile6,const char *inputFile7, const char *inputFile8,const char *LHCOFile,const char *Event_Info,TString outName, int EventToProcess, int tagg_zbb,int tagg_lep )
+void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFile3,const char *inputFile4,const char *inputFile5,const char *inputFile6,const char *inputFile7, const char *inputFile8,const char *LHCOFile,const char *Event_Info,TString outName, int EventToProcess, int tagg_zbb,int tagg_lep, int DYflag )
 {
   //------------------------- INPUTS NEEDED--------------------------------------------------------------------------//
   //  inputFile1     : gg weight Not normalized (output MW)
@@ -47,66 +47,75 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
   //  EventToProcess : number of events (has to be the same everywhere !)
   //  tagg_zbb       : Run on DY events ? Yes: 1, No: 0
   //  tagg_lep       : Choose your lepton:  Muons: 1, Electrons: 0
-  
+	cout<<" enter "<<" EventToProcess  "<<EventToProcess<<endl;  
  
         // init and read file
 	int var;
 	int card_num = 1;
 	int Evt_number =EventToProcess;
 	var = card_num * Evt_number;
+
+	cout<<"First input file is "<< inputFile1<<endl;
 	
 	ifstream infile1(inputFile1);
-	Double_t abscisse_1[var];
-	Double_t ordonnee_1[var];
-	Double_t error_1[var];
+	double *abscisse_1=new double[var];
+	double *ordonnee_1=new double[var];
+	double *error_1=new double[var];
 	Int_t line_1 = 0;	
 
 	ifstream infile2(inputFile2);
-	Double_t abscisse_2[var];
-	Double_t ordonnee_2[var];
-	Double_t error_2[var];
+	double *abscisse_2=new double[var];
+	double *ordonnee_2=new double[var];
+	double *error_2=new double[var];
 	Int_t line_2 = 0;
 	
         ifstream infile3(inputFile3);
-        Double_t abscisse_3[var];
-        Double_t ordonnee_3[var];
-        Double_t error_3[var];
+        double *abscisse_3=new double[var];
+        double *ordonnee_3=new double[var];
+        double *error_3=new double[var];
         Int_t line_3 = 0;
 
         ifstream infile4(inputFile4);
-        Double_t abscisse_4[var];
-        Double_t ordonnee_4[var];
-        Double_t error_4[var];
+        double *abscisse_4=new double[var];
+        double *ordonnee_4=new double[var];
+        double *error_4=new double[var];
         Int_t line_4 = 0;
 
         ifstream infile5(inputFile5);
-        Double_t abscisse_5[var];
-        Double_t ordonnee_5[var];
-        Double_t error_5[var];
+        double *abscisse_5=new double[var];
+        double *ordonnee_5=new double[var];
+        double *error_5=new double[var];
         Int_t line_5 = 0;
 
         ifstream infile6(inputFile6);
-        Double_t abscisse_6[var];
-        Double_t ordonnee_6[var];
-        Double_t error_6[var];
+        double *abscisse_6=new double[var];
+        double *ordonnee_6=new double[var];
+        double *error_6=new double[var];
         Int_t line_6 = 0;
+
+        cout<<"last input file is " <<inputFile7<<endl;
+
 
 	// Higgs Weights
         ifstream infile7(inputFile7);
-        Double_t abscisse_71[var];Double_t abscisse_72[var];Double_t abscisse_73[var];Double_t abscisse_74[var];Double_t abscisse_75[var];
-        Double_t ordonnee_71[var];Double_t ordonnee_72[var];Double_t ordonnee_73[var];Double_t ordonnee_74[var];Double_t ordonnee_75[var];
-        Double_t error_71[var];Double_t error_72[var];Double_t error_73[var];Double_t error_74[var];Double_t error_75[var];
+        double *abscisse_71=new double[var];double *abscisse_72=new double[var];double *abscisse_73=new double[var];double *abscisse_74=new double[var];double *abscisse_75=new double[var];
+        double *ordonnee_71=new double[var];double *ordonnee_72=new double[var];double *ordonnee_73=new double[var];double *ordonnee_74=new double[var];double *ordonnee_75=new double[var];
+        double *error_71=new double[var];double *error_72=new double[var];double *error_73=new double[var];double *error_74=new double[var];double *error_75=new double[var];
         Int_t line_71 = 0;Int_t line_72 = 0;Int_t line_73 = 0;Int_t line_74 = 0;Int_t line_75 = 0;
 
         ifstream infile8(inputFile8);
-        Double_t abscisse_81[var];Double_t abscisse_82[var];Double_t abscisse_83[var];Double_t abscisse_84[var];Double_t abscisse_85[var];
-        Double_t ordonnee_81[var];Double_t ordonnee_82[var];Double_t ordonnee_83[var];Double_t ordonnee_84[var];Double_t ordonnee_85[var];
-        Double_t error_81[var];Double_t error_82[var];Double_t error_83[var];Double_t error_84[var];Double_t error_85[var];
+        double *abscisse_81=new double[var];double *abscisse_82=new double[var];double *abscisse_83=new double[var];double *abscisse_84=new double[var];double *abscisse_85=new double[var];
+        double *ordonnee_81=new double[var];double *ordonnee_82=new double[var];double *ordonnee_83=new double[var];double *ordonnee_84=new double[var];double *ordonnee_85=new double[var];
+        double *error_81=new double[var];double *error_82=new double[var];double *error_83=new double[var];double *error_84=new double[var];double *error_85=new double[var];
         Int_t line_81 = 0;Int_t line_82 = 0;Int_t line_83 = 0;Int_t line_84 = 0;Int_t line_85 = 0;
 
-	double nul[var];
+        cout<<outName<<endl;
+
+	cout<<"after output creation"<<endl;
+	double *nul=new double[var];
 	TFile file(outName+".root","RECREATE");
 
+	cout<<"after output creation"<<endl;
 	//----------------------- load file 1 --------------------------------------------------------------
 	while(infile1 >> abscisse_1[line_1] >> ordonnee_1[line_1] >> error_1[line_1]){
 	  line_1++;
@@ -134,13 +143,13 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         infile6.close();
 
 	for(Int_t line=0; line<(5*var);++line){
-	  cout<<" guiguig "<<line<<endl;
+	  //cout<<" guiguig "<<line<<endl;
 	  if(line<var){infile7 >> abscisse_71[line_71] >> ordonnee_71[line_71] >> error_71[line_71];line_71++;}
 	  if(line<2*var&&line>(1*var -1)){infile7 >> abscisse_72[line_72] >> ordonnee_72[line_72] >> error_72[line_72];line_72++;}
           if(line<3*var&&line>(2*var -1)){infile7 >> abscisse_73[line_73] >> ordonnee_73[line_73] >> error_73[line_73];line_73++;}
           if(line<4*var&&line>(3*var -1)){infile7 >> abscisse_74[line_74] >> ordonnee_74[line_74] >> error_74[line_74];line_74++;}
           if(line<5*var&&line>(4*var -1)){infile7 >> abscisse_75[line_75] >> ordonnee_75[line_75] >> error_75[line_75];line_75++;}
-	  cout<<"abs "<<ordonnee_71[line]<<endl;
+	  //cout<<"abs "<<ordonnee_71[line]<<endl;
 	}
         infile7.close();
 
@@ -164,30 +173,52 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         TChain *tree = new TChain("tree1");
         tree->Reset();
         tree->Add(Event_Info);
+        Long64_t allEntries2 =tree->GetEntries();
+
 
         int isZb,isZc,isZl;
 	double btag_j1,btag_j2,Met_sig,noPUcorrMeT,noPUcorrMeT_phi,noPUcorrMeT_sig;
 	double llM,bbM,Pile_up;
 	int nbr_PV,nJets,codeDYprod;
-	Long64_t runNumber,eventNumber;
-
+	int flavor_j1,flavor_j2;
+	double trijetM_125,fsrjetphi_125,Met2,fsrjetetapm_125,fsrjetpt_125,trijetMdr,fsrDR,PT_j1,PT_j2;//,phi_j1,phi_j2Eta_j1,Eta_j2;
+	//Long64_t runNumber,eventNumber;
+        ULong64_t runNumber,eventNumber;
         //tree->SetBranchAddress("codeDYprod",&codeDYprod);
 	tree->SetBranchAddress("runNumber",&runNumber);
 	tree->SetBranchAddress("eventNumber",&eventNumber);
         tree->SetBranchAddress("isZb",&isZb);
         tree->SetBranchAddress("isZc",&isZc);
+	tree->SetBranchAddress("Flavor_j1",&flavor_j1);
+        tree->SetBranchAddress("Flavor_j2",&flavor_j2);
         tree->SetBranchAddress("isZl",&isZl);
         tree->SetBranchAddress("btag_j1",&btag_j1);
         tree->SetBranchAddress("btag_j2",&btag_j2);
-        tree->SetBranchAddress("Met_sig",&Met_sig);
+        tree->SetBranchAddress("Met",&Met2);
+	tree->SetBranchAddress("Met_sig",&Met_sig);
         tree->SetBranchAddress("llM",&llM);
         tree->SetBranchAddress("bbM",&bbM);
+
+	tree->SetBranchAddress("trijetM_125",&trijetM_125);
+	tree->SetBranchAddress("fsrjetphi_125",&fsrjetphi_125);
+	tree->SetBranchAddress("fsrjetetapm_125",&fsrjetetapm_125);
+	tree->SetBranchAddress("fsrjetpt_125",&fsrjetpt_125);
+	tree->SetBranchAddress("trijetMdr",&trijetMdr);
+	tree->SetBranchAddress("fsrDR",&fsrDR);
+	
+	tree->SetBranchAddress("Pt_j1",&PT_j1);
+	tree->SetBranchAddress("Pt_j2",&PT_j2);
+	//tree->SetBranchAddress("phi_j1",&phi_j1);	
+	//tree->SetBranchAddress("phi_j2",&phi_j2);	
+	//tree->SetBranchAddress("Eta_j1",&Eta_j1);	
+	//tree->SetBranchAddress("Eta_j2",&Eta_j2);		
+		
         tree->SetBranchAddress("nJets",&nJets);
 	tree->SetBranchAddress("nbr_PV",&nbr_PV);
 	tree->SetBranchAddress("Pile_up",&Pile_up);
-	tree->SetBranchAddress("noPUcorrMeT_sig",&noPUcorrMeT_sig);
-        tree->SetBranchAddress("noPUcorrMeT_phi",&noPUcorrMeT_phi);
-        tree->SetBranchAddress("noPUcorrMeT",&noPUcorrMeT);
+	//tree->SetBranchAddress("noPUcorrMeT_sig",&noPUcorrMeT_sig);
+        //tree->SetBranchAddress("noPUcorrMeT_phi",&noPUcorrMeT_phi);
+        //tree->SetBranchAddress("noPUcorrMeT",&noPUcorrMeT);
 
 
         TChain *chain= new TChain("LHCO");
@@ -212,15 +243,22 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	TRootElectron *Electron;
 	TIter itElectron(branchElectron);
 
+        TClonesArray *branchEvent = treeReader->UseBranch("Event");
+        TRootEvent *Event;
+        TIter itEvent(branchEvent);
+
+
         TTree *tree2 = new TTree("tree2","data");
 
         double Pt_elplus,Pt_elminus,Pt_Muplus,Pt_Muminus,Phi_elplus,Phi_elminus,Phi_Muplus,Phi_Muminus,Eta_elplus,Eta_elminus,Eta_Muplus,Eta_Muminus,Inv_Mass_lept,DR_jets,MeT,dPhiJ1Met,dPhiJ2Met,Inv_Mass_bb;
 	double Wtt,Wgg,Wqq,Wzz0,Wzz3,Wtwb;
 	double Whi0_115,Whi0_120,Whi0_125,Whi0_130,Whi0_135,Whi3_115,Whi3_120,Whi3_125,Whi3_130,Whi3_135;
-	double Pt_j1,Pt_j2,Eta_j1,Eta_j2,Phi_j1,Phi_j2,E_j1,E_j2;
+	double Pt_j1,Pt_j2,Eta_j1,Eta_j2,Phi_j1,Phi_j2,E_j1,E_j2,bestHiggsCandidate,DRfsr;
 	double MeTPhi, Met_signi, Met_signi_noC, MeTPhi_noC, MeT_noC,PileUp;
-	int flavour,btagj1,btagj2,nbrPV, multiplicity,DYprod;
-
+	int flavour,nbrPV, multiplicity,DYprod;
+	double btagj1,btagj2;
+	int Flavor_j1,Flavor_j2;
+	int DY_flag;
 	tree2->Branch("Pt_elplus",&Pt_elplus,"Pt_elplus/D");
 	tree2->Branch("Pt_elminus",&Pt_elminus,"Pt_elminus/D");
 	tree2->Branch("Pt_Muplus",&Pt_Muplus,"Pt_Muplus/D");
@@ -239,13 +277,15 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         tree2->Branch("Phi_j1",&Phi_j1,"Phi_j1/D");
         tree2->Branch("Pt_j1",&Pt_j1,"Pt_j1/D");
         tree2->Branch("E_j1",&E_j1,"E_j1/D");
-
+        tree2->Branch("Flavor_j1",&Flavor_j1,"Flavor_j1/I");
+        tree2->Branch("Flavor_j2",&Flavor_j2,"Flavor_j2/I");
+		
         tree2->Branch("Eta_j2",&Eta_j2,"Eta_j2/D");
 	tree2->Branch("Phi_j2",&Phi_j2,"Phi_j2/D");
         tree2->Branch("Pt_j2",&Pt_j2,"Pt_j2/D");
         tree2->Branch("E_j2",&E_j2,"E_j2/D");
-        tree2->Branch("btagj1",&btagj1,"btagj1/I");
-        tree2->Branch("btagj2",&btagj2,"btagj2/I");
+        tree2->Branch("btagj1",&btagj1,"btagj1/D");
+        tree2->Branch("btagj2",&btagj2,"btagj2/D");
 
         tree2->Branch("MeTPhi",&MeTPhi,"MeTPhi/D");
 	tree2->Branch("Met_signi",&Met_signi,"Met_signi/D");
@@ -264,6 +304,7 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         tree2->Branch("flavour",&flavour,"flavour/I");
 
         tree2->Branch("DYprod",&DYprod,"DYprod/I");
+        tree2->Branch("DY_flag",&DY_flag,"DY_flag/I");
 
 	tree2->Branch("nbrPV",&nbrPV,"nbrPV/I");
         tree2->Branch("PileUp",&PileUp,"PileUp/D");
@@ -289,21 +330,81 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
         tree2->Branch("Whi0_130",&Whi0_130,"Whi0_130/D");
         tree2->Branch("Whi3_135",&Whi3_135,"Whi3_135/D");
         tree2->Branch("Whi0_135",&Whi0_135,"Whi0_135/D");
-
+	
+	tree2->Branch("trijetM_125",&trijetM_125,"trijetM_125/D");
+	tree2->Branch("fsrjetphi_125",&fsrjetphi_125,"fsrjetphi_125/D");
+	tree2->Branch("fsrjetetapm_125",&fsrjetetapm_125,"fsrjetetapm_125/D");
+	tree2->Branch("fsrjetpt_125",&fsrjetpt_125,"fsrjetpt_125/D");
+	tree2->Branch("bestHiggsCandidate",&bestHiggsCandidate,"bestHiggsCandidate/D");
+	tree2->Branch("DRfsr",&DRfsr,"DRfsr/D");
+	tree2->Branch("fsrDR",&fsrDR,"fsrDR/D");
+	tree2->Branch("trijetMdr",&trijetMdr,"tijietMdr/D");
+		
         int even=0;
 
-	//for(Int_t entry = 0; entry <allEntries; ++entry){
-	for(Int_t entry = 0; entry <EventToProcess; ++entry){
+	int long EvtNum[EventToProcess];
+	int EvtEntry[EventToProcess];
+	int Evtok[EventToProcess];
+	int long RunNbr[EventToProcess];
+
+	int entrry=0;
+	
+	for (Int_t entry2 = 0; entry2 <allEntries; ++entry2){
+	//for (Int_t entry2 = 0; entry2 <EventToProcess; ++entry2){
+		treeReader->ReadEntry(entry2);
+                itEvent.Reset();itJet.Reset();
+                while((Event = (TRootEvent*) itEvent.Next()) ){
+          	int jet_count2=0;
+		while(jet = (TRootJet*) itJet.Next() ){
+            	jet_count2 = jet_count2+1;
+		//cout<<jet->PT<<endl;
+          	}
+                if(jet_count2>1){//Event->Trigger>0){            
+	        //cout<<" Is in the loop with 2 jets"<<Event->Trigger<<endl;
+		EvtEntry[entrry]=entry2;
+           	Evtok[entrry]=entrry;     
+                EvtNum[entrry]=Event->Trigger;
+		RunNbr[entrry]=Event->Number;
+		entrry=entrry+1;
+	}}}
+	
+	cout<<"***************** "<<entrry<<"$$$$$$$$$$$$$$$$$$$$$"<<endl;
+
+	for(Int_t entry = 0; entry <allEntries2; ++entry){
+	//for(Int_t entry = 0; entry <EventToProcess; ++entry){
 
 	  even++;
-	  //cout<<"------------------------------------------------------------------------------------"<<endl;
+	  cout<<"------------------------------------------------------------------------------------"<<endl;
+	  //cout<<even<<" "<<entry<<endl;
 	  treeReader->ReadEntry(entry);
+          tree->GetEntry(entry);
+	  cout<<" in tree1 file at entry: "<<entry<<" llM "<<llM<<" evt number "<<eventNumber<<endl;
+	  int tmp_ent=-1;
+	  int tmp_ent2=-1;
+	  bool match=false; 
+	  for(int jj=0;jj<EventToProcess; ++jj){
+		//cout<<"is in loop 2 before If "<<EvtNum[jj]<<" "<<eventNumber<<endl;
+		if(eventNumber==EvtNum[jj]){// && runNumber==RunNbr[jj]){
+		cout<<EvtNum[jj]<<" "<<RunNbr[jj]<<endl;
+		tmp_ent=Evtok[jj];
+		tmp_ent2=EvtEntry[jj];
+		match=true;
+		}
+	  }
+	  
+	  //tmp_ent=entry;
+	  //tmp_ent2=entry;
+	  if(match==true){
+	  treeReader->ReadEntry(tmp_ent2);
+	  //treeReader->ReadEntry(entry);
+	  }
 	  itJet.Reset();
 	  itMuon.Reset();
 	  itElectron.Reset();
 	  itMet.Reset();
-	  
-	  tree->GetEntry(entry);
+	  itEvent.Reset();	
+  
+	  //tree->GetEntry(entry);
 	  double mEt=0.0;
 	  TLorentzVector El;
 	  TLorentzVector antiEl;
@@ -316,8 +417,11 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 
 	  int jet_count=0;
 
+	  cout<<"weights "<<-log10(ordonnee_1[tmp_ent])<<" evt nbr "<<eventNumber<<" evt entry "<<tmp_ent2<<" "<<tmp_ent<<endl;
+	  cout<<flavor_j1<<" "<<flavor_j2<<endl;
+
 	  while(jet = (TRootJet*) itJet.Next() ){
-	    //cout<<" JETS "<<jet->PT<<" "<<jet->Eta<<" "<<jet->Phi<<endl;
+	    cout<<" JETS "<<jet->PT<<" "<<jet->Eta<<" "<<jet->Phi<<endl;
 	    if(jet_count==0){jets[0].SetPtEtaPhiM(jet->PT,jet->Eta,jet->Phi,jet->Mass);}
 	    if(jet_count==1){jets[1].SetPtEtaPhiM(jet->PT,jet->Eta,jet->Phi,jet->Mass);}
 	    jet_count = jet_count+1;
@@ -345,9 +449,15 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	    if(dPhi_Met_Jet2>TMath::Pi()){
 	      dPhi_Met_Jet2= (2*TMath::Pi()) - dPhi_Met_Jet2;
 	    }
-
-
+	   if(match==true){
+              //cout<<"MET number: "<<met->MET<<" "<<Met2<<endl;
+            }
 	  }
+	  while((Event = (TRootEvent*) itEvent.Next()) ){
+	      if(match==true){
+              //cout<<"Event number: "<<Event->Trigger<<" "<<eventNumber<<endl;
+	    }}
+
 	  TLorentzVector bbSy;
 	  bbSy=jets[0]+jets[1];
 	  double mass_bb = bbSy.M();
@@ -372,7 +482,7 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 
 	  //cout<<Inv_Mass_lept<<" "<<mEt<<endl;
 	  // check cuts before output for NN
-	  if(llM>6 && llM<206){// && mEt<50 ){//&& bbM>70 && bbM<155 && InvMassAll>350 && Dphi_Zbb>2.5 && Delta_bb<1.8 &&  Delta_ll<1.5 && Tstar >0.6 && Tstar <2){
+	  if(match==true){// && mEt<50 ){//&&bbM>70 && bbM<155 && InvMassAll>350 && Dphi_Zbb>2.5 && Delta_bb<1.8 &&  Delta_ll<1.5 && Tstar >0.6 && Tstar <2){
 	    Inv_Mass_lept = llM;//InvMassLepton;
 	    Inv_Mass_bb= bbM;//mass_bb;
 	    E_j1=jets[0].E();
@@ -383,8 +493,11 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	    Phi_j2=jets[1].Phi();
 	    Pt_j1=jets[0].Pt();
 	    Pt_j2=jets[1].Pt();
+	    
+	    //cout<<" jet Pt ------------ "<<endl;
+	    cout<<PT_j1<<" "<<jets[0].Pt()<<" "<<PT_j2<<" "<<jets[1].Pt()<<endl;
 
-	    cout<<codeDYprod<<endl;
+	    //cout<<codeDYprod<<endl;
 
             int flav=0;
 	    if(tagg_zbb==0){flav=0.0;}
@@ -393,40 +506,41 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	      if(isZc==1 && isZb==0)flav=1;
 	      if(isZl==1 && isZc==0 && isZb==0)flav=0;
 	    }          
+	    cout<<ordonnee_1[tmp_ent]<<" "<<tmp_ent<<endl;
+	    if(ordonnee_1[tmp_ent]>0.0){Wgg=-log10(ordonnee_1[tmp_ent]);}
+            if(ordonnee_2[tmp_ent]>0.0){Wqq=-log10(ordonnee_2[tmp_ent]);}
+	    if(ordonnee_3[tmp_ent]>0.0){Wtt=-log10(ordonnee_3[tmp_ent]);}
+	    if(ordonnee_4[tmp_ent]>0.0){Wtwb=-log10(ordonnee_4[tmp_ent]);}
+	    if(ordonnee_5[tmp_ent]>0.0){Wzz3=-log10(ordonnee_5[tmp_ent]);}
+            if(ordonnee_6[tmp_ent]>0.0){Wzz0=-log10(ordonnee_6[tmp_ent]);}
+            if(ordonnee_71[tmp_ent]>0.0){Whi3_115=-log10(ordonnee_71[tmp_ent]);}
+            if(ordonnee_81[tmp_ent]>0.0){Whi0_115=-log10(ordonnee_81[tmp_ent]);}
+            if(ordonnee_72[tmp_ent]>0.0){Whi3_120=-log10(ordonnee_72[tmp_ent]);}
+            if(ordonnee_82[tmp_ent]>0.0){Whi0_120=-log10(ordonnee_82[tmp_ent]);}
+            if(ordonnee_73[tmp_ent]>0.0){Whi3_125=-log10(ordonnee_73[tmp_ent]);}
+            if(ordonnee_83[tmp_ent]>0.0){Whi0_125=-log10(ordonnee_83[tmp_ent]);}
+            if(ordonnee_74[tmp_ent]>0.0){Whi3_130=-log10(ordonnee_74[tmp_ent]);}
+            if(ordonnee_84[tmp_ent]>0.0){Whi0_130=-log10(ordonnee_84[tmp_ent]);}
+            if(ordonnee_75[tmp_ent]>0.0){Whi3_135=-log10(ordonnee_75[tmp_ent]);}
+            if(ordonnee_85[tmp_ent]>0.0){Whi0_135=-log10(ordonnee_85[tmp_ent]);}
 	    
-	    if(ordonnee_1[entry]>0.0){Wgg=-log10(ordonnee_1[entry]);}
-            if(ordonnee_2[entry]>0.0){Wqq=-log10(ordonnee_2[entry]);}
-	    if(ordonnee_3[entry]>0.0){Wtt=-log10(ordonnee_3[entry]);}
-	    if(ordonnee_4[entry]>0.0){Wtwb=-log10(ordonnee_4[entry]);}
-	    if(ordonnee_5[entry]>0.0){Wzz3=-log10(ordonnee_5[entry]);}
-            if(ordonnee_6[entry]>0.0){Wzz0=-log10(ordonnee_6[entry]);}
-            if(ordonnee_71[entry]>0.0){Whi3_115=-log10(ordonnee_71[entry]);}
-            if(ordonnee_81[entry]>0.0){Whi0_115=-log10(ordonnee_81[entry]);}
-            if(ordonnee_72[entry]>0.0){Whi3_120=-log10(ordonnee_72[entry]);}
-            if(ordonnee_82[entry]>0.0){Whi0_120=-log10(ordonnee_82[entry]);}
-            if(ordonnee_73[entry]>0.0){Whi3_125=-log10(ordonnee_73[entry]);}
-            if(ordonnee_83[entry]>0.0){Whi0_125=-log10(ordonnee_83[entry]);}
-            if(ordonnee_74[entry]>0.0){Whi3_130=-log10(ordonnee_74[entry]);}
-            if(ordonnee_84[entry]>0.0){Whi0_130=-log10(ordonnee_84[entry]);}
-            if(ordonnee_75[entry]>0.0){Whi3_135=-log10(ordonnee_75[entry]);}
-            if(ordonnee_85[entry]>0.0){Whi0_135=-log10(ordonnee_85[entry]);}
-	    
-	    if(ordonnee_1[entry]==0.0){Wgg=-1;}
-            if(ordonnee_2[entry]==0.0){Wqq=-1;}
-	    if(ordonnee_3[entry]==0.0){Wtt=-1;}
-	    if(ordonnee_4[entry]==0.0){Wtwb=-1;}
-	    if(ordonnee_5[entry]==0.0){Wzz3=-1;}
-            if(ordonnee_6[entry]==0.0){Wzz0=-1;}
-            if(ordonnee_71[entry]==0.0){Whi3_115=-1;}
-            if(ordonnee_81[entry]==0.0){Whi0_115=-1;}
-            if(ordonnee_72[entry]==0.0){Whi3_120=-1;}
-            if(ordonnee_82[entry]==0.0){Whi0_120=-1;}
-            if(ordonnee_73[entry]==0.0){Whi3_125=-1;}
-            if(ordonnee_83[entry]==0.0){Whi0_125=-1;}
-            if(ordonnee_74[entry]==0.0){Whi3_130=-1;}
-            if(ordonnee_84[entry]==0.0){Whi0_130=-1;}
-            if(ordonnee_75[entry]==0.0){Whi3_135=-1;}
-            if(ordonnee_85[entry]==0.0){Whi0_135=-1;}
+	    if(ordonnee_1[tmp_ent]==0.0){Wgg=-1;}
+            if(ordonnee_2[tmp_ent]==0.0){Wqq=-1;}
+	    if(ordonnee_3[tmp_ent]==0.0){Wtt=-1;}
+	    //if(Wtt>35){Wtt=35;}
+	    if(ordonnee_4[tmp_ent]==0.0){Wtwb=-1;}
+	    if(ordonnee_5[tmp_ent]==0.0){Wzz3=-1;}
+            if(ordonnee_6[tmp_ent]==0.0){Wzz0=-1;}
+            if(ordonnee_71[tmp_ent]==0.0){Whi3_115=-1;}
+            if(ordonnee_81[tmp_ent]==0.0){Whi0_115=-1;}
+            if(ordonnee_72[tmp_ent]==0.0){Whi3_120=-1;}
+            if(ordonnee_82[tmp_ent]==0.0){Whi0_120=-1;}
+            if(ordonnee_73[tmp_ent]==0.0){Whi3_125=-1;}
+            if(ordonnee_83[tmp_ent]==0.0){Whi0_125=-1;}
+            if(ordonnee_74[tmp_ent]==0.0){Whi3_130=-1;}
+            if(ordonnee_84[tmp_ent]==0.0){Whi0_130=-1;}
+            if(ordonnee_75[tmp_ent]==0.0){Whi3_135=-1;}
+            if(ordonnee_85[tmp_ent]==0.0){Whi0_135=-1;}
 
 
 
@@ -455,7 +569,16 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	    MeT_noC=noPUcorrMeT;
 	    MeTPhi_noC=noPUcorrMeT_phi;
 	    Met_signi_noC=noPUcorrMeT_sig;
+	    
+	    DY_flag=-1;
+	    if(DYflag>-1){DY_flag=DYflag;}
+	    Flavor_j1=flavor_j1;
+	    Flavor_j2=flavor_j2;
+	    
+	    //cout<<" testt "<<endl;
+	    //cout<<flavor_j1<<" "<<flavor_j2<<endl;
 
+	    
 	    dPhiJ1Met=dPhi_Met_Jet1;
 	    dPhiJ2Met=dPhi_Met_Jet2;
 	    btagj1=btag_j1;
@@ -465,15 +588,42 @@ void MWToRoot(const char *inputFile1,const char *inputFile2, const char *inputFi
 	    nbrPV=nbr_PV;
 
 	    DYprod=codeDYprod;
+	    
+	    if((trijetM_125 - 125) < (bbM-125)){bestHiggsCandidate=trijetM_125;}
+	    if((trijetM_125 - 125) > (bbM-125)){bestHiggsCandidate=bbM;}
 
+	    double dphi1=jets[0].Phi()-fsrjetphi_125;
+	    if(dphi1>TMath::Pi()){
+	      dphi1= (2*TMath::Pi()) - dphi1;
+	    }
+	    double DR1=sqrt(pow(jets[0].Eta()-fsrjetetapm_125,2)+pow(dphi1,2));
+	    
+	    double dphi2=jets[1].Phi()-fsrjetphi_125;
+	    if(dphi2>TMath::Pi()){
+	      dphi2= (2*TMath::Pi()) - dphi2;
+	    }
+	    double DR2=sqrt(pow(jets[1].Eta()-fsrjetetapm_125,2)+pow(dphi2,2));	    
+	    
+	    if(DR1<DR2){DRfsr=DR1;}
+	    if(DR2<DR1){DRfsr=DR2;}
+	    
+	    cout<<"passssssssssssssssssssssss"<<endl;
+	    
 	    tree2->Fill();
 	  }
+	//}
+	cout<<"passssssssssssssssssssssss555"<<endl;
 
         }
+	
+	cout<<"before write"<<endl;
+	
 	tree2->Write();
 	file.Write();
 
-	delete treeReader;
-	delete chain;
+	cout<<"after write"<<endl;
+
+	//delete treeReader;
+	//delete chain;
 
 }
