@@ -108,21 +108,33 @@ double gg_weight;
 	int dyflag;	
 };
 
-double ptj1_cut = 20;
-double ptj2_cut = 20;
-double ptz_cut = -1.0;
+class kinematical_cuts {
+  private:
+    double ptj1_cut_input;
+    double ptj2_cut_input;
+    double ptz_cut_input;
+  
+  public:
 
-double setPtJ1Cut(double x) {ptj1_cut = x;}
-double setPtJ2Cut(double x) {ptj2_cut = x;}
-double setPtZCut(double x) {ptz_cut = x;}
+    inline double getPtJ1Cut() {return ptj1_cut_input;}
+    inline double getPtJ2Cut() {return ptj2_cut_input;}
+    inline double getPtZCut() {return ptz_cut_input;}
+    kinematical_cuts(double ptj1cut, double ptj2cut, double ptzcut);
+};
+
+kinematical_cuts::kinematical_cuts(double ptj1cut, double ptj2cut, double ptzcut) {
+  ptj1_cut_input = ptj1cut;
+  ptj2_cut_input = ptj2cut;
+  ptz_cut_input = ptzcut;
+  
+}
 
 
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2, int multi)
+void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu, int fill,int sig1,int sig2, int multi, kinematical_cuts *kin_cut)
 {
 
 // input file : read ttree
-TChain *chain;
 TChain *tree = new TChain("tree2");
 tree->Reset();
 tree->Add(rootFile);
@@ -183,7 +195,7 @@ tree->Add(rootFile);
  //  tree->SetBranchAddress("Flavor_j1",&Flavor_j1);
  //}
 
- cout << "ptj1_cut=" << ptj1_cut << " ptj2_cut=" << ptj2_cut << " ptz_cut=" << ptz_cut << endl;  
+ cout << "ptj1_cut_input=" << kin_cut->getPtJ1Cut() << " ptj2_cut_input=" << kin_cut->getPtJ2Cut() << " ptz_cut_input=" << kin_cut->getPtZCut() << endl;  
  
  
  int entryy=0, entryy1=0, entryy2=0, entryy3=0;
@@ -211,7 +223,15 @@ tree->Add(rootFile);
    double bmin=min(Ptj1,Ptj2);
    if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity==2&&(b1+b2).M()>80 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multi==0){evt[i]=true;}
    if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity>2&&(b1+b2).M()>50 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multi==1){evt[i]=true;}
-
+   
+   std::cout << "evt[i]="<<evt[i];
+   //Adding ptj1 ptj2 and ptz cuts
+   if ((l1+l2).Pt() > kin_cut->getPtZCut() && bmax > kin_cut->getPtJ1Cut() && bmin > kin_cut->getPtJ2Cut()) {}
+   else {evt[i] = false;}
+   
+   std::cout << " ptz=" << (l1+l2).Pt() << " ptj1=" << bmax << " ptj2=" << bmin << " evt[i]="<<evt[i] << std::endl;
+   
+   
    if(evt[i]==true){
    
    sim->gg_weight=Wgg;
@@ -283,6 +303,7 @@ tree->Add(rootFile);
    var->multi[i]=sim->Multi;
    var->DY_flag[i]=DY_flag_tree;
    sim->dyflag=var->DY_flag[i];
+
    if(fill==1 && sig2==0){
    	simu->Fill();entryy+=1;
 	if(var->DY_flag[i]==0){entryy1+=1;}
