@@ -10,6 +10,17 @@
 #include "include.h"
 #include "Read_input.h"
 
+//These are the default cuts
+//If you want to change the cuts DO NOT MODIFY THEM HERE, but change the arguments used in the NN.sh script
+double ptj1_cut = 20;
+double ptj2_cut = 20;
+double ptz_cut = -1.0;
+
+void setPtJ1Cut(double x) {ptj1_cut = x;}
+void setPtJ2Cut(double x) {ptj2_cut = x;}
+void setPtZCut(double x) {ptz_cut = x;}
+
+
 void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag,TString NNStruct,int iterations, int multiplicity)
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
@@ -66,15 +77,20 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	treetmp->Add(zh);
 	N4=treetmp->GetEntries();
 	delete treetmp;
+	
+
+	//Apply ptj1, ptj2, and ptz cuts
+	kinematical_cuts* kin_cut = new kinematical_cuts(ptj1_cut, ptj2_cut, ptz_cut);
+	
 
 	nn_vars *var1 = new nn_vars(N1);
-	if(tag==1){Input(dy,N1,var1,sim,simu,1,0,0,multiplicity);}
+	if(tag==1){Input(dy,N1,var1,sim,simu,1,0,0,multiplicity,kin_cut);}
 	nn_vars *var2 = new nn_vars(N2);
-	if(tag==2){Input(tt,N2,var2,sim,simu,1,0,0,multiplicity);}
+	if(tag==2){Input(tt,N2,var2,sim,simu,1,0,0,multiplicity,kin_cut);}
 	nn_vars *var3 = new nn_vars(N3);
-	if(tag==3){Input(zz,N3,var3,sim,simu,1,0,0,multiplicity);}
+	if(tag==3){Input(zz,N3,var3,sim,simu,1,0,0,multiplicity,kin_cut);}
 	nn_vars *var4 = new nn_vars(N4);
-	Input(zh,N4,var4,sim,simu,1,1,0,multiplicity);
+	Input(zh,N4,var4,sim,simu,1,1,0,multiplicity,kin_cut);
 
 	simu->Write();
 	// Tree SIMU for NN training filled
@@ -96,14 +112,14 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
         cout << "(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+" + (dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))"<<endl;
 
 	if(tag==1){
-	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
-	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1","(1.0*(type1==1))/"+normZH+"+((type1==0)/3 *((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	
+	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(1.0*(type1==1))/"+normZH+"+((type1==0)/4 *(2*(dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1!","(1.0*(type1==1))/"+normZH+"+((type1==0)/4 *(2*(dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))",simu,"Entry$%2!=0","Entry$%2==0");	
 	}
 	if(tag==2){
-	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
-	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
+	  if (multiplicity==0)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
+	  if (multiplicity==1)mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight,@Mbbjdr,@bbDR,@FSRDR:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");
 	}
-	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
+	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type1!","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}	// mean taht we train with 1000 iteration and we update the test and training curve with a step of 100 iterations.
 	
 	mlp->Train(iterations, "text,graph,update=2");
 	
@@ -147,7 +163,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	tth->SetDirectory(0);
 	Double_t params[7];
 	//if(tag==2){Double_t params[3];}// to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
-	int zbb=0;
 
 	//-------------------------------------------------------------------------
 	// FOR Zbb
@@ -305,3 +320,5 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 
 	file.Close();
 }
+
+
