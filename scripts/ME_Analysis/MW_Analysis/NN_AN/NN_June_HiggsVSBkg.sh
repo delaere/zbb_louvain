@@ -4,6 +4,12 @@ cd /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_A
 source /nfs/soft/cms/cmsset_default.sh; export SCRAM_ARCH=slc5_amd64_gcc462 ; source /nfs/soft/grid/ui/setup/grid-env.sh ; source /nfs/soft/crab/setup/crab.sh
 cmsenv
 
+dir=Final
+if [[ ! -d ${dir} ]]
+then
+    mkdir ${dir}
+fi
+
 #Check for correct number of arguments
 if [ $# -lt 2 ]
 then
@@ -36,23 +42,7 @@ iter=$4
 echo "extra cuts are "$5
 s_cuts=$5
 
-#s_cuts=ini'-'${cuts//'-'/'-minus-'}
-#s_cuts=${s_cuts//'>'/'-sup-'}
-#s_cuts=${s_cuts//'='/'-eq-'}
-#s_cuts=${s_cuts//'!'/'-dif-'}
-#s_cuts=${s_cuts//'<'/'-inf-'}
-#s_cuts=${s_cuts//'('/'-ipar-'}
-#s_cuts=${s_cuts//')'/'-epar-'}
-#s_cuts=${s_cuts//'&&'/'-and-'}
-#s_cuts=${s_cuts//'||'/'-or-'}
-#s_cuts=${s_cuts//' '/'-spa-'}
-#s_cuts=${s_cuts//'+'/'-plus-'}
-#s_cuts=${s_cuts//'*'/'-mult-'}
-#s_cuts=${s_cuts//'/'/'-div-'}
-#s_cuts=${s_cuts}-end
-#echo "extra string cut is "${s_cuts}
-
-root -l -b > logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
+root -l -b > ${dir}/logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
 
 TString channel("${channel}")
 TString mass("${mass}")
@@ -86,7 +76,7 @@ if(s_cuts.Contains("Nj3")) cuts+=" && multiplicity>2";
 if(s_cuts.Contains("Ptll20")) cuts+=" && Inv_Mass_lept>20";
 cout<<"extra cuts : "<<cuts<<endl;
 
-// COmpilation and submission
+// Compilation and submission
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/include.h
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Read_input_NN_inputs.h 
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Generic_NN_higgs_NN_inputs.C+
@@ -97,12 +87,12 @@ Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,NNStruct,iterations,cuts)
 
 EOF
 
-grep Epoch logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+grep Epoch ${dir}/logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > ${dir}/epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
-NUMOFPOINTS=$(cat epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt| wc -l )
+NUMOFPOINTS=$(cat ${dir}/epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt| wc -l )
 echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 
-root -l -b NN*${mass}*${channel}*${struct}*${iter}*${s_cuts}.root << EOF
+root -l -b ${dir}/NN*${mass}*${channel}*${struct}*${iter}*${s_cuts}.root << EOF
 
 //This part is copy and paste from the first time we call root
 
@@ -111,15 +101,16 @@ TString mass("${mass}")
 TString struct("${struct}")
 TString iter("$iter") 
 TString s_cuts("${s_cuts}")
+TString dir("${dir}/")
 TString NN("ZH"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts);
 
 int numberOfPoints=${NUMOFPOINTS}
 
 cout << "numberOfPoints=" << numberOfPoints << endl;
 
-TString epochinputtxt = "epoch_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts+".txt";
+TString epochinputtxt = dir+"epoch_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts+".txt";
 
-TFile* foutput = TFile::Open("NN_Higgs_vs_Bkg_"+NN+".root","UPDATE");
+TFile* foutput = TFile::Open(dir+"NN_Higgs_vs_Bkg_"+NN+".root","UPDATE");
 
 .L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/ComputeGraphFromTrainTxt.C
 ComputeGraphFromTrainTxt(foutput, epochinputtxt, numberOfPoints);

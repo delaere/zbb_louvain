@@ -17,7 +17,7 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	}
 
 	// output file : control of the NN
-        TFile file("NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
+        TFile file("Final/NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -141,40 +141,80 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	zzh->SetDirectory(0);
 	zhh->SetDirectory(0);
 	tth->SetDirectory(0);;
-	Double_t params[3]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
-	//int zbb=0;
+
+	int nIn = 3;
+	vector<string> vNNinputs;
+	if(NNStruct.BeginsWith(",")){
+	  size_t first=NNStruct.Index(":");
+	  string NNinputs = NNStruct.Remove(first).Data();
+	  while(NNinputs.length()>0){
+	    NNinputs = NNinputs.substr(2);
+	    first = NNinputs.find(",@");
+	    string tmp=NNinputs;
+	    if(first!=string::npos) tmp=NNinputs.substr(0,first); 
+	    cout<<"variables added to the NN : "<<tmp<<endl;
+	    vNNinputs.push_back(tmp);
+	    if(first!=string::npos) NNinputs = NNinputs.substr(first);
+	    else NNinputs = "";
+	    cout<<"NNinputs.length() "<<NNinputs.length()<<endl;
+	  }
+	  cout<<"params size "<<nIn<<endl;
+	  nIn+=vNNinputs.size();
+	}
+	Double_t params[nIn]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
+	cout<<"params size "<<nIn<<endl;
 
 	//-------------------------------------------------------------------------
 	// FOR Zbb
 	for (int i=0;i<N1; ++i) {
           params[0] = var1->hzbb[i];
-          params[2] = var1->htt[i];
           params[1] = var1->hzz[i];
+          params[2] = var1->htt[i];
+	  for(unsigned int j=0; j<vNNinputs.size(); j++){
+	    if(vNNinputs[j]=="Mbb") params[2+j] = var1->Mbb[i];
+	    else if(vNNinputs[j]=="Multi") params[2+j] = var1->multi[i];
+	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+	  }
 	  zbbh->Fill(mlp->Evaluate(0, params));
 	}
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
 	for (int i=0;i<N2; ++i) {
 	  params[0] = var2->hzbb[i];
-	  params[2] = var2->htt[i];
 	  params[1] = var2->hzz[i];
+	  params[2] = var2->htt[i];
+	  for(unsigned int j=0; j<vNNinputs.size(); j++){
+	    if(vNNinputs[j]=="Mbb") params[2+j] = var2->Mbb[i];
+	    else if(vNNinputs[j]=="Multi") params[2+j] = var2->multi[i];
+	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+	  }
 	  tth->Fill(mlp->Evaluate(0, params));
 	}
         //-------------------------------------------------------------------------        
 	// FOR ZZ
         for (int i=0;i<N3; ++i) {
 	  params[0] = var3->hzbb[i];
-          params[2] = var3->htt[i];
           params[1] = var3->hzz[i];
+          params[2] = var3->htt[i];
+	  for(unsigned int j=0; j<vNNinputs.size(); j++){
+	    if(vNNinputs[j]=="Mbb") params[2+j] = var3->Mbb[i];
+	    else if(vNNinputs[j]=="Multi") params[2+j] = var3->multi[i];
+	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+	  }
 	  zzh->Fill(mlp->Evaluate(0,params));
         }
         //-------------------------------------------------------------------------
 	// FOR ZH
         for (int i=0;i<N4; ++i) {
 	  params[0] = var4->hzbb[i];
-	  params[2] = var4->htt[i];
 	  params[1] = var4->hzz[i];
-          zhh->Fill(mlp->Evaluate(0, params));
+	  params[2] = var4->htt[i];
+	  for(unsigned int j=0; j<vNNinputs.size(); j++){
+	    if(vNNinputs[j]=="Mbb") params[2+j] = var4->Mbb[i];
+	    else if(vNNinputs[j]=="Multi") params[2+j] = var4->multi[i];
+	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+	  }          
+	  zhh->Fill(mlp->Evaluate(0, params));
         }
 //-------------------------------------------------------------------------                                                                                             
 
@@ -248,8 +288,8 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	bg_eff->Draw();
 	sig_eff->Draw("same");
 	TLegend *legend2 = new TLegend(.75, .80, .95, .95);
-	legend2->AddEntry(bg_eff, "t#bar{t}");
-	legend2->AddEntry(sig_eff, "Zbb");
+	legend2->AddEntry(bg_eff, "bkg");
+	legend2->AddEntry(sig_eff, "higgs");
 	legend2->Draw();
 	mlpa_canvas->cd(4);
 	TGraph *Eff = new TGraph(28,efficiency_sig,efficiency_bg);

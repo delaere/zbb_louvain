@@ -221,8 +221,7 @@ void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fi
     sim->metsig=MeTsig;   
     sim->Met=MeT;
     var->met[i]=sim->Met;
-    if(multiplicity>2){sim->Multi=1.;}
-    if(multiplicity<3){sim->Multi=0.;}
+    sim->Multi=multiplicity;
     var->multi[i]=sim->Multi;
     if(fill==1){simu->Fill();entry+=1;}     
   }
