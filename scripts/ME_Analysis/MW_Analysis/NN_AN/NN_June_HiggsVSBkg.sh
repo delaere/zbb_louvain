@@ -50,10 +50,10 @@ TString struct("${struct}")
 TString iter("${iter}") 
 TString s_cuts("${s_cuts}")
 TString DIR("/nfs/user/acaudron/Tree2_537/");
-TString fDY("ME_zbb_Zbb_"+channel+"_MC.root")
-TString fTT("ME_zbb_TT-FullLept_"+channel+"_MC.root")
-TString fZZ("ME_zbb_ZZ_"+channel+"_MC.root")
-TString fZH("ME_zbb_ZH"+mass+"_"+channel+"_MC.root")
+TString fDY("Tree_rdsME_DY_"+channel+"_MC.root")
+TString fTT("Tree_rdsME_TT-FullLept_"+channel+"_MC.root")
+TString fZZ("Tree_rdsME_ZZ_"+channel+"_MC.root")
+TString fZH("Tree_rdsME_ZH"+mass+"_"+channel+"_MC.root")
 
 cout<<"Directory is "<<DIR<<endl;
 
@@ -70,10 +70,14 @@ cout<<"iterations "<<iterations<<endl;
 
 //choose the cuts
 TString cuts("")
-if(s_cuts.Contains("Mbb80-160")) cuts+=" && (Inv_Mass_bb>70 && Inv_Mass_bb<160)";
-if(s_cuts.Contains("Nj2")) cuts+=" && multiplicity==2";
-if(s_cuts.Contains("Nj3")) cuts+=" && multiplicity>2";
-if(s_cuts.Contains("Ptll20")) cuts+=" && Inv_Mass_lept>20";
+if(s_cuts.Contains("Mbb80-160")) cuts+=" && (eventSelectiondijetM>80 && eventSelectiondijetM<160)";
+if(s_cuts.Contains("Mbb50-160")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<160)";
+if(s_cuts.Contains("Ptb1j40")) cuts+=" && jetmetbjet1pt>40";
+if(s_cuts.Contains("Ptb2j25")) cuts+=" && jetmetbjet2pt>25";
+if(s_cuts.Contains("Ptb2j25")) cuts+=" && eventSelectiondphiZbb>1.5";
+if(s_cuts.Contains("Nj2")) cuts+=" && jetmetnj==2";
+if(s_cuts.Contains("Nj3")) cuts+=" && jetmetnj>2";
+if(s_cuts.Contains("Ptll20")) cuts+=" && (eventSelectionbestzptMu>20 || eventSelectionbestzptEle>20)";
 cout<<"extra cuts : "<<cuts<<endl;
 
 // Compilation and submission
@@ -120,9 +124,19 @@ EOF
 echo ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
 python doNorm.py ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
 cat CSV_nosys_test.txt | sed -e s%ROOTFILE%~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g > ${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+cat CSV_nosys_test.txt | sed -e s%ROOTFILE%~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g | sed -e s%Combined/%Combined/prod%g > ${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
 cd /home/fynu/acaudron/scratch/CMSSW_6_1_1/src
 cmsenv
+echo COMPUTE LIMIT FOR FINAL NN
 combine -M Asymptotic ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1
+echo END COMPUTE LIMIT FOR FINAL NN
+echo ------------------------------------------------------------------------------------------------------------------
+
+echo ------------------------------------------------------------------------------------------------------------------
+echo COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
+combine -M Asymptotic ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1
+echo END COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
+echo ------------------------------------------------------------------------------------------------------------------
 cd /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN
 cmsenv

@@ -48,12 +48,12 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 
 	// open file to get nbres of entries
 
-	TString totcuts("Met_signi<10.0 && Inv_Mass_lept>76. && Inv_Mass_lept<106. && btagj1>0.679 && btagj2>0.679");
+	TString totcuts("rc_eventSelection_18_idx==1");
 	totcuts+=cuts;
 	cout<<"cut on : "<<totcuts<<endl;
 
 	int N1,N2,N3,N4;
-	TChain *treetmp =new TChain("tree2");
+	TChain *treetmp =new TChain("rds_zbb");
 	treetmp->Reset();
 	treetmp->Add(dy);
 	TTree *ttmp = treetmp->CopyTree(totcuts);
@@ -130,8 +130,13 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	// the test sample. Also the xaxis range is manually set.
 	TH1F *zbbh = new TH1F("zbbh", "NN output", 28, -0.2, 1.2);
 	TH1F *zzh = new TH1F("zzh", "NN output", 28, -0.2, 1.2);
-	TH1F *zhh = new TH1F("zhhh", "NN output", 28, -0.2, 1.2);	
+	TH1F *zhh = new TH1F("zhh", "NN output", 28, -0.2, 1.2);	
 	TH1F *tth = new TH1F("tth", "NN output", 28, -0.2, 1.2);
+
+	TH1F *zbbprod = new TH1F("zbbprod", "NNs prod", 28, -0.2, 1.2);
+	TH1F *zzprod = new TH1F("zzprod", "NNs prod", 28, -0.2, 1.2);
+	TH1F *zhprod = new TH1F("zhprod", "NNs prod", 28, -0.2, 1.2);	
+	TH1F *ttprod = new TH1F("ttprod", "NNs prod", 28, -0.2, 1.2);
 
 	// histo of efficiency
 	TH1F *bg_eff = new TH1F("bgh", "NN output", 28, -0.2, 1.2);
@@ -176,6 +181,7 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
 	  }
 	  zbbh->Fill(mlp->Evaluate(0, params));
+	  zbbprod->Fill(params[0]*params[1]*params[2]);
 	}
         //-------------------------------------------------------------------------                                                            
 	// FOR tt
@@ -189,6 +195,7 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
 	  }
 	  tth->Fill(mlp->Evaluate(0, params));
+	  ttprod->Fill(params[0]*params[1]*params[2]);
 	}
         //-------------------------------------------------------------------------        
 	// FOR ZZ
@@ -202,6 +209,7 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
 	  }
 	  zzh->Fill(mlp->Evaluate(0,params));
+	  zzprod->Fill(params[0]*params[1]*params[2]);
         }
         //-------------------------------------------------------------------------
 	// FOR ZH
@@ -215,6 +223,7 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
 	  }          
 	  zhh->Fill(mlp->Evaluate(0, params));
+	  zhprod->Fill(params[0]*params[1]*params[2]);
         }
 
 
@@ -235,7 +244,15 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	zzh->Write();
 	zhh->SetName("signal125");
 	zhh->Write();
-	file.cd();
+
+	zbbprod->SetName("prodDY125");
+	zbbprod->Write();
+	ttprod->SetName("prodTT125");
+        ttprod->Write();
+	zzprod->SetName("prodZZ125");
+	zzprod->Write();
+	zhprod->SetName("prodsignal125");
+	zhprod->Write();
 
 //------------------------------------------------------------------------- 
 //-------------------Normalisation and plot ------------------------------------------------------
