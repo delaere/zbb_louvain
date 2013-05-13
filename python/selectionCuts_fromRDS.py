@@ -166,6 +166,7 @@ for channel in channels:
             file[period]  = TFile(path["DoubleMu_Data"+period])
         
     tree_zbb1 = file["A"].Get("rds_zbb")
+    tmpfile=TFile("tmp.root","RECREATE")
     tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
     ws_zbb = file["A"].Get("ws_ras")
     ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
@@ -174,6 +175,7 @@ for channel in channels:
     for period in dataPeriods :
         if period=="A" : continue
         tree_zbb1 = file[period].Get("rds_zbb")
+        tmpfile=TFile("tmp.root","RECREATE")
         tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
         ws_zbb = file[period].Get("ws_ras")
         ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
