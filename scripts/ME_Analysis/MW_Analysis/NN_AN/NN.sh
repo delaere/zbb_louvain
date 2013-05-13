@@ -79,6 +79,7 @@ cout<<"iterations "<<iterations<<endl;
 
 // COmpilation and submission
 .L include.h
+.L Read_input_m.h 
 .L Generic_NN_higgs_test.C+
 cout<<"Start Neural_net_E"<<endl;
 
@@ -98,10 +99,7 @@ if(mass=="130") Mass=130;
 if(mass=="135") Mass=135;
 
 
-//Apply ptj1, ptj2, and ptz cuts
-//setPtJ1Cut(40);
-//setPtJ2Cut(25);
-//setPtZCut(20);
+
 Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,NNStruct,iterations, multiplicity)
 
 .q

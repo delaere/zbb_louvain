@@ -45,9 +45,7 @@ cout<<" OUTPUT root : ../../NN/NN_Higgs_vs_"<<NN<<endl;
 
 // Structure of the NN and nbr of iteration
 
-//TString NNStruct("4");
-TString NNStruct("6:3");
-
+TString NNStruct("4");
 int iterations=1000;
 cout<<"NNStruct "<<NNStruct<<endl;
 cout<<"iterations "<<iterations<<endl;

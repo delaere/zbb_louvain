@@ -100,9 +100,7 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 
 	cout<<"DY="<<Dy<<" TT="<<Tt<<" ZZ="<<Zz<<" Higgs="<<Hi<<endl;
 	
-	//TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","(0.9*(type2==1)/3*((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
-	  TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","(0.9*(type2==1)/4*(2*(dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
-	//TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type","(0.9*(type2==1)/4*(2*(dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT,@btagprod:"+NNStruct+":type!","(0.9*(type2==1)/3*((dyflag==0)/"+normdyflag0+"+(dyflag==1)/"+normdyflag1+" + (dyflag==2)/"+normdyflag2+"))+(type2==2)*(0.085/"+normTT+")+(type2==3)*(0.015/"+normZZ+")+(type2==4)*(1.05/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
 
 	mlp->Train(iterations, "text,graph,update=2");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
@@ -162,8 +160,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
             params[1] = var1->hzz[i];
 	    params[3] = var1->tagj1[i]*var1->tagj2[i];
 	    zbbh->Fill(mlp->Evaluate(0, params)); 
-	    std::cout << "debugZbb: NNout=" << mlp->Evaluate(0,params)<< " p[0]=" << params[0] << " p[1]=" << params[1] << " p[2]=" << params[2] << " p[3]=" << params[3]
-	              << " ptj1="<< var1->Leading_b[i]<<" ptj2="<< var1->subLeading_b[i]<<" Mbb="<<var1->Mbb[i]<<"jetbin="<<var1->multi[i]<<endl; 
 	  }
 	}
         //-------------------------------------------------------------------------                                                            
@@ -181,8 +177,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	    params[1] = var2->hzz[i];
             params[3] = var2->tagj1[i]*var2->tagj2[i];
 	  tth->Fill(mlp->Evaluate(0, params));
-	    std::cout << "debugTT: NNout=" << mlp->Evaluate(0,params)<< " p[0]=" << params[0] << " p[1]=" << params[1] << " p[2]=" << params[2] << " p[3]=" << params[3]
-	              << " ptj1="<< var2->Leading_b[i]<<" ptj2="<< var2->subLeading_b[i]<<" Mbb="<<var2->Mbb[i]<<"jetbin="<<var2->multi[i]<<endl; 
 	  }
 	}
         //-------------------------------------------------------------------------        
@@ -200,8 +194,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
             params[1] = var3->hzz[i];
             params[3] = var3->tagj1[i]*var3->tagj2[i];                               
 	    zzh->Fill(mlp->Evaluate(0,params));
-	    std::cout << "debugZZ: NNout=" << mlp->Evaluate(0,params)<< " p[0]=" << params[0] << " p[1]=" << params[1] << " p[2]=" << params[2] << " p[3]=" << params[3]
-	              << " ptj1="<< var3->Leading_b[i]<<" ptj2="<< var3->subLeading_b[i]<<" Mbb="<<var3->Mbb[i]<<"jetbin="<<var3->multi[i]<<endl; 
 	  }
         }
         //-------------------------------------------------------------------------
@@ -219,8 +211,6 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	    params[1] = var4->hzz[i];
             params[3] = var4->tagj1[i]*var4->tagj2[i];
           zhh->Fill(mlp->Evaluate(0, params));
-	    std::cout << "debugZH: NNout=" << mlp->Evaluate(0,params)<< " p[0]=" << params[0] << " p[1]=" << params[1] << " p[2]=" << params[2] << " p[3]=" << params[3]
-	              << " ptj1="<< var4->Leading_b[i]<<" ptj2="<< var4->subLeading_b[i]<<" Mbb="<<var4->Mbb[i]<<"jetbin="<<var4->multi[i]<<endl; 
 	  }
         }
 
