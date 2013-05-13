@@ -22,21 +22,42 @@ requirements   = (CMSFARM =?= TRUE)
 #requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = DY ML comb 125 multi2 4:3 800
+#arguments = BkgProcess WP LepChanel mH JetBin MLPstruct(optional) Niterations(opt)
+#arguments = DY ML comb 125 multi2 4:3 800
+#queue
+
+#arguments = DY ML comb 125 multiPlus2 7:4 5000
+#queue
+
+#arguments = TT ML comb 125 multi2 4:3 2000
+#queue
+
+#arguments = TT ML comb 125 multiPlus2 7:4 5000
+#queue
+
+#arguments = ZZ ML comb 125 multi2 4:3 2000
+#queue
+
+#arguments = ZZ ML comb 125 multiPlus2 4:3 1000
+#queue
+
+
+
+arguments = DY ML comb 125 multi2 7:3:7:3 25000
 queue
 
-arguments = DY ML comb 125 multiPlus2 7:4 5000
+arguments = DY ML comb 125 multiPlus2 8:4:5 25000
 queue
 
-arguments = TT ML comb 125 multi2 4:3 2000
+arguments = TT ML comb 125 multi2 6:5:3 8000
 queue
 
-arguments = TT ML comb 125 multiPlus2 7:4 5000
+arguments = TT ML comb 125 multiPlus2 7:5:3 1500
 queue
 
-arguments = ZZ ML comb 125 multi2 4:3 2000
+arguments = ZZ ML comb 125 multi2 5:3 7000
 queue
 
-arguments = ZZ ML comb 125 multiPlus2 4:3 1000
+arguments = ZZ ML comb 125 multiPlus2 5:3 700
 queue
 
