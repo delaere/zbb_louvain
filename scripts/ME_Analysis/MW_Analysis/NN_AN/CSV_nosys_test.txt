@@ -1,0 +1,15 @@
+#for testing cls after training
+imax 1 number of bins
+jmax 3 number of processes minus 1
+kmax 0 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes *      Name1 ROOTFILE  Combined/$PROCESS$MASS
+----------------------------------------------------------------------------------------------------------------------------------
+bin          Name1  
+observation  -1.0    
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                            Name1    Name1    Name1    Name1  
+process                                        signal   DY        ZZ       TT     
+process                                        0        1        2        3          
+rate                                           -1.0000  -1.0000  -1.0000  -1.0000 
+#lumi                    lnN                    1.1    1.1      1.1      1.1      
