@@ -216,14 +216,26 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	  }          
 	  zhh->Fill(mlp->Evaluate(0, params));
         }
+
+
 //-------------------------------------------------------------------------                                                                                             
-
-
 
 	cout<<"  Zbb  ALL "<<zbbh->Integral()<<endl;
 	cout<<"  TT   ALL "<<tth->Integral()<<endl;
 	cout<<"  ZZ   ALL "<<zzh->Integral()<<endl;
 	cout<<"  ZH   ALL "<<zhh->Integral()<<endl;
+
+//----------------------------------------------------Fill for CLs
+
+	zbbh->SetName("DY125");
+	zbbh->Write();
+	tth->SetName("TT125");
+        tth->Write();
+	zzh->SetName("ZZ125");
+	zzh->Write();
+	zhh->SetName("signal125");
+	zhh->Write();
+	file.cd();
 
 //------------------------------------------------------------------------- 
 //-------------------Normalisation and plot ------------------------------------------------------
