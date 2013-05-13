@@ -54,17 +54,17 @@ channels  = [
 #choose you set of cuts
 extraCuts = [
     "",
-    #"jetmetbjet1pt>40&jetmetbjet2pt>25",
-    #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
-    #"(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
-    #"jetmetnj==2",
-    #"jetmetnj==2&jetmetbjet1pt>40&jetmetbjet2pt>25",
-    #"jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
-    #"jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",
-    #"jetmetnj>2",
-    #"jetmetnj>2&jetmetbjet1pt>40&jetmetbjet2pt>25",
-    #"jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
-    #"jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
+    "jetmetbjet1pt>40&jetmetbjet2pt>25",
+    "(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    "(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
+    "jetmetnj==2",
+    "jetmetnj==2&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    "jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    "jetmetnj==2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    "jetmetnj>2",
+    "jetmetnj>2&jetmetbjet1pt>40&jetmetbjet2pt>25",
+    "jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)",
+    "jetmetnj>2&(eventSelectionbestzptEle>20||eventSelectionbestzptMu>20)&jetmetbjet1pt>40&jetmetbjet2pt>25",    
     #"vertexAssociationnvertices<13",
     #"vertexAssociationnvertices>=13&vertexAssociationnvertices<=17",
     #"vertexAssociationnvertices>17",
@@ -127,12 +127,14 @@ for sample in sampleList :
         print "Channel : ", channel
         if channel=="EEChannel" : file_mc  = TFile(path[sample+"_El_MC"])
         else : file_mc  = TFile(path[sample+"_Mu_MC"])
-        
-        tree_zbb = file_mc.Get("rds_zbb")
+
+        tree_zbb1 = file_mc.Get("rds_zbb")
+        tmpfile=TFile("tmp.root","RECREATE")
+        tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
         ws_zbb = file_mc.Get("ws_ras")
         ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
         rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
-        
+
         nEntries = rds_zbb.numEntries()
         if sample == "DY" :
             if not useMCTruth :
@@ -142,7 +144,7 @@ for sample in sampleList :
                 myRDS[channel+"Zno"] = rds_zbb.reduce(redStage + "&mcSelectioneventType==0")
             else :
                 myRDS[channel+"Zbb"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
-                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) ||(abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
+                myRDS[channel+"Zbx"] = rds_zbb.reduce(redStage + "&( (abs(jetmetbjet1Flavor)!=5&abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5&abs(jetmetbjet2Flavor)!=5) )")
                 myRDS[channel+"Zxx"] = rds_zbb.reduce(redStage + "&abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)!=5")
             print "myRDS.numEntries() for ", "Zbb" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbb"].numEntries()
             print "myRDS.numEntries() for ", "Zbx" , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"Zbx"].numEntries()
@@ -163,14 +165,16 @@ for channel in channels:
         else:
             file[period]  = TFile(path["DoubleMu_Data"+period])
         
-    tree_zbb = file["A"].Get("rds_zbb")
+    tree_zbb1 = file["A"].Get("rds_zbb")
+    tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
     ws_zbb = file["A"].Get("ws_ras")
     ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
     rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
 
     for period in dataPeriods :
         if period=="A" : continue
-        tree_zbb = file[period].Get("rds_zbb")
+        tree_zbb1 = file[period].Get("rds_zbb")
+        tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
         ws_zbb = file[period].Get("ws_ras")
         ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
         tmp = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
