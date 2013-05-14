@@ -21,7 +21,7 @@ void setPtJ2Cut(double x) {ptj2_cut = x;}
 void setPtZCut(double x) {ptz_cut = x;}
 
 
-void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag,TString NNStruct,int iterations, int multiplicity)
+void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TString name,int tag,TString NNStruct,int iterations, int multiplicity, TString study)
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
 		gSystem->Load("libMLP");
@@ -30,7 +30,13 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	std::cout << "[Neural_net_E] tag=" << tag << " NNStruct=" << NNStruct << " iterations=" << iterations << " multiplicity=" << multiplicity << std::endl;
 
 	// output file : control of the NN
-        TFile file("NN_Higgs_vs_"+name+".root","RECREATE");
+	TString String_iterations;
+	ostringstream os_iterations;
+	os_iterations << iterations;
+	String_iterations = os_iterations.str();
+	
+	TString name2=NNStruct+"_"+String_iterations+".root";
+        TFile file("NN_Higgs_vs_"+name+"_"+name2,"RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -127,8 +133,14 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh,TS
 	//TGraph *test = train_residual_plot;
 	
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("MLP_Higgs_vs_"+name,"python");
-	mlp->Export("MLP_Higgs_vs_"+name,"c++");
+	if(study=="study"){
+	  mlp->Export("MLP_Higgs_vs_"+name+"_"+NNStruct+"_"+String_iterations,"python");
+	  mlp->Export("MLP_Higgs_vs_"+name+"_"+NNStruct+"_"+String_iterations,"c++");
+	}
+	else{
+	  mlp->Export("MLP_Higgs_vs_"+name,"python");
+	  mlp->Export("MLP_Higgs_vs_"+name,"c++");	
+	}
 	mlp->Write();
 
 

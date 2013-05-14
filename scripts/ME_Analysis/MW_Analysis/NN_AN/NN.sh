@@ -36,6 +36,8 @@ echo "NN structure is " $6
 nnstructure=$6
 echo "Number of iterations is" $7
 niterations=$7
+echo "If you put study in the end of the command line, the name of your outputs will be with the NN structure and the number of iteration. If not, the name will be compatible for the
+merging code."
 
 
 root -l -b > logroot_${sample}_${WP}_${channel}_${mass}_${multi}.txt << EOF
@@ -47,8 +49,9 @@ TString mass("${mass}")
 TString multi("${multi}")
 TString nnstructure("${nnstructure}")
 TString niterations("${niterations}")
+TString study("${study}")
 
-TString DIR("/home/fynu/cbeluffi/scratch/MW_5/madweight/MW_Analysis/Tree2/");
+TString DIR("/home/fynu/cbeluffi/scratch/ZH_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Tree2/");
 
 TString fDY("DY_all_"+channel+".root")
 TString fTT("TT_"+channel+".root")
@@ -69,6 +72,7 @@ int iterations=20;
 if (nnstructure != "") {//nnstructure option was set
   NNStruct = nnstructure;
 }
+
 if (niterations != "") {//niterations option was set
   iterations = niterations.Atoi();
 }
@@ -102,7 +106,7 @@ if(mass=="135") Mass=135;
 //setPtJ1Cut(40);
 //setPtJ2Cut(25);
 //setPtZCut(20);
-Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,NNStruct,iterations, multiplicity)
+Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,NNStruct,iterations, multiplicity,study)
 
 .q
 EOF
@@ -115,6 +119,9 @@ echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 root -l -b NN*.root << EOF
 
 //This part is copy and paste from the first time we call root
+TString nnstructure("${nnstructure}")
+TString niterations("${niterations}")
+
 
 int numberOfPoints=${NUMOFPOINTS}
 
@@ -130,7 +137,7 @@ TString NN(sample+"_"+WP+"_CSV_2011_"+channel+"_ZH"+mass+"_"+multi);
 
 TString epochinputtxt = "epoch_"+sample+"_"+WP+"_"+channel+"_"+mass+"_"+multi+".txt";
 
-TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+".root","UPDATE");
+TFile* foutput = TFile::Open("NN_Higgs_vs_"+NN+"_"+nnstructure+"_"+niterations+".root","UPDATE");
 
 .L ComputeGraphFromTrainTxt.C
 cout<<"ComputeGraphFromTrainTxt"<<endl;
