@@ -1,6 +1,7 @@
 #! /bin/sh
 HOME=~acaudron/
-cd /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN
+dirNN=~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN
+cd ${dirNN}
 source /nfs/soft/cms/cmsset_default.sh; export SCRAM_ARCH=slc5_amd64_gcc462 ; source /nfs/soft/grid/ui/setup/grid-env.sh ; source /nfs/soft/crab/setup/crab.sh
 cmsenv
 
@@ -50,7 +51,7 @@ TString struct("${struct}")
 TString iter("${iter}") 
 TString s_cuts("${s_cuts}")
 TString DIR("/nfs/user/acaudron/Tree2_537/");
-TString fDY("Tree_rdsME_DY_"+channel+"_MC.root")
+TString fDY("Tree_rdsME_Zbb_"+channel+"_MC.root")
 TString fTT("Tree_rdsME_TT-FullLept_"+channel+"_MC.root")
 TString fZZ("Tree_rdsME_ZZ_"+channel+"_MC.root")
 TString fZH("Tree_rdsME_ZH"+mass+"_"+channel+"_MC.root")
@@ -74,16 +75,16 @@ if(s_cuts.Contains("Mbb80-160")) cuts+=" && (eventSelectiondijetM>80 && eventSel
 if(s_cuts.Contains("Mbb50-160")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<160)";
 if(s_cuts.Contains("Ptb1j40")) cuts+=" && jetmetbjet1pt>40";
 if(s_cuts.Contains("Ptb2j25")) cuts+=" && jetmetbjet2pt>25";
-if(s_cuts.Contains("Ptb2j25")) cuts+=" && eventSelectiondphiZbb>1.5";
+if(s_cuts.Contains("dPhiZbb1v5")) cuts+=" && eventSelectiondphiZbb>1.5";
 if(s_cuts.Contains("Nj2")) cuts+=" && jetmetnj==2";
 if(s_cuts.Contains("Nj3")) cuts+=" && jetmetnj>2";
 if(s_cuts.Contains("Ptll20")) cuts+=" && (eventSelectionbestzptMu>20 || eventSelectionbestzptEle>20)";
 cout<<"extra cuts : "<<cuts<<endl;
 
 // Compilation and submission
-.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/include.h
-.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Read_input_NN_inputs.h 
-.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Generic_NN_higgs_NN_inputs.C+
+.L ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/include.h
+.L ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Read_input_NN_inputs.h 
+.L ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/Generic_NN_higgs_NN_inputs.C+
 
 Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,NNStruct,iterations,cuts)
 
@@ -116,27 +117,27 @@ TString epochinputtxt = dir+"epoch_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts
 
 TFile* foutput = TFile::Open(dir+"NN_Higgs_vs_Bkg_"+NN+".root","UPDATE");
 
-.L /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/ComputeGraphFromTrainTxt.C
+.L ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/ComputeGraphFromTrainTxt.C
 ComputeGraphFromTrainTxt(foutput, epochinputtxt, numberOfPoints);
 .q
 EOF
 
 echo ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
 python doNorm.py ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
-cat CSV_nosys_test.txt | sed -e s%ROOTFILE%~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g > ${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
-cat CSV_nosys_test.txt | sed -e s%ROOTFILE%~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g | sed -e s%Combined/%Combined/prod%g > ${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g > ${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g | sed -e s%Combined/%Combined/prod%g > ${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
-cd /home/fynu/acaudron/scratch/CMSSW_6_1_1/src
+cd ~acaudron/scratch/CMSSW_6_1_1/src
 cmsenv
 echo COMPUTE LIMIT FOR FINAL NN
-combine -M Asymptotic ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1
+combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitNN_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 echo END COMPUTE LIMIT FOR FINAL NN
 echo ------------------------------------------------------------------------------------------------------------------
 
 echo ------------------------------------------------------------------------------------------------------------------
 echo COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
-combine -M Asymptotic ~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN/${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1
+combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitProd_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 echo END COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
 echo ------------------------------------------------------------------------------------------------------------------
-cd /home/fynu/acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/scripts/ME_Analysis/MW_Analysis/NN_AN
+cd ${dirNN}
 cmsenv
