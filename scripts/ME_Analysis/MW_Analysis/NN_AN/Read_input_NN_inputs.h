@@ -4,6 +4,10 @@
 #include "MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2.cxx"
 #include "MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2.cxx"
 
+#include "MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multiPlus2.cxx"
+#include "MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multiPlus2.cxx"
+#include "MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multiPlus2.cxx"
+
 
 class nn_vars {
  public:
@@ -201,25 +205,59 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
  cout << "ptj1_cut_input=" << kin_cut->getPtJ1Cut() << " ptj2_cut_input=" << kin_cut->getPtJ2Cut() << " ptz_cut_input=" << kin_cut->getPtZCut() << endl;  
   
   // NN declaration -------------------------------------
+  MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2* HTT  = 0;
+  MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2* HZbb = 0;
+  MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2* HZZ = 0;
+
+  MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multiPlus2* HTT_Plus2 = 0;
+  MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multiPlus2* HZbb_Plus2 = 0;
+  MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multiPlus2* HZZ_Plus2 = 0;
+   
+  if (multip == 0) {
+    !gROOT->GetClass("MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2");                                                                                                                                
+    HTT=new MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                        
+    if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
+      gSystem->Load("libMLP");                                                                                                                                                                                      
+    }                                                                                                                                                                                                              
   
-  !gROOT->GetClass("MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2");                                                                                                                                
-  MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2 *HTT=new MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                        
-  if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
-    gSystem->Load("libMLP");                                                                                                                                                                                      
-  }                                                                                                                                                                                                              
+    !gROOT->GetClass("MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2");                                                                                                                                                                   
+    HZbb=new MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                                                   
+    if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
+      gSystem->Load("libMLP");                                                                                                                                                                                      
+    }                                                                                                                                                                                                               
   
-  !gROOT->GetClass("MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2");                                                                                                                                                                   
-  MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2 *HZbb=new MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                                                   
-  if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                                
-    gSystem->Load("libMLP");                                                                                                                                                                                      
-  }                                                                                                                                                                                                               
+    !gROOT->GetClass("MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2");
+    HZZ=new MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                                                 
+    if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                            
+      gSystem->Load("libMLP");                                                                                                                          
+    }          
   
-  !gROOT->GetClass("MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2");
-  MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2 *HZZ=new MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multi2();                                                                                                                                                 
-  if (!gROOT->GetClass("TMultiLayerPerceptron")) {                                                                                                                                                            
-    gSystem->Load("libMLP");                                                                                                                          
-  }          
+  }
+  else if (multip == 1) {
+    !gROOT->GetClass("MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multiPlus2");                                                                                                                                
+    HTT_Plus2=new MLP_Higgs_vs_TT_ML_CSV_2011_comb_ZH125_multiPlus2();                                                                                                                        
+    if (!gROOT->GetClass("TmultiPlusLayerPerceptron")) {                                                                                                                                                                
+      gSystem->Load("libMLP");                                                                                                                                                                                      
+    }                                                                                                                                                                                                              
   
+    !gROOT->GetClass("MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multiPlus2");                                                                                                                                                                   
+    HZbb_Plus2=new MLP_Higgs_vs_DY_ML_CSV_2011_comb_ZH125_multiPlus2();                                                                                                                                                   
+    if (!gROOT->GetClass("TmultiPlusLayerPerceptron")) {                                                                                                                                                                
+      gSystem->Load("libMLP");                                                                                                                                                                                      
+    }                                                                                                                                                                                                               
+  
+    !gROOT->GetClass("MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multiPlus2");
+    HZZ_Plus2=new MLP_Higgs_vs_ZZ_ML_CSV_2011_comb_ZH125_multiPlus2();                                                                                                                                                 
+    if (!gROOT->GetClass("TmultiPlusLayerPerceptron")) {                                                                                                                                                            
+      gSystem->Load("libMLP");                                                                                                                          
+    }          
+  
+  }
+  else {
+    cout << "Unknown value for multip = " << multip << " aborting " << std::endl;
+     return;
+  }
+
   // ----------------------------------------------------
   
   int entryy=0, entryy1=0, entryy2=0, entryy3=0;                                                    
@@ -266,9 +304,22 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
       sim->zz3_weight=Wzz3;
       sim->hi_weight=Whi;
       sim->hi3_weight=Whi3;
-      sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
-      sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
-      sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
+      
+      if (multip == 0) {
+        sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
+        sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
+        sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
+      }
+      else if (multip == 1) {
+        sim->HvsZZ=HZZ_Plus2->Value(0,Wzz,Wzz3,Whi,Whi3);
+        sim->HvsZbb=HZbb_Plus2->Value(0,Wgg,Wqq,Whi,Whi3, mbbjdr, DR_jets, fsrdr);
+        sim->HvsTT=HTT_Plus2->Value(0,Wtt,Whi,Whi3, mbbjdr, DR_jets, fsrdr);                                                                                                                                                               
+      }
+      else {
+        cout << "Unknown value for multip = " << multip << " aborting " << std::endl;
+	return;
+      }
+      
       var->hzbb[i] = sim->HvsZbb;
       var->htt[i] = sim->HvsTT;
       var->hzz[i] = sim->HvsZZ;
