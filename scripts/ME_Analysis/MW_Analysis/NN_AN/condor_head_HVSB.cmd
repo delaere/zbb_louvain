@@ -22,9 +22,8 @@ requirements   = (CMSFARM =?= TRUE)
 #requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = multi2
+arguments = multi2 4:2 50 study
 queue
 
-arguments = multiPlus2
-queue
+
 

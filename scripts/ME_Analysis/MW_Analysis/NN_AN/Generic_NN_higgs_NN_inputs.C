@@ -10,14 +10,35 @@
 #include "include.h"
 #include "Read_input_NN_inputs.h"
 
-void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, TString name, TString NNStruct,int iterations, int multiplicity)
+
+//These are the default cuts
+//If you want to change the cuts DO NOT MODIFY THEM HERE, but change the arguments used in the NN.sh script
+double ptj1_cut = 20;
+double ptj2_cut = 20;
+double ptz_cut = -1.0;
+
+void setPtJ1Cut(double x) {ptj1_cut = x;}
+void setPtJ2Cut(double x) {ptj2_cut = x;}
+void setPtZCut(double x) {ptz_cut = x;}
+
+
+
+void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, TString name,TString NNStruct,int iterations, int multiplicity, TString study)
+
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
 		gSystem->Load("libMLP");
 	}
-
+	
+	
+	TString String_iterations;
+	ostringstream os_iterations;
+	os_iterations << iterations;
+	String_iterations = os_iterations.str();
+	
+	TString name2=NNStruct+"_"+String_iterations+".root";
 	// output file : control of the NN
-        TFile file("NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
+        TFile file("NN_Higgs_vs_Bkg_"+name+"_"+name2,"RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -71,15 +92,20 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 	treetmp->Add(zh);
 	N4=treetmp->GetEntries();
 	delete treetmp;
+	
+	//Apply ptj1, ptj2, and ptz cuts
+	kinematical_cuts* kin_cut = new kinematical_cuts(ptj1_cut, ptj2_cut, ptz_cut);
+	
+	
 
 	nn_vars *var1 = new nn_vars(N1);
-	Input(dy,N1,var1,sim,simu,0,1,multiplicity);
+	Input(dy,N1,var1,sim,simu,0,1,multiplicity,kin_cut);
 	nn_vars *var2 = new nn_vars(N2);
-	Input(tt,N2,var2,sim,simu,0,2,multiplicity);
+	Input(tt,N2,var2,sim,simu,0,2,multiplicity,kin_cut);
 	nn_vars *var3 = new nn_vars(N3);
-	Input(zz,N3,var3,sim,simu,0,3,multiplicity);
+	Input(zz,N3,var3,sim,simu,0,3,multiplicity,kin_cut);
 	nn_vars *var4 = new nn_vars(N4);
-	Input(zh,N4,var4,sim,simu,1,4,multiplicity);
+	Input(zh,N4,var4,sim,simu,1,4,multiplicity,kin_cut);
 
 
 	simu->Write();
@@ -104,8 +130,15 @@ void Neural_net_E(const char *dy,const char *tt,const char *zz,const char *zh, T
 
 	mlp->Train(iterations, "text,graph,update=2");
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("MLP_Higgs_vs_Bkg_"+name,"python");
-	mlp->Export("MLP_Higgs_vs_Bkg_"+name,"c++");
+	
+	if(study=="study"){
+	  mlp->Export("MLP_Higgs_vs_Bkg_"+name+"_"+NNStruct+"_"+String_iterations,"python");
+	  mlp->Export("MLP_Higgs_vs_Bkg_"+name+"_"+NNStruct+"_"+String_iterations,"c++");	
+	}
+	else{
+	  mlp->Export("MLP_Higgs_vs_Bkg_"+name,"python");
+	  mlp->Export("MLP_Higgs_vs_Bkg_"+name,"c++");
+	}
 	mlp->Write();
 
 

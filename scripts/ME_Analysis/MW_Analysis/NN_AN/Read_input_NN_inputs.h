@@ -116,8 +116,27 @@ class tree_in {
   int dyflag;	
 };
 
+class kinematical_cuts {
+  private:
+    double ptj1_cut_input;
+    double ptj2_cut_input;
+    double ptz_cut_input;
+  
+  public:
 
-void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,int sig,int typ, int multip)
+    inline double getPtJ1Cut() {return ptj1_cut_input;}
+    inline double getPtJ2Cut() {return ptj2_cut_input;}
+    inline double getPtZCut() {return ptz_cut_input;}
+    kinematical_cuts(double ptj1cut, double ptj2cut, double ptzcut);
+};
+
+kinematical_cuts::kinematical_cuts(double ptj1cut, double ptj2cut, double ptzcut) {
+  ptj1_cut_input = ptj1cut;
+  ptj2_cut_input = ptj2cut;
+  ptz_cut_input = ptzcut;
+  
+}
+void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,int sig,int typ, int multip, kinematical_cuts *kin_cut)
 {
   
   // input file : read ttree
@@ -179,6 +198,7 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
   tree->SetBranchAddress("Flavor_j1",&Flavor_j1); 						  
   tree->SetBranchAddress("Flavor_j2",&Flavor_j2);
   
+ cout << "ptj1_cut_input=" << kin_cut->getPtJ1Cut() << " ptj2_cut_input=" << kin_cut->getPtJ2Cut() << " ptz_cut_input=" << kin_cut->getPtZCut() << endl;  
   
   // NN declaration -------------------------------------
   
@@ -226,6 +246,13 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
     double tagmin=min(btagj1,btagj2);								
     double bmax=max(Ptj1,Ptj2);									
     double bmin=min(Ptj1,Ptj2);									
+   
+    std::cout << "evt[i]="<<evt[i];
+    //Adding ptj1 ptj2 and ptz cuts
+    if ((l1+l2).Pt() > kin_cut->getPtZCut() && bmax > kin_cut->getPtJ1Cut() && bmin > kin_cut->getPtJ2Cut()) {}
+    else {evt[i] = false;}
+   
+    std::cout << " ptz=" << (l1+l2).Pt() << " ptj1=" << bmax << " ptj2=" << bmin << " evt[i]="<<evt[i] << std::endl;
     
     if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity==2&&(b1+b2).M()>80 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multip==0){evt[i]=true;}
     if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity>2&&(b1+b2).M()>50 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multip==1){evt[i]=true;}
