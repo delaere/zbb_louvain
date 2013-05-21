@@ -38,6 +38,7 @@ echo "Number of iterations is" $7
 niterations=$7
 echo "If you put study in the end of the command line, the name of your outputs will be with the NN structure and the number of iteration. If not, the name will be compatible for the
 merging code."
+study=$8
 
 
 root -l -b > logroot_${sample}_${WP}_${channel}_${mass}_${multi}.txt << EOF
@@ -103,8 +104,8 @@ if(mass=="135") Mass=135;
 
 
 //Apply ptj1, ptj2, and ptz cuts
-//setPtJ1Cut(40);
-//setPtJ2Cut(25);
+setPtJ1Cut(40);
+setPtJ2Cut(25);
 //setPtZCut(20);
 Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,NNStruct,iterations, multiplicity,study)
 
