@@ -104,8 +104,8 @@ if(mass=="135") Mass=135;
 
 
 //Apply ptj1, ptj2, and ptz cuts
-setPtJ1Cut(40);
-setPtJ2Cut(25);
+//setPtJ1Cut(40);
+//setPtJ2Cut(25);
 //setPtZCut(20);
 Neural_net_E(DIR+fDY,DIR+fTT,DIR+fZZ,DIR+fZH,NN,s,NNStruct,iterations, multiplicity,study)
 
