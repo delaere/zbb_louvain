@@ -285,18 +285,21 @@ void Input(const char *rootFile,int N1,nn_vars *var, tree_in *sim,TTree *simu,in
     double bmax=max(Ptj1,Ptj2);									
     double bmin=min(Ptj1,Ptj2);									
    
-    std::cout << "evt[i]="<<evt[i];
-    //Adding ptj1 ptj2 and ptz cuts
-    if ((l1+l2).Pt() > kin_cut->getPtZCut() && bmax > kin_cut->getPtJ1Cut() && bmin > kin_cut->getPtJ2Cut()) {}
-    else {evt[i] = false;}
+
    
     std::cout << " ptz=" << (l1+l2).Pt() << " ptj1=" << bmax << " ptj2=" << bmin << " evt[i]="<<evt[i] << std::endl;
     
     if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity==2&&(b1+b2).M()>80 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multip==0){evt[i]=true;}
     if(MeTsig<10.&& bmax>20 && bmin>20 &&tagmax>0.679&&tagmin>0.244&&multiplicity>2&&(b1+b2).M()>50 && (b1+b2).M()<150&&((l1+l2).M()>76.) && ((l1+l2).M()<106.)&&multip==1){evt[i]=true;}
-    
-    if(evt[i]==true){  
       
+    std::cout << "evt[i]="<<evt[i];
+    //Adding ptj1 ptj2 and ptz cuts
+    if ((l1+l2).Pt() > kin_cut->getPtZCut() && bmax > kin_cut->getPtJ1Cut() && bmin > kin_cut->getPtJ2Cut()) {}
+    else {evt[i] = false;}  
+    
+       
+    if(evt[i]==true){  
+     
       sim->gg_weight=Wgg;
       sim->qq_weight=Wqq;
       sim->tt_weight=Wtt;
