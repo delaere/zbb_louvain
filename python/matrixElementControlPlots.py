@@ -154,7 +154,7 @@ class MatrixElementControlPlots(BaseControlPlots):
         self.readerREG.AddVariable("jetVtx3deL",self.var_jetVtx3deL)
         self.readerREG.AddVariable("met"       ,self.var_met)
         self.readerREG.AddVariable("rho"       ,self.var_rho)
-        self.readerREG.BookMVA("BDT_REG","/home/fynu/vizangarciaj/storage/TMVA/factoryJetReg_BDT.weights.xml")
+        self.readerREG.BookMVA("BDT_REG","/nfs/user/llbb/TMVAregression/factoryJetReg_BDT.weights.xml")
       
 
 
