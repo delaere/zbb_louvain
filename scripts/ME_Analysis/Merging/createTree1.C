@@ -316,7 +316,7 @@ void CreateTree(TString InputFile){
     nBjetsHP      = mc_RDS->jetmetnj;
     nBjetsHEHP    = mc_RDS->jetmetnj;
 	
-    category      = mc_RDS->rc_eventSelection_10_idx;
+    category      = mc_RDS->rc_eventSelection_14_idx;
 	
     if (category == 1 && Met_sig < 10 &&  Met_sig!= 0){
 
@@ -347,10 +347,10 @@ void CreateTree(TString InputFile){
 void Loop(){
   //CreateTree("DoubleMu_DataA");
   //CreateTree("DoubleEle_DataA");
-  CreateTree("DY_El_MC");
-  /*CreateTree("DY_Mu_MC");
+  //CreateTree("DY_El_MC");
+  //CreateTree("DY_Mu_MC");
   CreateTree("TT_El_MC");
-  CreateTree("TT_Mu_MC");
+  /*CreateTree("TT_Mu_MC");
   CreateTree("ZZ_El_MC");
   CreateTree("ZZ_Mu_MC");
   CreateTree("ZH110_El_MC");
