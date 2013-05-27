@@ -27,39 +27,41 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("ls","Lumi section",2000,0,2000)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
+      self.add("triggerDouble","Double trigger",2,0,2)
+      self.add("triggerSingle","Single trigger",2,0,2)
       self.add("zmassMu","zmassMu",10000,0,1000)
       self.add("bestzmassMu","bestzmassMu",10000,0,1000)
       self.add("zmassEle","zmassEle",10000,0,1000)
       self.add("bestzmassEle","bestzmassEle",10000,0,1000)
-      self.add("zptMu","zptMu",500,0,500)
-      self.add("bestzptMu","bestzptMu",500,0,500)
-      self.add("zptEle","zptEle",500,0,500)
-      self.add("bestzptEle","bestzptEle",500,0,500)
+      self.add("zptMu","zptMu",1000,0,1000)
+      self.add("bestzptMu","bestzptMu",1000,0,1000)
+      self.add("zptEle","zptEle",1000,0,1000)
+      self.add("bestzptEle","bestzptEle",1000,0,1000)
       self.add("scaldptZbj1","scaldptZbj1",1000,-500,500)
       self.add("drZbj1","distance between Z and leading jet",100,0,5)
       self.add("dphiZbj1","dphiZbj1",40,0,3.15)
       self.add("scaldptZbb","scaldptZbb",1000,-500,500)
       self.add("dphiZbb","dphiZbb",40,0,3.15)
       self.add("drZbb","drZbb",100,0,5)
-      self.add("dijetM","b bbar invariant mass",1000,0,1000)
-      self.add("dijetPt","b bbar Pt",500,0,500)
+      self.add("dijetM","b bbar invariant mass",3000,0,3000)
+      self.add("dijetPt","b bbar Pt",1000,0,1000)
       self.add("dijetdR","#Delta R (b bbar)",100,0,5)
       self.add("dijetSVdR","#Delta R (b bbar SV)",100,0,5)
       self.add("dphidijetMET","#Delta #phi (b bbar MET)",40,0,3.15)
-      self.add("ZbM","Zb invariant mass",1000,0,1000)
-      self.add("ZbPt","Zb Pt",500,0,500)
-      self.add("ZbbM","Zbb invariant mass",1000,0,1000)
-      self.add("ZbbPt","Zbb Pt",500,0,500)
+      self.add("ZbM","Zb invariant mass",3000,0,3000)
+      self.add("ZbPt","Zb Pt",1000,0,1000)
+      self.add("ZbbM","Zbb invariant mass",3000,0,3000)
+      self.add("ZbbPt","Zbb Pt",1000,0,1000)
       self.add("category","event category",eventCategories()+1,0,eventCategories()+1)  
-      self.add("mu1pt","leading muon Pt",500,0,500)
-      self.add("mu2pt","subleading muon Pt",500,0,500)
+      self.add("mu1pt","leading muon Pt",1000,0,1000)
+      self.add("mu2pt","subleading muon Pt",1000,0,1000)
       self.add("mu1eta","leading muon Eta",25,0,2.5)
       self.add("mu2eta","subleading muon Eta",25,0,2.5)
       self.add("mu1etapm","leading muon Eta",50,-2.5,2.5)
       self.add("mu2etapm","subleading muon Eta",50,-2.5,2.5)
       self.add("drllMu","drllMu",100,0,5)
-      self.add("el1pt","leading electron Pt",500,0,500)
-      self.add("el2pt","subleading electron Pt",500,0,500)
+      self.add("el1pt","leading electron Pt",1000,0,1000)
+      self.add("el2pt","subleading electron Pt",1000,0,1000)
       self.add("el1eta","leading electron Eta",25,0,2.5)
       self.add("el2eta","subleading electron Eta",25,0,2.5)
       self.add("el1etapm","leading electron Eta",50,-2.5,2.5)
@@ -72,7 +74,36 @@ class EventSelectionControlPlots(BaseControlPlots):
       result = { }
       ## trigger
       result["triggerSelection"] = self.checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
-      result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
+      #result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
+      triggerList = []
+      paths = event.triggerInfo.acceptedPaths()
+
+      triggers = []
+      SingleTrig = 0
+      DoubleTrig = 0
+      for i in range(paths.size()) :
+          name = paths[i].name()
+          #print name
+          for trig_name in ["HLT_Mu17_Mu8","HLT_Mu17_TkMu8","HLT_Mu13_Mu8","HLT_IsoMu24_v"] :
+              if name.find(trig_name)>-1 : triggers.append(trig_name)
+
+      if paths.size()>0 : triggerList.append(0)
+      if "HLT_Mu17_Mu8" in triggers or "HLT_Mu17_TkMu8" in triggers :
+          triggerList.append(1)
+          DoubleTrig = 1
+      if "HLT_Mu17_Mu8" in triggers : triggerList.append(2)
+      if "HLT_Mu17_TkMu8" in triggers : triggerList.append(3)
+      if len(triggerList)==1 :
+          if "HLT_Mu13_Mu8" in triggers : triggerList.append(4)
+          if "HLT_IsoMu24_v" in triggers : triggerList.append(5)
+      if "HLT_IsoMu24_v" in triggers : SingleTrig=1
+      if len(triggers)==0 : triggerList.append(6)
+      if len(triggerList)==1 or len(triggerList)>4 : print "error", len(triggerList)
+      
+      result["triggerBits"] = triggerList
+      result["triggerSingle"] = SingleTrig
+      result["triggerDouble"] = DoubleTrig
+      
       ## event category
       categoryData = event.catMu if self.muChannel else event.catEle
       result["category"] = [ ]
@@ -172,23 +203,27 @@ class EventSelectionControlPlots(BaseControlPlots):
       
       return result
 
-def runTest(path='../testfiles/'):
+def runTest(path='/nfs/user/llbb/Pat_8TeV_537/DoubleMu2012D/'):
   controlPlots = EventSelectionControlPlots(muChannel=True)
   if os.path.isdir(path):
     dirList=os.listdir(path)
     files=[]
+    j=0
     for fname in dirList:
       files.append(path+fname)
+      j+=1
+      if j>5 : break
   elif os.path.isfile(path):
     files=[path]
   else:
     files=[]
   events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
+  prepareAnalysisEvent(events,checkTrigger=True)
   controlPlots.beginJob()
   i = 0
   for event in events:
-    if i%1000==0 : print "Processing... event ", i
+    if i%100==0 : print "Processing... event ", i
+    #if i > 1000 : break
     controlPlots.processEvent(event)
     i += 1
   controlPlots.endJob()
