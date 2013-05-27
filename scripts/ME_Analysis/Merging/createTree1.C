@@ -333,7 +333,7 @@ void CreateTree(TString InputFile){
         nBjetsHEHP    = mc_RDS->jetmetnj;
 	
 	
-        category      = mc_RDS->rc_eventSelection_10_idx;
+        category      = mc_RDS->rc_eventSelection_11_idx;
 	
 
 	
