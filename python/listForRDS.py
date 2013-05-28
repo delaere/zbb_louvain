@@ -11,22 +11,30 @@ dataPeriods = [
 
 sampleList = [
     "DATA",
-    #"TT",
-    "TT-FullLept",
+    "TT",
+    #"TT-FullLept",
     "ZZ",
     "DY",
+    "DY50-70",
+    "DY70-100",
+    "DY100",
+    "DY180",
+    "DY1j",
+    "DY2j",
+    "DY3j",
+    "DY4j",
     "ZH125"
     ]#,"ZH120","ZH115","ZH130","ZH135"]
 
 totsampleList  = [
     "DATA",
-    #"TT",
-    "TT-FullLept",
+    "TT",
+    #"TT-FullLept",
     "ZZ",
     "Zbb",
     "Zbx",
     "Zxx",
-    #"Zno",
+    "Zno",
     "ZH125"
     ]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
 
@@ -39,11 +47,25 @@ for sample in totsampleList :
     MCsampleList.append(sample)
     if not sample in sigMCsampleList : bkgMCsampleList.append(sample)
 
+L_DY = "10325.26"
+DYrew = {
+    "50-70"   : "("+L_DY+"/(40626.58+"+L_DY+"))",
+    "70-100"  : "("+L_DY+"/(27019.59+"+L_DY+"))",
+    "100-180" : "("+L_DY+"/(78068.53+"+L_DY+"))",
+    "180"     : "("+L_DY+"/(78068.53+341113.16+"+L_DY+"))",
+    "1j"      : "("+L_DY+"/(41506.68+"+L_DY+"))",
+    "2j"      : "("+L_DY+"/(119183.18+"+L_DY+"))",
+    "3j"      : "("+L_DY+"/(203041.98+"+L_DY+"))",
+    "4j"      : "("+L_DY+"/(277900.48+"+L_DY+"))",
+    }
+
+
 from zbbCommons import zbbnorm
 nev_DYjets_summer12=29310189 # to be used on events produced in 532p4
 lumi = { "DATA"   : zbbnorm.lumi_tot2012,
          "TT"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
          "TT-FullLept" : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000.,
+         "Zbb_Zbb"     : zbbnorm.nev_Zbb_summer12/zbbnorm.xsec_Zbb_8TeV/1000.,
          "Zbb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zbx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
          "Zxx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
@@ -68,6 +90,8 @@ Extra_norm={ "MuMuChannelDATA"  : 1.0,
              "EEChannelTT"      : 1.0,
              "MuMuChannelTT-FullLept"    : (15000./62506.)/MuCorrFact,
              "EEChannelTT-FullLept"      : 15000./46492.,
+	     "MuMuChannelZbb_Zbb"    : (20000./111784.)/MuCorrFact,
+             "EEChannelZbb_Zbb"      : 20000./80672.,
 	     "MuMuChannelZbb"    : 1.0/MuCorrFact,
              "EEChannelZbb"      : 1.0,
 	     "MuMuChannelZbx"    : 1.0/MuCorrFact,
@@ -80,6 +104,22 @@ Extra_norm={ "MuMuChannelDATA"  : 1.0,
              "EEChannelZZ"      : 10000./11936.,
 	     "MuMuChannelZH125" : (10000./65412.)/MuCorrFact,
              "EEChannelZH125"   : 10000./48726.,
+             "MuMuChannelDY50-70" : 4000./6517.,
+             "EEChannelDY50-70" : 4000./4615.,
+             "MuMuChannelDY70-100" : 2000./3242.,
+             "EEChannelDY70-100" : 2000./2304.,
+             "MuMuChannelDY100" : 5000./9040,
+             "EEChannelDY100" : 5000./6789.,
+             "MuMuChannelDY180" : 5000./7281.,
+             "EEChannelDY180" : 5000./5648.,
+             "MuMuChannelDY1j" : 5000./8655.,
+             "EEChannelDY1j" : 5000./5942.,
+             "MuMuChannelDY2j" : 15000./38485.,
+             "EEChannelDY2j" : 15000./27727.,
+             "MuMuChannelDY3j" : 15000./39129.,
+             "EEChannelDY3j" : 15000./28325.,
+             "MuMuChannelDY4j" : 25000./43536.,
+             "EEChannelDY4j" : 25000./32339.,
             }
 
 SFs_fit={ "MuMuChannelDATA"  : 1.0,
@@ -192,8 +232,20 @@ namePlotList = [
      "jetmetbjet1betaStar" ,
      "jetmetbjet2beta" ,
      "jetmetbjet2betaStar",
-     
+
+     "mcSelectionnJets",
+     "mcSelectionnbJets",
+     "mcSelectionncJets",
+     "mcSelectionllpt",
      ]
+
+namePlotListOnMC = [
+    "mcSelectionnJets",
+    "mcSelectionnbJets",
+    "mcSelectionncJets",
+    "mcSelectionllpt",
+    ]
+
 
 namePlotListOnMerged = [
      "jetmetbjetMinCSVdisc"   ,   
@@ -378,6 +430,10 @@ min = {
     "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 0,
     "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 0,
 
+    "mcSelectionnJets" : -0.5,
+    "mcSelectionnbJets" : -0.5,
+    "mcSelectionncJets" : -0.5,
+    "mcSelectionllpt" : 0,
     }
 
 ################
@@ -489,6 +545,10 @@ max = {
     "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 1,
     "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 1,
 
+    "mcSelectionnJets" : 9.5,
+    "mcSelectionnbJets" : 9.5,
+    "mcSelectionncJets" : 9.5,
+    "mcSelectionllpt" : 500,
     }
 
 ################
@@ -599,5 +659,10 @@ binning = {
     "mlphiggsvsbkg_125_comb_MM_N_2_4_10000" : 20,
     "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000" : 20,
     "mlphiggsvsbkg_125_comb_MM_N_3_2_10000" : 20,
+
+    "mcSelectionnJets"  : 10,
+    "mcSelectionnbJets" : 10,
+    "mcSelectionncJets" : 10,
+    "mcSelectionllpt" : 25,
     }
     
