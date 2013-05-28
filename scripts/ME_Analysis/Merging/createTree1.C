@@ -181,7 +181,7 @@ void CreateTree(TString InputFile){
   //t_RDSME->Branch("category", &category, "category/I"); 
   
   ofstream myfile2; 
-  myfile2.open (outputFolder+"outRDStoLHCO_"+InputFile+".lhco",ios::app); 
+  myfile2.open (outputFolder+"outRDStoLHCO_"+InputFile+".lhco",ios::out); 
   
   Long64_t nbytesRDS = 0, nbRDS = 0;
   for (Int_t iRDS=0;iRDS<t_RDS->GetEntries();iRDS++) {
