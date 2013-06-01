@@ -10,14 +10,14 @@
 #include "include.h"
 #include "Read_input_NN_inputs.h"
 
-void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh, TString name, TString NNStruct, int iterations, TString cuts)
+void Neural_net_E(const string dy, const string zbb, const string tt, const string ttfulllept, const string zz, const string zh, TString name, TString directory, TString NNStruct, int iterations, TString cuts)
 {
 	if (!gROOT->GetClass("TMultiLayerPerceptron")) {
 		gSystem->Load("libMLP");
 	}
 
 	// output file : control of the NN
-        TFile file("Final/NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
+        TFile file(directory+"/NN_Higgs_vs_Bkg_"+name+".root","RECREATE");
 
 	//Creation of a Tree for NN training
 	TTree *simu = new TTree("Aphi","phi component of the potential");
@@ -32,19 +32,23 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
         simu->Branch("type2",&sim->type2,"type2/I");
 	simu->Branch("tt_weight",&sim->tt_weight,"tt_weight/D");
 	simu->Branch("deta",&sim->deta,"deta/D");
-	simu->Branch("dphi",&sim->dphi,"dphi/D");
+	simu->Branch("dphiZbb",&sim->dphi,"dphiZbb/D");
 	simu->Branch("ptZ",&sim->ptZ,"ptZ/D");
 	simu->Branch("ptbb",&sim->ptbb,"ptbb/D");
+	simu->Branch("prodCSV",&sim->prodCSV,"prodCSV/D");
 	simu->Branch("Met",&sim->Met,"Met/D");
 	simu->Branch("Mll",&sim->Mll,"Mll/D");
 	simu->Branch("Mbb",&sim->Mbb,"Mbb/D");
+	simu->Branch("regMbb",&sim->regMbb,"regMbb/D");
         simu->Branch("Multi",&sim->Multi,"Multi/I");
         simu->Branch("metsig",&sim->metsig,"metsig/D");
 
         simu->Branch("HvsZbb",&sim->HvsZbb,"HvsZbb/D");
         simu->Branch("HvsTT",&sim->HvsTT,"HvsTT/D");
         simu->Branch("HvsZZ",&sim->HvsZZ,"HvsZZ/D");
+	simu->Branch("prodNNs",&sim->prodNNs,"prodNNs/D");
 
+	simu->Branch("evtWeight",&sim->evtWeight,"evtWeight/D");
 
 	// open file to get nbres of entries
 
@@ -52,64 +56,51 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	totcuts+=cuts;
 	cout<<"cut on : "<<totcuts<<endl;
 
-	int N1,N2,N3,N4;
-	TChain *treetmp =new TChain("rds_zbb");
-	treetmp->Reset();
-	treetmp->Add(dy);
-	TTree *ttmp = treetmp->CopyTree(totcuts);
-	N1=ttmp->GetEntries();
-	cout<<"dy N1 is "<<N1<<endl;
-	treetmp->Reset();
-	ttmp->Reset();
-	treetmp->Add(tt);
-	ttmp = treetmp->CopyTree(totcuts);
-	N2=ttmp->GetEntries();
-	cout<<"tt N2 is "<<N2<<endl;
-	treetmp->Reset();
-	ttmp->Reset();
-	treetmp->Add(zz);
-	ttmp = treetmp->CopyTree(totcuts);
-	N3=ttmp->GetEntries();
-	cout<<"zz N3 is "<<N3<<endl;
-	treetmp->Reset();
-	ttmp->Reset();
-	treetmp->Add(zh);
-	ttmp = treetmp->CopyTree(totcuts);
-	N4=ttmp->GetEntries();
-	cout<<"zh N4 is "<<N4<<zh<<treetmp->GetEntries()<<endl;
-	delete treetmp;
-	delete ttmp;
-
-	cout<<N1<<" "<<N2<<" "<<N3<<" "<<N4<<endl;
-
-	nn_vars *var1 = new nn_vars(N1);
-	Input(dy,var1,sim,simu,1,0,1,totcuts);
-	nn_vars *var2 = new nn_vars(N2);
-	Input(tt,var2,sim,simu,1,0,2,totcuts);
-	nn_vars *var3 = new nn_vars(N3);
-	Input(zz,var3,sim,simu,1,0,3,totcuts);
-	nn_vars *var4 = new nn_vars(N4);
-	Input(zh,var4,sim,simu,1,1,5,totcuts);
-
+	std::map<string,int> Ni;
+	string listSample[]={dy,zbb,tt,ttfulllept,zz,zh};
+	int nSamples = 6;
+	std::map<string,int> sampleID;
+	sampleID[dy]=0; sampleID[zbb]=1; sampleID[tt]=0; sampleID[ttfulllept]=2; sampleID[zz]=3; sampleID[zh]=5;
+	std::map<string,nn_vars*> var;
+	for(int s = 0; s<nSamples; s++){
+	  TChain *treetmp =new TChain("rds_zbb");
+	  treetmp->Reset();
+	  treetmp->Add(listSample[s].c_str());
+	  TTree *ttmp = treetmp->CopyTree(totcuts);
+	  Ni[listSample[s]]=ttmp->GetEntries();
+	  cout<<s<<" N is "<<Ni[listSample[s]]<<endl;
+	  treetmp->Reset();
+	  ttmp->Reset();
+	  var[listSample[s]] = new nn_vars(Ni[listSample[s]]);
+	  int isSignal = 0;
+	  if(listSample[s]==zh) isSignal = 1;
+	  int fill = 1;
+	  if(listSample[s]==dy || listSample[s]==tt) fill=0;
+	  Input(listSample[s], var[listSample[s]], sim, simu, fill, isSignal, sampleID[listSample[s]], totcuts);
+	}
 	simu->Write();
 	// Tree SIMU for NN training filled
 
 	// Declaration of multiplayer perceptron object. input variable = branch of simu tree. Not all at the same time. To add a branch as input add @branchname. then : intermediate layer node, put : to add new layer. Ended by : @type mean that outup is 1 or 0. Then we specify the number of entries for training and test samples.
-	int Dy=var1->evt_nbr[0];
-	int Tt=var2->evt_nbr[0];
-	int Zz=var3->evt_nbr[0];
-	int Hi=var4->evt_nbr[0];
+	int Dy=var[zbb]->evt_nbr[0];
+	int Tt=var[ttfulllept]->evt_nbr[0];
+	int Zz=var[zz]->evt_nbr[0];
+	int Hi=var[zh]->evt_nbr[0];
 	ostringstream osdy,ostt,oszz,oszh;
 	osdy << Dy;ostt << Tt;oszz << Zz;oszh << Hi;
 	TString normZH= oszh.str();TString normDY= osdy.str();TString normTT= ostt.str();TString normZZ= oszz.str();
 
 	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 
-	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT"+NNStruct+":type!","(type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+")",simu,"Entry$%2!=0","Entry$%2==0");
+	TMultiLayerPerceptron *mlp =new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT"+NNStruct+":type!","evtWeight*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
 	mlp->Train(iterations, "text,graph,update=2");
+	//
+	if(tag==1){mlp =new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight:"+NNStruct+":type!","(type1==1)/"+normZH+"+(type1==0)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}
+	if(tag==2){mlp =new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight:"+NNStruct+":type!","(type1==1)/"+normZH+"+(type1==0)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}
+	if(tag==3){mlp =new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight:"+NNStruct+":type!","(type1==1)/"+normZH+"+(type1==0)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
-	mlp->Export("Final/MLP_Higgs_vs_Bkg_"+name,"python");
-	mlp->Export("Final/MLP_Higgs_vs_Bkg_"+name,"c++");
+	mlp->Export(directory+"/MLP_Higgs_vs_Bkg_"+name,"python");
+	mlp->Export(directory+"/MLP_Higgs_vs_Bkg_"+name,"c++");
 	mlp->Write();
 
 	// Use TMLPAnalyzer to see what it looks for. INFO will be in the contro root file
@@ -128,26 +119,25 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	// This will give approx. the same result as DrawNetwork.
 	// All entries are used, while DrawNetwork focuses on
 	// the test sample. Also the xaxis range is manually set.
-	TH1F *zbbh = new TH1F("zbbh", "NN output", 28, -0.2, 1.2);
-	TH1F *zzh = new TH1F("zzh", "NN output", 28, -0.2, 1.2);
-	TH1F *zhh = new TH1F("zhh", "NN output", 28, -0.2, 1.2);	
-	TH1F *tth = new TH1F("tth", "NN output", 28, -0.2, 1.2);
 
-	TH1F *zbbprod = new TH1F("zbbprod", "NNs prod", 28, -0.2, 1.2);
-	TH1F *zzprod = new TH1F("zzprod", "NNs prod", 28, -0.2, 1.2);
-	TH1F *zhprod = new TH1F("zhprod", "NNs prod", 28, -0.2, 1.2);	
-	TH1F *ttprod = new TH1F("ttprod", "NNs prod", 28, -0.2, 1.2);
+	std::map<string,TH1F*> hists;
+	string channel[] = {"Mu","EE"};
+	string hname[] = {"NN","prod"};
+	std::map<string,string> labels;
+	labels[dy]="DY"; labels[zbb]="Zbb"; labels[tt]="TT"; labels[ttfulllept]="TT-FullLept"; labels[zz]="ZZ"; labels[zh]="signal";
+	for(int s = 0; s<nSamples; s++){
+	  for(int c = 0; c<2; c++){
+	    for(int n = 0; n<2; n++){
+	      hists[labels[listSample[s]]+channel[c]+hname[n]] = new TH1F((labels[listSample[s]]+channel[c]+hname[n]).c_str(), (hname[n]+" output").c_str(), 28, -0.2, 1.2);
+	      hists[labels[listSample[s]]+channel[c]+hname[n]]->SetDirectory(0);
+	    }
+	  }
+	}
 
 	// histo of efficiency
 	TH1F *bg_eff = new TH1F("bgh", "NN output", 28, -0.2, 1.2);
 	TH1F *sig_eff = new TH1F("sigh", "NN output", 28, -0.2, 1.2);
 
-	zbbh->SetDirectory(0);
-	zzh->SetDirectory(0);
-	zhh->SetDirectory(0);
-	tth->SetDirectory(0);;
-
-	int nIn = 3;
 	vector<string> vNNinputs;
 	if(NNStruct.BeginsWith(",")){
 	  size_t first=NNStruct.Index(":");
@@ -170,130 +160,86 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	cout<<"params size "<<nIn<<endl;
 
 	//-------------------------------------------------------------------------
-	// FOR Zbb
-	for (int i=0;i<N1; ++i) {
-          params[0] = var1->hzbb[i];
-          params[1] = var1->hzz[i];
-          params[2] = var1->htt[i];
-	  for(unsigned int j=0; j<vNNinputs.size(); j++){
-	    if(vNNinputs[j]=="Mbb") params[2+j] = var1->Mbb[i];
-	    else if(vNNinputs[j]=="Multi") params[2+j] = var1->multi[i];
-	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+
+	for(int s = 0; s<nSamples; s++){
+	  for (int i=0;i<Ni[listSample[s]]; ++i) {
+	    params[0] = var[listSample[s]]->hzbb[i];
+	    params[1] = var[listSample[s]]->hzz[i];
+	    params[2] = var[listSample[s]]->htt[i];
+	    for(unsigned int j=0; j<vNNinputs.size(); j++){
+	      if(vNNinputs[j]=="Mbb") params[3+j] = var[listSample[s]]->Mbb[i];
+	      else if(vNNinputs[j]=="Multi") params[3+j] = var[listSample[s]]->multi[i];
+	      else if(vNNinputs[j]=="prodCSV") params[3+j] = var[listSample[s]]->tagj1[i]*var[listSample[s]]->tagj2[i];
+	      else if(vNNinputs[j]=="prodNNs") params[3+j] = var[listSample[s]]->prodNNs[i];
+	      else if(vNNinputs[j]=="regMbb") params[3+j] = var[listSample[s]]->regMbb[i];
+	      else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+	    }
+	    string ch = "EE";
+	    if(var[listSample[s]]->isMuMu[i]){
+	      ch = "Mu";
+	    }
+	    hists[labels[listSample[s]]+ch+"NN"]->Fill(mlp->Evaluate(0, params),var[listSample[s]]->evtWeight[i]);
+	    hists[labels[listSample[s]]+ch+"prod"]->Fill(params[0]*params[1]*params[2],var[listSample[s]]->evtWeight[i]);
 	  }
-	  zbbh->Fill(mlp->Evaluate(0, params));
-	  zbbprod->Fill(params[0]*params[1]*params[2]);
+	  for(int c = 0; c<2; c++){
+	    cout<<labels[listSample[s]]<<" "<<channel[c]<<" "<<hists[labels[listSample[s]]+channel[c]+"NN"]->Integral()<<endl;
+	  }
 	}
-        //-------------------------------------------------------------------------                                                            
-	// FOR tt
-	for (int i=0;i<N2; ++i) {
-	  params[0] = var2->hzbb[i];
-	  params[1] = var2->hzz[i];
-	  params[2] = var2->htt[i];
-	  for(unsigned int j=0; j<vNNinputs.size(); j++){
-	    if(vNNinputs[j]=="Mbb") params[2+j] = var2->Mbb[i];
-	    else if(vNNinputs[j]=="Multi") params[2+j] = var2->multi[i];
-	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
+
+	for(int c = 0; c<2; c++){
+	  file.mkdir(channel[c].c_str());
+	  file.cd(channel[c].c_str());
+	  for(int s = 0; s<nSamples; s++){
+	    for(int n = 0; n<2; n++){
+	      string Name = "";
+	      if(hname[n]=="prod") Name="prod";
+	      hists[labels[listSample[s]]+channel[c]+hname[n]]->SetName((Name+labels[listSample[s]]+"125").c_str());
+	      hists[labels[listSample[s]]+channel[c]+hname[n]]->Write();
+	    }
 	  }
-	  tth->Fill(mlp->Evaluate(0, params));
-	  ttprod->Fill(params[0]*params[1]*params[2]);
 	}
-        //-------------------------------------------------------------------------        
-	// FOR ZZ
-        for (int i=0;i<N3; ++i) {
-	  params[0] = var3->hzbb[i];
-          params[1] = var3->hzz[i];
-          params[2] = var3->htt[i];
-	  for(unsigned int j=0; j<vNNinputs.size(); j++){
-	    if(vNNinputs[j]=="Mbb") params[2+j] = var3->Mbb[i];
-	    else if(vNNinputs[j]=="Multi") params[2+j] = var3->multi[i];
-	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
-	  }
-	  zzh->Fill(mlp->Evaluate(0,params));
-	  zzprod->Fill(params[0]*params[1]*params[2]);
-        }
-        //-------------------------------------------------------------------------
-	// FOR ZH
-        for (int i=0;i<N4; ++i) {
-	  params[0] = var4->hzbb[i];
-	  params[1] = var4->hzz[i];
-	  params[2] = var4->htt[i];
-	  for(unsigned int j=0; j<vNNinputs.size(); j++){
-	    if(vNNinputs[j]=="Mbb") params[2+j] = var4->Mbb[i];
-	    else if(vNNinputs[j]=="Multi") params[2+j] = var4->multi[i];
-	    else cout<<"Variable added the NN not known, please add it in the code"<<endl;
-	  }          
-	  zhh->Fill(mlp->Evaluate(0, params));
-	  zhprod->Fill(params[0]*params[1]*params[2]);
-        }
-
-
-//-------------------------------------------------------------------------                                                                                             
-
-	cout<<"  Zbb  ALL "<<zbbh->Integral()<<endl;
-	cout<<"  TT   ALL "<<tth->Integral()<<endl;
-	cout<<"  ZZ   ALL "<<zzh->Integral()<<endl;
-	cout<<"  ZH   ALL "<<zhh->Integral()<<endl;
-
-//----------------------------------------------------Fill for CLs
-
-	zbbh->SetName("DY125");
-	zbbh->Write();
-	tth->SetName("TT125");
-        tth->Write();
-	zzh->SetName("ZZ125");
-	zzh->Write();
-	zhh->SetName("signal125");
-	zhh->Write();
-
-	zbbprod->SetName("prodDY125");
-	zbbprod->Write();
-	ttprod->SetName("prodTT125");
-        ttprod->Write();
-	zzprod->SetName("prodZZ125");
-	zzprod->Write();
-	zhprod->SetName("prodsignal125");
-	zhprod->Write();
+	file.cd();
 
 //------------------------------------------------------------------------- 
 //-------------------Normalisation and plot ------------------------------------------------------
-//-------------------------------------------------------------------------                                                                                                                                       
+//-------------------------------------------------------------------------                                                               
+	hists["TT-FullLeptMuNN"]->Add(hists["TT-FullLeptEENN"]);
+	hists["DYMuNN"]->Add(hists["DYEENN"]);
+	hists["ZZMuNN"]->Add(hists["ZZEENN"]);
+	hists["signalMuNN"]->Add(hists["signalEENN"]);
 
+	hists["TT-FullLeptMuNN"]->SetLineColor(kBlue); hists["TT-FullLeptMuNN"]->SetFillColor(kBlue);
+	hists["ZZMuNN"]->SetLineColor(kGreen); hists["ZZMuNN"]->SetFillColor(kGreen);
+	hists["DYMuNN"]->SetLineColor(kRed); hists["DYMuNN"]->SetFillColor(kRed);
 
-	tth->SetLineColor(kBlue);
-	zzh->SetLineColor(kGreen);
-	tth->SetFillColor(kBlue);
-	zzh->SetFillColor(kGreen);
-	zbbh->SetLineColor(kRed);
-	zbbh->SetFillColor(kRed);
-	tth->SetStats(0);
-	zzh->SetStats(0);
-	zbbh->SetStats(0);
+	hists["TT-FullLeptMuNN"]->SetStats(0);
+	hists["ZZMuNN"]->SetStats(0);
+	hists["DYMuNN"]->SetStats(0);
 
 	// normalisation
-
 	
-	tth->Scale((89.+112.4)/tth->Integral());
-	zbbh->Scale((762.38+137.5+138+574.2+115.1+96.9)/zbbh->Integral());
-	zzh->Scale((21.5+15.8)/zzh->Integral());
-	zhh->Scale((112.+137.5+138+762.38+21.5+89+15.8+574.2+115.1+96.9)/zhh->Integral());
+	hists["TT-FullLeptMuNN"]->Scale((89.+112.4)/hists["TT-FullLeptMuNN"]->Integral());
+	hists["DYMuNN"]->Scale((762.38+137.5+138+574.2+115.1+96.9)/hists["DYMuNN"]->Integral());
+	hists["ZZMuNN"]->Scale((21.5+15.8)/hists["ZZMuNN"]->Integral());
+	hists["signalMuNN"]->Scale((112.+137.5+138+762.38+21.5+89+15.8+574.2+115.1+96.9)/hists["signalMuNN"]->Integral());
 	//zhh->Scale(higgs_norm);
 
 	// create stack for histogram display
 
 	THStack *hs=new THStack("hs","test stacked histograms");
-	hs->Add(zbbh);
-	hs->Add(tth);
-	hs->Add(zzh);
+	hs->Add(hists["DYMuNN"]);
+	hs->Add(hists["TT-FullLeptMuNN"]);
+	hs->Add(hists["ZZMuNN"]);
 	//hs->Add(twbh);
 	hs->Draw();
 	//tth->Draw("same");
-	zhh->Draw("same");	
+	hists["signalMuNN"]->Draw("same");	
 	//dath->Draw("same");
 	TLegend *legend = new TLegend(.75, .80, .95, .95);
-	legend->AddEntry(zbbh, " Zbb ");
-	legend->AddEntry(tth, "t#bar{t}");
-	legend->AddEntry(zzh, " ZZ ");
-	legend->AddEntry(zhh, " Zhh ");
+	legend->AddEntry(hists["DYMuNN"], " Zbb ");
+	legend->AddEntry(hists["TT-FullLeptMuNN"], "t#bar{t}");
+	legend->AddEntry(hists["ZZMuNN"], " ZZ ");
+	legend->AddEntry(hists["signalMuNN"], " Zhh ");
 	legend->Draw();
 	
 	// efficiency computation signal VS background
@@ -302,13 +248,12 @@ void Neural_net_E(const char *dy, const char *tt, const char *zz, const char *zh
 	double efficiency_sig[28];
 	double efficiency_bg[28];
 	for(int b=1;b<29;b++){
-	  bg_eff->SetBinContent(b,((zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))/(zbbh->Integral()+tth->Integral()+zzh->Integral())));
-	  sig_eff->SetBinContent(b,(zhh->Integral(b,29)/zhh->Integral())); // here signal is zbb
-	  
-	  
-	  efficiency_sig[b-1]=(zhh->Integral(b,29)/zhh->Integral());
-          efficiency_bg[b-1]=((zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))/(zbbh->Integral()+tth->Integral()+zzh->Integral()));
-	  cout<<"S/sqrt(B) "<<zhh->Integral(b,29)/sqrt(zbbh->Integral(b,29)+tth->Integral(b,29)+zzh->Integral(b,29))<<endl;
+	  bg_eff->SetBinContent(b,((hists["DYMuNN"]->Integral(b,29)+hists["TT-FullLeptMuNN"]->Integral(b,29)+hists["ZZMuNN"]->Integral(b,29))/(hists["DYMuNN"]->Integral()+hists["TT-FullLeptMuNN"]->Integral()+hists["ZZMuNN"]->Integral())));
+	  sig_eff->SetBinContent(b,(hists["signalMuNN"]->Integral(b,29)/hists["signalMuNN"]->Integral())); // here signal is zbb
+	  	  
+	  efficiency_sig[b-1]=(hists["signalMuNN"]->Integral(b,29)/hists["signalMuNN"]->Integral());
+          efficiency_bg[b-1]=((hists["DYMuNN"]->Integral(b,29)+hists["TT-FullLeptMuNN"]->Integral(b,29)+hists["ZZMuNN"]->Integral(b,29))/(hists["DYMuNN"]->Integral()+hists["TT-FullLeptMuNN"]->Integral()+hists["ZZMuNN"]->Integral()));
+	  cout<<"S/sqrt(B) "<<hists["signalMuNN"]->Integral(b,29)/sqrt(hists["DYMuNN"]->Integral(b,29)+hists["TT-FullLeptMuNN"]->Integral(b,29)+hists["ZZMuNN"]->Integral(b,29))<<endl;
 	}
 	bg_eff->SetLineColor(kBlue);
 	sig_eff->SetLineColor(kRed);

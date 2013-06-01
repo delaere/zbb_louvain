@@ -21,6 +21,7 @@ class nn_vars {
   double *met;
   double *Mll;
   double *Mbb;
+  double *regMbb;
   double *Metsig;
   double * multi;
   double *hzbb;
@@ -30,6 +31,8 @@ class nn_vars {
   double *tagj1;
   double *tagj2;
   double *prodNNs;
+  double *evtWeight;
+  int *isMuMu;
   nn_vars(int size) {
     N = size;
     gg = new double[size];
@@ -47,6 +50,7 @@ class nn_vars {
     met = new double[size];
     Mll = new double[size];
     Mbb = new double[size];
+    regMbb = new double[size];
     hzbb = new double[size];
     htt = new double[size];
     hzz = new double[size];
@@ -56,6 +60,8 @@ class nn_vars {
     tagj1 = new double[size];
     tagj2 = new double[size];
     prodNNs = new double[size];
+    evtWeight = new double[size];
+    isMuMu = new int[size];
   }
 };
 
@@ -79,21 +85,24 @@ class tree_in {
   double HvsZbb;
   double HvsTT;
   double HvsZZ;
-  double prodtag;
+  double prodCSV;
+  double regMbb;
+  double dphiZbb;
   double prodNNs;
   double Multi;
   int type2;
+  double evtWeight;
 };
 
 
-void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fill, int sig, int typ2, TString totcuts)
+void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fill, int sig, int typ2, TString totcuts)
 {
 
   // input file : read ttree
   //TChain *chain;
   TChain *treeIn = new TChain("rds_zbb");
   treeIn->Reset();
-  treeIn->Add(rootFile);
+  treeIn->Add(rootFile.c_str());
   TTree *tree = treeIn->CopyTree(totcuts);
 
   double Eta_j1,Eta_j2,Phi_j1,Phi_j2,MeTPhi,MeT,MeTsig;
@@ -102,8 +111,10 @@ void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fi
   double Ej1,Ej2,Ptj1,Ptj2;
   double Wgg,Wqq,Wtt,Wzz,Wzz3,Whi,Whi3;
   double btagj1,btagj2;
-  double Mll, Mbb;
+  double Mll, Mbb, regMbb, zptMu, zptEle, dphiZbb;
   double multiplicity;
+  double btagWeights, leptWeights, lumiWeights;
+
   tree->SetBranchAddress("jetmetnj",&multiplicity);
   tree->SetBranchAddress("Wgg",&Wgg);
   tree->SetBranchAddress("Wqq",&Wqq);
@@ -139,6 +150,13 @@ void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fi
   tree->SetBranchAddress("jetmetbjet2CSVdisc",&btagj2);
   tree->SetBranchAddress("Inv_Mass_lept",&Mll);
   tree->SetBranchAddress("eventSelectiondijetM",&Mbb);
+  tree->SetBranchAddress("mebbNNCorrM",&regMbb);
+  tree->SetBranchAddress("eventSelectionbestzptMu",&zptMu);
+  tree->SetBranchAddress("eventSelectionbestzptEle",&zptEle);
+  tree->SetBranchAddress("eventSelectiondphiZbb",&dphiZbb);
+  tree->SetBranchAddress("BtaggingReweightingHPHP",&btagWeights);
+  tree->SetBranchAddress("LeptonsReweightingweight",&leptWeights);
+  tree->SetBranchAddress("lumiReweightingLumiWeight",&lumiWeights);
 
   // NN declaration -------------------------------------
   //!gROOT->GetClass("MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600");
@@ -210,17 +228,19 @@ void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fi
     var->tt[i]=sim->tt_weight;
     var->tagj1[i]=btagj1;
     var->tagj2[i]=btagj2;
-    sim->prodtag=btagj1*btagj2;
+    sim->prodCSV=btagj1*btagj2;
     sim->type=sig;
     sim->type2=typ2;
     sim->deta = fabs(Eta_j1-Eta_j2);
     var->deta[i]=fabs(Eta_j1-Eta_j2);
-    sim->ptZ=(l1+l2).Pt();
+    sim->ptZ=max(zptMu,zptEle);
     sim->ptbb=(b1+b2).Pt();
     sim->Mll=Mll;//(l1+l2).M();
     sim->Mbb=Mbb;//(b1+b2).M();
+    sim->regMbb=regMbb;//(b1+b2).M();
     var->Mll[i]=sim->Mll;
     var->Mbb[i]=sim->Mbb;
+    var->regMbb[i]=sim->regMbb;
     var->dphi[i]=sim->dphi;
     var->ptZ[i]=sim->ptZ;
     var->ptbb[i]=sim->ptbb;
@@ -230,6 +250,10 @@ void Input(const char *rootFile, nn_vars *var, tree_in *sim, TTree *simu, int fi
     var->met[i]=sim->Met;
     sim->Multi=multiplicity;
     var->multi[i]=sim->Multi;
+    var->evtWeight[i]=btagWeights*leptWeights*lumiWeights;
+    sim->evtWeight=var->evtWeight[i];
+    var->isMuMu[i] = 0;
+    if(zptMu>0) var->isMuMu[i] = 1;
     if(fill==1){simu->Fill();entry+=1;}     
   }
   var->evt_nbr[0]=entry;
