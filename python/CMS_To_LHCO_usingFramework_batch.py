@@ -464,6 +464,7 @@ def dumpAll(stage=12, muChannel=False, isData=False, path="/home/fynu/vizangarci
       print "We will run over file ", fname
   files=glob.glob(path+"*")
   events = Events (files)
+  print "files = ", files  
 
    # To be check to load MeT type 1 + phi correction
   jetalllabel="patJets"
