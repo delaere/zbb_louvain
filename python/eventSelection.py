@@ -5,6 +5,11 @@ from vertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from zbbCommons import isZbbSelection
 from Diff_MuonsPhys_Golden_ToBeRemoved import jsonMuonOnly
+#from DataFormats.GeometryVector import *
+#from DataFormats import *
+#from DataFormats import deltaPhi
+#from DataFormats.FWLite import deltaPhi
+import math
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 jetEtaCut = 2.1
@@ -342,6 +347,123 @@ def isBJet(jet,workingPoint,algo="SSV"):
   else:
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
+
+#returns charged tracks momentum from jet
+def getChargedTracksMomentum(jet):
+  pi = ROOT.TLorentzVector(0,0,0,0)
+  v_j1 = ROOT.TLorentzVector(0,0,0,0)
+  
+  #Loop to charged jet constituents
+  pfConst = jet.getPFConstituents()
+  for iConst in range (0, pfConst.size()):
+    if pfConst[iConst].charge() != 0:
+      pi.SetPtEtaPhiE(  pfConst[iConst].pt(),  pfConst[iConst].eta(),  pfConst[iConst].phi(),  pfConst[iConst].energy() )
+      v_j1 += pi
+  return v_j1
+
+def getTvect(jet):
+
+  t_Vect = ROOT.TVector2(0,0)
+  null = ROOT.TVector2(0,0)
+  ci = ROOT.TVector2(0,0)
+  pi = ROOT.TLorentzVector(0,0,0,0)
+  J = ROOT.TLorentzVector(0,0,0,0)
+  r = ROOT.TVector2(0,0)
+  patJetpfcPt = 1e10
+  r_mag = 1e10
+  nOfconst = 0
+
+  #re-reconstruct the jet direction with the charged tracks
+  pfConst = jet.getPFConstituents()
+  for iConst in range (0, pfConst.size()):
+    if pfConst[iConst].charge() != 0:
+      pi.SetPtEtaPhiE( pfConst[iConst].pt(), pfConst[iConst].eta(), pfConst[iConst].phi(), pfConst[iConst].energy() )
+      J += pi
+      nOfconst+=1
+    
+  
+  #if there are less than two charged tracks do not calculate the pull (there is not enough info). It returns a null vector
+  #print  "nOfconst=",nOfconst
+  if nOfconst < 2 :
+    return t_Vect
+    #return None
+  
+
+  v_J = ROOT.TVector2( J.Rapidity(), J.Phi() )
+  #calculate TVector using only charged tracks
+  for iConst in range (0, pfConst.size()):
+    if pfConst[iConst].charge() != 0:
+      patJetpfcPt = pfConst[iConst].pt()
+      pi.SetPtEtaPhiE( pfConst[iConst].pt(), pfConst[iConst].eta(), pfConst[iConst].phi(), pfConst[iConst].energy() )
+      
+
+      #r.Set( pi.Rapidity() - J.Rapidity(), Geom::deltaPhi( patJetpfc.at(idx)->phi(), J.Phi() ) );
+      #r_mag = r.Mod();
+      #t_Vect += ( patJetpfcPt / J.Pt() ) * r_mag * r;
+
+      x = pi.Rapidity() - J.Rapidity()
+      y = deltaBarePhi( pfConst[iConst].phi(), J.Phi() )
+      r = ROOT.TVector2(x, y)
+      #print "x=",x
+      #print "y=",y
+      #print "patJetpfcPt=",patJetpfcPt
+      #print "J.Pt()=",J.Pt()
+      #print "r.Mod=",r.Mod()
+      x *= ( patJetpfcPt / J.Pt() )*r.Mod()
+      y *= ( patJetpfcPt / J.Pt() )*r.Mod()
+      xold = t_Vect.Px()
+      yold = t_Vect.Py()
+      #print "x=",x
+      #print "y=",y
+      
+      t_Vect.Set(xold+x, yold+y)
+       
+  #print "t_Vect.X=",t_Vect.Px()
+  #print "t_Vect.Y=",t_Vect.Py()
+  
+  return t_Vect
+
+#I should be able to import somehow the deltaPhi from DataFormats/GeometryVector/interface/VectorUtil.h
+# but since I'm not sure how I put them here after translating them to python
+def deltaBarePhi(phi1, phi2):
+  dphi = phi2-phi1
+  if dphi > math.pi:
+    dphi -= 2.0*math.pi
+  elif  dphi <= -math.pi:
+    dphi += 2.0*math.pi
+  return dphi
+
+#delta Theta Pull variable as in VHbb analysis
+def getDeltaTheta(jet1, jet2):
+  deltaTheta = 1e10
+  pi = ROOT.TLorentzVector(0,0,0,0)
+  v_j1 = getChargedTracksMomentum(jet1)
+  v_j2 = getChargedTracksMomentum(jet2)
+
+  #if one of the jets has no charged constituents deltaTheta will go to the overflow bin
+  if v_j2.Mag() == 0 or v_j1.Mag() == 0:
+    return 1e10
+  
+    
+  t = getTvect(jet1)
+
+
+  #if tvector could not be formed
+  if t.Mod() == 0: return 1e10
+    
+  
+  dphi =  v_j2.Phi() - v_j1.Phi()
+  if dphi > math.pi:
+    dphi -= 2.0*math.pi
+  elif dphi <= -math.pi:
+    dphi += 2.0*math.pi
+ 
+  deltaeta = v_j2.Rapidity() - v_j1.Rapidity()
+  BBdir = ROOT.TVector2( deltaeta, dphi )
+    
+  deltaTheta = t.DeltaPhi(BBdir)
+    
+  return deltaTheta
 
 
 def isZcandidate(zCandidate,vertex=None):

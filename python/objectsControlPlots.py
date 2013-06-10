@@ -315,6 +315,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("bjet2JPdisc","subleading bjet JP discriminant",100,0,2.5)
       self.add("bjet2beta","subleading bjet beta function",20,-1,1)
       self.add("bjet2betaStar","subleading bjet beta* function",20,-1,1)
+      self.add("deltaThetaPull", "deltaThetaPull (color flow)", 100, -5, 5)
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.add("nj","jet count",15,-0.5,14.5)
       self.add("nb","b-jet count",5,-0.5,4.5)
@@ -414,6 +415,8 @@ class JetmetControlPlots(BaseControlPlots):
       indexSecondJet = -1
       b1 = ROOT.TLorentzVector(0,0,0,0)
       b2 = ROOT.TLorentzVector(0,0,0,0)
+      bjet1 = None
+      bjet2 = None
       ijet = 0
       
       maxbdiscSSVHE = -1
@@ -518,6 +521,11 @@ class JetmetControlPlots(BaseControlPlots):
             if indexDijet==1:
 	      indexFirstJet = ijet
 	      b1.SetPtEtaPhiM(jetPt,jet.eta(),jet.phi(),jet.mass())
+	      chargedTracksFourMomentum = getChargedTracksMomentum(jet)
+	      #print "chargedTracksFourMomentum.Pt()=",chargedTracksFourMomentum.Pt()
+	      tvector = getTvect(jet)
+	      #print "tvector.Mod()=",tvector.Mod()
+	      bjet1 = jet
               result["bjet1pt"] = jetPt
               result["bjet1ptME"] = jetPt
 	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -543,6 +551,7 @@ class JetmetControlPlots(BaseControlPlots):
             elif indexDijet==2:
               indexSecondJet = ijet
 	      b2.SetPtEtaPhiM(jetPt,jet.eta(),jet.phi(),jet.mass())
+	      bjet2 = jet
               result["bjet2pt"] = jetPt
               result["bjet2ptME"] = jetPt
 	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
@@ -567,7 +576,11 @@ class JetmetControlPlots(BaseControlPlots):
           if isBJet(jet,"HP",self.btagging): nbP += 1
         ijet+=1
       
-      #second loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
+      if bjet1 !=  None and bjet2 != None:
+        result["deltaThetaPull"]=getDeltaTheta(bjet1, bjet2)
+      else:
+        result["deltaThetaPull"]=1e10
+      #another loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
       fsrjet={}
       #init diffmass to huge number
       diffmass={}
