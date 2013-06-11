@@ -12,7 +12,7 @@ then
 fi
 
 #Check for correct number of arguments
-if [ $# -lt 2 ]
+if [ $# -lt 5 ]
 then
     echo "missing arguments, example : source NN_June_HiggsVSBkg.sh channel"
     echo "channel is : Mu, El or comb"
@@ -40,10 +40,12 @@ echo "struct fo the NN is "$3
 struct=$3
 echo "number of iterations is "$4
 iter=$4
-echo "extra cuts are "$5
-s_cuts=$5
+echo "NN choice is "$5
+choice=$5
+echo "extra cuts are "$6
+s_cuts=$6
 
-root -l -b > ${dir}/logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
+root -l -b > ${dir}/logroot_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
 
 TString channel("${channel}")
 TString mass("${mass}")
@@ -52,6 +54,7 @@ TString iter("${iter}")
 TString s_cuts("${s_cuts}")
 TString DIR("/nfs/user/acaudron/Tree2_537/");
 TString outdir("${dir}")
+TString choice("${choice}")
 TString fZbb(DIR+"Tree_rdsME_Zbb_"+channel+"_MC.root")
 TString fDY(DIR+"Tree_rdsME_DY_"+channel+"_MC.root")
 TString fTTFullLept(DIR+"Tree_rdsME_TT-FullLept_"+channel+"_MC.root")
@@ -94,18 +97,18 @@ cout<<"extra cuts : "<<cuts<<endl;
 .L ./Read_input_NN_inputs.h 
 .L ./Generic_NN_higgs_NN_inputs.C+
 
-Neural_net_E(fDY.Data(),fZbb.Data(),fTT.Data(),fTTFullLept.Data(),fZZ.Data(),fZH.Data(),NN,outdir,NNStruct,iterations,cuts)
+Neural_net_E(fDY.Data(),fZbb.Data(),fTT.Data(),fTTFullLept.Data(),fZZ.Data(),fZH.Data(),NN,outdir,choice,NNStruct,iterations,cuts)
 
 .q
 
 EOF
 
-grep Epoch ${dir}/logroot_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > ${dir}/epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+grep Epoch ${dir}/logroot_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt | sed -e 's/Epoch: //' | sed -e 's/learn=//' |sed -e 's/test=//' > ${dir}/epoch_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
-NUMOFPOINTS=$(cat ${dir}/epoch_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt| wc -l )
+NUMOFPOINTS=$(cat ${dir}/epoch_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt| wc -l )
 echo "NUMOFPOINTS READ =" $NUMOFPOINTS
 
-root -l -b ${dir}/NN*${mass}*${channel}*${struct}*${iter}*${s_cuts}.root << EOF
+root -l -b ${dir}/NN*${choice}*${mass}*${channel}*${struct}*${iter}*${s_cuts}.root << EOF
 
 //This part is copy and paste from the first time we call root
 
@@ -115,39 +118,44 @@ TString struct("${struct}")
 TString iter("$iter") 
 TString s_cuts("${s_cuts}")
 TString dir("${dir}/")
+TString choice("${choice}")
 TString NN("ZH"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts);
 
 int numberOfPoints=${NUMOFPOINTS}
 
 cout << "numberOfPoints=" << numberOfPoints << endl;
 
-TString epochinputtxt = dir+"epoch_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts+".txt";
+TString epochinputtxt = dir+"epoch_"+choice+"_"+mass+"_"+channel+struct+"_"+iter+"_"+s_cuts+".txt";
 
-TFile* foutput = TFile::Open(dir+"NN_Higgs_vs_Bkg_"+NN+".root","UPDATE");
+TFile* foutput = TFile::Open(dir+"NN_"+choice+"_"+NN+".root","UPDATE");
 
 .L ./ComputeGraphFromTrainTxt.C
 ComputeGraphFromTrainTxt(foutput, epochinputtxt, numberOfPoints);
 .q
 EOF
 
-echo ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
-python doNorm.py ${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
-cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g > ${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
-cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_Higgs_vs_Bkg_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g | sed -e s%Channel/%Channel/prod%g > ${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+echo ${dir}/NN_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
+python doNorm.py ${dir}/NN_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root
+cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g > ${dir}/CSV_nosys_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+cat CSV_nosys_test.txt | sed -e s%ROOTFILE%${dirNN}/${dir}/NN_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.root%g | sed -e s%Channel/%Channel/prod%g > ${dir}/CSV_nosys_prod_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 
 cd ~acaudron/scratch/CMSSW_6_1_1/src
 cmsenv
 echo COMPUTE LIMIT FOR FINAL NN
-combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitNN_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitNN_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 rm roostats*
 echo END COMPUTE LIMIT FOR FINAL NN
 echo ------------------------------------------------------------------------------------------------------------------
 
-echo ------------------------------------------------------------------------------------------------------------------
-echo COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
-combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_prod_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitProd_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
-rm roostats*
-echo END COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
-echo ------------------------------------------------------------------------------------------------------------------
+if [ ${choice} = "Higgs_vs_Bkg" ]
+then
+    echo ------------------------------------------------------------------------------------------------------------------
+    echo COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
+    combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_prod_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitProd_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
+    rm roostats*
+    echo END COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
+    echo ------------------------------------------------------------------------------------------------------------------
+fi
+
 cd ${dirNN}
 cmsenv
