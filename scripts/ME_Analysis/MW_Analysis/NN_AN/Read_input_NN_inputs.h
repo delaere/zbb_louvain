@@ -32,6 +32,9 @@ class nn_vars {
   double *tagj2;
   double *prodNNs;
   double *evtWeight;
+  double *trijetMdr;
+  double *fsrDR;
+  double *dijetdR;
   int *isMuMu;
   nn_vars(int size) {
     N = size;
@@ -61,6 +64,9 @@ class nn_vars {
     tagj2 = new double[size];
     prodNNs = new double[size];
     evtWeight = new double[size];
+    trijetMdr = new double[size];
+    fsrDR = new double[size];
+    dijetdR = new double[size];
     isMuMu = new int[size];
   }
 };
@@ -92,6 +98,10 @@ class tree_in {
   double Multi;
   int type2;
   double evtWeight;
+  double trijetMdr;
+  double fsrDR;
+  double dijetdR;
+
 };
 
 
@@ -114,8 +124,12 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
   double Mll, Mbb, regMbb, zptMu, zptEle, dphiZbb;
   double multiplicity;
   double btagWeights, leptWeights, lumiWeights;
+  double jetmettrijetMdr, fsrDR, dijetdR;
 
   tree->SetBranchAddress("jetmetnj",&multiplicity);
+  tree->SetBranchAddress("jetmettrijetMdr",&trijetMdr);
+  tree->SetBranchAddress("jetmetfsrDR",&fsrDR);
+  tree->SetBranchAddress("eventSelectiondijetdR",&dijetdR);
   tree->SetBranchAddress("Wgg",&Wgg);
   tree->SetBranchAddress("Wqq",&Wqq);
   tree->SetBranchAddress("Wtt",&Wtt);
@@ -250,6 +264,12 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
     var->met[i]=sim->Met;
     sim->Multi=multiplicity;
     var->multi[i]=sim->Multi;
+    sim->trijetMdr=trijetMdr;
+    var->trijetMdr[i]=sim->trijetMdr;
+    sim->fsrDR=fsrDR;
+    var->fsrDR[i]=sim->fsrDR;
+    sim->dijetdR=dijetdR;
+    var->dijetdR[i]=sim->dijetdR;
     var->evtWeight[i]=btagWeights*leptWeights*lumiWeights;
     sim->evtWeight=var->evtWeight[i];
     var->isMuMu[i] = 0;
