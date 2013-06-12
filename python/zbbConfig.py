@@ -22,11 +22,11 @@ class configuration:
 
   # control plot classes
   controlPlots = [ 
-                   controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { muonList = "allmuons", muonType="none" }),
-                   controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { muonType="tight" }),
-                   controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { electronList="allelectrons", electronType="none" }),
-                   controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { electronType="tight" }),
-                   controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { btagging="CSV" }),
+                   controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
+                   controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
+                   controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
+                   controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
+                   controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":"CSV" }),
                    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
                    controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
                    controlPlot("MCselection", "MonteCarloSelectionControlPlots", "MonteCarloSelectionControlPlots", { }),
@@ -57,27 +57,27 @@ class configuration:
                      ] 
 
   eventProducers   = [ eventProducer("vertex", ObjectSelection, vertex),
-                       eventProducer("goodJets_mu", ObjectSelection, goodJets, { muChannel=True,eleChannel=False } ),
-                       eventProducer("goodJets_ele", ObjectSelection, goodJets, { muChannel=False,eleChannel=True } ),
-                       eventProducer("goodJets_all", ObjectSelection, goodJets, { muChannel=True,eleChannel=True } ),
-                       eventProducer("goodJets_none", ObjectSelection, goodJets, { muChannel=False,eleChannel=False } ),
-                       eventProducer("isMuTriggerOK", ObjectSelection, isTriggerOK, { muChannel=True,eleChannel=False,perRun=True } ),
-                       eventProducer("isEleTriggerOK", ObjectSelection, isTriggerOK, { muChannel=False,eleChannel=True,perRun=True } ),
-                       eventProducer("isTriggerOK", ObjectSelection, isTriggerOK, { muChannel=True,eleChannel=True,perRun=True } ),
-                       eventProducer("category", EventSelection, eventCategory, { btagging="CSV", ZjetFilter="bcl" } ),
-                       eventProducer("bestZmumuCandidate", ObjectSelection, findBestCandidate, { muChannel=True,eleChannel=False } ),
-                       eventProducer("bestZelelCandidate", ObjectSelection, findBestCandidate, { muChannel=False,eleChannel=True } ),
-                       eventProducer("bestZcandidate", ObjectSelection, findBestCandidate, { muChannel=True,eleChannel=True } ),
-                       eventProducer("dijet_muChannel", ObjectSelection, findDijetPair, { btagging=btagging,muChannel=True,eleChannel=False } ),
-                       eventProducer("dijet_eleChannel", ObjectSelection, findDijetPair, { btagging=btagging,muChannel=False,eleChannel=True } ),
-                       eventProducer("dijet_all", ObjectSelection, findDijetPair, { btagging=btagging,muChannel=True,eleChannel=True } ),
-                       eventProducer("sortedGenJets", MonteCarloSelection, genjetCollectionsProducer, { ptcut=0, etacut=10 } )
+                       eventProducer("goodJets_mu", ObjectSelection, goodJets, { "muChannel":True,"eleChannel":False } ),
+                       eventProducer("goodJets_ele", ObjectSelection, goodJets, { "muChannel":False,"eleChannel":True } ),
+                       eventProducer("goodJets_all", ObjectSelection, goodJets, { "muChannel":True,"eleChannel":True } ),
+                       eventProducer("goodJets_none", ObjectSelection, goodJets, { "muChannel":False,"eleChannel":False } ),
+                       eventProducer("isMuTriggerOK", ObjectSelection, isTriggerOK, { "muChannel":True,"eleChannel":False,"perRun":True } ),
+                       eventProducer("isEleTriggerOK", ObjectSelection, isTriggerOK, { "muChannel":False,"eleChannel":True,"perRun":True } ),
+                       eventProducer("isTriggerOK", ObjectSelection, isTriggerOK, { "muChannel":True,"eleChannel":True,"perRun":True } ),
+                       eventProducer("category", EventSelection, eventCategory, { "btagging":"CSV", "ZjetFilter":"bcl" } ),
+                       eventProducer("bestZmumuCandidate", ObjectSelection, findBestCandidate, { "muChannel":True,"eleChannel":False } ),
+                       eventProducer("bestZelelCandidate", ObjectSelection, findBestCandidate, { "muChannel":False,"eleChannel":True } ),
+                       eventProducer("bestZcandidate", ObjectSelection, findBestCandidate, { "muChannel":True,"eleChannel":True } ),
+                       eventProducer("dijet_muChannel", ObjectSelection, findDijetPair, { "btagging":btagging,"muChannel":True,"eleChannel":False } ),
+                       eventProducer("dijet_eleChannel", ObjectSelection, findDijetPair, { "btagging":btagging,"muChannel":False,"eleChannel":True } ),
+                       eventProducer("dijet_all", ObjectSelection, findDijetPair, { "btagging":btagging,"muChannel":True,"eleChannel":True } ),
+                       eventProducer("sortedGenJets", MonteCarloSelection, genjetCollectionsProducer, { "ptcut":0, "etacut":10 } )
                      ]
 
-  eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{0,999,0,999,file=zbbfile.ssvperfData,btagging="CSV"}),
+  eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":zbbfile.ssvperfData,"btagging":"CSV"}),
                        eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
-                       eventWeight("MonteCarlo","MonteCarloReWeighting","MonteCarloReWeighting", {shift=0, MCmode="none"}),
-                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData, systematicShift=0})
+                       eventWeight("MonteCarlo","MonteCarloReWeighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
+                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":zbbfile.pileupMC, "DataFileName":zbbfile.pileupData, "systematicShift":0})
                      ]
 
 class eventDumpConfig:

@@ -110,8 +110,8 @@ def eventCategory(event,btagging="CSV", ZjetFilter="bcl"):
   if event.object().event().eventAuxiliary().isRealData():
     zbbsystematics.JERfactor = 0
     zbbsystematics.JESfactor = 0
-  return eventCategoryChannel(event, muChannel=True, eleChannel=False,btagging, ZjetFilter) +
-         eventCategoryChannel(event, muChannel=False, eleChannel=True,btagging, ZjetFilter)
+  return eventCategoryChannel(event, muChannel=True, eleChannel=False,btagging=btagging, ZjetFilter=ZjetFilter) + \
+         eventCategoryChannel(event, muChannel=False, eleChannel=True,btagging=btagging, ZjetFilter=ZjetFilter)
   
 def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFilter="bcl"):
   """Check analysis requirements for various steps."""
