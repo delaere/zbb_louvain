@@ -1,8 +1,6 @@
 //Use minimal-brain-usage approach 2 merge llbb tree (frome now on
 //rds_bb tree) with ME tree
 
-
-
 // Idea is 2 create with MakeClass skeletons for rds_zbb and ME trees
 //then took the list of variables and copy them 2 a), b), c) parts of the code, use some
 //text editing magic to manipulate the list of variables to transform them in what you need:
@@ -332,13 +330,13 @@ void CreateParentTree(TString InputFile) {
    
    //-----------------------------------------------------------------------
    // Input files location
-   TString folder = "/nfs/user/acaudron/Tree2_53X/";
+   TString folder = "/nfs/user/acaudron/Tree2_537/";
    TString folderB = "/nfs/user/acaudron/Tree2_537/";
    //RDS location
    TString folder2 = "/nfs/user/acaudron/RDS537/";
 
-   TFile* f_RDS  = new TFile(folder2+"File_rds_zbb_" + InputFile + ".root");
-   TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
+   TFile* f_RDS  = new TFile(folder2+"File_rds_zbb_"+InputFile+".root");
+   TTree* t_RDS  = (TTree*) f_RDS->Get("rds_zbb");  
    
    TString mename = folder+"ME_zbb_" + InputFile + ".root";
    //mename.ReplaceAll("A_DATA", "_DATA");
@@ -347,11 +345,11 @@ void CreateParentTree(TString InputFile) {
    TFile* f_ME  = new TFile(mename);
    TTree* t_ME    = (TTree*)f_ME->Get("tree2");  
    
-   TFile *f_RDSME = new TFile(folderB+"Tree_rdsME_" +InputFile + ".root", "RECREATE");
+   TFile *f_RDSME = new TFile(folderB+"Tree_rdsME_"+InputFile +".root", "RECREATE");
    TTree *t_RDSME = t_RDS->CloneTree(0);
    t_RDSME->SetTitle("merged zbb-ME tree");
 
-
+   cout<<"read file : "<<f_RDS->GetName()<<endl;
    //-----------------------------------------------------------------------
 
    //Initialize histograms for reweighting
@@ -1162,8 +1160,8 @@ double Compute1DReweight(TH1D* hRW, double value) {
 void SimpleTree() {
   //CreateParentTree("DoubleMu_DataA");
   //CreateParentTree("DoubleEle_DataA");
-   //CreateParentTree("DoubleMu_DataA06aug");
-   //CreateParentTree("DoubleEle_DataA06aug");
+  //CreateParentTree("DoubleMu_DataA06aug");
+  //CreateParentTree("DoubleEle_DataA06aug");
    //CreateParentTree("DoubleMu_DataB");
    //CreateParentTree("DoubleEle_DataB");
    /*CreateParentTree("DoubleMu_DataC-v1");
@@ -1177,11 +1175,13 @@ void SimpleTree() {
    //CreateParentTree("DY_Pt100_El_MC");
    CreateParentTree("TT_Mu_MC");
    CreateParentTree("TT_El_MC");
+   CreateParentTree("TT-FullLept_Mu_MC");
+   CreateParentTree("TT-FullLept_El_MC");
    CreateParentTree("ZZ_Mu_MC");
    CreateParentTree("ZZ_El_MC");
    CreateParentTree("ZH125_Mu_MC");
-   CreateParentTree("ZH125_El_MC");
-   /*CreateParentTree("ZH115_Mu_MC");
+   CreateParentTree("ZH125_El_MC");/*
+   CreateParentTree("ZH115_Mu_MC");
    CreateParentTree("ZH115_El_MC");
    CreateParentTree("ZH120_Mu_MC");
    CreateParentTree("ZH120_El_MC");

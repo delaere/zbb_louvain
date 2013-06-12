@@ -10,7 +10,7 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
     def beginJob(self):
       # declare histograms
-      self.add("eventType","Event Type (0,l,c,b)+Z",4,0,4)
+      self.add("eventType","Event Type (0,ll,cl,cc,bl,bc,bb)+Z",10,-0.5,9.5)
 
       self.add("LepPosPx","Generator cuadrivector, LepPosPx", 400, -400, 400)
       self.add("LepPosPy","Generator cuadrivector, LepPosPy", 400, -400, 400)
@@ -146,13 +146,25 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result["AntibottomPz"] = antibottomPz
       result["AntibottomEn"] = antibottomEn
       
-      #Clasify the event in Zb, Zcc, or Zl
+      #Clasify the event in Zbb,Zbc,Zbl,Zcc, Zcl, or Zll
       self.i += 1
-      if isZbEvent(event):
+      if isZbbEvent(event):
         self.bjet += 1
+        result["eventType"] = 6
+        return result
+      if isZbcEvent(event):
+        self.bjet += 1
+        result["eventType"] = 5
+        return result
+      if isZblEvent(event):
+        self.bjet += 1
+        result["eventType"] = 4
+        return result
+      if isZccEvent(event):
+        self.cjet += 1
         result["eventType"] = 3
         return result
-      if isZcEvent(event):
+      if isZclEvent(event):
         self.cjet += 1
         result["eventType"] = 2
         return result

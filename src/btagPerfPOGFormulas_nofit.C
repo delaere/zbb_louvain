@@ -5,12 +5,12 @@
 #include "TH1F.h"
 #include "TF1.h"
 #include <string>
-#include "UserCode/zbb_louvain/interface/btagPerfPOGformulas.h"
+#include "UserCode/zbb_louvain/interface/btagPerfPOGformulas_nofit.h"
 
 // uncertainties in Pt bins 
 // according POG reccom., computed for pt 20-800, for pt > 800 GeV: use the SFb value at 800 GeV with twice the quoted uncertainty 
 
-float btagPerfPOGFormulas::SFb_error_CSVL[] = {
+float btagPerfPOGFormulas_nofit::SFb_error_CSVL[] = {
   0.0484285,
   0.0126178,
   0.0120027,
@@ -29,7 +29,7 @@ float btagPerfPOGFormulas::SFb_error_CSVL[] = {
   0.0474291,
 };
 
-float btagPerfPOGFormulas::SFb_error_CSVM[] = {
+float btagPerfPOGFormulas_nofit::SFb_error_CSVM[] = {
   0.0554504,
   0.0209663,
   0.0207019,
@@ -48,17 +48,50 @@ float btagPerfPOGFormulas::SFb_error_CSVM[] = {
   0.0717567,
 };
 
+float btagPerfPOGFormulas_nofit::SFb_error_CSVT[] = {
+  0.0567059,
+  0.0266907,
+  0.0263491,
+  0.0342831,
+  0.0303327,
+  0.024608,
+  0.0333786,
+  0.0317642,
+  0.031102,
+  0.0295603,
+  0.0474663,
+  0.0503182,
+  0.0580424,
+  0.0575776,
+  0.0769779,
+  0.0898199,
+};
 
-btagPerfPOGFormulas::btagPerfPOGFormulas() {
+
+btagPerfPOGFormulas_nofit::btagPerfPOGFormulas_nofit(const char* inputfile) {
   // just a sigmoid. Used to parametrize the efficiencies
   eff_ = new TF1("sigmoidTimesL","[0]+([3]+[4]*x)/(1+exp([1]-x*[2]))",20,1000);
+  std::cout<<"I'm using the hardcoded CSV b-tag SFs"<<std::endl;
+  esdata_ = TFile::Open(inputfile);
+  h_eff_csvl_b_brl_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptb_Barrel"  );
+  h_eff_csvl_b_fwd_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptb_Endcaps" );
+  h_eff_csvl_c_brl_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptc_Barrel"  );
+  h_eff_csvl_c_fwd_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptc_Endcaps" );
+  h_eff_csvl_l_brl_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptl_Barrel"  );
+  h_eff_csvl_l_fwd_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptl_Endcaps" );
+  h_eff_csvm_b_brl_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptb_Barrel"  );
+  h_eff_csvm_b_fwd_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptb_Endcaps" );
+  h_eff_csvm_c_brl_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptc_Barrel"  );
+  h_eff_csvm_c_fwd_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptc_Endcaps" );
+  h_eff_csvm_l_brl_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptl_Barrel"  );
+  h_eff_csvm_l_fwd_ = (TH1F*)esdata_->Get( "CSVM/h_eff_bTagOverGoodJet_ptl_Endcaps" );
 }
 
-btagPerfPOGFormulas::~btagPerfPOGFormulas() {
+btagPerfPOGFormulas_nofit::~btagPerfPOGFormulas_nofit() {
   delete eff_;
 }
 
-btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
+btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
 
   // values for Moriond 2013, see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
   int index=999;
@@ -163,56 +196,63 @@ btagPerfBase::value btagPerfPOGFormulas::getbEffScaleFactor(int flavor, int algo
   return std::make_pair(SFb, SFb_unc);
 }  
 
-btagPerfBase::value btagPerfPOGFormulas::getbEfficiency(int flavor, int algo, double pt, double eta) const {
+btagPerfBase::value btagPerfPOGFormulas_nofit::getbEfficiency(int flavor, int algo, double pt, double eta) const {
+  // small protection against large et (shere we have no measurement).
+  // the subject is a bit delicate, but I think it is better to use
+  // the efficiency for the last bin than to set it to 0.
+  if(pt>800) pt=800;
   switch(abs(flavor)) {
-    case 5: {
-      if(algo==1) {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.840321,4.81788,-0.076856,-82.2072,0.018272);
-        } else {
-          eff_->SetParameters(0.836553,4.07004,-0.0759033,-35.2138,-0.00014107);
-        }
-      } else {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.676632,2.78089,-0.0254405,-14.5089,0.294153);
-        } else {
-          eff_->SetParameters(0.671256,2.2391,-0.0369153,-10.4821,0.112888);
-        }
-      }
-      return std::make_pair(eff_->Eval(pt),0.);
-    }
-    case 4: {
-      if(algo==1) {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.359646,2.82075,-0.111542,-60.3113,3.0002);
-        } else {
-          eff_->SetParameters(0.385027,1.35562,-0.105426,-20.9092,1.11364);
-        }
-      } else {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.200776,1.17113,-0.0683021,-1.6036,0.0033813);
-        } else {
-          eff_->SetParameters(0.157195,2.3917,-0.0854877,-5.08071,-0.0221911);
-        }
-      }
-      return std::make_pair(eff_->Eval(pt),0.);
-    }
-    default: {
-      if(algo==1) {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.0807507,-4.94873,-0.0494754,0.0467574,-0.000975562);
-        } else {
-          eff_->SetParameters(0.129643,-2.59915,-0.119248,-0.420888,0.0245026);
-        }
-      } else {
-        if(fabs(eta)<1.2) {
-          eff_->SetParameters(0.0145932,-3.96123,-0.0337904,-0.00135054,-8.38501e-05);
-        } else {
-          eff_->SetParameters(0.0163065,-328.366,-4.24081,0.00713713,-0.000172221);
-        }
-      }
-      return std::make_pair(eff_->Eval(pt),0.);
-    }
+  case 5:
+    // this is not in the db and must be parametrized from OUR mc
+    if(fabs(eta)<1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_b_brl_->GetBinContent(h_eff_csvl_b_brl_->FindBin(pt)),
+			    h_eff_csvl_b_brl_->GetBinError(h_eff_csvl_b_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_b_fwd_->GetBinContent(h_eff_csvl_b_fwd_->FindBin(pt)),
+			    h_eff_csvl_b_fwd_->GetBinError(h_eff_csvl_b_fwd_->FindBin(pt)));
+    else if(fabs(eta)<1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_b_brl_->GetBinContent(h_eff_csvm_b_brl_->FindBin(pt)),
+			    h_eff_csvm_b_brl_->GetBinError(h_eff_csvm_b_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_b_fwd_->GetBinContent(h_eff_csvm_b_fwd_->FindBin(pt)),
+			    h_eff_csvm_b_fwd_->GetBinError(h_eff_csvm_b_fwd_->FindBin(pt)));
+    else
+      return std::make_pair(0.,0.);
+  case 4:
+    // this is not in the db and must be parametrized from OUR mc
+    if(fabs(eta)<1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_c_brl_->GetBinContent(h_eff_csvl_c_brl_->FindBin(pt)),
+			    h_eff_csvl_c_brl_->GetBinError(h_eff_csvl_c_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_c_fwd_->GetBinContent(h_eff_csvl_c_fwd_->FindBin(pt)),
+			    h_eff_csvl_c_fwd_->GetBinError(h_eff_csvl_c_fwd_->FindBin(pt)));
+    else if(fabs(eta)<1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_c_brl_->GetBinContent(h_eff_csvm_c_brl_->FindBin(pt)),
+			    h_eff_csvm_c_brl_->GetBinError(h_eff_csvm_c_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_c_fwd_->GetBinContent(h_eff_csvm_c_fwd_->FindBin(pt)),
+			    h_eff_csvm_c_fwd_->GetBinError(h_eff_csvm_c_fwd_->FindBin(pt)));
+    else
+      return std::make_pair(0.,0.);
+  default: {
+    // this better parametrized from OUR mc
+    if(pt>700 && fabs(eta)>1.5) pt=700;
+    else if(pt>800) pt=800;
+    if(fabs(eta)<1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_l_brl_->GetBinContent(h_eff_csvl_l_brl_->FindBin(pt)),
+			    h_eff_csvl_l_brl_->GetBinError(h_eff_csvl_l_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==1)
+      return std::make_pair(h_eff_csvl_l_fwd_->GetBinContent(h_eff_csvl_l_fwd_->FindBin(pt)),
+			    h_eff_csvl_l_fwd_->GetBinError(h_eff_csvl_l_fwd_->FindBin(pt)));
+    else if(fabs(eta)<1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_l_brl_->GetBinContent(h_eff_csvm_l_brl_->FindBin(pt)),
+                            h_eff_csvm_l_brl_->GetBinError(h_eff_csvm_l_brl_->FindBin(pt)));
+    else if(fabs(eta)>1.2 && algo==2)
+      return std::make_pair(h_eff_csvm_l_fwd_->GetBinContent(h_eff_csvm_l_fwd_->FindBin(pt)),
+			    h_eff_csvm_l_fwd_->GetBinError(h_eff_csvm_l_fwd_->FindBin(pt)));
+    else
+      return std::make_pair(0.,0.);
+  }
   }
 }
 

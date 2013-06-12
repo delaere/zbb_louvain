@@ -101,7 +101,7 @@ process.outpath = cms.EndPath(process.out)
 
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.9 $'),
+    version = cms.untracked.string('$Revision: 1.10 $'),
     annotation = cms.untracked.string('PAT tuple for Z+b analysis'),
     name = cms.untracked.string('$Source: /local/reps/CMSSW/UserCode/zbb_louvain/test/skimDY_423_cfg.py,v $')
     #name = cms.untracked.string('PAT2')
@@ -193,7 +193,7 @@ process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p5','
 process.out.outputCommands = cms.untracked.vstring('keep *')
 
 
-from globalLists import pathPAT, dirSkim
+from UserCode.zbb_louvain.globalLists import pathPAT, dirSkim
 path = pathPAT
 
 ### options ###

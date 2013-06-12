@@ -12,8 +12,8 @@ class btagPerfPOGFormulas : public btagPerfBase {
     virtual btagPerfBase::value getbEfficiency(int flavor, int algo, double pt, double eta) const;
   private:
     TF1* eff_;
-    static float SFb_error_CSVL[17];
-    static float SFb_error_CSVM[17];
-    static float SFb_error_CSVT[17];
+    static float SFb_error_CSVL[16];
+    static float SFb_error_CSVM[16];
+    static float SFb_error_CSVT[16];
 };
 
