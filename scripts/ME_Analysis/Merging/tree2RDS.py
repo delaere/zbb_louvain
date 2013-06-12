@@ -1,26 +1,17 @@
+
 from ROOT import *
+from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS
+RooAbsData.setDefaultStorageType(RooAbsData.Tree)
+
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
 
-  print "inputfile", InputFile  
-  f  = TFile("MergeRDS_CSV/Tree_rdsME_" + InputFile + ".root")
-  t  = f.Get("rds_zbb")
+  print "inputfile", InputFile
 
-  file_data  = TFile("File_ws_ZZ_Mu_MC.root")
-  ws_data    = file_data.Get("ws")
-  rdsZbb_data = ws_data.data("rds_zbb")
-  myRDSRAS = rdsZbb_data.get()
-#Sensible ranges
-#  myWttRRV = RooRealVar("Wtt", "Wtt", 20, 30)
-#  myWggRRV = RooRealVar("Wgg", "Wgg", 18, 25)
-#  myWqqRRV = RooRealVar("Wqq", "Wqq", 18, 25)
-#  myWtwbRRV = RooRealVar("Wtwb", "Wtwb", 20, 30)
-#  myWzz3RRV = RooRealVar("Wzz3", "Wzz3", 9, 17)
-#  myWzz0RRV = RooRealVar("Wzz0", "Wzz0", 16, 28)
-#  myWhi3RRV = RooRealVar("Whi3", "Whi3", 10, 23)
-#  myWhi0RRV = RooRealVar("Whi0", "Whi0", 18, 33)
+  file_data = TFile("/nfs/user/acaudron/RDS537/File_rds_zbb_ZZ_Mu_MC.root")
+  ws_zbb = file_data.Get("ws_ras")
+  myRDSRAS = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
 
-
-#big range so we don't loose events out of range
+  #big range so we don't loose events out of range
   myWttRRV = RooRealVar("Wtt", "Wtt", -10, 300)
   myWggRRV = RooRealVar("Wgg", "Wgg", -10, 300)
   myWqqRRV = RooRealVar("Wqq", "Wqq", -10, 300)
@@ -42,8 +33,6 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myjetmetbjetProdCSVdiscRRV = RooRealVar("jetmetbjetProdCSVdisc","jetmetbjetProdCSVdisc",-10, 10)
   
   myMeTRRV = RooRealVar("MeT", "MeT", 0, 600)#met to check the matching
-
-
 
   mymlpZbbvsTT_MM = RooRealVar("mlpZbbvsTT_MM", "mlpZbbvsTT_MM", -10000, 600)
   mymlpZbbvsTT_MM_N = RooRealVar("mlpZbbvsTT_MM_N", "mlpZbbvsTT_MM_N", -10000, 600)
@@ -76,6 +65,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlphiggsvstt_115_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_115_mu_MM_N", "mlphiggsvstt_115_mu_MM_N", -10000, 600)
   mymlphiggsvszz_115_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_115_mu_MM_N", "mlphiggsvszz_115_mu_MM_N", -10000, 600)
   mymlphiggsvsbkg_115_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_115_mu_MM_N", "mlphiggsvsbkg_115_mu_MM_N", -10000, 600)
+  mymlphiggsvszbb_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_115_comb_MM_N_2011", "mlphiggsvszbb_115_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvstt_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_115_comb_MM_N_2011", "mlphiggsvstt_115_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvszz_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_115_comb_MM_N_2011", "mlphiggsvszz_115_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvsbkg_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_115_comb_MM_N_2011", "mlphiggsvsbkg_115_comb_MM_N_2011", -10000, 600)
   mymlphiggsvszbb_115_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_115_comb_MM_N", "mlphiggsvszbb_115_comb_MM_N", -10000, 600)
   mymlphiggsvstt_115_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_115_comb_MM_N", "mlphiggsvstt_115_comb_MM_N", -10000, 600)
   mymlphiggsvszz_115_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_115_comb_MM_N", "mlphiggsvszz_115_comb_MM_N", -10000, 600)
@@ -105,6 +98,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlphiggsvstt_120_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_120_mu_MM_N", "mlphiggsvstt_120_mu_MM_N", -10000, 600)
   mymlphiggsvszz_120_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_120_mu_MM_N", "mlphiggsvszz_120_mu_MM_N", -10000, 600)
   mymlphiggsvsbkg_120_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_120_mu_MM_N", "mlphiggsvsbkg_120_mu_MM_N", -10000, 600)
+  mymlphiggsvszbb_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_120_comb_MM_N_2011", "mlphiggsvszbb_120_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvstt_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_120_comb_MM_N_2011", "mlphiggsvstt_120_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvszz_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_120_comb_MM_N_2011", "mlphiggsvszz_120_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvsbkg_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_120_comb_MM_N_2011", "mlphiggsvsbkg_120_comb_MM_N_2011", -10000, 600)
   mymlphiggsvszbb_120_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_120_comb_MM_N", "mlphiggsvszbb_120_comb_MM_N", -10000, 600)
   mymlphiggsvstt_120_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_120_comb_MM_N", "mlphiggsvstt_120_comb_MM_N", -10000, 600)
   mymlphiggsvszz_120_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_120_comb_MM_N", "mlphiggsvszz_120_comb_MM_N", -10000, 600)
@@ -134,6 +131,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlphiggsvstt_125_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_125_mu_MM_N", "mlphiggsvstt_125_mu_MM_N", -10000, 600)
   mymlphiggsvszz_125_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_125_mu_MM_N", "mlphiggsvszz_125_mu_MM_N", -10000, 600)
   mymlphiggsvsbkg_125_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_125_mu_MM_N", "mlphiggsvsbkg_125_mu_MM_N", -10000, 600)
+  mymlphiggsvszbb_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_125_comb_MM_N_2011", "mlphiggsvszbb_125_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvstt_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_125_comb_MM_N_2011", "mlphiggsvstt_125_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvszz_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_125_comb_MM_N_2011", "mlphiggsvszz_125_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvsbkg_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2011", "mlphiggsvsbkg_125_comb_MM_N_2011", -10000, 600)
   mymlphiggsvszbb_125_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_125_comb_MM_N", "mlphiggsvszbb_125_comb_MM_N", -10000, 600)
   mymlphiggsvstt_125_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_125_comb_MM_N", "mlphiggsvstt_125_comb_MM_N", -10000, 600)
   mymlphiggsvszz_125_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_125_comb_MM_N", "mlphiggsvszz_125_comb_MM_N", -10000, 600)
@@ -163,6 +164,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlphiggsvstt_130_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_130_mu_MM_N", "mlphiggsvstt_130_mu_MM_N", -10000, 600)
   mymlphiggsvszz_130_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_130_mu_MM_N", "mlphiggsvszz_130_mu_MM_N", -10000, 600)
   mymlphiggsvsbkg_130_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_130_mu_MM_N", "mlphiggsvsbkg_130_mu_MM_N", -10000, 600)
+  mymlphiggsvszbb_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_130_comb_MM_N_2011", "mlphiggsvszbb_130_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvstt_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_130_comb_MM_N_2011", "mlphiggsvstt_130_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvszz_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_130_comb_MM_N_2011", "mlphiggsvszz_130_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvsbkg_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_130_comb_MM_N_2011", "mlphiggsvsbkg_130_comb_MM_N_2011", -10000, 600)
   mymlphiggsvszbb_130_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_130_comb_MM_N", "mlphiggsvszbb_130_comb_MM_N", -10000, 600)
   mymlphiggsvstt_130_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_130_comb_MM_N", "mlphiggsvstt_130_comb_MM_N", -10000, 600)
   mymlphiggsvszz_130_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_130_comb_MM_N", "mlphiggsvszz_130_comb_MM_N", -10000, 600)
@@ -192,12 +197,15 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlphiggsvstt_135_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_135_mu_MM_N", "mlphiggsvstt_135_mu_MM_N", -10000, 600)
   mymlphiggsvszz_135_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_135_mu_MM_N", "mlphiggsvszz_135_mu_MM_N", -10000, 600)
   mymlphiggsvsbkg_135_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_135_mu_MM_N", "mlphiggsvsbkg_135_mu_MM_N", -10000, 600)
+  mymlphiggsvszbb_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_135_comb_MM_N_2011", "mlphiggsvszbb_135_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvstt_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_135_comb_MM_N_2011", "mlphiggsvstt_135_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvszz_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_135_comb_MM_N_2011", "mlphiggsvszz_135_comb_MM_N_2011", -10000, 600)
+  mymlphiggsvsbkg_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_135_comb_MM_N_2011", "mlphiggsvsbkg_135_comb_MM_N_2011", -10000, 600)
   mymlphiggsvszbb_135_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_135_comb_MM_N", "mlphiggsvszbb_135_comb_MM_N", -10000, 600)
   mymlphiggsvstt_135_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_135_comb_MM_N", "mlphiggsvstt_135_comb_MM_N", -10000, 600)
   mymlphiggsvszz_135_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_135_comb_MM_N", "mlphiggsvszz_135_comb_MM_N", -10000, 600)
   mymlphiggsvsbkg_135_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_135_comb_MM_N", "mlphiggsvsbkg_135_comb_MM_N", -10000, 600)
-#
-#
+
   myRDSRAS.add(myWttRRV)
   myRDSRAS.add(myWggRRV)
   myRDSRAS.add(myWqqRRV)
@@ -249,6 +257,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlphiggsvstt_115_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_115_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_115_mu_MM_N_RRV)
+  myRDSRAS.add(mymlphiggsvszbb_115_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvstt_115_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvszz_115_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvsbkg_115_comb_MM_N_2011_RRV)
   myRDSRAS.add(mymlphiggsvszbb_115_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvstt_115_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_115_comb_MM_N_RRV)
@@ -278,6 +290,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlphiggsvstt_120_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_120_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_120_mu_MM_N_RRV)
+  myRDSRAS.add(mymlphiggsvszbb_120_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvstt_120_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvszz_120_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvsbkg_120_comb_MM_N_2011_RRV)
   myRDSRAS.add(mymlphiggsvszbb_120_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvstt_120_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_120_comb_MM_N_RRV)
@@ -307,6 +323,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlphiggsvstt_125_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_125_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_125_mu_MM_N_RRV)
+  myRDSRAS.add(mymlphiggsvszbb_125_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvstt_125_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvszz_125_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvsbkg_125_comb_MM_N_2011_RRV)
   myRDSRAS.add(mymlphiggsvszbb_125_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvstt_125_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_125_comb_MM_N_RRV)
@@ -336,6 +356,10 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlphiggsvstt_130_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_130_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_130_mu_MM_N_RRV)
+  myRDSRAS.add(mymlphiggsvszbb_130_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvstt_130_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvszz_130_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvsbkg_130_comb_MM_N_2011_RRV)
   myRDSRAS.add(mymlphiggsvszbb_130_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvstt_130_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_130_comb_MM_N_RRV)
@@ -365,41 +389,59 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlphiggsvstt_135_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_135_mu_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_135_mu_MM_N_RRV)
+  myRDSRAS.add(mymlphiggsvszbb_135_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvstt_135_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvszz_135_comb_MM_N_2011_RRV)
+  myRDSRAS.add(mymlphiggsvsbkg_135_comb_MM_N_2011_RRV)
   myRDSRAS.add(mymlphiggsvszbb_135_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvstt_135_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvszz_135_comb_MM_N_RRV)
   myRDSRAS.add(mymlphiggsvsbkg_135_comb_MM_N_RRV)
-
-
-
-  fout = TFile("RDS_rdsME_" +InputFile + ".root", "RECREATE")
+  
+  f  = TFile(dirTree2+"Tree_rdsME_"+InputFile+".root","READ")
+  t  = f.Get("rds_zbb")
   myRDS_sum = RooDataSet("rds_zbb", "rds_zbb", t, myRDSRAS)
-  
-  myRDS_sum.Write()
 
-  
+  ras_zbb = myRDS_sum.get()
+  ws_ras = RooWorkspace("ws_ras","workspace_ras")
+  getattr(ws_ras,'import')(ras_zbb)
+
+  ws_ras.writeToFile(dirTree2+"RDS_rdsME_"+InputFile+".root")
+  gDirectory.Add(ws_ras)
+
+  fout=TFile(dirTree2+"RDS_rdsME_"+InputFile+".root","UPDATE")
+  tree_zbb = myRDS_sum.tree()
+  tree_zbb.Write()
+  fout.Close()
 
 
-tree2RDSoneSample(InputFile = "MuA_DATA")
-tree2RDSoneSample(InputFile = "MuB_DATA")
-tree2RDSoneSample(InputFile = "Mu_MC")
+tree2RDSoneSample(InputFile = "DoubleMu_DataA")
+#tree2RDSoneSample(InputFile = "DoubleMu_DataA06aug")
+tree2RDSoneSample(InputFile = "DoubleMu_DataB")
+tree2RDSoneSample(InputFile = "DoubleMu_DataC-v1")
+tree2RDSoneSample(InputFile = "DoubleMu_DataC-v2")
+tree2RDSoneSample(InputFile = "DoubleMu_DataD")
+tree2RDSoneSample(InputFile = "DY_Mu_MC")
 tree2RDSoneSample(InputFile = "TT_Mu_MC")
 tree2RDSoneSample(InputFile = "ZZ_Mu_MC")
-tree2RDSoneSample(InputFile = "ZH115_Mu_MC")
-tree2RDSoneSample(InputFile = "ZH120_Mu_MC")
+#tree2RDSoneSample(InputFile = "ZH115_Mu_MC")
+#tree2RDSoneSample(InputFile = "ZH120_Mu_MC")
 tree2RDSoneSample(InputFile = "ZH125_Mu_MC")
-tree2RDSoneSample(InputFile = "ZH130_Mu_MC")
-tree2RDSoneSample(InputFile = "ZH135_Mu_MC")
+#tree2RDSoneSample(InputFile = "ZH130_Mu_MC")
+#tree2RDSoneSample(InputFile = "ZH135_Mu_MC")
 
-tree2RDSoneSample(InputFile = "ElA_DATA")
-tree2RDSoneSample(InputFile = "ElB_DATA")
-#tree2RDSoneSample(InputFile = "DY_Pt100_El_MC")
-tree2RDSoneSample(InputFile = "El_MC")
+tree2RDSoneSample(InputFile = "DoubleEle_DataA")
+#tree2RDSoneSample(InputFile = "DoubleEle_DataA06aug")
+tree2RDSoneSample(InputFile = "DoubleEle_DataB")
+tree2RDSoneSample(InputFile = "DoubleEle_DataC-v1")
+tree2RDSoneSample(InputFile = "DoubleEle_DataC-v2")
+tree2RDSoneSample(InputFile = "DoubleEle_DataD")
+tree2RDSoneSample(InputFile = "DY_El_MC")
 tree2RDSoneSample(InputFile = "TT_El_MC")
 tree2RDSoneSample(InputFile = "ZZ_El_MC")
-tree2RDSoneSample(InputFile = "ZH115_El_MC")
-tree2RDSoneSample(InputFile = "ZH120_El_MC")
+#tree2RDSoneSample(InputFile = "ZH115_El_MC")
+#tree2RDSoneSample(InputFile = "ZH120_El_MC")
 tree2RDSoneSample(InputFile = "ZH125_El_MC")
-tree2RDSoneSample(InputFile = "ZH130_El_MC")
-tree2RDSoneSample(InputFile = "ZH135_El_MC")
+#tree2RDSoneSample(InputFile = "ZH130_El_MC")
+#tree2RDSoneSample(InputFile = "ZH135_El_MC")
 

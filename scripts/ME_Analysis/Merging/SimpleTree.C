@@ -65,12 +65,16 @@
 #include "../NN/MLP_TT_vs_DY_MM_N_CSV_2011_mm.cxx"
 #include "../NN/MLP_TT_vs_DY_ML_CSV_2011_mm.cxx"
 
-// Include NN trained on ee-mm merged
+// Include NN trained on ee-mm merged 2011
 #include "MLP_Higgs_vs_DY_MM_N_CSV_2011_comb.cxx"
 #include "MLP_Higgs_vs_ZZ_MM_N_CSV_2011_comb.cxx"
 #include "MLP_Higgs_vs_TT_MM_N_CSV_2011_comb.cxx"
 #include "MLP_Higgs_vs_BKG_MM_N_CSV_2011_comb.cxx"
-
+// Include NN trained on ee-mm merged 2012
+#include "MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125.cxx"
+#include "MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125.cxx"
+#include "MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125.cxx"
+#include "MLP_Higgs_vs_Bkg_ZH125_comb.cxx"
 
 
 //----------------------------------------------------------------
@@ -185,10 +189,15 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    MLP_Higgs_vs_BKG_MM_N_CSV_2011_mm *MLP_higgs_vs_BKG_MM_N_mm = 0;
    MLP_Higgs_vs_BKG_ML_CSV_2011_mm *MLP_higgs_vs_BKG_ML_mm = 0;
    
-    MLP_Higgs_vs_DY_MM_N_CSV_2011_comb *MLP_higgs_vs_DY_MM_N_comb = 0;  
-    MLP_Higgs_vs_ZZ_MM_N_CSV_2011_comb *MLP_higgs_vs_ZZ_MM_N_comb = 0;  
-    MLP_Higgs_vs_TT_MM_N_CSV_2011_comb *MLP_higgs_vs_TT_MM_N_comb = 0;  
-    MLP_Higgs_vs_BKG_MM_N_CSV_2011_comb *MLP_higgs_vs_BKG_MM_N_comb = 0;
+   MLP_Higgs_vs_DY_MM_N_CSV_2011_comb *MLP_higgs_vs_DY_MM_N_comb_2011 = 0;  
+   MLP_Higgs_vs_ZZ_MM_N_CSV_2011_comb *MLP_higgs_vs_ZZ_MM_N_comb_2011 = 0;  
+   MLP_Higgs_vs_TT_MM_N_CSV_2011_comb *MLP_higgs_vs_TT_MM_N_comb_2011 = 0;  
+   MLP_Higgs_vs_BKG_MM_N_CSV_2011_comb *MLP_higgs_vs_BKG_MM_N_comb_2011 = 0;
+
+   MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125 *MLP_higgs_vs_DY_MM_N_comb = 0;  
+   MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125 *MLP_higgs_vs_ZZ_MM_N_comb = 0;  
+   MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125 *MLP_higgs_vs_TT_MM_N_comb = 0;  
+   MLP_Higgs_vs_Bkg_ZH125_comb *MLP_higgs_vs_BKG_MM_N_comb = 0;
 //-----------------------------------------------------------------------------
    Double_t mlphiggsvszbb_115_MM,mlphiggsvszbb_120_MM,mlphiggsvszbb_125_MM,mlphiggsvszbb_130_MM,mlphiggsvszbb_135_MM;
    Double_t mlphiggsvszz_115_MM,mlphiggsvszz_120_MM,mlphiggsvszz_125_MM,mlphiggsvszz_130_MM,mlphiggsvszz_135_MM;
@@ -202,6 +211,11 @@ TH1D* hZbbReweight_bestzpt_El = 0;
    Double_t mlphiggsvsbkg_115_mu_MM,mlphiggsvsbkg_120_mu_MM,mlphiggsvsbkg_125_mu_MM,mlphiggsvsbkg_130_mu_MM,mlphiggsvsbkg_135_mu_MM;
    Double_t mlpZbbvsTT_mu_MM;
   
+   Double_t mlphiggsvszbb_115_comb_MM_N_2011,mlphiggsvszbb_120_comb_MM_N_2011,mlphiggsvszbb_125_comb_MM_N_2011,mlphiggsvszbb_130_comb_MM_N_2011,mlphiggsvszbb_135_comb_MM_N_2011;
+   Double_t mlphiggsvszz_115_comb_MM_N_2011,mlphiggsvszz_120_comb_MM_N_2011,mlphiggsvszz_125_comb_MM_N_2011,mlphiggsvszz_130_comb_MM_N_2011,mlphiggsvszz_135_comb_MM_N_2011;
+   Double_t mlphiggsvstt_115_comb_MM_N_2011,mlphiggsvstt_120_comb_MM_N_2011,mlphiggsvstt_125_comb_MM_N_2011,mlphiggsvstt_130_comb_MM_N_2011,mlphiggsvstt_135_comb_MM_N_2011;
+   Double_t mlphiggsvsbkg_115_comb_MM_N_2011,mlphiggsvsbkg_120_comb_MM_N_2011,mlphiggsvsbkg_125_comb_MM_N_2011,mlphiggsvsbkg_130_comb_MM_N_2011,mlphiggsvsbkg_135_comb_MM_N_2011;
+
    Double_t mlphiggsvszbb_115_comb_MM_N,mlphiggsvszbb_120_comb_MM_N,mlphiggsvszbb_125_comb_MM_N,mlphiggsvszbb_130_comb_MM_N,mlphiggsvszbb_135_comb_MM_N;
    Double_t mlphiggsvszz_115_comb_MM_N,mlphiggsvszz_120_comb_MM_N,mlphiggsvszz_125_comb_MM_N,mlphiggsvszz_130_comb_MM_N,mlphiggsvszz_135_comb_MM_N;
    Double_t mlphiggsvstt_115_comb_MM_N,mlphiggsvstt_120_comb_MM_N,mlphiggsvstt_125_comb_MM_N,mlphiggsvstt_130_comb_MM_N,mlphiggsvstt_135_comb_MM_N;
@@ -252,13 +266,13 @@ void CreateParentTree(TString InputFile) {
      return;
    }
    
-   else if (InputFile.Contains("Mu_") || InputFile.Contains("MuA_") || InputFile.Contains("MuB_")) {
+   else if (InputFile.Contains("Mu_") || InputFile.Contains("Mu_") || InputFile.Contains("Mu_")) {
      std::cout << "  running MuMu channel" << std::endl;
      isMuChannel = true;
      sanitycut = " && eventSelectionbestzmassMu > 0.01 ";
    }
    
-   else if (InputFile.Contains("El_") || InputFile.Contains("ElA_") || InputFile.Contains("ElB_")) {
+   else if (InputFile.Contains("El_") || InputFile.Contains("Ele_") || InputFile.Contains("Ele_")) {
      std::cout << "  running over ElEl channel" << std::endl;
      sanitycut = " && eventSelectionbestzmassEl > 0.01 ";
    }
@@ -303,39 +317,37 @@ void CreateParentTree(TString InputFile) {
    MLP_higgs_vs_BKG_MM_N_mm = new MLP_Higgs_vs_BKG_MM_N_CSV_2011_mm();
    MLP_higgs_vs_BKG_ML_mm = new MLP_Higgs_vs_BKG_ML_CSV_2011_mm();
 
-   MLP_higgs_vs_DY_MM_N_comb = new MLP_Higgs_vs_DY_MM_N_CSV_2011_comb();
-   MLP_higgs_vs_ZZ_MM_N_comb = new MLP_Higgs_vs_ZZ_MM_N_CSV_2011_comb();
-   MLP_higgs_vs_TT_MM_N_comb = new MLP_Higgs_vs_TT_MM_N_CSV_2011_comb();
-   MLP_higgs_vs_BKG_MM_N_comb = new MLP_Higgs_vs_BKG_MM_N_CSV_2011_comb();
+   MLP_higgs_vs_DY_MM_N_comb_2011 = new MLP_Higgs_vs_DY_MM_N_CSV_2011_comb();
+   MLP_higgs_vs_ZZ_MM_N_comb_2011 = new MLP_Higgs_vs_ZZ_MM_N_CSV_2011_comb();
+   MLP_higgs_vs_TT_MM_N_comb_2011 = new MLP_Higgs_vs_TT_MM_N_CSV_2011_comb();
+   MLP_higgs_vs_BKG_MM_N_comb_2011 = new MLP_Higgs_vs_BKG_MM_N_CSV_2011_comb();
+
+   MLP_higgs_vs_DY_MM_N_comb = new MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125();
+   MLP_higgs_vs_ZZ_MM_N_comb = new MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125();
+   MLP_higgs_vs_TT_MM_N_comb = new MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125();
+   MLP_higgs_vs_BKG_MM_N_comb = new MLP_Higgs_vs_Bkg_ZH125_comb();
 
    
    
    
    //-----------------------------------------------------------------------
    // Input files location
-   TString folder = "MergeRDS_CSV/";
+   TString folder = "/nfs/user/acaudron/Tree2_53X/";
+   TString folderB = "/nfs/user/acaudron/Tree2_537/";
    //RDS location
-   TString folder2 = "/home/fynu/vizangarciaj/storage/CMSSW444_121207_forCSV2011Branch/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testCSV2011_130110/";
-   //TString folder2 = "/storage/data/cms/users/vizangarciaj/RDS/SMP-12-003_v0_121114/PlainTrees/";
-   //TString folder2 = "/storage/data/cms/users/vizangarciaj/RDS/SMP-12-003_v0_121114_JER0/JESMinus/";
-   //TString folder2 = "/storage/data/cms/users/vizangarciaj/RDS/SMP-12-003_v0_121114_JER0/JESPlus/";
-   //TString folder2 = "testsMergeRDS_jesM/";
-   //TFile* f_RDS  = new TFile(folder2+"Tree_File_rds_zbb_" + InputFile + ".root");
-   //folder = "./testAfterAddBranchSimpleTree/"; folder2 = folder;
-   TFile* f_RDS  = new TFile(folder2+"Tree_File_rds_zbb_" + InputFile + ".root");
+   TString folder2 = "/nfs/user/acaudron/RDS537/";
+
+   TFile* f_RDS  = new TFile(folder2+"File_rds_zbb_" + InputFile + ".root");
    TTree* t_RDS    = (TTree*)f_RDS->Get("rds_zbb");  
    
-   //RooDataSet* R_RDS = (RooDataSet*)f_RDS->Get("rds_zbb");
-   //TTree* t_RDS    = (TTree*)R_RDS->tree();
-
    TString mename = folder+"ME_zbb_" + InputFile + ".root";
-   mename.ReplaceAll("A_DATA", "_DATA");
-   mename.ReplaceAll("B_DATA", "_DATA");
+   //mename.ReplaceAll("A_DATA", "_DATA");
+   //mename.ReplaceAll("B_DATA", "_DATA");
 
    TFile* f_ME  = new TFile(mename);
    TTree* t_ME    = (TTree*)f_ME->Get("tree2");  
    
-   TFile *f_RDSME = new TFile(folder+"Tree_rdsME_" +InputFile + ".root", "RECREATE");
+   TFile *f_RDSME = new TFile(folderB+"Tree_rdsME_" +InputFile + ".root", "RECREATE");
    TTree *t_RDSME = t_RDS->CloneTree(0);
    t_RDSME->SetTitle("merged zbb-ME tree");
 
@@ -450,6 +462,28 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mlphiggsvszz_135_ML" , &mlphiggsvszz_135_ML,"mlphiggsvszz_135_ML/D");
 
 
+   t_RDSME->Branch("mlphiggsvszbb_125_comb_MM_N_2011" , &mlphiggsvszbb_125_comb_MM_N_2011,"mlphiggsvszbb_125_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszz_125_comb_MM_N_2011" , &mlphiggsvszz_125_comb_MM_N_2011,"mlphiggsvszz_125_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvstt_125_comb_MM_N_2011" , &mlphiggsvstt_125_comb_MM_N_2011,"mlphiggsvstt_125_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvsbkg_125_comb_MM_N_2011" , &mlphiggsvsbkg_125_comb_MM_N_2011,"mlphiggsvsbkg_125_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszbb_115_comb_MM_N_2011" , &mlphiggsvszbb_115_comb_MM_N_2011,"mlphiggsvszbb_115_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszz_115_comb_MM_N_2011" , &mlphiggsvszz_115_comb_MM_N_2011,"mlphiggsvszz_115_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvstt_115_comb_MM_N_2011" , &mlphiggsvstt_115_comb_MM_N_2011,"mlphiggsvstt_115_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvsbkg_115_comb_MM_N_2011" , &mlphiggsvsbkg_115_comb_MM_N_2011,"mlphiggsvsbkg_115_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszbb_135_comb_MM_N_2011" , &mlphiggsvszbb_135_comb_MM_N_2011,"mlphiggsvszbb_135_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszz_135_comb_MM_N_2011" , &mlphiggsvszz_135_comb_MM_N_2011,"mlphiggsvszz_135_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvstt_135_comb_MM_N_2011" , &mlphiggsvstt_135_comb_MM_N_2011,"mlphiggsvstt_135_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvsbkg_135_comb_MM_N_2011" , &mlphiggsvsbkg_135_comb_MM_N_2011,"mlphiggsvsbkg_135_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszbb_130_comb_MM_N_2011" , &mlphiggsvszbb_130_comb_MM_N_2011,"mlphiggsvszbb_130_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszz_130_comb_MM_N_2011" , &mlphiggsvszz_130_comb_MM_N_2011,"mlphiggsvszz_130_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvstt_130_comb_MM_N_2011" , &mlphiggsvstt_130_comb_MM_N_2011,"mlphiggsvstt_130_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvsbkg_130_comb_MM_N_2011" , &mlphiggsvsbkg_130_comb_MM_N_2011,"mlphiggsvsbkg_130_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszbb_120_comb_MM_N_2011" , &mlphiggsvszbb_120_comb_MM_N_2011,"mlphiggsvszbb_120_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvszz_120_comb_MM_N_2011" , &mlphiggsvszz_120_comb_MM_N_2011,"mlphiggsvszz_120_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvstt_120_comb_MM_N_2011" , &mlphiggsvstt_120_comb_MM_N_2011,"mlphiggsvstt_120_comb_MM_N_2011/D");
+   t_RDSME->Branch("mlphiggsvsbkg_120_comb_MM_N_2011" , &mlphiggsvsbkg_120_comb_MM_N_2011,"mlphiggsvsbkg_120_comb_MM_N_2011/D");
+
+
    t_RDSME->Branch("mlphiggsvszbb_125_comb_MM_N" , &mlphiggsvszbb_125_comb_MM_N,"mlphiggsvszbb_125_comb_MM_N/D");
    t_RDSME->Branch("mlphiggsvszz_125_comb_MM_N" , &mlphiggsvszz_125_comb_MM_N,"mlphiggsvszz_125_comb_MM_N/D");
    t_RDSME->Branch("mlphiggsvstt_125_comb_MM_N" , &mlphiggsvstt_125_comb_MM_N,"mlphiggsvstt_125_comb_MM_N/D");
@@ -470,7 +504,6 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mlphiggsvszz_120_comb_MM_N" , &mlphiggsvszz_120_comb_MM_N,"mlphiggsvszz_120_comb_MM_N/D");
    t_RDSME->Branch("mlphiggsvstt_120_comb_MM_N" , &mlphiggsvstt_120_comb_MM_N,"mlphiggsvstt_120_comb_MM_N/D");
    t_RDSME->Branch("mlphiggsvsbkg_120_comb_MM_N" , &mlphiggsvsbkg_120_comb_MM_N,"mlphiggsvsbkg_120_comb_MM_N/D");
-
    
 
    t_RDSME->Branch("mlphiggsvszbb_125_mu_MM" , &mlphiggsvszbb_125_mu_MM,"mlphiggsvszbb_125_mu_MM/D");
@@ -528,7 +561,7 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("mlphiggsvsbkg_125_mu_ML" , &mlphiggsvsbkg_125_mu_ML,"mlphiggsvsbkg_125_mu_ML/D");
    t_RDSME->Branch("mlphiggsvsbkg_125_mu_MM" , &mlphiggsvsbkg_125_mu_MM,"mlphiggsvsbkg_125_mu_MM/D");
    t_RDSME->Branch("mlphiggsvsbkg_125_mu_MM_N" , &mlphiggsvsbkg_125_mu_MM_N,"mlphiggsvsbkg_125_mu_MM_N/D");
-   t_RDSME->Branch("mlphiggsvsbkg_1305_mu_ML" , &mlphiggsvsbkg_130_mu_ML,"mlphiggsvsbkg_130_mu_ML/D");
+   t_RDSME->Branch("mlphiggsvsbkg_130_mu_ML" , &mlphiggsvsbkg_130_mu_ML,"mlphiggsvsbkg_130_mu_ML/D");
    t_RDSME->Branch("mlphiggsvsbkg_130_mu_MM" , &mlphiggsvsbkg_130_mu_MM,"mlphiggsvsbkg_130_mu_MM/D");
    t_RDSME->Branch("mlphiggsvsbkg_130_mu_MM_N" , &mlphiggsvsbkg_130_mu_MM_N,"mlphiggsvsbkg_130_mu_MM_N/D");
    t_RDSME->Branch("mlphiggsvsbkg_135_mu_ML" , &mlphiggsvsbkg_135_mu_ML,"mlphiggsvsbkg_135_mu_ML/D");
@@ -695,6 +728,11 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_125_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_ee->Value(0, Wzz0 , Wzz3, Whi0_125 , Whi3_125)));
         mlphiggsvsbkg_125_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_ee->Value(0, mlphiggsvszbb_125_MM_N  , mlphiggsvszz_125_MM_N , mlphiggsvstt_125_MM_N)));
 	// For H 125
+	mlphiggsvszbb_125_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb_2011->Value(0, Wgg, Wqq, Whi0_125 , Whi3_125)));
+	mlphiggsvszz_125_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb_2011->Value(0, Wzz0 , Wzz3, Whi0_125 , Whi3_125)));
+	mlphiggsvstt_125_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb_2011->Value(0, Wtt, Whi0_125 , Whi3_125)));
+	mlphiggsvsbkg_125_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_comb_2011->Value(0,mlphiggsvszbb_125_comb_MM_N,mlphiggsvszz_125_comb_MM_N,mlphiggsvstt_125_comb_MM_N )));
+	// For H 125
 	mlphiggsvszbb_125_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_125 , Whi3_125)));
 	mlphiggsvszz_125_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3, Whi0_125 , Whi3_125)));
 	mlphiggsvstt_125_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb->Value(0, Wtt, Whi0_125 , Whi3_125)));
@@ -713,7 +751,8 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_125_mu_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_mm->Value(0, Wzz0 , Wzz3 , Whi0_125 , Whi3_125)));
         mlphiggsvsbkg_125_mu_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_mm->Value(0, mlphiggsvszbb_125_mu_MM_N  , mlphiggsvszz_125_mu_MM_N , mlphiggsvstt_125_mu_MM_N)));
 	//cout<<MLP_higgs_vs_BKG_MM_N_mm->Value(0, mlphiggsvszbb_125_mu_MM_N  , mlphiggsvszz_125_mu_MM_N , mlphiggsvstt_125_mu_MM_N)<<endl;
-        // For H 115
+  
+      // For H 115
         mlphiggsvszbb_115_MM = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_115 , Whi3_115)));
         mlphiggsvstt_115_MM = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_ee->Value(0, Wtt, Whi0_115 , Whi3_115)));
         mlphiggsvszz_115_MM = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3, Whi0_115 , Whi3_115)));
@@ -726,6 +765,11 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvstt_115_MM_N = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_ee->Value(0, Wtt, Whi0_115 , Whi3_115)));
         mlphiggsvszz_115_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_ee->Value(0, Wzz0 , Wzz3, Whi0_115 , Whi3_115)));
         mlphiggsvsbkg_115_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_ee->Value(0, mlphiggsvszbb_115_MM_N  , mlphiggsvszz_115_MM_N , mlphiggsvstt_115_MM_N)));
+        // For H 115
+        mlphiggsvszbb_115_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb_2011->Value(0, Wgg, Wqq, Whi0_115 , Whi3_115)));
+        mlphiggsvszz_115_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb_2011->Value(0, Wzz0 , Wzz3, Whi0_115 , Whi3_115)));
+        mlphiggsvstt_115_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb_2011->Value(0, Wtt, Whi0_115 , Whi3_115)));
+        mlphiggsvsbkg_115_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_comb_2011->Value(0,mlphiggsvszbb_115_comb_MM_N_2011,mlphiggsvszz_115_comb_MM_N_2011,mlphiggsvstt_115_comb_MM_N_2011 )));
         // For H 115
         mlphiggsvszbb_115_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_115 , Whi3_115)));
         mlphiggsvszz_115_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3, Whi0_115 , Whi3_115)));
@@ -759,6 +803,11 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_120_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_ee->Value(0, Wzz0 , Wzz3, Whi0_120 , Whi3_120)));
         mlphiggsvsbkg_120_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_ee->Value(0, mlphiggsvszbb_120_MM_N  , mlphiggsvszz_120_MM_N , mlphiggsvstt_120_MM_N)));
         // For H 120
+        mlphiggsvszbb_120_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb_2011->Value(0, Wgg, Wqq, Whi0_120 , Whi3_120)));
+        mlphiggsvszz_120_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb_2011->Value(0, Wzz0 , Wzz3, Whi0_120 , Whi3_120)));
+        mlphiggsvstt_120_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb_2011->Value(0, Wtt, Whi0_120 , Whi3_120)));
+        mlphiggsvsbkg_120_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_comb_2011->Value(0,mlphiggsvszbb_120_comb_MM_N_2011,mlphiggsvszz_120_comb_MM_N_2011,mlphiggsvstt_120_comb_MM_N_2011 ))); 
+        // For H 120
         mlphiggsvszbb_120_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_120 , Whi3_120)));
         mlphiggsvszz_120_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3, Whi0_120 , Whi3_120)));
         mlphiggsvstt_120_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb->Value(0, Wtt, Whi0_120 , Whi3_120)));
@@ -790,6 +839,11 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvstt_130_MM_N = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_ee->Value(0, Wtt, Whi0_130 , Whi3_130)));
         mlphiggsvszz_130_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_ee->Value(0, Wzz0 , Wzz3, Whi0_130 , Whi3_130)));
         mlphiggsvsbkg_130_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_ee->Value(0, mlphiggsvszbb_130_MM_N  , mlphiggsvszz_130_MM_N , mlphiggsvstt_130_MM_N)));
+        // For H 130
+        mlphiggsvszbb_130_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb_2011->Value(0, Wgg, Wqq, Whi0_130 , Whi3_130)));
+        mlphiggsvszz_130_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb_2011->Value(0, Wzz0 , Wzz3, Whi0_130 , Whi3_130)));
+        mlphiggsvstt_130_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb_2011->Value(0, Wtt, Whi0_130 , Whi3_130)));
+        mlphiggsvsbkg_130_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_comb_2011->Value(0,mlphiggsvszbb_130_comb_MM_N_2011,mlphiggsvszz_130_comb_MM_N_2011,mlphiggsvstt_130_comb_MM_N_2011 )));
         // For H 130
         mlphiggsvszbb_130_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_130 , Whi3_130)));
         mlphiggsvszz_130_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3, Whi0_130 , Whi3_130)));
@@ -823,6 +877,11 @@ void CreateParentTree(TString InputFile) {
         mlphiggsvszz_135_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_ee->Value(0, Wzz0 , Wzz3, Whi0_135 , Whi3_135)));
         mlphiggsvsbkg_135_MM_N = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_ee->Value(0, mlphiggsvszbb_135_MM_N  , mlphiggsvszz_135_MM_N , mlphiggsvstt_135_MM_N)));
          // For H 135
+        mlphiggsvszbb_135_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb_2011->Value(0, Wgg, Wqq, Whi0_135 , Whi3_135)));
+        mlphiggsvszz_135_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb_2011->Value(0, Wzz0 , Wzz3, Whi0_135 , Whi3_135)));
+        mlphiggsvstt_135_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb_2011->Value(0, Wtt, Whi0_135 , Whi3_135)));
+        mlphiggsvsbkg_135_comb_MM_N_2011 = max(0.0,min(1.0,MLP_higgs_vs_BKG_MM_N_comb_2011->Value(0,mlphiggsvszbb_135_comb_MM_N_2011,mlphiggsvszz_135_comb_MM_N_2011,mlphiggsvstt_135_comb_MM_N_2011 )));
+         // For H 135
         mlphiggsvszbb_135_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_135 , Whi3_135)));
         mlphiggsvszz_135_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3, Whi0_135 , Whi3_135)));
         mlphiggsvstt_135_comb_MM_N = max(0.0,min(1.0,MLP_higgs_vs_TT_MM_N_comb->Value(0, Wtt, Whi0_135 , Whi3_135)));
@@ -847,7 +906,7 @@ void CreateParentTree(TString InputFile) {
 
 //------------------------------------ FOR BLINDING ----------------------------------------------------------------------------------
 	// For H 125
-	if (InputFile.Contains("DATA")){
+	if (InputFile.Contains("Data")){
 	  if( MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_125 , Whi3_125)>0.5){mlphiggsvszbb_125_MM=-999.;}
 	  if( MLP_higgs_vs_TT_MM_ee->Value(0, Wtt,Whi0_125 , Whi3_125)>0.5){mlphiggsvstt_125_MM=-999.;}
 	  if( MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3 ,Whi0_125 , Whi3_125)>0.5){mlphiggsvszz_125_MM=-999.;}
@@ -878,7 +937,7 @@ void CreateParentTree(TString InputFile) {
           if( MLP_higgs_vs_BKG_MM_N_comb->Value(0, MLP_higgs_vs_DY_MM_N_comb->Value(0, Wgg, Wqq, Whi0_125 , Whi3_125), MLP_higgs_vs_ZZ_MM_N_comb->Value(0, Wzz0 , Wzz3 , Whi0_125 , Whi3_125) ,MLP_higgs_vs_TT_MM_N_comb->Value(0, Wtt, Whi0_125 , Whi3_125) ) > 0.5 ){mlphiggsvsbkg_125_comb_MM_N=-999.;}
 	}
         // For H 115
-        if (InputFile.Contains("DATA")){
+        if (InputFile.Contains("Data")){
           if( MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_115 , Whi3_115)>0.5){mlphiggsvszbb_115_MM=-999.;}
           if( MLP_higgs_vs_TT_MM_ee->Value(0, Wtt,Whi0_115 , Whi3_115)>0.5){mlphiggsvstt_115_MM=-999.;}
           if( MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3 ,Whi0_115 , Whi3_115)>0.5){mlphiggsvszz_115_MM=-999.;}
@@ -910,7 +969,7 @@ void CreateParentTree(TString InputFile) {
 		
 		}
 	// For H 120
-        if (InputFile.Contains("DATA")){
+        if (InputFile.Contains("Data")){
           if( MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_120 , Whi3_120)>0.5){mlphiggsvszbb_120_MM=-999.;}
           if( MLP_higgs_vs_TT_MM_ee->Value(0, Wtt,Whi0_120 , Whi3_120)>0.5){mlphiggsvstt_120_MM=-999.;}
           if( MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3 ,Whi0_120 , Whi3_120)>0.5){mlphiggsvszz_120_MM=-999.;}
@@ -943,7 +1002,7 @@ void CreateParentTree(TString InputFile) {
 	
 	}
         // For H 130
-        if (InputFile.Contains("DATA")){
+        if (InputFile.Contains("Data")){
 	  if( MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_130 , Whi3_130)>0.5){mlphiggsvszbb_130_MM=-999.;}
           if( MLP_higgs_vs_TT_MM_ee->Value(0, Wtt,Whi0_130 , Whi3_130)>0.5){mlphiggsvstt_130_MM=-999.;}
           if( MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3 ,Whi0_130 , Whi3_130)>0.5){mlphiggsvszz_130_MM=-999.;}
@@ -975,7 +1034,7 @@ void CreateParentTree(TString InputFile) {
 	
 	}
 	// For H 135
-        if (InputFile.Contains("DATA")){
+        if (InputFile.Contains("Data")){
 	  if( MLP_higgs_vs_DY_MM_ee->Value(0, Wgg, Wqq, Whi0_135 , Whi3_135)>0.5){mlphiggsvszbb_135_MM=-999.;}
           if( MLP_higgs_vs_TT_MM_ee->Value(0, Wtt,Whi0_135 , Whi3_135)>0.5){mlphiggsvstt_135_MM=-999.;}
           if( MLP_higgs_vs_ZZ_MM_ee->Value(0, Wzz0 , Wzz3 ,Whi0_135 , Whi3_135)>0.5){mlphiggsvszz_135_MM=-999.;}
@@ -1101,12 +1160,20 @@ double Compute1DReweight(TH1D* hRW, double value) {
 //   CreateParentTree(InputFile);
 
 void SimpleTree() {
-   CreateParentTree("MuA_DATA");
-   CreateParentTree("ElA_DATA");
-   CreateParentTree("MuB_DATA");
-   CreateParentTree("ElB_DATA");
-   CreateParentTree("Mu_MC");
-   CreateParentTree("El_MC");
+  //CreateParentTree("DoubleMu_DataA");
+  //CreateParentTree("DoubleEle_DataA");
+   //CreateParentTree("DoubleMu_DataA06aug");
+   //CreateParentTree("DoubleEle_DataA06aug");
+   //CreateParentTree("DoubleMu_DataB");
+   //CreateParentTree("DoubleEle_DataB");
+   /*CreateParentTree("DoubleMu_DataC-v1");
+   CreateParentTree("DoubleEle_DataC-v1");
+   CreateParentTree("DoubleMu_DataC-v2");
+   CreateParentTree("DoubleEle_DataC-v2");
+   CreateParentTree("DoubleMu_DataD");
+   CreateParentTree("DoubleEle_DataD");*/
+   CreateParentTree("DY_Mu_MC");
+   CreateParentTree("DY_El_MC");
    //CreateParentTree("DY_Pt100_El_MC");
    CreateParentTree("TT_Mu_MC");
    CreateParentTree("TT_El_MC");
@@ -1114,14 +1181,14 @@ void SimpleTree() {
    CreateParentTree("ZZ_El_MC");
    CreateParentTree("ZH125_Mu_MC");
    CreateParentTree("ZH125_El_MC");
-   CreateParentTree("ZH115_Mu_MC");
+   /*CreateParentTree("ZH115_Mu_MC");
    CreateParentTree("ZH115_El_MC");
    CreateParentTree("ZH120_Mu_MC");
    CreateParentTree("ZH120_El_MC");
    CreateParentTree("ZH130_Mu_MC");
    CreateParentTree("ZH130_El_MC");
    CreateParentTree("ZH135_Mu_MC");
-   CreateParentTree("ZH135_El_MC");
+   CreateParentTree("ZH135_El_MC");*/
 }
 
 //mergeOneSample(InputFile = "Mu_DATA")

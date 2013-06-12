@@ -34,12 +34,12 @@ listToProcess = [
 
     "DY_MC",
     "TT_MC",
-    #"ZZ_MC",
+    "ZZ_MC",
 
     #"ZH110_MC",
     #"ZH115_MC",
     #"ZH120_MC",
-    #"ZH125_MC",
+    "ZH125_MC",
     #"ZH130_MC",
     #"ZH135_MC",
     #"ZH140_MC",
@@ -54,6 +54,12 @@ listToProcess = [
     #"DY50-70_MC",
     #"DY70-100_MC",
     #"DY180_MC",
+
+    #"Zbb_MC",
+
+    #"TT-FullLept_MC",
+    #"TT-SemiLept_MC",
+    #"TT-Hadronic_MC",
     ]
 
 #list of existing samples : use to generate the other lists
@@ -101,6 +107,10 @@ listsamples = [
     "DY50-70_MC",
     "DY70-100_MC",
     "DY180_MC",
+    "Zbb_MC",
+    "TT-FullLept_MC",
+    "TT-SemiLept_MC",
+    "TT-Hadronic_MC",
     ]
 
 #correspondance between PAT and skim
@@ -148,11 +158,16 @@ PATtoSkim = {
     "DY50-70_MC"          : "Summer12_DYjets_Pt50to70_S10" ,
     "DY70-100_MC"         : "Summer12_DYjets_Pt70to100_S10" ,
     "DY180_MC"            : "Summer12_DYjets_Pt180_S10" ,
+    "Zbb_MC"              : "Summer12_Zbb_S10" ,
+    "TT-FullLept_MC"      : "Summer12_TTbarFullLept_S10" , 
+    "TT-SemiLept_MC"      : "Summer12_TTbarSemiLept_S10" ,
+    "TT-Hadronic_MC"      : "Summer12_TTbarHadronic_S10" ,
     }
 
 #use to produce the skims and access to the PAT, skim
 dirPAT = "/nfs/user/llbb/Pat_8TeV_537/"
-dirSkim = "/nfs/user/acaudron/skim537/"
+#dirSkim = "/nfs/user/acaudron/skim537/"
+dirSkim = "/nfs/user/acaudron/skim53X/"
 pathPAT = {}
 pathSkim = {}
 
@@ -161,7 +176,8 @@ listToProcessEMu = []
 listsamplesEMu = []
 
 #use to produce RDS and LHCO and to acces to RDS, LHCO
-dirRDS = "/nfs/user/acaudron/RDS537/"
+#dirRDS = "/nfs/user/acaudron/RDS537/"
+dirRDS = "/nfs/user/acaudron/RDS53X_update19fb/"
 dirLHCO = "/nfs/user/acaudron/LHCO537/"
 pathSkimEMu = {}
 pathRDS = {}
@@ -170,7 +186,7 @@ muChannel = {}
 checkTrigger = {}
 
 #use to produce/access to Tree2, MergedTree and MergedRDS
-dirTree2 = "/nfs/user/acaudron/Tree2_53X/"
+dirTree2 = "/nfs/user/acaudron/Tree2_537/"
 pathTree2 = {}
 pathMergedTree = {}
 pathMergedRDS = {}
