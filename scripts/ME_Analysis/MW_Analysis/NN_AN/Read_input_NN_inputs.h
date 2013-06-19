@@ -3,6 +3,15 @@
 #include "NN_537/MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600.cxx"
 #include "NN_537/MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000.cxx"
 
+
+#include "selection/MLP_Higgs_vs_DY_ZH125_comb-2-4_1000_Nj2_Mbb80-150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "selection/MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_dijetdR-3-9_500_Nj3_Mbb50-150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "selection/MLP_Higgs_vs_TT_ZH125_comb-5-10_700_Nj2_Mbb50-200_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "selection/MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_dijetdR-2-4_500_Nj3_Mbb50-150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "selection/MLP_Higgs_vs_ZZ_ZH125_comb-2-4_750_Nj2_Mbb80-150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "selection/MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_dijetdR-2-4_501_Nj3_Mbb50-150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+
+
 class nn_vars {
   public:
   int N;
@@ -27,10 +36,18 @@ class nn_vars {
   double *hzbb;
   double *htt;
   double *hzz;
+  double *hzbb_2j;
+  double *htt_2j;
+  double *hzz_2j;
+  double *hzbb_3j;
+  double *htt_3j;
+  double *hzz_3j;
   int *evt_nbr;
   double *tagj1;
   double *tagj2;
   double *prodNNs;
+  double *prodNNs_2j;
+  double *prodNNs_3j;
   double *evtWeight;
   double *trijetMdr;
   double *fsrDR;
@@ -57,12 +74,20 @@ class nn_vars {
     hzbb = new double[size];
     htt = new double[size];
     hzz = new double[size];
+    hzbb_2j = new double[size];
+    htt_2j = new double[size];
+    hzz_2j = new double[size];
+    hzbb_3j = new double[size];
+    htt_3j = new double[size];
+    hzz_3j = new double[size];
     Metsig = new double[size];
     multi = new double[size];
     evt_nbr = new int[size];
     tagj1 = new double[size];
     tagj2 = new double[size];
     prodNNs = new double[size];
+    prodNNs_2j = new double[size];
+    prodNNs_3j = new double[size];
     evtWeight = new double[size];
     trijetMdr = new double[size];
     fsrDR = new double[size];
@@ -91,10 +116,18 @@ class tree_in {
   double HvsZbb;
   double HvsTT;
   double HvsZZ;
+  double HvsZbb_2j;
+  double HvsTT_2j;
+  double HvsZZ_2j;
+  double HvsZbb_3j;
+  double HvsTT_3j;
+  double HvsZZ_3j;
   double prodCSV;
   double regMbb;
   double dphiZbb;
   double prodNNs;
+  double prodNNs_2j;
+  double prodNNs_3j;
   double Multi;
   int type2;
   double evtWeight;
@@ -124,7 +157,7 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
   double Mll, Mbb, regMbb, zptMu, zptEle, dphiZbb;
   double multiplicity;
   double btagWeights, leptWeights, lumiWeights;
-  double jetmettrijetMdr, fsrDR, dijetdR;
+  double trijetMdr, fsrDR, dijetdR;
 
   tree->SetBranchAddress("jetmetnj",&multiplicity);
   tree->SetBranchAddress("jetmettrijetMdr",&trijetMdr);
@@ -173,24 +206,17 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
   tree->SetBranchAddress("lumiReweightingLumiWeight",&lumiWeights);
 
   // NN declaration -------------------------------------
-  //!gROOT->GetClass("MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600");
   MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600 *HZbb=new MLP_Higgs_vs_DY_MM_N_CSV_2012_comb_ZH125_3_2_1_600(); 
-  if (!gROOT->GetClass("TMultiLayerPerceptron")) { 
-    gSystem->Load("libMLP");
-  }                                                                                                                                                                    
-
-  //!gROOT->GetClass("MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500");  
   MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500 *HTT=new MLP_Higgs_vs_TT_MM_N_CSV_2012_comb_ZH125_5_2_3_1_500();    
-  if (!gROOT->GetClass("TMultiLayerPerceptron")){
-    gSystem->Load("libMLP");
-  }
-
-  //!gROOT->GetClass("MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000");
   MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000 *HZZ=new MLP_Higgs_vs_ZZ_MM_N_CSV_2012_comb_ZH125_2_5_3_1_1000();
-  if (!gROOT->GetClass("TMultiLayerPerceptron")) {
-    gSystem->Load("libMLP");                                                                                                                          
-  }          
-  
+
+  MLP_Higgs_vs_DY_ZH125_comb_2_4_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *HZbb_2j = new MLP_Higgs_vs_DY_ZH125_comb_2_4_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();
+  MLP_Higgs_vs_TT_ZH125_comb_5_10_700_Nj2_Mbb50_200_Ptb1j40_Ptb2j25_Ptll20 *HTT_2j = new MLP_Higgs_vs_TT_ZH125_comb_5_10_700_Nj2_Mbb50_200_Ptb1j40_Ptb2j25_Ptll20(); 
+  MLP_Higgs_vs_ZZ_ZH125_comb_2_4_750_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *HZZ_2j = new MLP_Higgs_vs_ZZ_ZH125_comb_2_4_750_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();   
+
+  MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_dijetdR_3_9_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *HZbb_3j = new MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_dijetdR_3_9_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+  MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *HTT_3j = new MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+  MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_501_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *HZZ_3j = new MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_501_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
   // ----------------------------------------------------
   
   double entry=0.0;
@@ -218,14 +244,43 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
     sim->zz3_weight=Wzz3;
     sim->hi_weight=Whi;
     sim->hi3_weight=Whi3;
+    sim->trijetMdr=trijetMdr;
+    var->trijetMdr[i]=sim->trijetMdr;
+    sim->fsrDR=fsrDR;
+    var->fsrDR[i]=sim->fsrDR;
+    sim->dijetdR=dijetdR;
+    var->dijetdR[i]=sim->dijetdR;
+
     sim->HvsZbb=HZbb->Value(0,Wgg,Wqq,Whi,Whi3);
     sim->HvsTT=HTT->Value(0,Wtt,Whi,Whi3);                                                                                                                                                               
     sim->HvsZZ=HZZ->Value(0,Wzz,Wzz3,Whi,Whi3);
+
+    sim->HvsZbb_2j=HZbb_2j->Value(0,Wgg,Wqq,Whi,Whi3);
+    sim->HvsTT_2j=HTT_2j->Value(0,Wtt,Whi,Whi3);                                                                                                                                                    
+    sim->HvsZZ_2j=HZZ_2j->Value(0,Wzz,Wzz3,Whi,Whi3);
+
+    sim->HvsZbb_3j=HZbb_3j->Value(0,Wgg,Wqq,Whi,Whi3,trijetMdr,fsrDR,dijetdR);
+    sim->HvsTT_3j=HTT_3j->Value(0,Wtt,Whi,Whi3,trijetMdr,fsrDR,dijetdR);                                                                                                                        
+    sim->HvsZZ_3j=HZZ_3j->Value(0,Wzz,Wzz3,Whi,Whi3,trijetMdr,fsrDR,dijetdR);
+
     var->hzbb[i] = sim->HvsZbb;
     var->htt[i] = sim->HvsTT;
     var->hzz[i] = sim->HvsZZ;
+
+    var->hzbb_2j[i] = sim->HvsZbb_2j;
+    var->htt_2j[i] = sim->HvsTT_2j;
+    var->hzz_2j[i] = sim->HvsZZ_2j;
+
+    var->hzbb_3j[i] = sim->HvsZbb_3j;
+    var->htt_3j[i] = sim->HvsTT_3j;
+    var->hzz_3j[i] = sim->HvsZZ_3j;
+
     sim->prodNNs=sim->HvsZbb*sim->HvsTT*sim->HvsZZ;
     var->prodNNs[i]=sim->prodNNs;
+    sim->prodNNs_2j=sim->HvsZbb_2j*sim->HvsTT_2j*sim->HvsZZ_2j;
+    var->prodNNs_2j[i]=sim->prodNNs_2j;
+    sim->prodNNs_3j=sim->HvsZbb_3j*sim->HvsTT_3j*sim->HvsZZ_3j;
+    var->prodNNs_3j[i]=sim->prodNNs_3j;
     if(sim->gg_weight>300.0){sim->gg_weight=50;}
     if(sim->qq_weight>300.0){sim->qq_weight=50;}
     if(sim->tt_weight>300.0){sim->tt_weight=50;}
@@ -264,12 +319,6 @@ void Input(const string rootFile, nn_vars *var, tree_in *sim, TTree *simu, int f
     var->met[i]=sim->Met;
     sim->Multi=multiplicity;
     var->multi[i]=sim->Multi;
-    sim->trijetMdr=trijetMdr;
-    var->trijetMdr[i]=sim->trijetMdr;
-    sim->fsrDR=fsrDR;
-    var->fsrDR[i]=sim->fsrDR;
-    sim->dijetdR=dijetdR;
-    var->dijetdR[i]=sim->dijetdR;
     var->evtWeight[i]=btagWeights*leptWeights*lumiWeights;
     sim->evtWeight=var->evtWeight[i];
     var->isMuMu[i] = 0;

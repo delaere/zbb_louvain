@@ -48,6 +48,16 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
         simu->Branch("HvsZZ",&sim->HvsZZ,"HvsZZ/D");
 	simu->Branch("prodNNs",&sim->prodNNs,"prodNNs/D");
 
+        simu->Branch("HvsZbb_2j",&sim->HvsZbb_2j,"HvsZbb_2j/D");
+        simu->Branch("HvsTT_2j",&sim->HvsTT_2j,"HvsTT_2j/D");
+        simu->Branch("HvsZZ_2j",&sim->HvsZZ_2j,"HvsZZ_2j/D");
+	simu->Branch("prodNNs_2j",&sim->prodNNs_2j,"prodNNs_2j/D");
+
+        simu->Branch("HvsZbb_3j",&sim->HvsZbb_3j,"HvsZbb_3j/D");
+        simu->Branch("HvsTT_3j",&sim->HvsTT_3j,"HvsTT_3j/D");
+        simu->Branch("HvsZZ_3j",&sim->HvsZZ_3j,"HvsZZ_3j/D");
+	simu->Branch("prodNNs_3j",&sim->prodNNs_3j,"prodNNs_3j/D");
+
 	simu->Branch("evtWeight",&sim->evtWeight,"evtWeight/D");
 	simu->Branch("trijetMdr",&sim->trijetMdr,"trijetMdr/D");
 	simu->Branch("fsrDR",&sim->fsrDR,"fsrDR/D");
@@ -65,7 +75,7 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	std::map<string,int> sampleID;
 	sampleID[dy]=1; sampleID[zbb]=1; sampleID[tt]=2; sampleID[ttfulllept]=2; sampleID[zz]=3; sampleID[zh]=5;
 	std::map<string,int> fill;
-	if(NNchoice=="Higgs_vs_Bkg") {fill[dy]=1; fill[zbb]=1; fill[tt]=1; fill[ttfulllept]=1; fill[zz]=1; fill[zh]=1;}
+	if(NNchoice.Contains("Higgs_vs_Bkg")) {fill[dy]=1; fill[zbb]=1; fill[tt]=1; fill[ttfulllept]=1; fill[zz]=1; fill[zh]=1;}
 	if(NNchoice=="Higgs_vs_DY") {fill[dy]=1; fill[zbb]=1; fill[tt]=0; fill[ttfulllept]=0; fill[zz]=0; fill[zh]=1;}
 	if(NNchoice=="Higgs_vs_TT") {fill[dy]=0; fill[zbb]=0; fill[tt]=1; fill[ttfulllept]=1; fill[zz]=0; fill[zh]=1;}
 	if(NNchoice=="Higgs_vs_ZZ") {fill[dy]=0; fill[zbb]=0; fill[tt]=0; fill[ttfulllept]=0; fill[zz]=1; fill[zh]=1;}
@@ -99,14 +109,19 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	cout<<Dy<<" "<<Tt<<" "<<Zz<<" "<<Hi<<endl;
 
 	TMultiLayerPerceptron *mlp = new TMultiLayerPerceptron();
-	if(NNchoice=="Higgs_vs_Bkg") mlp = new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT"+NNStruct+":type!","evtWeight*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
+	if(NNchoice=="Higgs_vs_Bkg") mlp = new TMultiLayerPerceptron("@HvsZbb,@HvsZZ,@HvsTT"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
+	if(NNchoice=="Higgs_vs_Bkg_2j") mlp = new TMultiLayerPerceptron("@HvsZbb_2j,@HvsZZ_2j,@HvsTT_2j"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
+	if(NNchoice=="Higgs_vs_Bkg_3j") mlp = new TMultiLayerPerceptron("@HvsZbb_3j,@HvsZZ_3j,@HvsTT_3j"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
 	if(NNchoice=="Higgs_vs_DY"){mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==1)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}
 	if(NNchoice=="Higgs_vs_TT"){mlp = new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==2)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}
 	if(NNchoice=="Higgs_vs_ZZ"){mlp = new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==3)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}
+
+	if(NNchoice=="Higgs_vs_Bkg_7w") mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@tt_weight,@zz_weight,@zz3_weight"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
+
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
 	mlp->Train(iterations, "text,graph,update=2");
-	mlp->Export(directory+"/MLP_"+NNchoice+"_"+name,"python");
-	mlp->Export(directory+"/MLP_"+NNchoice+"_"+name,"c++");
+	mlp->Export((directory+"/MLP_"+NNchoice+"_"+name).ReplaceAll("-","_"),"python");
+	mlp->Export((directory+"/MLP_"+NNchoice+"_"+name).ReplaceAll("-","_"),"c++");
 	mlp->Write();
 
 	// Use TMLPAnalyzer to see what it looks for. INFO will be in the contro root file
@@ -145,7 +160,8 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	TH1F *sig_eff = new TH1F("sigh", "NN output", 28, -0.2, 1.2);
 
 	int nIn = 3;
-	if(NNchoice=="Higgs_vs_DY" && NNchoice=="Higgs_vs_ZZ") nIn=4;
+	if(NNchoice=="Higgs_vs_DY" || NNchoice=="Higgs_vs_ZZ") nIn=4;
+	if(NNchoice=="Higgs_vs_Bkg_7w") nIn=7;
 	vector<string> vNNinputs;
 	if(NNStruct.BeginsWith(",")){
 	  size_t first=NNStruct.Index(":");
@@ -162,28 +178,33 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	    cout<<"NNinputs.length() "<<NNinputs.length()<<endl;
 	  }
 	  cout<<"params size "<<nIn<<endl;
-	  nIn+=vNNinputs.size();
+	  //nIn+=vNNinputs.size();
 	}
-	Double_t params[nIn]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
-	cout<<"params size "<<nIn<<endl;
+	Double_t params[nIn+vNNinputs.size()]; // to change according to the number of input in the NN; Order must be the same as teh one for NN training !!!
+	cout<<"params size "<<nIn+vNNinputs.size()<<endl;
 
 	//-------------------------------------------------------------------------
 
 	for(int s = 0; s<nSamples; s++){
 	  for (int i=0;i<Ni[listSample[s]]; ++i) {
 	    if(NNchoice=="Higgs_vs_Bkg") {params[0] = var[listSample[s]]->hzbb[i]; params[1] = var[listSample[s]]->hzz[i]; params[2] = var[listSample[s]]->htt[i];}
+	    if(NNchoice=="Higgs_vs_Bkg_2j") {params[0] = var[listSample[s]]->hzbb_2j[i]; params[1] = var[listSample[s]]->hzz_2j[i]; params[2] = var[listSample[s]]->htt_2j[i];}
+	    if(NNchoice=="Higgs_vs_Bkg_3j") {params[0] = var[listSample[s]]->hzbb_3j[i]; params[1] = var[listSample[s]]->hzz_3j[i]; params[2] = var[listSample[s]]->htt_3j[i];}
 	    if(NNchoice=="Higgs_vs_DY") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i];}
 	    if(NNchoice=="Higgs_vs_TT") {params[0] = var[listSample[s]]->tt[i]; params[1] = var[listSample[s]]->hi[i]; params[2] = var[listSample[s]]->hi3[i];}
 	    if(NNchoice=="Higgs_vs_ZZ") {params[0] = var[listSample[s]]->zz[i]; params[1] = var[listSample[s]]->zz3[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i];}
+
+	    if(NNchoice=="Higgs_vs_Bkg_7w") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i]; params[4] = var[listSample[s]]->tt[i]; params[5] = var[listSample[s]]->zz[i]; params[6] = var[listSample[s]]->zz3[i];}
+
 	    for(unsigned int j=0; j<vNNinputs.size(); j++){
-	      if(vNNinputs[j]=="Mbb") params[3+j] = var[listSample[s]]->Mbb[i];
-	      else if(vNNinputs[j]=="Multi") params[3+j] = var[listSample[s]]->multi[i];
-	      else if(vNNinputs[j]=="prodCSV") params[3+j] = var[listSample[s]]->tagj1[i]*var[listSample[s]]->tagj2[i];
-	      else if(vNNinputs[j]=="prodNNs") params[3+j] = var[listSample[s]]->prodNNs[i];
-	      else if(vNNinputs[j]=="regMbb") params[3+j] = var[listSample[s]]->regMbb[i];
-	      else if(vNNinputs[j]=="trijetMdr") params[3+j] = var[listSample[s]]->trijetMdr[i];
-	      else if(vNNinputs[j]=="fsrDR") params[3+j] = var[listSample[s]]->fsrDR[i];
-	      else if(vNNinputs[j]=="dijetdR") params[3+j] = var[listSample[s]]->dijetdR[i];
+	      if(vNNinputs[j]=="Mbb") params[nIn+j] = var[listSample[s]]->Mbb[i];
+	      else if(vNNinputs[j]=="Multi") params[nIn+j] = var[listSample[s]]->multi[i];
+	      else if(vNNinputs[j]=="prodCSV") params[nIn+j] = var[listSample[s]]->tagj1[i]*var[listSample[s]]->tagj2[i];
+	      else if(vNNinputs[j]=="prodNNs") params[nIn+j] = var[listSample[s]]->prodNNs[i];
+	      else if(vNNinputs[j]=="regMbb") params[nIn+j] = var[listSample[s]]->regMbb[i];
+	      else if(vNNinputs[j]=="trijetMdr") params[nIn+j] = var[listSample[s]]->trijetMdr[i];
+	      else if(vNNinputs[j]=="fsrDR") params[nIn+j] = var[listSample[s]]->fsrDR[i];
+	      else if(vNNinputs[j]=="dijetdR") params[nIn+j] = var[listSample[s]]->dijetdR[i];
 	      else cout<<"Variable added the NN not known, please add it in the code"<<endl;
 	    }
 	    string ch = "EE";
@@ -231,7 +252,7 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	hists["DYMuNN"]->SetStats(0);
 
 	// normalisation
-	if(NNchoice=="Higgs_vs_Bkg"){
+	if(NNchoice.Contains("Higgs_vs_Bkg")){
 	  hists["TTMuNN"]->Scale(0.15/hists["TTMuNN"]->Integral());
 	  hists["DYMuNN"]->Scale(0.80/hists["DYMuNN"]->Integral());
 	  hists["ZZMuNN"]->Scale(0.05/hists["ZZMuNN"]->Integral());

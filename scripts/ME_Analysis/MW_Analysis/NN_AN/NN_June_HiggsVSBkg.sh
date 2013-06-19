@@ -5,7 +5,7 @@ cd ${dirNN}
 source /nfs/soft/cms/cmsset_default.sh; export SCRAM_ARCH=slc5_amd64_gcc462 ; source /nfs/soft/grid/ui/setup/grid-env.sh ; source /nfs/soft/crab/setup/crab.sh
 cmsenv
 
-dir=FinalV3
+dir=FinalV4
 if [[ ! -d ${dir} ]]
 then
     mkdir ${dir}
@@ -45,7 +45,7 @@ choice=$5
 echo "extra cuts are "$6
 s_cuts=$6
 
-root -l -b > ${dir}/logroot_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
+root -l > ${dir}/logroot_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt << EOF
 
 TString channel("${channel}")
 TString mass("${mass}")
@@ -81,6 +81,7 @@ if(s_cuts.Contains("Mbb80-160")) cuts+=" && (eventSelectiondijetM>80 && eventSel
 if(s_cuts.Contains("Mbb80-150")) cuts+=" && (eventSelectiondijetM>80 && eventSelectiondijetM<150)";
 if(s_cuts.Contains("Mbb50-150")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<150)";
 if(s_cuts.Contains("Mbb50-160")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<160)";
+if(s_cuts.Contains("Mbb50-200")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<200)";
 if(s_cuts.Contains("Ptb1j45")) cuts+=" && jetmetbjet1pt>45";
 if(s_cuts.Contains("Ptb1j40")) cuts+=" && jetmetbjet1pt>40";
 if(s_cuts.Contains("Ptb2j25")) cuts+=" && jetmetbjet2pt>25";
@@ -144,10 +145,11 @@ cmsenv
 echo COMPUTE LIMIT FOR FINAL NN
 combine -M Asymptotic ${dirNN}/${dir}/CSV_nosys_${choice}_ZH${mass}_${channel}${struct}_${iter}_${s_cuts}.txt -m 125 -t -1 > ${dirNN}/${dir}/loglimitNN_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 rm roostats*
+cat ${dirNN}/${dir}/loglimitNN_${choice}_${mass}_${channel}${struct}_${iter}_${s_cuts}.txt
 echo END COMPUTE LIMIT FOR FINAL NN
 echo ------------------------------------------------------------------------------------------------------------------
 
-if [ ${choice} = "Higgs_vs_Bkg" ]
+if [[ "${choice}" == *"Higgs_vs_Bkg"* ]]
 then
     echo ------------------------------------------------------------------------------------------------------------------
     echo COMPUTE LIMIT FOR PROD INTERMEDIATE NNs
