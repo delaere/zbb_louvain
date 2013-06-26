@@ -146,7 +146,7 @@ sampleList     = ["DATA","DY","TT","ZZ","ZH125","DYPt100","ZH120","ZH115","ZH130
 
         
 lumi = { "DATAMuMuChannel"   : zbbnorm.lumi_totMu2011,
-         "DATAEEChannel"     : zbbnorm.lumi_totEl2011,
+         "DATAEEChannel"     : zbbnorm.lumi_totEle2011,
          "TTEEChannel"     : zbbnorm.nev_TTjets_fall11/(zbbnorm.xsec_TTjets_7TeV)/1000.,
          "ZbEEChannel"     : zbbnorm.nev_DYjets_fall11/(zbbnorm.xsec_DYjets_7TeV)/1000.,
          "ZbPtZDownEEChannel"     : zbbnorm.nev_DYjets_fall11/(zbbnorm.xsec_DYjets_7TeV)/1000.,
