@@ -47,7 +47,6 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-
   lumi_totEle2011=4.99 #in fb-1
   lumi_totMu2011=5.05
 
@@ -61,11 +60,22 @@ class zbbnorm:
   xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
   xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
   xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
-  xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
+  xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_section
   xsec_ZH130_7TeV =    0.0143 #ZHxsec"0.2778", BR(H->bb)"0.494" 
-  xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404" 
+  xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404
+  xsec_ZH115_7TeV_El =    0.0300 *51013./12753 #ZHxsec"0.4107", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV_El =    0.0242 *52298./13074#ZHxsec"0.3598", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV_El =      0.0189*55586./13896. #for El ME
+  xsec_ZH130_7TeV_El =    0.0143 *56888./14222#ZHxsec"0.2778", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV_El =    0.0103 *58371./14592#ZHxsec"0.2453", BR(H->bb)"0.404" 
+  xsec_ZH115_7TeV_Mu =    0.0300 *72638./14527 #ZHxsec"0.4107", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV_Mu =    0.0242 *74039./14807#ZHxsec"0.3598", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV_Mu =      0.0189*77923./15584. #for Mu ME
+  xsec_ZH130_7TeV_Mu =    0.0143 *80290./16058#ZHxsec"0.2778", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV_Mu =    0.0103 *82020./16404#ZHxsec"0.2453", BR(H->bb)"0.404"
   xsec_tW_7TeV    =    5.3    #NLO inclusive
   xsec_tbarW_7TeV =    5.3    #NLO inclusive
+
   
   #x_section 8 TeV in pb, yet under construction, to be checked later
   #https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSectionsat8TeV
@@ -100,4 +110,4 @@ class zbbnorm:
   nev_ZH135_summer12    =  1096956 # not yet
                   
 class zbbme:
-  doMEcontrolPlots = False # if false nobody else of this class matters
+  doMEcontrolPlots = True # if false nobody else of this class matters
