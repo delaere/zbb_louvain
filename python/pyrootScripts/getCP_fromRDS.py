@@ -54,7 +54,7 @@ totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
 sampleList  = ["DATA","DY","TT","ZZ","ZH125"]
 
 
-lumi = { "DATA"   : zbbnorm.lumi_totEl2011,
+lumi = { "DATA"   : zbbnorm.lumi_totEle2011,
          "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
          "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
          "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
