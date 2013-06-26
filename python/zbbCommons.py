@@ -1,4 +1,6 @@
 ##choose if you want to thz Zbb selection or the ZHbb selection 
+import os
+
 isZbbSelection = True
 tagger = "ssv_witheff_062012"
 if not isZbbSelection : tagger = "csv_witheff"
@@ -33,13 +35,13 @@ class zbbsystematics:
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData="../data/performance_"+tagger+".root"
-  pileupData="../data/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON_v2_pileupTruth.root"
-  pileupMC="../data/Fall11_PU_MC.root"
-  jecUncertainty="../data/JEC11_V12_AK5PF_UncertaintySources.txt"
+  ssvperfData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/performance_"+tagger+".root"
+  pileupData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON_v2_pileupTruth.root"
+  pileupMC=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Fall11_PU_MC.root"
+  jecUncertainty=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/JEC11_V12_AK5PF_UncertaintySources.txt"
 
-  pileupData2012="../data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
-  pileupMC2012="../data/MCpileup_Summer12_S10.root"
+  pileupData2012=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_pileupTruth.root"
+  pileupMC2012=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/MCpileup_Summer12_S10.root"
 
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
