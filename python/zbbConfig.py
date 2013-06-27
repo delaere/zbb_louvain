@@ -44,6 +44,7 @@ class configuration:
 
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
   eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>",zbblabel.genlabel),
+                       eventCollection("lheParticles","LHEEventProduct","source"),
                        eventCollection("genJets","vector<reco::GenJet>",zbblabel.genjetlabel),
                        eventCollection("genInfo","GenEventInfoProduct",zbblabel.genInfolabel),
                        eventCollection("vertices","vector<reco::Vertex>",zbblabel.vertexlabel),

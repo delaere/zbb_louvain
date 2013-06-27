@@ -66,7 +66,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       else:
         checkTrigger = False
       ## trigger
-      result["triggerSelection"] = self.checkTrigger==False or event.isTriggerOK 
+      result["triggerSelection"] = checkTrigger==False or event.isTriggerOK 
       #result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       triggerList = []
       paths = event.triggerInfo.acceptedPaths()

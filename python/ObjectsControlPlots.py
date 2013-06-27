@@ -1,6 +1,6 @@
 import ROOT
 import array
-from math import sin, sqrt
+from math import sin, fabs
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from ObjectSelection import *
@@ -611,7 +611,6 @@ class JetmetControlPlots(BaseControlPlots):
           b1 = ROOT.TLorentzVector(self._JECuncertainty.jetPt(dijet[0]),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
           b2 = ROOT.TLorentzVector(self._JECuncertainty.jetPt(dijet[1]),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
           for index,jet in enumerate(event.jets):
-              goodJets = event.goodJets_mu if self.muChannel else event.goodJets_ele
               if goodJets[index] and not jet in dijet:
                   #print "there is isrjet"
                   if firstJet == True:

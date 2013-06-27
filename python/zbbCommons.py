@@ -1,4 +1,5 @@
 import os
+dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
 
 class zbblabel:
   """labels used in the PAT configuration"""
@@ -32,10 +33,10 @@ class zbbsystematics:
 
 class zbbfile:
   """files containing calibrations and other data"""
-  ssvperfData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
-  pileupData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
-  pileupMC=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/MCpileup_Summer12_S10.root"
-  jecUncertainty=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/JEC11_V12_AK5PF_UncertaintySources.txt"
+  ssvperfData=dataDirectory+"performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
+  pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
+  pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
+  jecUncertainty=dataDirectory+"JEC11_V12_AK5PF_UncertaintySources.txt"
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
 

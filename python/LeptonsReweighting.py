@@ -1,9 +1,7 @@
 from PatAnalysis.EventSelection import categoryName
-from zbbCommons import zbblabel, zbbsystematics
+from zbbCommons import zbblabel, zbbsystematics, dataDirectory
 from math import sqrt
 import pickle
-
-#from myFuncTimer import print_timing
 
 ##______General functions______
 
@@ -159,7 +157,7 @@ class MuonSFMap:
 
    def __init__(self):
      """Construct a MuonSFMap using pikle files."""
-     f = open('./reweighting_files_V2/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     f = open(dataDirectory+'Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._range = ''
@@ -191,7 +189,7 @@ class MuonTriggerEffMap_leg17_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
@@ -226,7 +224,7 @@ class MuonTriggerEffMap_leg8_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
