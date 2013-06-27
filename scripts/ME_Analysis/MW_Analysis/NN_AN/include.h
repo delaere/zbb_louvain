@@ -44,3 +44,4 @@ using namespace std;
 #include <vector>
 #include "TFractionFitter.h"
 
+#include <map>

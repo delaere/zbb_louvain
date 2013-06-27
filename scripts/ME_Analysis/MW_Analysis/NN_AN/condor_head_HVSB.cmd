@@ -15,10 +15,110 @@ when_to_transfer_output = ON_EXIT
 
 # the following two parameters are required for the ingrid cluster
 universe       = vanilla
-#requirements   = (CMSFARM =?= TRUE)
+requirements   = (CMSFARM =?= TRUE)
 # for Madgraph users replace the previous line by:
-requirements   = (MADGRAPH =?= TRUE)
+#requirements   = (MADGRAPH =?= TRUE)
 
 # run the program
-arguments = comb 125
+arguments = comb 125 -1 10000 
 queue
+
+# run the program
+arguments = comb 125 -1 10000 Mbb80-160
+queue
+
+# run the program
+arguments = comb 125 -1 10000 Nj2
+queue
+
+# run the program
+arguments = comb 125 -1 10000 Nj3
+queue
+
+# run the program
+arguments = comb 125 -1 10000 Mbb80-160_Nj2
+queue
+
+# run the program
+arguments = comb 125 -1 10000 Mbb80-160_Nj3
+queue
+
+###
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 
+queue
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 Mbb80-160
+queue
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 Nj2
+queue
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 Nj3
+queue
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 Mbb80-160_Nj2
+queue
+
+# run the program
+arguments = comb 125 _Mbb-1 10000 Mbb80-160_Nj3
+queue
+
+####
+
+# run the program
+arguments = comb 125 _Multi-1 10000 
+queue
+
+# run the program
+arguments = comb 125 _Multi-1 10000 Mbb80-160
+queue
+
+# run the program
+arguments = comb 125 _Multi-1 10000 Nj2
+queue
+
+# run the program
+arguments = comb 125 _Multi-1 10000 Nj3
+queue
+
+# run the program
+arguments = comb 125 _Multi-1 10000 Mbb80-160_Nj2
+queue
+
+# run the program
+arguments = comb 125 _Multi-1 10000 Mbb80-160_Nj3
+queue
+
+
+####
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 
+queue
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 Mbb80-160
+queue
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 Nj2
+queue
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 Nj3
+queue
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 Mbb80-160_Nj2
+queue
+
+# run the program
+arguments = comb 125 _(HvsZbb*HvsTT*HvsZZ)-1 10000 Mbb80-160_Nj3
+queue
+

@@ -46,19 +46,20 @@ listToProcess = [
     #"ZH145_MC",
     #"ZH150_MC",
     
-    #"DY1j_MC",
-    #"DY2j_MC",
-    #"DY3j_MC",
-    #"DY4j_MC",
+    "DY1j_MC",
+    "DY2j_MC",
+    "DY3j_MC",
+    "DY4j_MC",
 
-    #"DY50-70_MC",
-    #"DY70-100_MC",
-    #"DY180_MC",
+    "DY50-70_MC",
+    "DY70-100_MC",
+    "DY100_MC",
+    "DY180_MC",
 
-    #"Zbb_MC",
+    "Zbb_MC",
 
-    #"TT-FullLept_MC",
-    #"TT-SemiLept_MC",
+    "TT-FullLept_MC",
+    "TT-SemiLept_MC",
     #"TT-Hadronic_MC",
     ]
 
@@ -106,6 +107,7 @@ listsamples = [
     "DY4j_MC",
     "DY50-70_MC",
     "DY70-100_MC",
+    "DY100_MC",
     "DY180_MC",
     "Zbb_MC",
     "TT-FullLept_MC",
@@ -157,6 +159,7 @@ PATtoSkim = {
     "DY4j_MC"             : "Summer12_DY4jets_S10" ,
     "DY50-70_MC"          : "Summer12_DYjets_Pt50to70_S10" ,
     "DY70-100_MC"         : "Summer12_DYjets_Pt70to100_S10" ,
+    "DY100_MC"            : "Summer12_DYjets_Pt100_S10" ,
     "DY180_MC"            : "Summer12_DYjets_Pt180_S10" ,
     "Zbb_MC"              : "Summer12_Zbb_S10" ,
     "TT-FullLept_MC"      : "Summer12_TTbarFullLept_S10" , 
@@ -166,8 +169,9 @@ PATtoSkim = {
 
 #use to produce the skims and access to the PAT, skim
 dirPAT = "/nfs/user/llbb/Pat_8TeV_537/"
+#dirPAT = "/storage/data/cms/store/user/acaudron/Dec2012production8TeV/"
 #dirSkim = "/nfs/user/acaudron/skim537/"
-dirSkim = "/nfs/user/acaudron/skim53X/"
+dirSkim = "/nfs/user/acaudron/skim537/"
 pathPAT = {}
 pathSkim = {}
 
@@ -177,7 +181,10 @@ listsamplesEMu = []
 
 #use to produce RDS and LHCO and to acces to RDS, LHCO
 #dirRDS = "/nfs/user/acaudron/RDS537/"
-dirRDS = "/nfs/user/acaudron/RDS53X_update19fb/"
+#dirRDS = "/nfs/user/acaudron/RDS53X_update19fb/"
+dirRDS = "/nfs/user/acaudron/RDS537/"
+dirRDS_PUup = "/nfs/user/acaudron/RDS537_PUup/"
+dirRDS_PUdown = "/nfs/user/acaudron/RDS537_PUdown/"
 dirLHCO = "/nfs/user/acaudron/LHCO537/"
 pathSkimEMu = {}
 pathRDS = {}
