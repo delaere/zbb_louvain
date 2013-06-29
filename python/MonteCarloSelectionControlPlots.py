@@ -153,41 +153,41 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       result["AntibottomPz"] = antibottomPz
       result["AntibottomEn"] = antibottomEn
       
-      ##Clasify the event in Zbb,Zbc,Zbl,Zcc, Zcl, or Zll
-      #self.i += 1
-      #lhe = LHEinfo(event)
-      ##print "nLep", lhe
-      #result["isZ"]=lhe["isZ"]
-      #result["nLeptons"]=lhe["nLep"]
-      #result["llpt"]=lhe["llpt"]
-      #result["nJets"]=lhe["nj"]
-      #result["nbJets"]=lhe["nb"]
-      #result["ncJets"]=lhe["nc"]
-      #
-      #if isZbbEvent(event):
-      #  self.bjet += 1
-      #  result["eventType"] = 6
-      #  return result
-      #if isZbcEvent(event):
-      #  self.bjet += 1
-      #  result["eventType"] = 5
-      #  return result
-      #if isZblEvent(event):
-      #  self.bjet += 1
-      #  result["eventType"] = 4
-      #  return result
-      #if isZccEvent(event):
-      #  self.cjet += 1
-      #  result["eventType"] = 3
-      #  return result
-      #if isZclEvent(event):
-      #  self.cjet += 1
-      #  result["eventType"] = 2
-      #  return result
-      #if isZlEvent(event):
-      #  self.ljet += 1
-      #  result["eventType"] = 1
-      #  return result
+      #Clasify the event in Zbb,Zbc,Zbl,Zcc, Zcl, or Zll
+      self.i += 1
+      lhe = LHEinfo(event)
+      #print "nLep", lhe
+      result["isZ"]=lhe["isZ"]
+      result["nLeptons"]=lhe["nLep"]
+      result["llpt"]=lhe["llpt"]
+      result["nJets"]=lhe["nj"]
+      result["nbJets"]=lhe["nb"]
+      result["ncJets"]=lhe["nc"]
+      
+      if isZbbEvent(event):
+        self.bjet += 1
+        result["eventType"] = 6
+        return result
+      if isZbcEvent(event):
+        self.bjet += 1
+        result["eventType"] = 5
+        return result
+      if isZblEvent(event):
+        self.bjet += 1
+        result["eventType"] = 4
+        return result
+      if isZccEvent(event):
+        self.cjet += 1
+        result["eventType"] = 3
+        return result
+      if isZclEvent(event):
+        self.cjet += 1
+        result["eventType"] = 2
+        return result
+      if isZlEvent(event):
+        self.ljet += 1
+        result["eventType"] = 1
+        return result
       result["eventType"] = 0
       return result
 

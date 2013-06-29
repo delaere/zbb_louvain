@@ -101,8 +101,11 @@ class AnalysisEvent(Events):
      if not name in self._collections:
        raise AttributeError("%r object has no attribute %r" % name)
      if not name in self.vardict:
-       self.getByLabel(self._collections[name]["collection"],self._collections[name]["handle"])
-       self.vardict[name] = self._collections[name]["handle"].product()
+       try:
+         self.getByLabel(self._collections[name]["collection"],self._collections[name]["handle"])
+         self.vardict[name] = self._collections[name]["handle"].product()
+       except:
+         self.vardict[name] = None
      return getattr(self,name)
 
    def addProducer(self,name,producer,**kwargs):
@@ -191,8 +194,11 @@ class AnalysisEvent(Events):
      if attr in self.__dict__["vardict"]:
        return self.vardict[attr]
      if attr in self._collections:
-       self.getByLabel(self._collections[attr]["collection"],self._collections[attr]["handle"])
-       return self.vardict.setdefault(attr, self._collections[attr]["handle"].product())
+       try:
+         self.getByLabel(self._collections[attr]["collection"],self._collections[attr]["handle"])
+         return self.vardict.setdefault(attr, self._collections[attr]["handle"].product())
+       except:
+         return self.vardict.setdefault(attr, None)
      if attr in self._producers:
        return self.vardict.setdefault(attr, self._producers[attr][0](self, **self._producers[attr][1]))
      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
