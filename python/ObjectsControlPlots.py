@@ -4,17 +4,7 @@ from math import sin, fabs
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from ObjectSelection import *
-from zbbCommons import zbblabel,zbbfile,zbbsystematics
-
-############
-#ROOT.gSystem.Load("libFWCoreFWLite.so");
-#ROOT.AutoLibraryLoader.enable()
-#L2L3res = ROOT.FactorizedJetCorrector("L2Relative","../testfiles/JEC/GR_R_42_V20_AK5PF_L2Relative_L2L3Residual.txt")
-#def jetpt(jet):
-#  L2L3res.setJetEta(jet.pt())
-#  L2L3res.setJetPt(jet.eta())
-#  return jet.pt()*L2L3res.getCorrection()
-############
+from zbbConfig import configuration
 
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
@@ -369,8 +359,8 @@ class JetmetControlPlots(BaseControlPlots):
       """JetmetControlPlots"""
       result = { }
       if event.object().event().eventAuxiliary().isRealData():
-        zbbsystematics.JERfactor = 0
-        zbbsystematics.JESfactor = 0
+        configuration.JERfactor = 0
+        configuration.JESfactor = 0
       # process event and fill histograms
       result["SSVHEdisc"] = [ ]
       result["SSVHPdisc"] = [ ]

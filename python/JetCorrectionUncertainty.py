@@ -3,12 +3,12 @@ import ROOT
 import PatAnalysis.CMSSW
 from math import sqrt
 from random import gauss
-from zbbCommons import zbbfile,zbbsystematics
+from zbbConfig import configuration
 
 class JetCorrectionUncertaintyProxy:
   """A class to access JEC uncertainties"""
 
-  def __init__(self,file=zbbfile.jecUncertainty):
+  def __init__(self,file=configuration.jecUncertainty):
     if not os.path.isfile(file):
       print "Error: ",file, ": No such file."
       self._engine = None
@@ -28,16 +28,16 @@ class JetCorrectionUncertaintyProxy:
     jetpt = jet.pt()
     # smear to reproduce resolution measured in data
     # apply JetMet recommendation:  pT->max[0.,pTgen+c*(pT-pTgen)] 
-    if abs(zbbsystematics.JERfactor)>0.01: # non-zero
+    if abs(configuration.JERfactor)>0.01: # non-zero
       try:
         ptgen = jet.genJet().pt()
       except:
         ptgen = gauss(jetpt,self.jetEnergyResolution(jet))
-      jersf = (self.jerCorrectionFactor(jet)-1.) * zbbsystematics.JERfactor
+      jersf = (self.jerCorrectionFactor(jet)-1.) * configuration.JERfactor
       jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
     # take into account JEC uncertainty
-    if abs(zbbsystematics.JESfactor)>0.01: # non-zero
-      jesunc = self.unc_tot_jet(jet) * zbbsystematics.JESfactor * jetpt
+    if abs(configuration.JESfactor)>0.01: # non-zero
+      jesunc = self.unc_tot_jet(jet) * configuration.JESfactor * jetpt
       jetpt = max(0., jetpt + jesunc)
     # return the jet pt, including all of the above
     return jetpt

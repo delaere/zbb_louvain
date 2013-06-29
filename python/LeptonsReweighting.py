@@ -1,5 +1,5 @@
 from PatAnalysis.EventSelection import categoryName
-from zbbCommons import zbblabel, zbbsystematics, dataDirectory
+from zbbConfig import configuration
 from math import sqrt
 import pickle
 
@@ -157,7 +157,7 @@ class MuonSFMap:
 
    def __init__(self):
      """Construct a MuonSFMap using pikle files."""
-     f = open(dataDirectory+'Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._range = ''
@@ -189,7 +189,7 @@ class MuonTriggerEffMap_leg17_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open(dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
@@ -224,7 +224,7 @@ class MuonTriggerEffMap_leg8_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open(dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
@@ -345,10 +345,10 @@ class LeptonsReWeighting:
 
      lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
 
-     if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
+     if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
 
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
@@ -408,10 +408,10 @@ class LeptonsReWeighting:
      lw *= (0.5*hlt_sf_run2012_a + 0.5*hlt_sf_run2012_b) ##percentage according to the lumi in which they were not prescaled (apparently same efficinecy for AB)
      #lw *= 0.966 ## temporary solution!
 
-     if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
+     if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
    def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""

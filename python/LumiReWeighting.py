@@ -1,11 +1,10 @@
 import ROOT
 import PatAnalysis.CMSSW
-from zbbCommons import zbblabel,zbbfile
 
 class LumiReWeighting:
    """A class to reweight MC according to number of pileup events."""
 
-   def __init__(self, MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData, systematicShift=0):
+   def __init__(self, MonteCarloFileName, DataFileName, systematicShift=0):
       # set the names for histograms. In the new scheme, the data file contains three histograms for nominal and +/-1sigma.
       MonteCarloHistName = "pileup"
       DataHistName = { 0 : "pileup", -1 : "pileupDOWN1", 1 : "pileupUP1" }

@@ -4,15 +4,14 @@ import ROOT
 import PatAnalysis.CMSSW
 from PatAnalysis.EventSelection import categoryName
 from ObjectSelection import isBJet
-
-from zbbCommons import zbbfile,zbbsystematics
+from zbbConfig import configuration
 
 class BtaggingWeight:
   """compute the event weight based on btagging SF"""
 
-  def __init__(self,jmin1,jmax1,jmin2,jmax2, file=zbbfile.ssvperfData, btagging="CSV"):
+  def __init__(self, jmin1, jmax1, jmin2, jmax2, file, btagging="CSV"):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
-    self.myJetSet = ROOT.JetSet(zbbsystematics.SF_running_mode,file)
+    self.myJetSet = ROOT.JetSet(configuration.SF_running_mode,file)
     self.btagging=btagging
 
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
@@ -69,7 +68,7 @@ class BtaggingWeight:
           #if jet.et() > 100. : print "WARNING : "+btagging+"HE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
-      self.myJetSet.addJet(zbbsystematics.SF_uncert, flavor,jet.et(),jet.eta())
+      self.myJetSet.addJet(configuration.SF_uncert, flavor,jet.et(),jet.eta())
     #if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+btagging+"HP tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
     #if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+btagging+"HE tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
     return max(self.getWeight(self.myJetSet,ntagsHE,ntagsHP),0.)

@@ -1,45 +1,5 @@
-import os
-dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
-
-class zbblabel:
-  """labels used in the PAT configuration"""
-  allmuonslabel="allMuons"
-  muonlabel="tightMuons"
-  allelectronslabel="allElectrons"
-  electronlabel="tightElectrons"
-  #jetlabel="smearedPatJetsResDown"
-  jetlabel="cleanPatJets"
-  zmumulabel="zmuTightmuTight"
-  zelelabel="zelTightelTight"
-  vertexlabel="goodPV"
-  pulabel="addPileupInfo"
-  triggerlabel="patTriggerEvent"
-  metlabel="patType01SCorrectedPFMet"
-  rholabel="kt6PFJets"
-  genlabel="genParticles" #genlabel="prunedGen"
-  genjetlabel="ak5GenJets"
-  genInfolabel="generator"
-
-class zbbsystematics:
-  # btagging reweighting
-  SF_uncert="mean" ## choose among min/max/mean
-  SF_running_mode= "hardcoded_nofit" ## choose between hardcoded/database
-  #SF_running_mode= "database" ## choose between "hardcoded" and "database"
-  # Jet Energy corrections for MC. For data, these factors must be (forced to) zero!
-  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
-  JESfactor = 0. # 1 = +1sigma
-  # Lepton reweighting uncertainty
-  LeptonTnPfactor = 0
-
-class zbbfile:
-  """files containing calibrations and other data"""
-  ssvperfData=dataDirectory+"performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
-  pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
-  pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
-  jecUncertainty=dataDirectory+"JEC11_V12_AK5PF_UncertaintySources.txt"
-  controlPlots="controlPlots.root"
-  rooDataset="File_rds_zbb.root"
-
+# this file is named zbbCommons for backward compatibility.
+# this should be put in a database
 class zbbnorm:
   """information to be used for the MC sample normalization"""
   lumi_totEle2011=5.217 #in fb-1
@@ -106,7 +66,3 @@ class zbbnorm:
   nev_ZH125_summer12      =   999462 # OK
   nev_ZH130_summer12      =  1000000 # OK
   nev_ZH135_summer12      =  1000000 # OK
-                  
-class zbbme:
-  doMEcontrolPlots = True # if false nobody else of this class matters
-  doNNJetRegression = False

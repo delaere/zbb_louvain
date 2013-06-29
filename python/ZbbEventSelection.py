@@ -1,7 +1,7 @@
 import ROOT
 import MonteCarloSelection
 from ObjectSelection import *
-from zbbCommons import zbbsystematics
+from zbbConfig import configuration
 from PatAnalysis.CPconfig import configuration
 
 #########################################################################
@@ -109,8 +109,8 @@ def isInCategoryChannel(category, categoryTuple):
 
 def eventCategory(event,btagging="CSV", ZjetFilter="bcl"):
   if event.object().event().eventAuxiliary().isRealData():
-    zbbsystematics.JERfactor = 0
-    zbbsystematics.JESfactor = 0
+    configuration.JERfactor = 0
+    configuration.JESfactor = 0
   return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, ZjetFilter=ZjetFilter) + \
          eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, ZjetFilter=ZjetFilter)
   

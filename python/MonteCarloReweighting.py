@@ -1,7 +1,5 @@
-import ROOT
 import math
 from copy import deepcopy
-from zbbCommons import zbblabel,zbbfile
 
 class MonteCarloReWeighting:
    """A class to reweight MC according to kinematic uncertainties."""

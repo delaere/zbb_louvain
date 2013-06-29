@@ -1,6 +1,5 @@
 import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
-from zbbCommons import zbblabel,zbbfile
 
 class LumiReWeightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""

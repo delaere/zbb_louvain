@@ -1,7 +1,5 @@
-import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from VertexAssociation import *
-from zbbCommons import zbblabel
 
 class VertexAssociationControlPlots(BaseControlPlots):
     """A class to create control plots for vertex association"""

@@ -4,7 +4,7 @@ from math import sqrt, pi
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from PatAnalysis.EventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbbme,zbbsystematics
+from zbbConfig import configuration
 
 class MatrixElementControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -128,7 +128,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("DeltaPtInv_lm","DeltaPtInv_lm", 1, -99999., 99999.);
 
       #Initialize Reader for NN Correction
-      if zbbme.doNNJetRegression == True:
+      if configuration.doNNJetRegression == True:
         self.readerREG.AddVariable("jetBtag"   ,self.var_jetBtag)
         self.readerREG.AddVariable("jetPt"     ,self.var_jetPt)
         self.readerREG.AddVariable("jetEta"    ,self.var_jetEta)
@@ -151,8 +151,8 @@ class MatrixElementControlPlots(BaseControlPlots):
       result = { }
       # disable JES/JER corrections for data (should already be done elsewhere)
       if event.object().event().eventAuxiliary().isRealData():
-        zbbsystematics.JERfactor = 0
-        zbbsystematics.JESfactor = 0
+        configuration.JERfactor = 0
+        configuration.JESfactor = 0
       # in all cases, we need a reco Z
       bestZcandidate = event.bestZcandidate
       if bestZcandidate is None:
@@ -335,7 +335,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet1phi"] = dijet[0].phi()
           result["bjet1mass"] = dijet[0].mass()
 	  corrDijet0 = 1.
-          if zbbme.doNNJetRegression == True:
+          if configuration.doNNJetRegression == True:
             self.var_jetBtag[0] = dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[0].eta()
@@ -382,7 +382,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet2phi"] = dijet[1].phi()
           result["bjet2mass"] = dijet[1].mass()
 	  corrDijet1 = 1.
-          if zbbme.doNNJetRegression == True:
+          if configuration.doNNJetRegression == True:
             self.var_jetBtag[0] = dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[1].eta()

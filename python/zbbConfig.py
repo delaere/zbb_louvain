@@ -1,4 +1,4 @@
-from zbbCommons import *
+import os
 
 #configuration of the ControlPlot machinery
 from collections import namedtuple
@@ -20,10 +20,22 @@ class configuration:
   # event selection class
   eventSelection = "ZbbEventSelection"
 
-  # my variables
+  # my variables: files, systematics and other options
   btagging = "CSV" 
   muChannel = True
   eleChannel = True
+  SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
+  SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
+  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
+  JESfactor = 0. # 1 = +1sigma
+  LeptonTnPfactor = 0 # Lepton reweighting uncertainty
+  doMEcontrolPlots = True
+  doNNJetRegression = False
+  dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
+  ssvperfData=dataDirectory+"performance_csv_witheff.root"
+  pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
+  pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
+  jecUncertainty=dataDirectory+"JEC11_V12_AK5PF_UncertaintySources.txt"
 
   # control plot classes
   controlPlots = [ 
@@ -43,23 +55,23 @@ class configuration:
                  ]
 
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
-  eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>",zbblabel.genlabel),
+  eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>","genParticles"),
                        eventCollection("lheParticles","LHEEventProduct","source"),
-                       eventCollection("genJets","vector<reco::GenJet>",zbblabel.genjetlabel),
-                       eventCollection("genInfo","GenEventInfoProduct",zbblabel.genInfolabel),
-                       eventCollection("vertices","vector<reco::Vertex>",zbblabel.vertexlabel),
-                       eventCollection("jets","vector<pat::Jet>",zbblabel.jetlabel),
-                       eventCollection("MET","vector<pat::MET>",zbblabel.metlabel),
+                       eventCollection("genJets","vector<reco::GenJet>","ak5GenJets"),
+                       eventCollection("genInfo","GenEventInfoProduct","generator"),
+                       eventCollection("vertices","vector<reco::Vertex>","goodPV"),
+                       eventCollection("jets","vector<pat::Jet>","cleanPatJets"),
+                       eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patMETsPF"),
-                       eventCollection("Zmumu","vector<reco::CompositeCandidate>",zbblabel.zmumulabel),
-                       eventCollection("Zelel","vector<reco::CompositeCandidate>",zbblabel.zelelabel),
-                       eventCollection("triggerInfo","pat::TriggerEvent",zbblabel.triggerlabel),
-                       eventCollection("electrons","vector<pat::Electron>",zbblabel.electronlabel),
-                       eventCollection("muons","vector<pat::Muon>",zbblabel.muonlabel),
-                       eventCollection("allelectrons","vector<pat::Electron>",zbblabel.allelectronslabel),
-                       eventCollection("allmuons","vector<pat::Muon>",zbblabel.allmuonslabel),
-                       eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >",zbblabel.pulabel),
-                       eventCollection("rho","double",(zbblabel.rholabel,"rho"))
+                       eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
+                       eventCollection("Zelel","vector<reco::CompositeCandidate>","zelTightelTight"),
+                       eventCollection("triggerInfo","pat::TriggerEvent","patTriggerEvent"),
+                       eventCollection("electrons","vector<pat::Electron>","tightElectrons"),
+                       eventCollection("muons","vector<pat::Muon>","tightMuons"),
+                       eventCollection("allelectrons","vector<pat::Electron>","allElectrons"),
+                       eventCollection("allmuons","vector<pat::Muon>","allMuons"),
+                       eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
+                       eventCollection("rho","double",("kt6PFJets","rho"))
                      ] 
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
@@ -80,10 +92,10 @@ class configuration:
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } )
                      ]
 
-  eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":zbbfile.ssvperfData,"btagging":btagging}),
+  eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":ssvperfData,"btagging":btagging}),
                        eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
                        eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
-                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":zbbfile.pileupMC, "DataFileName":zbbfile.pileupData, "systematicShift":0})
+                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":pileupMC, "DataFileName":pileupData, "systematicShift":0})
                      ]
 
 class eventDumpConfig:

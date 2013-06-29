@@ -2,7 +2,7 @@ import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from ObjectSelection import selectedTriggers
-from zbbCommons import zbblabel, zbbsystematics
+from zbbConfig import configuration
 
 class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -61,8 +61,8 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       result = { }
       if event.object().event().eventAuxiliary().isRealData():
         checkTrigger = True
-        zbbsystematics.JERfactor = 0
-        zbbsystematics.JESfactor = 0
+        configuration.JERfactor = 0
+        configuration.JESfactor = 0
       else:
         checkTrigger = False
       ## trigger

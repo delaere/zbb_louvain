@@ -18,7 +18,7 @@ import shutil
 
 from DataFormats.FWLite import Events, Handle
 import eventSelection as llbb
-from zbbCommons import zbbfile, zbblabel
+from zbbCommons import zbblabel
 
 from LumiReWeighting import LumiReWeighting 
 from LeptonsReweighting import LeptonsReWeighting
