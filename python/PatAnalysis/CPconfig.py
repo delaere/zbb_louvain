@@ -1,5 +1,3 @@
-from zbbCommons import *
-
 #configuration of the ControlPlot machinery
 from collections import namedtuple
 controlPlot     = namedtuple("controlPlot",    ["label","module","classname","kwargs"])

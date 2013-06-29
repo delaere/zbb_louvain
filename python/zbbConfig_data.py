@@ -97,7 +97,7 @@ class configuration:
 #                       eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
 #                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":pileupMC, "DataFileName":pileupData, "systematicShift":0})
 #                     ]
-eventWeights     = []
+  eventWeights     = []
 
 class eventDumpConfig:
   # fine-tuning of the event content for display
