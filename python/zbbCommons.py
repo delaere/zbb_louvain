@@ -1,5 +1,7 @@
 import os
 
+rmPixelMisAligRuns = False
+
 class zbblabel:
   """labels used in the PAT configuration"""
   allmuonslabel="allMuons"
@@ -41,8 +43,8 @@ class zbbfile:
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-  lumi_totEle2011=5.217 #in fb-1
-  lumi_totMu2011=5.275
+  lumi_totEle2011=4.99 #in fb-1
+  lumi_totMu2011=5.05
 
   lumi_tot2012= 19.45 #A+B+C+D
   #lumi_tot2012= 19.45-7.27 #ABC

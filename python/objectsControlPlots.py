@@ -224,7 +224,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("JPdiscDisc1","JPdiscDisc1",100,0,2.5)
       self.add("MET","MET",100,0,200)
       self.add("METphi","MET #phi",70,-3.5,3.5)
-      self.add("METsignificance","MET significance",100,0,20)
+      self.add("METsignificance","MET significance",1000,0,500)
       self.add("METphiNNregression","MET #ph for NN regression",70,-3.5,3.5)
       self.add("METNNregression","MET for NN regression",250,0,500)
       self.add("jetpt","Jet Pt",100,15,215)

@@ -160,6 +160,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
         continue
       if jobNumber>0 and i>=jobNumber*n : break
       if i%1000==1 :
+        #if i>1000 : break
         print "Processing... event", i, ". Last batch in ", (time.time()-t0),"s."
         t0 = time.time()
       if _muChan :
@@ -219,7 +220,9 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
     getattr(ws,'import')(rds_zbb)
     ws.Print()
 
-    ras_zbb = rds_zbb.get()
+    red_rds_zbb = rds_zbb.reduce("rc_eventSelection_1==1")
+
+    ras_zbb = red_rds_zbb.get()
     ws_ras = RooWorkspace("ws_ras","workspace_ras")
     getattr(ws_ras,'import')(ras_zbb)
     ws_ras.Print()
@@ -230,7 +233,7 @@ def processInputFile(_muChan=muChannel[channel], _path=path[channel]) :
 
     f=TFile(outputDir+"File_rds_zbb_"+channel+postfix+".root","UPDATE")
     #f=TFile("test.root","UPDATE")
-    tree_zbb = rds_zbb.tree()
+    tree_zbb = red_rds_zbb.tree()
     tree_zbb.Write()
     f.Close()
 

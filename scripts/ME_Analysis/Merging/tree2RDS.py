@@ -3,6 +3,60 @@ from ROOT import *
 from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
 
+listNNs = [
+  #Maximum 60 chs
+  "NN_Higgs125vsDY_MM_N_CSV_2011_comb",#1
+  "NN_Higgs125vsZZ_MM_N_CSV_2011_comb",
+  "NN_Higgs125vsTT_MM_N_CSV_2011_comb",
+  "NN_Higgs125vsBKG_MM_N_CSV_2011_comb",
+  "NN_Higgs125vsDY_MM_N_CSV_2012_comb_ZH125",#5
+  "NN_Higgs125vsZZ_MM_N_CSV_2012_comb_ZH125",
+  "NN_Higgs125vsTT_MM_N_CSV_2012_comb_ZH125",
+  "NN_Higgs125vsBkgcomb",
+  "NN_Higgs125vsDY_MM_N_CSV_2012_comb3_2_1_600",
+  "NN_Higgs125vsTT_MM_N_CSV_2012_comb5_2_3_1_500",#10
+  "NN_Higgs125vsZZ_MM_N_CSV_2012_comb2_5_3_1_1000",
+  "NN_Higgs125vsBkgcomb_2_3_2_1_1000",
+  "NN_Higgs125vsBkgcomb_1_10000",
+  "NN_Higgs125vsBkgcomb_1_5000",
+  "NN_Higgs125vsBkgcomb_2_10000",#15
+  "NN_Higgs125vsBkgcomb_2_5000",
+  "NN_Higgs125vsBkgcomb_3_5000",
+  "NN_Higgs125vsBkgcomb_2_3_2_10000",
+  "NN_Higgs125vsBkgcomb_2_3_2_5000",
+  "NN_Higgs125vsBkgcomb_2_4_10000",#20
+  "NN_Higgs125vsBkgcomb_2_5_3_1_1000",
+  "NN_Higgs125vsBkgcomb_3_2_10000",
+  "NN_Higgs125vsDYcomb_2_4_1000_Nj2Mbb80_150Pt402520",
+  "NN_Higgs125vsZZcomb_2_4_750_Nj2Mbb80_150Pt402520",
+  "NN_Higgs125vsTTcomb_5_10_700_Nj2Mbb50_200Pt402520",#25
+  "NN_Higgs125vsBkg_2jcomb_2_2_2_500_Nj2Mbb50_200Pt402520",
+  "NN_Higgs125vsBkg_2jcomb_6_6_131_Nj2Mbb80_150Pt402520_3",
+  "NN_Higgs125vsBkg_2jcomb_9_3_100_Nj2Mbb80_150Pt402520_8",
+  "NN_Higgs125vsBkg_2jcomb_9_3_100_Nj2Mbb80_150Pt402520_21",
+  "NN_Higgs125vsBkg_2jcomb_2_500_Nj2Mbb80_150Pt402520_1",#30
+  "NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt402520",
+  "NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt402520",
+  "NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt402520",
+  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_4",
+  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_5",#35
+  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_9",
+  "NN_Higgs125vsBkg_3jcomb_9_9_300_Nj3_Mbb50_150_Pt402520_4",
+  "NN_Higgs125vsBkg_3jcomb_5_600_Nj3_Mbb50_150_Pt402520_1",
+    
+  "SumNN",
+  "ProdNN",
+  "SumWeightedNN",
+  "SumNN_2j",
+  "ProdNN_2j",
+  "SumWeightedNN_2j",
+  "SumNN_3j",
+  "ProdNN_3j",
+  "SumWeightedNN_3j",
+  ]
+
+RAS = {}
+
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
 
   print "inputfile", InputFile
@@ -18,23 +72,13 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myWtwbRRV = RooRealVar("Wtwb", "Wtwb", -10, 3300)
   myWzz3RRV = RooRealVar("Wzz3", "Wzz3", -10, 300)
   myWzz0RRV = RooRealVar("Wzz0", "Wzz0", -10, 300)
-  myWhi3115RRV = RooRealVar("Whi3_115", "Whi3_115", -10, 300)
-  myWhi0115RRV = RooRealVar("Whi0_115", "Whi0_115", -10, 300)
-  myWhi3120RRV = RooRealVar("Whi3_120", "Whi3_120", -10, 300)
-  myWhi0120RRV = RooRealVar("Whi0_120", "Whi0_120", -10, 300)
-  myWhi3125RRV = RooRealVar("Whi3_125", "Whi3_125", -10, 300)
-  myWhi0125RRV = RooRealVar("Whi0_125", "Whi0_125", -10, 300)
-  myWhi3130RRV = RooRealVar("Whi3_130", "Whi3_130", -10, 300)
-  myWhi0130RRV = RooRealVar("Whi0_130", "Whi0_130", -10, 300)
-  myWhi3135RRV = RooRealVar("Whi3_135", "Whi3_135", -10, 300)
-  myWhi0135RRV = RooRealVar("Whi0_135", "Whi0_135", -10, 300)
+  for m in ["110","115","120","125","130","135","140","145","150"] :
+    RAS["hi0"+m]=RooRealVar("Whi0_"+m, "Whi0_"+m, -10, 300)
+    RAS["hi3"+m]=RooRealVar("Whi3_"+m, "Whi3_"+m, -10, 300)
+    for nn in listNNs : RAS[nn+m] = RooRealVar(nn+"_"+m, nn+"_"+m, -10000, 600)
   myjetmetbjetMinCSVdiscRRV = RooRealVar("jetmetbjetMinCSVdisc","jetmetbjetMinCSVdisc",-10, 10)
   myjetmetbjetMaxCSVdiscRRV = RooRealVar("jetmetbjetMaxCSVdisc","jetmetbjetMaxCSVdisc",-10, 10)
   myjetmetbjetProdCSVdiscRRV = RooRealVar("jetmetbjetProdCSVdisc","jetmetbjetProdCSVdisc",-10, 10)
-
-  mySumNNRRV = RooRealVar("SumNN","SumNN",-10, 10)
-  myProdNNRRV = RooRealVar("ProdNN","ProdNN",-10, 10)
-  mySumWeightedNNRRV = RooRealVar("SumWeightedNN","SumWeightedNN",-10, 10)
 
   myMeTRRV = RooRealVar("MeT", "MeT", 0, 600)#met to check the matching
 
@@ -44,203 +88,14 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   mymlpZbbvsTT_mu_MM = RooRealVar("mlpZbbvsTT_mu_MM", "mlpZbbvsTT_mu_MM", -10000, 600)
   mymlpZbbvsTT_mu_MM_N = RooRealVar("mlpZbbvsTT_mu_MM_N", "mlpZbbvsTT_mu_MM_N", -10000, 600)
   mymlpZbbvsTT_mu_ML = RooRealVar("mlpZbbvsTT_mu_ML", "mlpZbbvsTT_mu_ML", -10000, 600)
+  mymlpDYvsTT_2012 = RooRealVar("mlpDYvsTT_2012", "mlpDYvsTT_2012", -10000, 600)
   
-  mymlphiggsvszbb_115_MM_RRV = RooRealVar("mlphiggsvszbb_115_MM", "mlphiggsvszbb_115_MM", -10000, 600)
-  mymlphiggsvstt_115_MM_RRV = RooRealVar("mlphiggsvstt_115_MM", "mlphiggsvstt_115_MM", -10000, 600)
-  mymlphiggsvszz_115_MM_RRV = RooRealVar("mlphiggsvszz_115_MM", "mlphiggsvszz_115_MM", -10000, 600)
-  mymlphiggsvsbkg_115_MM_RRV = RooRealVar("mlphiggsvsbkg_115_MM", "mlphiggsvsbkg_115_MM", -10000, 600)
-  mymlphiggsvszbb_115_ML_RRV = RooRealVar("mlphiggsvszbb_115_ML", "mlphiggsvszbb_115_ML", -10000, 600)
-  mymlphiggsvstt_115_ML_RRV = RooRealVar("mlphiggsvstt_115_ML", "mlphiggsvstt_115_ML", -10000, 600)
-  mymlphiggsvszz_115_ML_RRV = RooRealVar("mlphiggsvszz_115_ML", "mlphiggsvszz_115_ML", -10000, 600)
-  mymlphiggsvsbkg_115_ML_RRV = RooRealVar("mlphiggsvsbkg_115_ML", "mlphiggsvsbkg_115_ML", -10000, 600)
-  mymlphiggsvszbb_115_MM_N_RRV = RooRealVar("mlphiggsvszbb_115_MM_N", "mlphiggsvszbb_115_MM_N", -10000, 600)
-  mymlphiggsvstt_115_MM_N_RRV = RooRealVar("mlphiggsvstt_115_MM_N", "mlphiggsvstt_115_MM_N", -10000, 600)
-  mymlphiggsvszz_115_MM_N_RRV = RooRealVar("mlphiggsvszz_115_MM_N", "mlphiggsvszz_115_MM_N", -10000, 600)
-  mymlphiggsvsbkg_115_MM_N_RRV = RooRealVar("mlphiggsvsbkg_115_MM_N", "mlphiggsvsbkg_115_MM_N", -10000, 600)
-  mymlphiggsvszbb_115_mu_MM_RRV = RooRealVar("mlphiggsvszbb_115_mu_MM", "mlphiggsvszbb_115_mu_MM", -10000, 600)
-  mymlphiggsvstt_115_mu_MM_RRV = RooRealVar("mlphiggsvstt_115_mu_MM", "mlphiggsvstt_115_mu_MM", -10000, 600)
-  mymlphiggsvszz_115_mu_MM_RRV = RooRealVar("mlphiggsvszz_115_mu_MM", "mlphiggsvszz_115_mu_MM", -10000, 600)
-  mymlphiggsvsbkg_115_mu_MM_RRV = RooRealVar("mlphiggsvsbkg_115_mu_MM", "mlphiggsvsbkg_115_mu_MM", -10000, 600)
-  mymlphiggsvszbb_115_mu_ML_RRV = RooRealVar("mlphiggsvszbb_115_mu_ML", "mlphiggsvszbb_115_mu_ML", -10000, 600)
-  mymlphiggsvstt_115_mu_ML_RRV = RooRealVar("mlphiggsvstt_115_mu_ML", "mlphiggsvstt_115_mu_ML", -10000, 600)
-  mymlphiggsvszz_115_mu_ML_RRV = RooRealVar("mlphiggsvszz_115_mu_ML", "mlphiggsvszz_115_mu_ML", -10000, 600)
-  mymlphiggsvsbkg_115_mu_ML_RRV = RooRealVar("mlphiggsvsbkg_115_mu_ML", "mlphiggsvsbkg_115_mu_ML", -10000, 600)
-  mymlphiggsvszbb_115_mu_MM_N_RRV = RooRealVar("mlphiggsvszbb_115_mu_MM_N", "mlphiggsvszbb_115_mu_MM_N", -10000, 600)
-  mymlphiggsvstt_115_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_115_mu_MM_N", "mlphiggsvstt_115_mu_MM_N", -10000, 600)
-  mymlphiggsvszz_115_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_115_mu_MM_N", "mlphiggsvszz_115_mu_MM_N", -10000, 600)
-  mymlphiggsvsbkg_115_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_115_mu_MM_N", "mlphiggsvsbkg_115_mu_MM_N", -10000, 600)
-  mymlphiggsvszbb_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_115_comb_MM_N_2011", "mlphiggsvszbb_115_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvstt_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_115_comb_MM_N_2011", "mlphiggsvstt_115_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszz_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_115_comb_MM_N_2011", "mlphiggsvszz_115_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvsbkg_115_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_115_comb_MM_N_2011", "mlphiggsvsbkg_115_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszbb_115_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_115_comb_MM_N", "mlphiggsvszbb_115_comb_MM_N", -10000, 600)
-  mymlphiggsvstt_115_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_115_comb_MM_N", "mlphiggsvstt_115_comb_MM_N", -10000, 600)
-  mymlphiggsvszz_115_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_115_comb_MM_N", "mlphiggsvszz_115_comb_MM_N", -10000, 600)
-  mymlphiggsvsbkg_115_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_115_comb_MM_N", "mlphiggsvsbkg_115_comb_MM_N", -10000, 600)
-
-  mymlphiggsvszbb_120_MM_RRV = RooRealVar("mlphiggsvszbb_120_MM", "mlphiggsvszbb_120_MM", -10000, 600)
-  mymlphiggsvstt_120_MM_RRV = RooRealVar("mlphiggsvstt_120_MM", "mlphiggsvstt_120_MM", -10000, 600)
-  mymlphiggsvszz_120_MM_RRV = RooRealVar("mlphiggsvszz_120_MM", "mlphiggsvszz_120_MM", -10000, 600)
-  mymlphiggsvsbkg_120_MM_RRV = RooRealVar("mlphiggsvsbkg_120_MM", "mlphiggsvsbkg_120_MM", -10000, 600)
-  mymlphiggsvszbb_120_ML_RRV = RooRealVar("mlphiggsvszbb_120_ML", "mlphiggsvszbb_120_ML", -10000, 600)
-  mymlphiggsvstt_120_ML_RRV = RooRealVar("mlphiggsvstt_120_ML", "mlphiggsvstt_120_ML", -10000, 600)
-  mymlphiggsvszz_120_ML_RRV = RooRealVar("mlphiggsvszz_120_ML", "mlphiggsvszz_120_ML", -10000, 600)
-  mymlphiggsvsbkg_120_ML_RRV = RooRealVar("mlphiggsvsbkg_120_ML", "mlphiggsvsbkg_120_ML", -10000, 600)
-  mymlphiggsvszbb_120_MM_N_RRV = RooRealVar("mlphiggsvszbb_120_MM_N", "mlphiggsvszbb_120_MM_N", -10000, 600)
-  mymlphiggsvstt_120_MM_N_RRV = RooRealVar("mlphiggsvstt_120_MM_N", "mlphiggsvstt_120_MM_N", -10000, 600)
-  mymlphiggsvszz_120_MM_N_RRV = RooRealVar("mlphiggsvszz_120_MM_N", "mlphiggsvszz_120_MM_N", -10000, 600)
-  mymlphiggsvsbkg_120_MM_N_RRV = RooRealVar("mlphiggsvsbkg_120_MM_N", "mlphiggsvsbkg_120_MM_N", -10000, 600)
-  mymlphiggsvszbb_120_mu_MM_RRV = RooRealVar("mlphiggsvszbb_120_mu_MM", "mlphiggsvszbb_120_mu_MM", -10000, 600)
-  mymlphiggsvstt_120_mu_MM_RRV = RooRealVar("mlphiggsvstt_120_mu_MM", "mlphiggsvstt_120_mu_MM", -10000, 600)
-  mymlphiggsvszz_120_mu_MM_RRV = RooRealVar("mlphiggsvszz_120_mu_MM", "mlphiggsvszz_120_mu_MM", -10000, 600)
-  mymlphiggsvsbkg_120_mu_MM_RRV = RooRealVar("mlphiggsvsbkg_120_mu_MM", "mlphiggsvsbkg_120_mu_MM", -10000, 600)
-  mymlphiggsvszbb_120_mu_ML_RRV = RooRealVar("mlphiggsvszbb_120_mu_ML", "mlphiggsvszbb_120_mu_ML", -10000, 600)
-  mymlphiggsvstt_120_mu_ML_RRV = RooRealVar("mlphiggsvstt_120_mu_ML", "mlphiggsvstt_120_mu_ML", -10000, 600)
-  mymlphiggsvszz_120_mu_ML_RRV = RooRealVar("mlphiggsvszz_120_mu_ML", "mlphiggsvszz_120_mu_ML", -10000, 600)
-  mymlphiggsvsbkg_120_mu_ML_RRV = RooRealVar("mlphiggsvsbkg_120_mu_ML", "mlphiggsvsbkg_120_mu_ML", -10000, 600)
-  mymlphiggsvszbb_120_mu_MM_N_RRV = RooRealVar("mlphiggsvszbb_120_mu_MM_N", "mlphiggsvszbb_120_mu_MM_N", -10000, 600)
-  mymlphiggsvstt_120_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_120_mu_MM_N", "mlphiggsvstt_120_mu_MM_N", -10000, 600)
-  mymlphiggsvszz_120_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_120_mu_MM_N", "mlphiggsvszz_120_mu_MM_N", -10000, 600)
-  mymlphiggsvsbkg_120_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_120_mu_MM_N", "mlphiggsvsbkg_120_mu_MM_N", -10000, 600)
-  mymlphiggsvszbb_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_120_comb_MM_N_2011", "mlphiggsvszbb_120_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvstt_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_120_comb_MM_N_2011", "mlphiggsvstt_120_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszz_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_120_comb_MM_N_2011", "mlphiggsvszz_120_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvsbkg_120_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_120_comb_MM_N_2011", "mlphiggsvsbkg_120_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszbb_120_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_120_comb_MM_N", "mlphiggsvszbb_120_comb_MM_N", -10000, 600)
-  mymlphiggsvstt_120_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_120_comb_MM_N", "mlphiggsvstt_120_comb_MM_N", -10000, 600)
-  mymlphiggsvszz_120_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_120_comb_MM_N", "mlphiggsvszz_120_comb_MM_N", -10000, 600)
-  mymlphiggsvsbkg_120_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_120_comb_MM_N", "mlphiggsvsbkg_120_comb_MM_N", -10000, 600)
-
-  mymlphiggsvszbb_125_MM_RRV = RooRealVar("mlphiggsvszbb_125_MM", "mlphiggsvszbb_125_MM", -10000, 600)
-  mymlphiggsvstt_125_MM_RRV = RooRealVar("mlphiggsvstt_125_MM", "mlphiggsvstt_125_MM", -10000, 600)
-  mymlphiggsvszz_125_MM_RRV = RooRealVar("mlphiggsvszz_125_MM", "mlphiggsvszz_125_MM", -10000, 600)
-  mymlphiggsvsbkg_125_MM_RRV = RooRealVar("mlphiggsvsbkg_125_MM", "mlphiggsvsbkg_125_MM", -10000, 600)
-  mymlphiggsvszbb_125_ML_RRV = RooRealVar("mlphiggsvszbb_125_ML", "mlphiggsvszbb_125_ML", -10000, 600)
-  mymlphiggsvstt_125_ML_RRV = RooRealVar("mlphiggsvstt_125_ML", "mlphiggsvstt_125_ML", -10000, 600)
-  mymlphiggsvszz_125_ML_RRV = RooRealVar("mlphiggsvszz_125_ML", "mlphiggsvszz_125_ML", -10000, 600)
-  mymlphiggsvsbkg_125_ML_RRV = RooRealVar("mlphiggsvsbkg_125_ML", "mlphiggsvsbkg_125_ML", -10000, 600)
-  mymlphiggsvszbb_125_MM_N_RRV = RooRealVar("mlphiggsvszbb_125_MM_N", "mlphiggsvszbb_125_MM_N", -10000, 600)
-  mymlphiggsvstt_125_MM_N_RRV = RooRealVar("mlphiggsvstt_125_MM_N", "mlphiggsvstt_125_MM_N", -10000, 600)
-  mymlphiggsvszz_125_MM_N_RRV = RooRealVar("mlphiggsvszz_125_MM_N", "mlphiggsvszz_125_MM_N", -10000, 600)
-  mymlphiggsvsbkg_125_MM_N_RRV = RooRealVar("mlphiggsvsbkg_125_MM_N", "mlphiggsvsbkg_125_MM_N", -10000, 600)
-  mymlphiggsvszbb_125_mu_MM_RRV = RooRealVar("mlphiggsvszbb_125_mu_MM", "mlphiggsvszbb_125_mu_MM", -10000, 600)
-  mymlphiggsvstt_125_mu_MM_RRV = RooRealVar("mlphiggsvstt_125_mu_MM", "mlphiggsvstt_125_mu_MM", -10000, 600)
-  mymlphiggsvszz_125_mu_MM_RRV = RooRealVar("mlphiggsvszz_125_mu_MM", "mlphiggsvszz_125_mu_MM", -10000, 600)
-  mymlphiggsvsbkg_125_mu_MM_RRV = RooRealVar("mlphiggsvsbkg_125_mu_MM", "mlphiggsvsbkg_125_mu_MM", -10000, 600)
-  mymlphiggsvszbb_125_mu_ML_RRV = RooRealVar("mlphiggsvszbb_125_mu_ML", "mlphiggsvszbb_125_mu_ML", -10000, 600)
-  mymlphiggsvstt_125_mu_ML_RRV = RooRealVar("mlphiggsvstt_125_mu_ML", "mlphiggsvstt_125_mu_ML", -10000, 600)
-  mymlphiggsvszz_125_mu_ML_RRV = RooRealVar("mlphiggsvszz_125_mu_ML", "mlphiggsvszz_125_mu_ML", -10000, 600)
-  mymlphiggsvsbkg_125_mu_ML_RRV = RooRealVar("mlphiggsvsbkg_125_mu_ML", "mlphiggsvsbkg_125_mu_ML", -10000, 600)
-  mymlphiggsvszbb_125_mu_MM_N_RRV = RooRealVar("mlphiggsvszbb_125_mu_MM_N", "mlphiggsvszbb_125_mu_MM_N", -10000, 600)
-  mymlphiggsvstt_125_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_125_mu_MM_N", "mlphiggsvstt_125_mu_MM_N", -10000, 600)
-  mymlphiggsvszz_125_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_125_mu_MM_N", "mlphiggsvszz_125_mu_MM_N", -10000, 600)
-  mymlphiggsvsbkg_125_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_125_mu_MM_N", "mlphiggsvsbkg_125_mu_MM_N", -10000, 600)
-  mymlphiggsvszbb_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_125_comb_MM_N_2011", "mlphiggsvszbb_125_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvstt_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_125_comb_MM_N_2011", "mlphiggsvstt_125_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszz_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_125_comb_MM_N_2011", "mlphiggsvszz_125_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvsbkg_125_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2011", "mlphiggsvsbkg_125_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszbb_125_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_125_comb_MM_N", "mlphiggsvszbb_125_comb_MM_N", -10000, 600)
-  mymlphiggsvstt_125_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_125_comb_MM_N", "mlphiggsvstt_125_comb_MM_N", -10000, 600)
-  mymlphiggsvszz_125_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_125_comb_MM_N", "mlphiggsvszz_125_comb_MM_N", -10000, 600)
-  mymlphiggsvsbkg_125_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N", "mlphiggsvsbkg_125_comb_MM_N", -10000, 600)
-  mynewmlphiggsvszbb_125_comb_MM_N_RRV = RooRealVar("newmlphiggsvszbb_125_comb_MM_N", "newmlphiggsvszbb_125_comb_MM_N", -10000, 600)
-  mynewmlphiggsvstt_125_comb_MM_N_RRV = RooRealVar("newmlphiggsvstt_125_comb_MM_N", "newmlphiggsvstt_125_comb_MM_N", -10000, 600)
-  mynewmlphiggsvszz_125_comb_MM_N_RRV = RooRealVar("newmlphiggsvszz_125_comb_MM_N", "newmlphiggsvszz_125_comb_MM_N", -10000, 600)
-  mynewmlphiggsvsbkg_125_comb_MM_N_RRV = RooRealVar("newmlphiggsvsbkg_125_comb_MM_N", "newmlphiggsvsbkg_125_comb_MM_N", -10000, 600)
-
-  mlphiggsvsbkg_125_comb_MM_N_1_10000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_1_10000", "mlphiggsvsbkg_125_comb_MM_N_1_10000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_1_5000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_1_5000", "mlphiggsvsbkg_125_comb_MM_N_1_5000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_10000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_10000", "mlphiggsvsbkg_125_comb_MM_N_2_10000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_5000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_5000", "mlphiggsvsbkg_125_comb_MM_N_2_5000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_3_5000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_3_5000", "mlphiggsvsbkg_125_comb_MM_N_3_5000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000", "mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000", "mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_4_10000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_4_10000", "mlphiggsvsbkg_125_comb_MM_N_2_4_10000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000", "mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000", -10000, 600)
-  mlphiggsvsbkg_125_comb_MM_N_3_2_10000_RRV = RooRealVar("mlphiggsvsbkg_125_comb_MM_N_3_2_10000", "mlphiggsvsbkg_125_comb_MM_N_3_2_10000", -10000, 600)
-                                
-
-  mymlphiggsvszbb_130_MM_RRV = RooRealVar("mlphiggsvszbb_130_MM", "mlphiggsvszbb_130_MM", -10000, 600)
-  mymlphiggsvstt_130_MM_RRV = RooRealVar("mlphiggsvstt_130_MM", "mlphiggsvstt_130_MM", -10000, 600)
-  mymlphiggsvszz_130_MM_RRV = RooRealVar("mlphiggsvszz_130_MM", "mlphiggsvszz_130_MM", -10000, 600)
-  mymlphiggsvsbkg_130_MM_RRV = RooRealVar("mlphiggsvsbkg_130_MM", "mlphiggsvsbkg_130_MM", -10000, 600)
-  mymlphiggsvszbb_130_ML_RRV = RooRealVar("mlphiggsvszbb_130_ML", "mlphiggsvszbb_130_ML", -10000, 600)
-  mymlphiggsvstt_130_ML_RRV = RooRealVar("mlphiggsvstt_130_ML", "mlphiggsvstt_130_ML", -10000, 600)
-  mymlphiggsvszz_130_ML_RRV = RooRealVar("mlphiggsvszz_130_ML", "mlphiggsvszz_130_ML", -10000, 600)
-  mymlphiggsvsbkg_130_ML_RRV = RooRealVar("mlphiggsvsbkg_130_ML", "mlphiggsvsbkg_130_ML", -10000, 600)
-  mymlphiggsvszbb_130_MM_N_RRV = RooRealVar("mlphiggsvszbb_130_MM_N", "mlphiggsvszbb_130_MM_N", -10000, 600)
-  mymlphiggsvstt_130_MM_N_RRV = RooRealVar("mlphiggsvstt_130_MM_N", "mlphiggsvstt_130_MM_N", -10000, 600)
-  mymlphiggsvszz_130_MM_N_RRV = RooRealVar("mlphiggsvszz_130_MM_N", "mlphiggsvszz_130_MM_N", -10000, 600)
-  mymlphiggsvsbkg_130_MM_N_RRV = RooRealVar("mlphiggsvsbkg_130_MM_N", "mlphiggsvsbkg_130_MM_N", -10000, 600)
-  mymlphiggsvszbb_130_mu_MM_RRV = RooRealVar("mlphiggsvszbb_130_mu_MM", "mlphiggsvszbb_130_mu_MM", -10000, 600)
-  mymlphiggsvstt_130_mu_MM_RRV = RooRealVar("mlphiggsvstt_130_mu_MM", "mlphiggsvstt_130_mu_MM", -10000, 600)
-  mymlphiggsvszz_130_mu_MM_RRV = RooRealVar("mlphiggsvszz_130_mu_MM", "mlphiggsvszz_130_mu_MM", -10000, 600)
-  mymlphiggsvsbkg_130_mu_MM_RRV = RooRealVar("mlphiggsvsbkg_130_mu_MM", "mlphiggsvsbkg_130_mu_MM", -10000, 600)
-  mymlphiggsvszbb_130_mu_ML_RRV = RooRealVar("mlphiggsvszbb_130_mu_ML", "mlphiggsvszbb_130_mu_ML", -10000, 600)
-  mymlphiggsvstt_130_mu_ML_RRV = RooRealVar("mlphiggsvstt_130_mu_ML", "mlphiggsvstt_130_mu_ML", -10000, 600)
-  mymlphiggsvszz_130_mu_ML_RRV = RooRealVar("mlphiggsvszz_130_mu_ML", "mlphiggsvszz_130_mu_ML", -10000, 600)
-  mymlphiggsvsbkg_130_mu_ML_RRV = RooRealVar("mlphiggsvsbkg_130_mu_ML", "mlphiggsvsbkg_130_mu_ML", -10000, 600)
-  mymlphiggsvszbb_130_mu_MM_N_RRV = RooRealVar("mlphiggsvszbb_130_mu_MM_N", "mlphiggsvszbb_130_mu_MM_N", -10000, 600)
-  mymlphiggsvstt_130_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_130_mu_MM_N", "mlphiggsvstt_130_mu_MM_N", -10000, 600)
-  mymlphiggsvszz_130_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_130_mu_MM_N", "mlphiggsvszz_130_mu_MM_N", -10000, 600)
-  mymlphiggsvsbkg_130_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_130_mu_MM_N", "mlphiggsvsbkg_130_mu_MM_N", -10000, 600)
-  mymlphiggsvszbb_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_130_comb_MM_N_2011", "mlphiggsvszbb_130_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvstt_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_130_comb_MM_N_2011", "mlphiggsvstt_130_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszz_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_130_comb_MM_N_2011", "mlphiggsvszz_130_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvsbkg_130_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_130_comb_MM_N_2011", "mlphiggsvsbkg_130_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszbb_130_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_130_comb_MM_N", "mlphiggsvszbb_130_comb_MM_N", -10000, 600)
-  mymlphiggsvstt_130_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_130_comb_MM_N", "mlphiggsvstt_130_comb_MM_N", -10000, 600)
-  mymlphiggsvszz_130_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_130_comb_MM_N", "mlphiggsvszz_130_comb_MM_N", -10000, 600)
-  mymlphiggsvsbkg_130_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_130_comb_MM_N", "mlphiggsvsbkg_130_comb_MM_N", -10000, 600)
-
-  mymlphiggsvszbb_135_MM_RRV = RooRealVar("mlphiggsvszbb_135_MM", "mlphiggsvszbb_135_MM", -10000, 600)
-  mymlphiggsvstt_135_MM_RRV = RooRealVar("mlphiggsvstt_135_MM", "mlphiggsvstt_135_MM", -10000, 600)
-  mymlphiggsvszz_135_MM_RRV = RooRealVar("mlphiggsvszz_135_MM", "mlphiggsvszz_135_MM", -10000, 600)
-  mymlphiggsvsbkg_135_MM_RRV = RooRealVar("mlphiggsvsbkg_135_MM", "mlphiggsvsbkg_135_MM", -10000, 600)
-  mymlphiggsvszbb_135_ML_RRV = RooRealVar("mlphiggsvszbb_135_ML", "mlphiggsvszbb_135_ML", -10000, 600)
-  mymlphiggsvstt_135_ML_RRV = RooRealVar("mlphiggsvstt_135_ML", "mlphiggsvstt_135_ML", -10000, 600)
-  mymlphiggsvszz_135_ML_RRV = RooRealVar("mlphiggsvszz_135_ML", "mlphiggsvszz_135_ML", -10000, 600)
-  mymlphiggsvsbkg_135_ML_RRV = RooRealVar("mlphiggsvsbkg_135_ML", "mlphiggsvsbkg_135_ML", -10000, 600)
-  mymlphiggsvszbb_135_MM_N_RRV = RooRealVar("mlphiggsvszbb_135_MM_N", "mlphiggsvszbb_135_MM_N", -10000, 600)
-  mymlphiggsvstt_135_MM_N_RRV = RooRealVar("mlphiggsvstt_135_MM_N", "mlphiggsvstt_135_MM_N", -10000, 600)
-  mymlphiggsvszz_135_MM_N_RRV = RooRealVar("mlphiggsvszz_135_MM_N", "mlphiggsvszz_135_MM_N", -10000, 600)
-  mymlphiggsvsbkg_135_MM_N_RRV = RooRealVar("mlphiggsvsbkg_135_MM_N", "mlphiggsvsbkg_135_MM_N", -10000, 600)
-  mymlphiggsvszbb_135_mu_MM_RRV = RooRealVar("mlphiggsvszbb_135_mu_MM", "mlphiggsvszbb_135_mu_MM", -10000, 600)
-  mymlphiggsvstt_135_mu_MM_RRV = RooRealVar("mlphiggsvstt_135_mu_MM", "mlphiggsvstt_135_mu_MM", -10000, 600)
-  mymlphiggsvszz_135_mu_MM_RRV = RooRealVar("mlphiggsvszz_135_mu_MM", "mlphiggsvszz_135_mu_MM", -10000, 600)
-  mymlphiggsvsbkg_135_mu_MM_RRV = RooRealVar("mlphiggsvsbkg_135_mu_MM", "mlphiggsvsbkg_135_mu_MM", -10000, 600)
-  mymlphiggsvszbb_135_mu_ML_RRV = RooRealVar("mlphiggsvszbb_135_mu_ML", "mlphiggsvszbb_135_mu_ML", -10000, 600)
-  mymlphiggsvstt_135_mu_ML_RRV = RooRealVar("mlphiggsvstt_135_mu_ML", "mlphiggsvstt_135_mu_ML", -10000, 600)
-  mymlphiggsvszz_135_mu_ML_RRV = RooRealVar("mlphiggsvszz_135_mu_ML", "mlphiggsvszz_135_mu_ML", -10000, 600)
-  mymlphiggsvsbkg_135_mu_ML_RRV = RooRealVar("mlphiggsvsbkg_135_mu_ML", "mlphiggsvsbkg_135_mu_ML", -10000, 600)
-  mymlphiggsvszbb_135_mu_MM_N_RRV = RooRealVar("mlphiggsvszbb_135_mu_MM_N", "mlphiggsvszbb_135_mu_MM_N", -10000, 600)
-  mymlphiggsvstt_135_mu_MM_N_RRV = RooRealVar("mlphiggsvstt_135_mu_MM_N", "mlphiggsvstt_135_mu_MM_N", -10000, 600)
-  mymlphiggsvszz_135_mu_MM_N_RRV = RooRealVar("mlphiggsvszz_135_mu_MM_N", "mlphiggsvszz_135_mu_MM_N", -10000, 600)
-  mymlphiggsvsbkg_135_mu_MM_N_RRV = RooRealVar("mlphiggsvsbkg_135_mu_MM_N", "mlphiggsvsbkg_135_mu_MM_N", -10000, 600)
-  mymlphiggsvszbb_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszbb_135_comb_MM_N_2011", "mlphiggsvszbb_135_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvstt_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvstt_135_comb_MM_N_2011", "mlphiggsvstt_135_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszz_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvszz_135_comb_MM_N_2011", "mlphiggsvszz_135_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvsbkg_135_comb_MM_N_2011_RRV = RooRealVar("mlphiggsvsbkg_135_comb_MM_N_2011", "mlphiggsvsbkg_135_comb_MM_N_2011", -10000, 600)
-  mymlphiggsvszbb_135_comb_MM_N_RRV = RooRealVar("mlphiggsvszbb_135_comb_MM_N", "mlphiggsvszbb_135_comb_MM_N", -10000, 600)
-  mymlphiggsvstt_135_comb_MM_N_RRV = RooRealVar("mlphiggsvstt_135_comb_MM_N", "mlphiggsvstt_135_comb_MM_N", -10000, 600)
-  mymlphiggsvszz_135_comb_MM_N_RRV = RooRealVar("mlphiggsvszz_135_comb_MM_N", "mlphiggsvszz_135_comb_MM_N", -10000, 600)
-  mymlphiggsvsbkg_135_comb_MM_N_RRV = RooRealVar("mlphiggsvsbkg_135_comb_MM_N", "mlphiggsvsbkg_135_comb_MM_N", -10000, 600)
 
   myRDSRAS.add(myWttRRV)
   myRDSRAS.add(myWggRRV)
   myRDSRAS.add(myWqqRRV)
   myRDSRAS.add(myWzz3RRV)
   myRDSRAS.add(myWzz0RRV)
-  myRDSRAS.add(myWhi3115RRV)
-  myRDSRAS.add(myWhi0115RRV)
-  myRDSRAS.add(myWhi3120RRV)
-  myRDSRAS.add(myWhi0120RRV)
-  myRDSRAS.add(myWhi3125RRV)
-  myRDSRAS.add(myWhi0125RRV)
-  myRDSRAS.add(myWhi3130RRV)
-  myRDSRAS.add(myWhi0130RRV)
-  myRDSRAS.add(myWhi3135RRV)
-  myRDSRAS.add(myWhi0135RRV)
   myRDSRAS.add(myMeTRRV)
   myRDSRAS.add(myjetmetbjetMinCSVdiscRRV)
   myRDSRAS.add(myjetmetbjetMaxCSVdiscRRV)
@@ -252,190 +107,9 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(mymlpZbbvsTT_mu_MM)
   myRDSRAS.add(mymlpZbbvsTT_mu_MM_N)
   myRDSRAS.add(mymlpZbbvsTT_mu_ML)
+  myRDSRAS.add(mymlpDYvsTT_2012)
 
-  myRDSRAS.add(mySumNNRRV)
-  myRDSRAS.add(myProdNNRRV)
-  myRDSRAS.add(mySumWeightedNNRRV)
-
-  myRDSRAS.add(mymlphiggsvszbb_115_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_115_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_115_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_115_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_115_comb_MM_N_RRV)
-
-  myRDSRAS.add(mymlphiggsvszbb_120_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_120_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_120_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_120_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_120_comb_MM_N_RRV)
-  
-  myRDSRAS.add(mymlphiggsvszbb_125_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_125_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_125_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_125_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_125_comb_MM_N_RRV)
-  myRDSRAS.add(mynewmlphiggsvszbb_125_comb_MM_N_RRV)
-  myRDSRAS.add(mynewmlphiggsvstt_125_comb_MM_N_RRV)
-  myRDSRAS.add(mynewmlphiggsvszz_125_comb_MM_N_RRV)
-  myRDSRAS.add(mynewmlphiggsvsbkg_125_comb_MM_N_RRV)
-  
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_1_10000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_1_5000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_10000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_5000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_3_5000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_3_2_10000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_3_2_5000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_4_10000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_2_5_3_1_1000_RRV)
-  myRDSRAS.add(mlphiggsvsbkg_125_comb_MM_N_3_2_10000_RRV)
-
-  myRDSRAS.add(mymlphiggsvszbb_130_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_130_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_130_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_130_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_130_comb_MM_N_RRV)
-  
-  myRDSRAS.add(mymlphiggsvszbb_135_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_mu_MM_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_mu_ML_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_mu_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_comb_MM_N_2011_RRV)
-  myRDSRAS.add(mymlphiggsvszbb_135_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvstt_135_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvszz_135_comb_MM_N_RRV)
-  myRDSRAS.add(mymlphiggsvsbkg_135_comb_MM_N_RRV)
+  for n in RAS : myRDSRAS.add(RAS[n])
   
   f  = TFile(dirTree2+"Tree_rdsME_"+InputFile+".root","READ")
   t  = f.Get("rds_zbb")
@@ -454,35 +128,66 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   fout.Close()
 
 
-tree2RDSoneSample(InputFile = "DoubleMu_DataA")
-tree2RDSoneSample(InputFile = "DoubleMu_DataA06aug")
-tree2RDSoneSample(InputFile = "DoubleMu_DataB")
-tree2RDSoneSample(InputFile = "DoubleMu_DataC-v1")
-tree2RDSoneSample(InputFile = "DoubleMu_DataC-v2")
-tree2RDSoneSample(InputFile = "DoubleMu_DataD")
-tree2RDSoneSample(InputFile = "DY_Mu_MC")
-tree2RDSoneSample(InputFile = "TT_Mu_MC")
-tree2RDSoneSample(InputFile = "TT-FullLept_Mu_MC")
-tree2RDSoneSample(InputFile = "ZZ_Mu_MC")
-#tree2RDSoneSample(InputFile = "ZH115_Mu_MC")
-#tree2RDSoneSample(InputFile = "ZH120_Mu_MC")
-tree2RDSoneSample(InputFile = "ZH125_Mu_MC")
-#tree2RDSoneSample(InputFile = "ZH130_Mu_MC")
-#tree2RDSoneSample(InputFile = "ZH135_Mu_MC")
+list=[
+      "DoubleEle_DataA",
+      "DoubleEle_DataA06aug",
+      "DoubleEle_DataB",
+      "DoubleEle_DataC-v1",
+      "DoubleEle_DataC-v2",
+      "DoubleEle_DataD",
+      "DoubleMu_DataA",
+      "DoubleMu_DataA06aug",
+      "DoubleMu_DataB",
+      "DoubleMu_DataC-v1",
+      "DoubleMu_DataC-v2",
+      "DoubleMu_DataD",
+      "DY_Mu_MC",
+      "DY_El_MC",
+      "TT_Mu_MC",
+      "TT_El_MC",
+      "ZZ_Mu_MC",
+      "ZZ_El_MC",
+      "ZH110_Mu_MC",
+      "ZH110_El_MC",
+      "ZH115_Mu_MC",
+      "ZH115_El_MC",
+      "ZH120_Mu_MC",
+      "ZH120_El_MC",
+      "ZH125_Mu_MC",
+      "ZH125_El_MC",
+      "ZH130_Mu_MC",
+      "ZH130_El_MC",
+      "ZH135_Mu_MC",
+      "ZH135_El_MC",
+      "ZH140_Mu_MC",
+      "ZH140_El_MC",
+      "ZH145_Mu_MC",
+      "ZH145_El_MC",
+      "ZH150_Mu_MC",
+      "ZH150_El_MC",
+      "TT-FullLept_Mu_MC",
+      "TT-FullLept_El_MC",
+      "Zbb_Mu_MC",
+      "Zbb_El_MC",
+      "DY1j_Mu_MC",
+      "DY1j_El_MC",
+      "DY2j_Mu_MC",
+      "DY2j_El_MC",
+      "DY3j_Mu_MC",
+      "DY3j_El_MC",
+      #"DY4j_Mu_MC",
+      #"DY4j_El_MC",
+      "DY50-70_Mu_MC",
+      "DY50-70_El_MC",
+      "DY70-100_Mu_MC",
+      "DY70-100_El_MC",
+      "DY100_Mu_MC",
+      "DY100_El_MC",
+      "DY180_Mu_MC",
+      "DY180_El_MC",
+      ]
 
-tree2RDSoneSample(InputFile = "DoubleEle_DataA")
-tree2RDSoneSample(InputFile = "DoubleEle_DataA06aug")
-tree2RDSoneSample(InputFile = "DoubleEle_DataB")
-tree2RDSoneSample(InputFile = "DoubleEle_DataC-v1")
-tree2RDSoneSample(InputFile = "DoubleEle_DataC-v2")
-tree2RDSoneSample(InputFile = "DoubleEle_DataD")
-tree2RDSoneSample(InputFile = "DY_El_MC")
-tree2RDSoneSample(InputFile = "TT_El_MC")
-tree2RDSoneSample(InputFile = "TT-FullLept_El_MC")
-tree2RDSoneSample(InputFile = "ZZ_El_MC")
-##tree2RDSoneSample(InputFile = "ZH115_El_MC")
-#tree2RDSoneSample(InputFile = "ZH120_El_MC")
-tree2RDSoneSample(InputFile = "ZH125_El_MC")
-#tree2RDSoneSample(InputFile = "ZH130_El_MC")
-#tree2RDSoneSample(InputFile = "ZH135_El_MC")
+
+for s in list : 
+  tree2RDSoneSample(InputFile = s)
 

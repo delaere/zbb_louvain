@@ -61,7 +61,7 @@ TString LHCO("/nfs/user/acaudron/LHCO537/")
 TString EvtInfo("/nfs/user/acaudron/LHCO537/")
 
 .L include.h
-.L MW_analysis_All_Full_v7.C+ 
+.L MW_analysis.C+ 
 
 MWToRoot(gg,qq,tt,tt0,zz_c3,zz_c0,hi_c3,hi_c0,LHCO+file2,EvtInfo+file3,file,$4,$5,$6)
 

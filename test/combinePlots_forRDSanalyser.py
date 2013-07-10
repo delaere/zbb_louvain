@@ -9,7 +9,7 @@ flow="overflow"
 if flow=="overflow" : overflow = cms.untracked.bool(True)
 else : overflow = cms.untracked.bool(False)
 
-DIR="hist_binbybin"
+DIR="July_MM_NNs_DYptSFs"
 WP="18"
 
 class EColor:
@@ -74,6 +74,12 @@ process.CombinePlots = cms.PSet(
     scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12), 
     role = cms.string('Z+xx')
    ),
+#   cms.PSet(
+#    fileName = cms.string(DIR+'/histoStage'+WP+'extraCutsZno.root'),
+#    color = cms.uint32(EColor.kOrange+palette),
+#    scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12), 
+#    role = cms.string('Z+nothing')
+#   ),
    #cms.PSet(
    #  fileName = cms.string('histoStage'+WP+'extraCutsZA.root'),
    #  color = cms.uint32(1),
@@ -106,7 +112,7 @@ process.CombinePlots = cms.PSet(
       overflow=overflow,
       #rebin = cms.untracked.uint32(20),
       logx = cms.untracked.bool(False),
-      logy = cms.untracked.bool(True),
+      logy = cms.untracked.bool(False),
       labelx = cms.untracked.string("M_{Z} (GeV)"),
       labely = cms.untracked.string("Events/2GeV"),
       rangex = cms.untracked.vdouble(76.,106.)
@@ -138,7 +144,7 @@ process.CombinePlots = cms.PSet(
 #      end = cms.untracked.double(265),
       width = cms.untracked.double(10),
       logx = cms.untracked.bool(False),
-      logy = cms.untracked.bool(True),
+      logy = cms.untracked.bool(False),
       labelx = cms.untracked.string("p_{T}^{b-lead} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
@@ -147,7 +153,7 @@ process.CombinePlots = cms.PSet(
       overflow=overflow,
       #rebin = cms.untracked.uint32(10),
       logx = cms.untracked.bool(False),
-      logy = cms.untracked.bool(True),
+      logy = cms.untracked.bool(False),
       labelx = cms.untracked.string("p_{T}^{b-sublead} (GeV)"),
       labely = cms.untracked.string("Events/10GeV")
     ),
