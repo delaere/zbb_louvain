@@ -16,11 +16,14 @@
 #######################################################################################
 
 from ROOT import *
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+lib_path2 = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path2)
 from eventSelection import categoryNames
 from zbbCommons import rmPixelMisAligRuns
 from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, namePlotListOnMerged, min, max, binning, PlotForCLs, SFs_fit_MM, SFs_fit_ML, blindList, DYrew, namePlotListOnMC
 from globalLists import pathMergedRDS, pathRDS
-import os
 
 #####################################################
 ### sample/wp/selection of interest

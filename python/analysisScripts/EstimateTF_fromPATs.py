@@ -36,6 +36,8 @@ import numpy as n
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent

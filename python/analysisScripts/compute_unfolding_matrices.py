@@ -17,6 +17,8 @@ import pwd
 import shutil
 
 from DataFormats.FWLite import Events, Handle
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 import eventSelection as llbb
 from zbbCommons import zbbfile, zbblabel
 

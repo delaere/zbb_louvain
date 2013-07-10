@@ -14,6 +14,8 @@ import sys
 import LaunchOnCondor
 import glob
 
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
 from globalLists import listToProcess, dirSkim
 samples = listToProcess
 

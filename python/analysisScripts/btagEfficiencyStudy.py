@@ -1,6 +1,8 @@
 import ROOT
 import sys
 import os 
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 from AnalysisEvent import AnalysisEvent
 from eventSelection import *
 from LumiReWeighting import *

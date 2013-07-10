@@ -6,6 +6,8 @@ import numpy as n
 import sys
 import os
 from DataFormats.FWLite import Events, Handle
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 from LumiReWeighting import LumiReWeighting
 from zbbCommons import zbblabel
 from math import *

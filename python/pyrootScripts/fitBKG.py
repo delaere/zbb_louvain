@@ -1,6 +1,11 @@
 #import
 from ROOT import *
 from optparse import OptionParser
+import os, sys
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+lib_path2 = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path2)
 #parser options
 parser = OptionParser()
 parser.add_parser = OptionParser()

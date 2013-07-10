@@ -15,12 +15,16 @@ from optparse import OptionParser
 
 FarmDirectory = "FARM_RDSmaker_TEST"
 
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
 from globalLists import listToProcessEMu, pathSkimEMu
 processesToRun = listToProcessEMu
 path = pathSkimEMu
 
 print "I will run over ", len(processesToRun), "processes"
 
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 from AnalysisEvent import AnalysisEvent
 import glob
 

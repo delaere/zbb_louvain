@@ -2,7 +2,8 @@
 
 import os
 import LaunchOnCondor
-
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
 from globalLists import listToProcessEMu
 version = "V2"
 
