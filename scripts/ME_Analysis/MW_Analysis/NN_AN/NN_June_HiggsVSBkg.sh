@@ -5,7 +5,7 @@ cd ${dirNN}
 source /nfs/soft/cms/cmsset_default.sh; export SCRAM_ARCH=slc5_amd64_gcc462 ; source /nfs/soft/grid/ui/setup/grid-env.sh ; source /nfs/soft/crab/setup/crab.sh
 cmsenv
 
-dir=FinalV4
+dir=FinalV6
 if [[ ! -d ${dir} ]]
 then
     mkdir ${dir}
@@ -82,6 +82,13 @@ if(s_cuts.Contains("Mbb80-150")) cuts+=" && (eventSelectiondijetM>80 && eventSel
 if(s_cuts.Contains("Mbb50-150")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<150)";
 if(s_cuts.Contains("Mbb50-160")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<160)";
 if(s_cuts.Contains("Mbb50-200")) cuts+=" && (eventSelectiondijetM>50 && eventSelectiondijetM<200)";
+
+if(s_cuts.Contains("regbbMass80-160")) cuts+=" && (mebbNNCorrM>80 && mebbNNCorrM<160)";
+if(s_cuts.Contains("regbbMass80-150")) cuts+=" && (mebbNNCorrM>80 && mebbNNCorrM<150)";
+if(s_cuts.Contains("regbbMass50-150")) cuts+=" && (mebbNNCorrM>50 && mebbNNCorrM<150)";
+if(s_cuts.Contains("regbbMass50-160")) cuts+=" && (mebbNNCorrM>50 && mebbNNCorrM<160)";
+if(s_cuts.Contains("regbbMass50-200")) cuts+=" && (mebbNNCorrM>50 && mebbNNCorrM<200)";
+
 if(s_cuts.Contains("Ptb1j45")) cuts+=" && jetmetbjet1pt>45";
 if(s_cuts.Contains("Ptb1j40")) cuts+=" && jetmetbjet1pt>40";
 if(s_cuts.Contains("Ptb2j25")) cuts+=" && jetmetbjet2pt>25";

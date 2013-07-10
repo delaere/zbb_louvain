@@ -79,6 +79,7 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	if(NNchoice=="Higgs_vs_DY") {fill[dy]=1; fill[zbb]=1; fill[tt]=0; fill[ttfulllept]=0; fill[zz]=0; fill[zh]=1;}
 	if(NNchoice=="Higgs_vs_TT") {fill[dy]=0; fill[zbb]=0; fill[tt]=1; fill[ttfulllept]=1; fill[zz]=0; fill[zh]=1;}
 	if(NNchoice=="Higgs_vs_ZZ") {fill[dy]=0; fill[zbb]=0; fill[tt]=0; fill[ttfulllept]=0; fill[zz]=1; fill[zh]=1;}
+	if(NNchoice=="DY_vs_TT") {fill[dy]=1; fill[zbb]=1; fill[tt]=1; fill[ttfulllept]=1; fill[zz]=0; fill[zh]=0;}
 	std::map<string,nn_vars*> var;
 	for(int s = 0; s<nSamples; s++){
 	  TChain *treetmp =new TChain("rds_zbb");
@@ -92,6 +93,7 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	  var[listSample[s]] = new nn_vars(Ni[listSample[s]]);
 	  int isSignal = 0;
 	  if(listSample[s]==zh) isSignal = 1;
+	  else if((listSample[s]==dy||listSample[s]==zbb) && NNchoice=="DY_vs_TT") isSignal = 1;
 	  Input(listSample[s], var[listSample[s]], sim, simu, fill[listSample[s]], isSignal, sampleID[listSample[s]], totcuts);
 	}
 	simu->Write();
@@ -115,8 +117,11 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	if(NNchoice=="Higgs_vs_DY"){mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==1)/"+normDY+"",simu,"Entry$%2!=0","Entry$%2==0");}
 	if(NNchoice=="Higgs_vs_TT"){mlp = new TMultiLayerPerceptron("@tt_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==2)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}
 	if(NNchoice=="Higgs_vs_ZZ"){mlp = new TMultiLayerPerceptron("@zz_weight,@zz3_weight,@hi_weight,@hi3_weight"+NNStruct+":type!","(type2==5)/"+normZH+"+(type2==3)/"+normZZ+"",simu,"Entry$%2!=0","Entry$%2==0");}
+	if(NNchoice=="DY_vs_TT"){mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@tt_weight"+NNStruct+":type!","(type2==1)/"+normDY+"+(type2==2)/"+normTT+"",simu,"Entry$%2!=0","Entry$%2==0");}
 
 	if(NNchoice=="Higgs_vs_Bkg_7w") mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@hi_weight,@hi3_weight,@tt_weight,@zz_weight,@zz3_weight"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
+
+	if(NNchoice=="Higgs_vs_Bkg_5w") mlp = new TMultiLayerPerceptron("@gg_weight,@qq_weight,@tt_weight,@zz_weight,@zz3_weight"+NNStruct+":type!","1.0*((type2==1)*(0.887/"+normDY+")+(type2==2)*(0.095/"+normTT+")+(type2==3)*(0.018/"+normZZ+")+(type2==5)*(1.2/"+normZH+"))",simu,"Entry$%2!=0","Entry$%2==0");
 
 	// Function of the NN is exported in python. AND in c++ code (in NN directory) Function to use to evaluate NN
 	mlp->Train(iterations, "text,graph,update=2");
@@ -162,6 +167,7 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	int nIn = 3;
 	if(NNchoice=="Higgs_vs_DY" || NNchoice=="Higgs_vs_ZZ") nIn=4;
 	if(NNchoice=="Higgs_vs_Bkg_7w") nIn=7;
+	if(NNchoice=="Higgs_vs_Bkg_5w") nIn=5;
 	vector<string> vNNinputs;
 	if(NNStruct.BeginsWith(",")){
 	  size_t first=NNStruct.Index(":");
@@ -193,8 +199,10 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	    if(NNchoice=="Higgs_vs_DY") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i];}
 	    if(NNchoice=="Higgs_vs_TT") {params[0] = var[listSample[s]]->tt[i]; params[1] = var[listSample[s]]->hi[i]; params[2] = var[listSample[s]]->hi3[i];}
 	    if(NNchoice=="Higgs_vs_ZZ") {params[0] = var[listSample[s]]->zz[i]; params[1] = var[listSample[s]]->zz3[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i];}
+	    if(NNchoice=="DY_vs_TT") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->tt[i];}
 
 	    if(NNchoice=="Higgs_vs_Bkg_7w") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->hi[i]; params[3] = var[listSample[s]]->hi3[i]; params[4] = var[listSample[s]]->tt[i]; params[5] = var[listSample[s]]->zz[i]; params[6] = var[listSample[s]]->zz3[i];}
+	    if(NNchoice=="Higgs_vs_Bkg_5w") {params[0] = var[listSample[s]]->gg[i]; params[1] = var[listSample[s]]->qq[i]; params[2] = var[listSample[s]]->tt[i]; params[3] = var[listSample[s]]->zz[i]; params[4] = var[listSample[s]]->zz3[i];}
 
 	    for(unsigned int j=0; j<vNNinputs.size(); j++){
 	      if(vNNinputs[j]=="Mbb") params[nIn+j] = var[listSample[s]]->Mbb[i];
@@ -266,19 +274,19 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	// create stack for histogram display
 
 	THStack *hs=new THStack("hs","test stacked histograms");
-	if(fill[zbb]) hs->Add(hists["DYMuNN"]);
+	if(fill[zbb]&&NNchoice!="DY_vs_TT") hs->Add(hists["DYMuNN"]);
 	if(fill[tt]) hs->Add(hists["TTMuNN"]);
 	if(fill[zz]) hs->Add(hists["ZZMuNN"]);
-	//hs->Add(twbh);
+
 	hs->Draw();
-	//tth->Draw("same");
-	hists["signalMuNN"]->Draw("same");	
-	//dath->Draw("same");
+	if(NNchoice!="DY_vs_TT") hists["signalMuNN"]->Draw("same");	
+	else hists["DYMuNN"]->Draw("same");
+
 	TLegend *legend = new TLegend(.75, .80, .95, .95);
-	if(fill[zbb]) legend->AddEntry(hists["DYMuNN"], " DY ");
+	if(fill[zbb]&&NNchoice!="DY_vs_TT") legend->AddEntry(hists["DYMuNN"], " DY ");
 	if(fill[tt]) legend->AddEntry(hists["TTMuNN"], "t#bar{t}");
 	if(fill[zz]) legend->AddEntry(hists["ZZMuNN"], " ZZ ");
-	legend->AddEntry(hists["signalMuNN"], " Zhh ");
+	legend->AddEntry(hists["signalMuNN"], " signal ");
 	legend->Draw();
 	
 	// efficiency computation signal VS background
@@ -288,10 +296,12 @@ void Neural_net_E(const string dy, const string zbb, const string tt, const stri
 	double efficiency_bg[28];
 
 	for(int b=1;b<29;b++){
-	  double seff = hists["signalMuNN"]->Integral(b,29)/hists["signalMuNN"]->Integral();
+	  string namesig="signalMuNN";
+	  if(NNchoice=="DY_vs_TT") namesig="DYMuNN";
+	  double seff = hists[namesig]->Integral(b,29)/hists[namesig]->Integral();
 	  double beff = 0;
 	  for(int s = 0; s<nSamples; s++){
-	    if(fill[listSample[s]]&&(listSample[s]==dy||listSample[s]==tt||listSample[s]==zz)) beff+=hists[labels[listSample[s]]+"MuNN"]->Integral(b,29);
+	    if(fill[listSample[s]]&&((listSample[s]==dy&&NNchoice!="DY_vs_TT")||listSample[s]==tt||listSample[s]==zz)) beff+=hists[labels[listSample[s]]+"MuNN"]->Integral(b,29);
 	  }
 
 	  bg_eff->SetBinContent(b,beff);
