@@ -247,9 +247,14 @@ class AnalysisEvent(Events):
      mystring += "Collections:\n"
      for colname in self._collections.keys():
        collection = self.getCollection(colname)
-       handle = str(self._collections[colname]["handle"])
-       mystring += "*** %s has %d elements\n" % (colname,len(collection))
-       mystring += reduce(lambda a,b: a+b,map(str,collection))
+       try:
+         mystring += "*** %s has %d elements\n" % (colname,len(collection))
+         if isinstance(collection[0],float): # protection... DoubleBuffer is seen with a large size
+           mystring += collection[0]
+         else:
+           mystring += reduce(lambda a,b: a+b,map(str,collection),"")
+       except:
+         pass
      mystring += "\n-----------------------------------------------------------------\n"
      # list the registered producers
      mystring += "Producers:\n"

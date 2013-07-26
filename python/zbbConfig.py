@@ -101,5 +101,5 @@ class configuration:
 class eventDumpConfig:
   # fine-tuning of the event content for display
   productsToPrint   = [ ] # list of product to display (use the producer label)
-  collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label) 
+  collectionsToHide = [ "genParticles" ] # collections used in the analysis but not printed (use the collection label) 
 
