@@ -247,18 +247,19 @@ class AnalysisEvent(Events):
      mystring += "Collections:\n"
      for colname in self._collections.keys():
        collection = self.getCollection(colname)
+       if mystring[-1]!='\n': mystring += '\n'
        try:
          if isinstance(collection[0],float): # protection... DoubleBuffer is seen with a large size
            mystring += "*** %s is a float whose value is %f\n"%(colname,collection[0])
          else:
            mystring += "*** %s has %d elements\n" % (colname,len(collection))
-           mystring += reduce(lambda a,b: a+b,map(CMSSW.objectStr,collection),"")
+           mystring += reduce(lambda a,b: a+b,map(str,collection),"")
        except IndexError:
          mystring += "*** %s has %d elements\n" % (colname,len(collection))
        except TypeError:
          if collection is not None:
            mystring += "*** %s has 1 element\n" % colname
-           mystring += CMSSW.objectStr(collection)
+           mystring += str(collection)
        except:
          pass
      mystring += "\n-----------------------------------------------------------------\n"
@@ -274,16 +275,16 @@ class AnalysisEvent(Events):
          try:
            thisstring = "%s => vector of %d objects(s)\n" % (k,len(v))
          except:
-           mystring += "%s => %s\n"%(k,CMSSW.objectStr(v))
+           mystring += "%s => %s\n"%(k,str(v))
          else:
            try:
              for it,vec in enumerate(v):
-               thisstring += "%s[%d] = %s\n"%(k,it,CMSSW.objectStr(vec))
+               thisstring += "%s[%d] = %s\n"%(k,it,str(vec))
            except: 
-             mystring += "%s => %s\n"%(k,CMSSW.objectStr(v))
+             mystring += "%s => %s\n"%(k,str(v))
            else:
              mystring += thisstring
        else:
-         mystring += "%s => %s\n"%(k,CMSSW.objectStr(v))
+         mystring += "%s => %s\n"%(k,str(v))
      return mystring
 
