@@ -5,6 +5,7 @@ ROOT.gSystem.Load("libPhysicsToolsUtilities.so")
 from types import MethodType
 import libPyROOT as _root
 from ROOT import TLorentzVector,TVector3
+from math import sin
 
 #####################################################
 ### Definition of the string conversion methods   ###
@@ -70,15 +71,15 @@ def _pat_Electron__str__(self):
   superclusterEta = abs(self.superCluster().eta())
   theString += "  Number of missing hits: %d\n" % self.gsfTrack().numberOfLostHits()
   theString += "  SuperCluster Et: %f\n" % scEt
-  theString += "  HCAL isolation: %f\n"  % self.dr03HcalTowerSumEt()/scEt
-  theString += "  ECAL isolation: %f\n"  % self.dr03EcalRecHitSumEt()/scEt
-  theString += "  Tk   isolation: %f\n"  % self.dr03TkSumPt()/scEt
+  theString += "  HCAL isolation: %f\n"  % (self.dr03HcalTowerSumEt()/scEt)
+  theString += "  ECAL isolation: %f\n"  % (self.dr03EcalRecHitSumEt()/scEt)
+  theString += "  Tk   isolation: %f\n"  % (self.dr03TkSumPt()/scEt)
   theString += "  H over E: %f\n" % self.hadronicOverEm()
   theString += "  dphi: %f\n" % self.deltaPhiEleClusterTrackAtCalo()
   theString += "  deta: %f\n" % self.deltaEtaEleClusterTrackAtCalo()
   theString += "  inin: %f\n" % self.scSigmaIEtaIEta()
   theString += "  d0: %f\n"   % abs(self.dB())
-  theString += "  supercluster eta: %f\n" % self.superCluster().eta(),
+  theString += "  supercluster eta: %f\n" % self.superCluster().eta()
   if superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 ):
     theString += " => in fiducial region\n"
   else:
