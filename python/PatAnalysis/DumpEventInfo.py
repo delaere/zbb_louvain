@@ -4,6 +4,7 @@ import CMSSW
 from AnalysisEvent import AnalysisEvent
 import EventSelection
 from CPconfig import eventDumpConfig
+#import pdb
 
 def DumpEventInfo(event=None, runNumber=None, eventNumber=None, lsNumber=None, path="./"):
   """Dump informations about a given event"""
@@ -31,6 +32,7 @@ def DumpEventInfo(event=None, runNumber=None, eventNumber=None, lsNumber=None, p
   for collection in eventDumpConfig.collectionsToHide: event.removeCollection(collection)
   # Now, we can go on with the printing.
   print event
+  #pdb.set_trace()
 
 if __name__=="__main__":
   import sys

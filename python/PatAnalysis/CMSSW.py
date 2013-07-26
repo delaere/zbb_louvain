@@ -119,6 +119,15 @@ def _reco_CompositeCandidate__str__(self):
 ROOT.reco.CompositeCandidate
 _root.MakeRootClass( "reco.CompositeCandidate" ).__str__    = _reco_CompositeCandidate__str__
 
+### for some reason, this doesn't work for CMSSW classes...
+def objectStr(obj):
+  return { ROOT.reco.Vertex : _reco_vertex__str__,
+           ROOT.pat.MET : _pat_met__str__,
+           ROOT.pat.Jet : _pat_Jet__str__,
+           ROOT.pat.Electron : _pat_Electron__str__,
+           ROOT.pat.Muon : _pat_Muon__str__,
+           ROOT.reco.CompositeCandidate : _reco_CompositeCandidate__str__}.get(obj.__class__,lambda x:str(x)+'\n')(obj)
+  
 #####################################################
 ### Definition of additional ROOT methods         ###
 #####################################################
@@ -129,5 +138,4 @@ def _lorentzVector__str__( self ):
   return theString
 
 _root.MakeRootClass( "TLorentzVector" ).__str__    = _lorentzVector__str__
-
 
