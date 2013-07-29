@@ -25,7 +25,7 @@ def Delta(par1,par2):
 #                                           Call Function
 #---------------------------------------------------------------------------------------------
 #------------------------------------FOR RUNNING with the script -----------------------------
-def dumpAll(stage=9, muChannel=False, path="/home/fynu/lceard/store/Prod_MC_2011_V2/Summer11/Eff_2/DYJets_Summer11/",fileAll=None,numb=None):
+def dumpAll(stage=9, muChannel=True, path="/home/fynu/lceard/store/Prod_MC_2011_V2/Summer11/Eff_2/DYJets_Summer11/",fileAll=None,numb=None):
   out_file_INCL= open(fileAll,"w")
   dirList=os.listdir(path)
   files=[]
@@ -599,4 +599,4 @@ def dumpAll(stage=9, muChannel=False, path="/home/fynu/lceard/store/Prod_MC_2011
 for num, arg in enumerate(sys.argv):
   print num, arg
  
-dumpAll(fileAll=sys.argv[1],numb=sys.argv[2])
+dumpAll(fileAll=sys.argv[1],numb=sys.argv[2],muChannel=sys.argv[3])
