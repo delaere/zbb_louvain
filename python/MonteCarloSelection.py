@@ -1,6 +1,8 @@
 # OLD methods to classify the DY events, based on parton-level information. Renamed to avoid name conflict with new methods.
 
 import math
+import operator
+import itertools
 from ROOT import TLorentzVector
 
 def isGenZlEvent(genParticles,ptcut=15, onlyStatus3=False):
@@ -63,17 +65,21 @@ def delta_phi(phi1,phi2):
   if dphi > math.pi : dphi = 2*math.pi-dphi
   return dphi
 
+def delta_R(part1,part2):
+  return math.hypot((part1.eta() - part2.eta()), delta_phi(part1.phi(), part2.phi()))
+
 def match_GenToHad(genjets, hadrons, dr):
   """match hadrons to jets and returns matched jets"""
   matched = []
   for hadron in hadrons:
     in_cone = []
     for jet in genjets:
-      deltar = math.hypot((hadron.eta() - jet.eta()), delta_phi(hadron.phi(), jet.phi()))
-      if deltar < dr: in_cone.append([deltar, jet])
+      deltar = delta_R(hadron,jet)
+      if deltar < dr:
+        in_cone.append([deltar, jet, hadron])
     if in_cone:
-      bestmatch = min(in_cone)[1]
-      matched.append(jet)
+      bestmatch = min(in_cone, key=operator.itemgetter(0))[1]
+      matched.append(bestmatch)
       genjets.remove(bestmatch)
   return (matched,genjets)
 
@@ -184,4 +190,53 @@ def LHEinfo(event):
     "nc"   : nc,
     }
   return out
+
+# methods to get a generator-level Z candidate
+
+# This first version does basically what Roberto was doing in zbb_counter.
+# It finds a Z decaying into lepton, checks the acceptance for leptons and the Z mass.
+def getGenZparticle(event, muons=True, electrons=True, leptonPtCut=20, leptonEtaCut=2.4):
+  """method to find a Z decaying into leptons."""
+  for part in event.genParticles:
+    if abs(part.pdgId()) == 23 and part.status()==3:
+      l0=part.daughter(0)
+      l1=part.daughter(1)
+      if (l0 and l1 and l0.status()==3 and l1.status()==3 and ((muons and abs(l0.pdgId())==13 and abs(l1.pdgId())==13) or ( electrons and abs(l0.pdgId())==11 and abs(l1.pdgId())==11))):
+        if l0.pt()>leptonPtCut and l1.pt()>leptonPtCut and abs(l0.eta())<leptonEtaCut and abs(l1.eta())<leptonEtaCut:
+          l1c=TLorentzVector(l0.px(),l0.py(),l0.pz(),l0.energy())
+          l2c=TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
+          if 76 <= (l1c+l2c).M() <= 106:
+            return part
+  return None
+
+# This second version is what Ludivine is doing for the unfolding.
+# It finds a lepton pair at generator level that is compatible with the Z hypothesis.
+# By construction, it is closer to what we do at reco level and does not require that 
+# the leptons be from a gen Z explicitely.
+def getGenZleptonPair(event, muons=True, electrons=True, leptonPtCut=20, leptonEtaCut=2.4):
+  # get gen electrons and muons
+  genElectrons=[]
+  genMuons=[]
+  for genPart in event.genParticles :
+    if electrons and abs(genPart.pdgId())==11 and genPart.status()==1 and genPart.pt()>leptonPtCut and abs(genPart.eta())<leptonEtaCut:
+      genElectrons.append(genPart)
+    if muons and abs(genPart.pdgId())==13 and genPart.status()==1 and genPart.pt()>leptonPtCut and abs(genPart.eta())<leptonEtaCut:
+      genMuons.append(genPart)
+  # build pairs
+  genZCandidates=[]
+  for lpair in itertools.chain(itertools.combinations(genElectrons,2),itertools.combinations(genMuons,2)):
+    lepton1 = lpair[0]
+    lepton2 = lpair[1]
+    if lepton1.charge() != lepton2.charge():
+      genZcandidate=TLorentzVector(lepton1.px(),lepton1.py(),lepton1.pz(),lepton1.energy()) + \
+                    TLorentzVector(lepton2.px(),lepton2.py(),lepton2.pz(),lepton2.energy())
+      if 76 <= genZcandidate.M() <= 106 :
+        genZCandidates.append((genZcandidate,lepton1,lepton2))
+  # find best option based on the mass
+  def massDiff(z):
+    return abs(z[0].M()-91.1876)
+  if len(genZCandidates)>0:
+    return min(genZCandidates, key=massDiff)[1:]
+  else:
+    return None
 

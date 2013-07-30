@@ -89,7 +89,9 @@ class configuration:
                        eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":True,"eleChannel":False } ),
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":True,"eleChannel":True } ),
-                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } )
+                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
+#                       eventProducer("genZparticle", "MonteCarloSelection", "getGenZparticle", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
+                       eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
                      ]
 
   eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":ssvperfData,"btagging":btagging}),
