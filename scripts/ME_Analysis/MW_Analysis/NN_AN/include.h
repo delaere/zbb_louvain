@@ -32,6 +32,10 @@ using namespace std;
 #include "TGraphErrors.h"
 #include "TMultiGraph.h"
 #include "TFile.h"
+#include "TMVA/Factory.h"
+#include "TMVA/Reader.h"
+
+using namespace TMVA;
 
 #include "TH1.h"
 #include "TF1.h"

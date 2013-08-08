@@ -21,6 +21,9 @@
 #include <algorithm>
 #include "rds_zbb.C"
 #include "tree2.C"
+#include "TMVA/Reader.h"
+
+using namespace TMVA;
 // Include NN traine on ee
 // MM: CSV Medium Medium WP
 // MM_N: CSV Medium Medium WP + narrow Mll
@@ -87,12 +90,32 @@
 #include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_3j_ZH125_comb_9_9_300_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_4.cxx"
 #include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_3j_ZH125_comb_5_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_1.cxx"
 
+//ML
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_DY_ZH125_comb_12_120_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20_2.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_ZZ_ZH125_comb_2_2_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_TT_ZH125_comb_6_3_2_150_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_9_6_3_210_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_9_100_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_2_2_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_5000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_2_500_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20.cxx"
+
+//ML ZZ
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+#include "../MW_Analysis/NN_AN/selectedNNs/MLP_ZZ_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20.cxx"
+
 //general include
 #include <iostream>
 #include <map>
 
 //define list of NNs
-int nNNs = 38;
+int nNNs = 38+16;
 std::string NNs [] = {
   //Maximum 60 chs
   "NN_Higgs125vsDY_MM_N_CSV_2011_comb",//1
@@ -132,7 +155,25 @@ std::string NNs [] = {
   "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_5",//35
   "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_9",
   "NN_Higgs125vsBkg_3jcomb_9_9_300_Nj3_Mbb50_150_Pt402520_4",
-  "NN_Higgs125vsBkg_3jcomb_5_600_Nj3_Mbb50_150_Pt402520_1"};
+  "NN_Higgs125vsBkg_3jcomb_5_600_Nj3_Mbb50_150_Pt402520_1",
+
+  "NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2",
+  "NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520",//40
+  "NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520",
+  "NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt",
+  "NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt",
+  "NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt",
+  "NN_Higgs125vsBkg_2jcomb_4_5000_Nj2Mbb80_150Pt402520",//45
+  "NN_Higgs125vsBkg_2jcomb_4_2_500_Nj2Mbb80_150Pt402520",
+  "NN_Higgs125vsBkg_3jcomb_prodCSV_5_3_1000_Nj3Mbb50_150Pt",
+  "NN_Higgs125vsBkg_3jcomb_prodCSV_3_2_1000_Nj3Mbb50_150Pt",
+  "NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20",
+  "NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520",//50
+  "NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520",
+  "NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520",
+  "NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520",
+  "NN_ZZvsBkg_3jcomb_prodCSV_9_200_Nj3Mbb15_115Pt402520"
+};
 //------------------------------------------------------------
 //Switch to turn on or of the ZbbReweight
 void InitZbbReweight();
@@ -184,6 +225,16 @@ Double_t        Wtwb;
 Double_t        Wzz3;
 Double_t        Wzz0;
 
+Float_t        wgg;
+Float_t        wqq;
+Float_t        wtt;
+Float_t        wzz3;
+Float_t        wzz0;
+Float_t        wzh3;
+Float_t        wzh0;
+Float_t        jetmetbjetprodCSVdisc;
+Double_t       bdt;
+
 std::map< std::string , Double_t > Whi0;
 std::map< std::string , Double_t > Whi3;
 int nmasses = 9;
@@ -231,9 +282,19 @@ std::map< std::string , Double_t > SumNN_3j;
 std::map< std::string , Double_t > ProdNN_3j;
 std::map< std::string , Double_t > SumWeightedNN_3j;
 
+std::map< std::string , Double_t > SumNN_ML_2j;
+std::map< std::string , Double_t > ProdNN_ML_2j;
+std::map< std::string , Double_t > SumWeightedNN_ML_2j;
+
+std::map< std::string , Double_t > SumNN_ML_3j;
+std::map< std::string , Double_t > ProdNN_ML_3j;
+std::map< std::string , Double_t > SumWeightedNN_ML_3j;
+
 //Extra variables for reweighting stuff
 Double_t ZbbReweight_dijetdR;
 Double_t ZbbReweight_bestzpt;
+
+TMVA::Reader * reader;
 
 void CreateParentTree(TString InputFile) {
    std::cout << "Running over sample: " << InputFile << std::endl;
@@ -260,6 +321,18 @@ void CreateParentTree(TString InputFile) {
      return;
    }
   
+   reader = new TMVA::Reader("!Color:!Silent");
+   reader->AddVariable("ggweight", &wgg);
+   reader->AddVariable("qqweight", &wqq);
+   reader->AddVariable("ttweight", &wtt);
+   reader->AddVariable("zzweight", &wzz0);
+   reader->AddVariable("zz3weight", &wzz3);
+   reader->AddVariable("hiweight", &wzh0);
+   reader->AddVariable("hi3weight", &wzh3);
+   reader->AddVariable("prodCSV", &jetmetbjetprodCSVdisc);
+   reader->BookMVA("BDT", "../MW_Analysis/NN_AN/selectedBDT/higgs_BDT.weights.xml");
+
+
    MLP_TT_vs_DY_MM_CSV_2011 *MLP_TT_vs_DY_MM_ee = new MLP_TT_vs_DY_MM_CSV_2011();
    MLP_TT_vs_DY_MM_N_CSV_2011 *MLP_TT_vs_DY_MM_N_ee = new MLP_TT_vs_DY_MM_N_CSV_2011();
    MLP_TT_vs_DY_ML_CSV_2011 *MLP_TT_vs_DY_ML_ee = new MLP_TT_vs_DY_ML_CSV_2011();
@@ -314,8 +387,23 @@ void CreateParentTree(TString InputFile) {
    MLP_Higgs_vs_Bkg_3j_ZH125_comb_9_9_300_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_4 *MLP_higgs_vs_Bkg_3j_ZH125_comb_9_9_300_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_4 =new MLP_Higgs_vs_Bkg_3j_ZH125_comb_9_9_300_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_4();
    MLP_Higgs_vs_Bkg_3j_ZH125_comb_5_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_1 *MLP_higgs_vs_Bkg_3j_ZH125_comb_5_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_1 = new MLP_Higgs_vs_Bkg_3j_ZH125_comb_5_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_1();
 
+   MLP_Higgs_vs_DY_ZH125_comb_12_120_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20_2 *MLP_higgs_vs_DY_ZH125_comb_12_120_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20_2 = new MLP_Higgs_vs_DY_ZH125_comb_12_120_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20_2();
+   MLP_Higgs_vs_ZZ_ZH125_comb_2_2_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_ZZ_ZH125_comb_2_2_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_ZZ_ZH125_comb_2_2_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_TT_ZH125_comb_6_3_2_150_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_TT_ZH125_comb_6_3_2_150_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_TT_ZH125_comb_6_3_2_150_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_9_6_3_210_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_9_6_3_210_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_9_6_3_210_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_9_100_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_9_100_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_9_100_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_2_2_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_2_2_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_2_2_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_5000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_Bkg_2j_ZH125_comb_4_5000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_5000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_2_500_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_Bkg_2j_ZH125_comb_4_2_500_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_Bkg_2j_ZH125_comb_4_2_500_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 *MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20 = new MLP_Higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20();
+   MLP_ZZ_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 *MLP_zz_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20 = new MLP_ZZ_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20();
 
-   
    //-----------------------------------------------------------------------
    // Input files location
 
@@ -376,6 +464,7 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("flavour", &flavour, "flavour/I");
    t_RDSME->Branch("eventNumber", &eventNumber, "eventNumber/l");
    t_RDSME->Branch("runNumber", &runNumber, "runNumber/l");
+   t_RDSME->Branch("bdt", &bdt, "bdt/D");
    t_RDSME->Branch("Wgg", &Wgg, "Wgg/D");
    t_RDSME->Branch("Wqq", &Wqq, "Wqq/D");
    t_RDSME->Branch("Wtt", &Wtt, "Wtt/D");
@@ -396,6 +485,14 @@ void CreateParentTree(TString InputFile) {
      t_RDSME->Branch(("SumNN_3j_"+masses[m]).c_str() , &SumNN_3j[masses[m]],("SumNN_3j_"+masses[m]+"/D").c_str());
      t_RDSME->Branch(("ProdNN_3j_"+masses[m]).c_str() , &ProdNN_3j[masses[m]],("ProdNN_3j_"+masses[m]+"/D").c_str());
      t_RDSME->Branch(("SumWeightedNN_3j_"+masses[m]).c_str() , &SumWeightedNN_3j[masses[m]],("SumWeightedNN_3j_"+masses[m]+"/D").c_str());
+
+     t_RDSME->Branch(("SumNN_ML_2j_"+masses[m]).c_str() , &SumNN_ML_2j[masses[m]],("SumNN_ML_2j_"+masses[m]+"/D").c_str());
+     t_RDSME->Branch(("ProdNN_ML_2j_"+masses[m]).c_str() , &ProdNN_ML_2j[masses[m]],("ProdNN_ML_2j_"+masses[m]+"/D").c_str());
+     t_RDSME->Branch(("SumWeightedNN_ML_2j_"+masses[m]).c_str() , &SumWeightedNN_ML_2j[masses[m]],("SumWeightedNN_ML_2j_"+masses[m]+"/D").c_str());
+     
+     t_RDSME->Branch(("SumNN_ML_3j_"+masses[m]).c_str() , &SumNN_ML_3j[masses[m]],("SumNN_ML_3j_"+masses[m]+"/D").c_str());
+     t_RDSME->Branch(("ProdNN_ML_3j_"+masses[m]).c_str() , &ProdNN_ML_3j[masses[m]],("ProdNN_ML_3j_"+masses[m]+"/D").c_str());
+     t_RDSME->Branch(("SumWeightedNN_ML_3j_"+masses[m]).c_str() , &SumWeightedNN_ML_3j[masses[m]],("SumWeightedNN_ML_3j_"+masses[m]+"/D").c_str());
 
      for(int n=0; n<nNNs; n++) {
        t_RDSME->Branch((NNs[n]+"_"+masses[m]).c_str(), &NNvalue[NNs[n]+"_"+masses[m]],(NNs[n]+"_"+masses[m]+"/D").c_str());
@@ -554,6 +651,17 @@ void CreateParentTree(TString InputFile) {
 	jetmetbjetMaxCSVdisc=std::max(mc_RDS->jetmetbjet1CSVdisc,mc_RDS->jetmetbjet2CSVdisc);
 	jetmetbjetProdCSVdisc=mc_RDS->jetmetbjet1CSVdisc*mc_RDS->jetmetbjet2CSVdisc;
 
+
+	wtt = Wtt;
+	wqq = Wqq;
+ 	wgg = Wgg;
+        wzz3 = Wzz3;
+        Wzz0 = Wzz0;
+        wzh3 = Whi3["125"];
+        wzh0 = Whi0["125"];
+	jetmetbjetprodCSVdisc=jetmetbjetProdCSVdisc;
+        bdt = reader->EvaluateMVA("BDT");
+
         Inv_Mass_bb = mc_ME->Inv_Mass_bb;
         Inv_Mass_lept = mc_ME->Inv_Mass_lept;
 	
@@ -617,7 +725,7 @@ void CreateParentTree(TString InputFile) {
 	  NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_dijetdR_3_9_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR,mc_RDS->eventSelectiondijetdR)));
 	  NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_501_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wzz0 , Wzz3, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR,mc_RDS->eventSelectiondijetdR)));
 	  NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_dijetdR_2_4_500_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR,mc_RDS->eventSelectiondijetdR)));
-	  SumNN_3j[masses[m]] = (NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]]+NNvalue["NN_Higgs125vsZZcomb_trijetMdr_fsrDR_dijetdR_2_4_501_Nj3Mbb50_150Pt402520_"+masses[m]]+NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]])/3;
+	  SumNN_3j[masses[m]] = (NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]]+NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]]+NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]])/3;
 	  ProdNN_3j[masses[m]] = NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]]*NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]]*NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]];
 	  SumWeightedNN_3j[masses[m]] = NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]]*0.8+NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]]*0.05+NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]]*0.15;
 	  
@@ -627,6 +735,44 @@ void CreateParentTree(TString InputFile) {
 	  NNvalue["NN_Higgs125vsBkg_3jcomb_9_9_300_Nj3_Mbb50_150_Pt402520_4_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_9_9_300_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_4->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]])));
 	  NNvalue["NN_Higgs125vsBkg_3jcomb_5_600_Nj3_Mbb50_150_Pt402520_1_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_5_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20_1->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt_"+masses[m]])));
 
+
+
+	  NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_DY_ZH125_comb_12_120_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20_2->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]])));
+	  NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_ZZ_ZH125_comb_2_2_1000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wzz0, Wzz3, Whi0[masses[m]] , Whi3[masses[m]])));
+	  NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_TT_ZH125_comb_6_3_2_150_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]])));
+	  SumNN_ML_2j[masses[m]] = (NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]]+NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]]+NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]])/3;
+	  ProdNN_ML_2j[masses[m]] = NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]]*NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]]*NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]];
+	  SumWeightedNN_ML_2j[masses[m]] = NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]]*0.8+NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]]*0.05+NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]]*0.15;
+
+
+	  NNvalue["NN_Higgs125vsBkg_2jcomb_4_5000_Nj2Mbb80_150Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_2j_ZH125_comb_4_5000_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]],NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]],NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]])));
+	  NNvalue["NN_Higgs125vsBkg_2jcomb_4_2_500_Nj2Mbb80_150Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_2j_ZH125_comb_4_2_500_Nj2_Mbb80_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcomb_12_120_Nj2Mbb80_150Pt402520_2_"+masses[m]],NNvalue["NN_Higgs125vsZZcomb_2_2_1000_Nj2Mbb80_150Pt402520_"+masses[m]],NNvalue["NN_Higgs125vsTTcomb_6_3_2_150_Nj2Mbb80_150Pt402520_"+masses[m]])));
+	  
+
+	  NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_9_6_3_210_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	  NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_ZZ_ZH125_comb_trijetMdr_fsrDR_9_100_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wzz0, Wzz3, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	  NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_TT_ZH125_comb_trijetMdr_fsrDR_2_2_600_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	  SumNN_ML_3j[masses[m]] = (NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]]+NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]]+NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]])/3;
+	  ProdNN_ML_3j[masses[m]] = NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]]*NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]]*NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]];
+	  SumWeightedNN_ML_3j[masses[m]] = NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]]*0.8+NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]]*0.05+NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]]*0.15;
+
+	  NNvalue["NN_Higgs125vsBkg_3jcomb_prodCSV_5_3_1000_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
+	  NNvalue["NN_Higgs125vsBkg_3jcomb_prodCSV_3_2_1000_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
+
+
+
+	  NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]])));
+	  NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]])));
+
+	  NNvalue["NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20_"+masses[m]],NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520_"+masses[m]])));
+
+
+	  NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	  NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+
+	  NNvalue["NN_ZZvsBkg_3jcomb_prodCSV_9_200_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520_"+masses[m]],NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
+
+	  
 	}
 
 
@@ -748,7 +894,6 @@ void SimpleTree() {
   CreateParentTree("DY180_Mu_MC");
   CreateParentTree("DY180_El_MC");
   
-   //CreateParentTree("DY_Pt100_El_MC");
   CreateParentTree("TT_Mu_MC");
   CreateParentTree("TT_El_MC");
   CreateParentTree("TT-FullLept_Mu_MC");

@@ -11,8 +11,8 @@
 
 using namespace std;
 
-TString inputFolder = "/nfs/user/acaudron/RDS537/";
-TString outputFolder = "/nfs/user/acaudron/LHCO537/";
+TString inputFolder = "/nfs/user/acaudron/RDS537_JESdown/";
+TString outputFolder = "/nfs/user/acaudron/LHCO537_JESdown/";
 
 void CreateTree(TString InputFile){ 
  
@@ -316,7 +316,7 @@ void CreateTree(TString InputFile){
     nBjetsHP      = mc_RDS->jetmetnj;
     nBjetsHEHP    = mc_RDS->jetmetnj;
 	
-    category      = mc_RDS->rc_eventSelection_14_idx;
+    category      = mc_RDS->rc_eventSelection_10_idx;
 	
     if (category == 1 && Met_sig < 10 &&  Met_sig!= 0){
 
@@ -347,10 +347,31 @@ void CreateTree(TString InputFile){
 void Loop(){
   //CreateTree("DoubleMu_DataA");
   //CreateTree("DoubleEle_DataA");
-  //CreateTree("DY_El_MC");
-  //CreateTree("DY_Mu_MC");
-  CreateTree("TT_El_MC");
-  /*CreateTree("TT_Mu_MC");
+  CreateTree("DY_El_MC");
+  CreateTree("DY_Mu_MC");
+
+  CreateTree("DY1j_El_MC");
+  CreateTree("DY1j_Mu_MC");
+  CreateTree("DY2j_El_MC");
+  CreateTree("DY2j_Mu_MC");
+  CreateTree("DY3j_El_MC");
+  CreateTree("DY3j_Mu_MC");
+  CreateTree("DY4j_El_MC");
+  CreateTree("DY4j_Mu_MC");
+  CreateTree("DY50-70_El_MC");
+  CreateTree("DY50-70_Mu_MC");
+  CreateTree("DY70-100_El_MC");
+  CreateTree("DY70-100_Mu_MC");
+  CreateTree("DY100_El_MC");
+  CreateTree("DY100_Mu_MC");
+  CreateTree("DY180_El_MC");
+  CreateTree("DY180_Mu_MC");
+
+  CreateTree("TT-FullLept_El_MC");
+  CreateTree("TT-FullLept_Mu_MC");
+
+  //CreateTree("TT_El_MC");
+  //CreateTree("TT_Mu_MC");
   CreateTree("ZZ_El_MC");
   CreateTree("ZZ_Mu_MC");
   CreateTree("ZH110_El_MC");
@@ -370,5 +391,5 @@ void Loop(){
   CreateTree("ZH145_El_MC");
   CreateTree("ZH145_Mu_MC");
   CreateTree("ZH150_El_MC");
-  CreateTree("ZH150_Mu_MC");*/
+  CreateTree("ZH150_Mu_MC");
 }

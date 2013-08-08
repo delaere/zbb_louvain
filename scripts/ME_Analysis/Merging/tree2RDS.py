@@ -1,60 +1,9 @@
 
 from ROOT import *
-from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS
+from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS, PlotForCLsRaw
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
 
-listNNs = [
-  #Maximum 60 chs
-  "NN_Higgs125vsDY_MM_N_CSV_2011_comb",#1
-  "NN_Higgs125vsZZ_MM_N_CSV_2011_comb",
-  "NN_Higgs125vsTT_MM_N_CSV_2011_comb",
-  "NN_Higgs125vsBKG_MM_N_CSV_2011_comb",
-  "NN_Higgs125vsDY_MM_N_CSV_2012_comb_ZH125",#5
-  "NN_Higgs125vsZZ_MM_N_CSV_2012_comb_ZH125",
-  "NN_Higgs125vsTT_MM_N_CSV_2012_comb_ZH125",
-  "NN_Higgs125vsBkgcomb",
-  "NN_Higgs125vsDY_MM_N_CSV_2012_comb3_2_1_600",
-  "NN_Higgs125vsTT_MM_N_CSV_2012_comb5_2_3_1_500",#10
-  "NN_Higgs125vsZZ_MM_N_CSV_2012_comb2_5_3_1_1000",
-  "NN_Higgs125vsBkgcomb_2_3_2_1_1000",
-  "NN_Higgs125vsBkgcomb_1_10000",
-  "NN_Higgs125vsBkgcomb_1_5000",
-  "NN_Higgs125vsBkgcomb_2_10000",#15
-  "NN_Higgs125vsBkgcomb_2_5000",
-  "NN_Higgs125vsBkgcomb_3_5000",
-  "NN_Higgs125vsBkgcomb_2_3_2_10000",
-  "NN_Higgs125vsBkgcomb_2_3_2_5000",
-  "NN_Higgs125vsBkgcomb_2_4_10000",#20
-  "NN_Higgs125vsBkgcomb_2_5_3_1_1000",
-  "NN_Higgs125vsBkgcomb_3_2_10000",
-  "NN_Higgs125vsDYcomb_2_4_1000_Nj2Mbb80_150Pt402520",
-  "NN_Higgs125vsZZcomb_2_4_750_Nj2Mbb80_150Pt402520",
-  "NN_Higgs125vsTTcomb_5_10_700_Nj2Mbb50_200Pt402520",#25
-  "NN_Higgs125vsBkg_2jcomb_2_2_2_500_Nj2Mbb50_200Pt402520",
-  "NN_Higgs125vsBkg_2jcomb_6_6_131_Nj2Mbb80_150Pt402520_3",
-  "NN_Higgs125vsBkg_2jcomb_9_3_100_Nj2Mbb80_150Pt402520_8",
-  "NN_Higgs125vsBkg_2jcomb_9_3_100_Nj2Mbb80_150Pt402520_21",
-  "NN_Higgs125vsBkg_2jcomb_2_500_Nj2Mbb80_150Pt402520_1",#30
-  "NN_Higgs125vsDYcombMbbjdRbjdRbb_3_9_500_Nj3Mbb50_150Pt402520",
-  "NN_Higgs125vsZZcombMbbjdRbjdRbb_2_4_501_Nj3Mbb50_150Pt402520",
-  "NN_Higgs125vsTTcombMbbjdRbjdRbb_2_4_500_Nj3Mbb50_150Pt402520",
-  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_4",
-  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_5",#35
-  "NN_Higgs125vsBkg_3jcomb_4_1000_Nj3_Mbb50_150_Pt402520_9",
-  "NN_Higgs125vsBkg_3jcomb_9_9_300_Nj3_Mbb50_150_Pt402520_4",
-  "NN_Higgs125vsBkg_3jcomb_5_600_Nj3_Mbb50_150_Pt402520_1",
-    
-  "SumNN",
-  "ProdNN",
-  "SumWeightedNN",
-  "SumNN_2j",
-  "ProdNN_2j",
-  "SumWeightedNN_2j",
-  "SumNN_3j",
-  "ProdNN_3j",
-  "SumWeightedNN_3j",
-  ]
-
+listNNs = PlotForCLsRaw
 RAS = {}
 
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
@@ -72,6 +21,7 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myWtwbRRV = RooRealVar("Wtwb", "Wtwb", -10, 3300)
   myWzz3RRV = RooRealVar("Wzz3", "Wzz3", -10, 300)
   myWzz0RRV = RooRealVar("Wzz0", "Wzz0", -10, 300)
+  mybdtRRV = RooRealVar("bdt", "bdt", -10, 300)
   for m in ["110","115","120","125","130","135","140","145","150"] :
     RAS["hi0"+m]=RooRealVar("Whi0_"+m, "Whi0_"+m, -10, 300)
     RAS["hi3"+m]=RooRealVar("Whi3_"+m, "Whi3_"+m, -10, 300)
@@ -97,6 +47,7 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(myWzz3RRV)
   myRDSRAS.add(myWzz0RRV)
   myRDSRAS.add(myMeTRRV)
+  myRDSRAS.add(mybdtRRV)
   myRDSRAS.add(myjetmetbjetMinCSVdiscRRV)
   myRDSRAS.add(myjetmetbjetMaxCSVdiscRRV)
   myRDSRAS.add(myjetmetbjetProdCSVdiscRRV)

@@ -32,7 +32,7 @@ from AnalysisEvent import AnalysisEvent
 from ROOT import *
 from itertools import combinations
 from baseControlPlots import getArgSet
-from zbbCommons import zbbfile, zbbme
+from zbbCommons import zbbfile, zbbme, zbbsystematics
 from optparse import OptionParser
 
 ###############
@@ -72,12 +72,15 @@ btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
 
-from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS
+from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS, dirRDS_JESup, dirRDS_JESdown
 path = pathSkimEMu
 outputDir=dirRDS
 #outputDir=""
+if zbbsystematics.JESfactor==1 : outputDir=dirRDS_JESup
+elif zbbsystematics.JESfactor==-1 : outputDir=dirRDS_JESdown
+print "zbbsystematics.JESfactor", zbbsystematics.JESfactor, ", outputDir", outputDir
 postfix=""
-#postfix="_newdefMC_btagSFs"
+#postfix="_testtau"
 if jobNumber>0 : postfix=postfix+"_"+str(jobNumber)
 
 #checkTrigger[channel]=False

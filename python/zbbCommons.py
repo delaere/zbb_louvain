@@ -37,16 +37,17 @@ class zbbfile:
   ssvperfData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/performance_csv_witheff.root" ## in order to use the csv efficiencies and SFs
   pileupData=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
   pileupMC=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/MCpileup_Summer12_S10.root"
-  jecUncertainty=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/JEC11_V12_AK5PF_UncertaintySources.txt"
+  jecUncertainty=str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt"
   controlPlots="controlPlots.root"
   rooDataset="File_rds_zbb.root"
 
 class zbbnorm:
   """information to be used for the MC sample normalization"""
-  lumi_totEle2011=4.99 #in fb-1
-  lumi_totMu2011=5.05
+  lumi_totEle2011 = 4.99 #in fb-1
+  lumi_totMu2011  = 5.05
 
-  lumi_tot2012= 19.45 #A+B+C+D
+  lumi_tot2012 = 19.45 #A+B+C+D
+  if rmPixelMisAligRuns : lumi_tot2012-=0.58
   #lumi_tot2012= 19.45-7.27 #ABC
   
   #x_section 7 TeV in pb
