@@ -1,0 +1,3 @@
+[submodule "python/SAMADhi"]
+	path = python/SAMADhi
+	url = git@github.com:delaere/SAMADhi.git
