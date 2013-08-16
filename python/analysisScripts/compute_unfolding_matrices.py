@@ -18,11 +18,30 @@ import shutil
 
 from DataFormats.FWLite import Events, Handle
 import eventSelection as llbb
-from zbbCommons import zbblabel
 
 from LumiReWeighting import LumiReWeighting 
 from LeptonsReweighting import LeptonsReWeighting
 from btaggingWeight import btaggingWeight
+
+class zbblabel:
+  """labels used in the PAT configuration.
+     Note that the use of labels is deprecated in favor of the AnalysisEvent interface."""
+  allmuonslabel="allMuons"
+  muonlabel="tightMuons"
+  allelectronslabel="allElectrons"
+  electronlabel="tightElectrons"
+  #jetlabel="smearedPatJetsResDown"
+  jetlabel="cleanPatJets"
+  zmumulabel="zmuTightmuTight"
+  zelelabel="zelTightelTight"
+  vertexlabel="goodPV"
+  pulabel="addPileupInfo"
+  triggerlabel="patTriggerEvent"
+  metlabel="patType01SCorrectedPFMet"
+  rholabel="kt6PFJets"
+  genlabel="genParticles" #genlabel="prunedGen"
+  genjetlabel="ak5GenJets"
+  genInfolabel="generator"
 
 class unfolder:
     """ Class to compute unfolding "matrices" """
