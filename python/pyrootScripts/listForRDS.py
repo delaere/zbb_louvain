@@ -1,52 +1,4 @@
 
-
-dataPeriods = [
-    "A",
-    "A06aug",
-    "B",
-    "C-v1",
-    "C-v2",
-    "D",
-    ]
-
-sampleList = [
-    "DATA",
-    "TT",
-    #"TT-FullLept",
-    "ZZ",
-    "DY",
-    "DY50-70",
-    "DY70-100",
-    "DY100",
-    "DY180",
-    "DY1j",
-    "DY2j",
-    "DY3j",
-    "DY4j",
-    "ZH125"
-    ]#,"ZH120","ZH115","ZH130","ZH135"]
-
-totsampleList  = [
-    "DATA",
-    "TT",
-    #"TT-FullLept",
-    "ZZ",
-    "Zbb",
-    "Zbx",
-    "Zxx",
-    "Zno",
-    "ZH125"
-    ]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-
-sigMCsampleList= ["ZH125"]#,"ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-MCsampleList=[]
-bkgMCsampleList=[]
-
-for sample in totsampleList :
-    if sample=="DATA" : continue
-    MCsampleList.append(sample)
-    if not sample in sigMCsampleList : bkgMCsampleList.append(sample)
-
 L_DY = "10325.26"
 DYrew = {
     "50-70"   : "("+L_DY+"/(40626.58+"+L_DY+"))",
@@ -58,30 +10,6 @@ DYrew = {
     "3j"      : "("+L_DY+"/(203041.98+"+L_DY+"))",
     "4j"      : "("+L_DY+"/(277900.48+"+L_DY+"))",
     }
-
-
-from zbbCommons import zbbnorm
-nev_DYjets_summer12=29310189 # to be used on events produced in 532p4
-lumi = { "DATA"   : zbbnorm.lumi_tot2012,
-         "TT"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
-         "TT-FullLept" : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000.,
-         "Zbb_Zbb"     : zbbnorm.nev_Zbb_summer12/zbbnorm.xsec_Zbb_8TeV/1000.,
-         "Zbb"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "Zbx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "Zxx"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "Zno"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-#         "Zbb"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-#         "Zbx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-#         "Zxx"     : nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZZ"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000.,
-         "ZH110"  : zbbnorm.nev_ZH110_summer12/zbbnorm.xsec_ZH110_8TeV/1000.,
-         "ZH115"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
-         "ZH120"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
-         "ZH125"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000.,
-         "ZH130"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
-         "ZH135"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.
-         }
-
 
 MuCorrFact = 1.0
 Extra_norm={ "MuMuChannelDATA"  : 1.0,

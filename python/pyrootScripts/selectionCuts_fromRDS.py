@@ -17,15 +17,16 @@
 
 from ROOT import *
 from eventSelection import categoryNames
-from listForRDS import sampleList, totsampleList, sigMCsampleList, MCsampleList, bkgMCsampleList, lumi, dataPeriods, Extra_norm, namePlotList, namePlotListOnMerged, min, max, binning, PlotForCLs, SFs_fit, blindList
-from globalLists import pathMergedRDS, pathRDS
+from zbbSamples import getSample, getDataLuminosity
+from zbbSamples import channels, MCsamples, datasamples, sigMCsamples, bkgMCsamples, totsamples
+from listForRDS import Extra_norm, namePlotList, namePlotListOnMerged, min, max, binning, PlotForCLs, SFs_fit, blindList
 import os
 
 #####################################################
 ### sample/wp/selection of interest
 #####################################################
 
-runOnMergedRDS = False
+sampleType = "RDS" # "MERDS"
 goTotCLS = False
 DirOut="hist_newznothing"
 doRew = False
@@ -45,11 +46,6 @@ for cat in categoryNames:
     wp+=1
 
 WP=str(wp)
-
-channels  = [
-    "EEChannel",
-    "MuMuChannel",
-    ]
 
 #choose you set of cuts
 extraCuts = [
@@ -83,8 +79,8 @@ extraCuts = [
     ]
 
 extraCutsLep = {
-    "EEChannel"     : "(eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.)",
-    "MuMuChannel"   : "(eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.)"
+    "El"     : "(eventSelectionbestzmassEle>76.&eventSelectionbestzmassEle<106.)",
+    "Mu"   : "(eventSelectionbestzmassMu>76.&eventSelectionbestzmassMu<106.)"
     }
 
 stringCut = {}
@@ -101,10 +97,10 @@ for i in range(0,len(extraCuts)) :
 
 MCweight = {}
 
-for sample in MCsampleList:
+for sample in MCsamples:
     for channel in channels :
-        print "the lumi of ", sample, " = ", lumi[sample]
-        MCweight[channel+sample] = lumi["DATA"]/lumi[sample]/Extra_norm[channel+sample]
+        print "the lumi of ", sample, " = ", getSample(sample,channel,sampleType).getLuminosity()
+        MCweight[channel+sample] = getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity()/Extra_norm[channel+sample]
         print "the weight of ", channel+sample," = ", MCweight[channel+sample]
 
 #############
@@ -117,24 +113,17 @@ myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {}
 
-path = pathMergedRDS
-if not runOnMergedRDS : path = pathRDS
-
-for sample in sampleList :
-    if sample=="DATA" : continue
+for sample in MCsamples :
     redStage = "rc_eventSelection_"+WP+"==1"
     for channel in channels:
         print "Channel : ", channel
-        if channel=="EEChannel" : file_mc  = TFile(path[sample+"_El_MC"])
-        else : file_mc  = TFile(path[sample+"_Mu_MC"])
-
+        file_mc  = TFile(getSample(sample,channel,sampleType).path)
         tree_zbb1 = file_mc.Get("rds_zbb")
         tmpfile=TFile("tmp.root","RECREATE")
         tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
         ws_zbb = file_mc.Get("ws_ras")
         ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
         rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
-
         nEntries = rds_zbb.numEntries()
         if sample == "DY" :
             if not useMCTruth :
@@ -153,43 +142,33 @@ for sample in sampleList :
         else :
             myRDS[channel+sample] = rds_zbb.reduce(redStage)
             print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+sample].numEntries()
-            
         file_mc.Close()
 
 for channel in channels:
     print "Channel : ", channel
     file={}
-    for period in dataPeriods :
-        if channel=="EEChannel": 
-            file[period]  = TFile(path["DoubleEle_Data"+period])
-        else:
-            file[period]  = TFile(path["DoubleMu_Data"+period])
-        
-    tree_zbb1 = file["A"].Get("rds_zbb")
-    tmpfile=TFile("tmp.root","RECREATE")
-    tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
-    ws_zbb = file["A"].Get("ws_ras")
-    ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
-    rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
-
-    for period in dataPeriods :
-        if period=="A" : continue
-        tree_zbb1 = file[period].Get("rds_zbb")
-        tmpfile=TFile("tmp.root","RECREATE")
-        tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
-        ws_zbb = file[period].Get("ws_ras")
-        ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
-        tmp = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
-        rds_zbb.append(tmp)
+    for sample in datasamples :
+      file[sample] = TFile(getSample(sample,channel,sampleType).path)
+    rds_zbb = None
+    for sample in datasamples :
+      tree_zbb1 = file[sample].Get("rds_zbb")
+      tmpfile=TFile("tmp.root","RECREATE")
+      tree_zbb=tree_zbb1.CopyTree(redStage.replace("==","_idx=="))
+      ws_zbb = file[sample].Get("ws_ras")
+      ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
+      if rds_zbb is None:
+        rds_zbb = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
+      else:
+        rds_zbb.append(RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)) 
     nEntries = rds_zbb.numEntries()
     myRDS[channel+"DATA"] = rds_zbb.reduce(redStage)
     print "myRDS.numEntries() for DATA = ", nEntries, ". After stage ", WP, " : ", myRDS[channel+"DATA"].numEntries()
-    for period in dataPeriods : file[period].Close()
+    for sample in datasamples : file[sample].Close()
     
 ###############
 ### weights ###
 ###############
-tmp=myRDS["EEChannelZZ"].reduce("mcSelectioneventType==1")
+tmp=myRDS["ElZZ"].reduce("mcSelectioneventType==1")
 ras_zbb = tmp.get()
 tmp=0
 
@@ -208,19 +187,19 @@ for b in btagRew:
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
 rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
 rrv_w_ptz = {
-    "MuMuChannel" : ras_zbb["eventSelectionbestzptMu"],
-    "EEChannel" : ras_zbb["eventSelectionbestzptEle"]
+    "Mu" : ras_zbb["eventSelectionbestzptMu"],
+    "El" : ras_zbb["eventSelectionbestzptEle"]
 }
 w = {}
 rewFormula = {}
 for channel in channels :
     if doRew :
-        if channel=="EEChannel" : rewFormula[channel] = "*(1172.93/1391.86)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
+        if channel=="El" : rewFormula[channel] = "*(1172.93/1391.86)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
         else : rewFormula[channel] = "*(1606.22/1913.74)*((0.945437+0.00378645*20)*(@3<20)+(0.945437+0.00378645*@3)*(@3>20)*(@3<200)+(0.945437+0.00378645*200.)*(@3>200))"
     else : rewFormula[channel] = ""
-    for sample in totsampleList :
+    for sample in totsamples :
         rescale=1./Extra_norm[channel+sample]
-        if not runOnMergedRDS : rescale=1.
+        if sampleType=="RDS" : rescale=1.
         if useSFs : rescale*=SFs_fit[channel+sample]
         if sample!="Zbb" : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale), RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
         else : w[channel+sample]=RooFormulaVar("w","w", "@0*@1*@2*"+str(rescale)+rewFormula[channel], RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptz[channel]))
@@ -228,7 +207,7 @@ for channel in channels :
 ### PLOTS ###
 #############
         
-if runOnMergedRDS : namePlotList+=namePlotListOnMerged
+if sampleType=="MERDS" : namePlotList+=namePlotListOnMerged
 var = {}
 for name in namePlotList:
     print "name = ", name
@@ -251,7 +230,7 @@ rdh = {}
 
 for channel in channels :
     print "channel ... ", channel
-    for sample in totsampleList :
+    for sample in totsamples :
         print "sample ... ", sample
         for cut in extraCuts :
             if cut=="" : iCut=extraCutsLep[channel]
@@ -271,25 +250,25 @@ for channel in channels :
 
             nevts["pure"+sample+channel+cut]     = myRDS_red_w.numEntries()
             print "myRDS_red_w.numEntries()", myRDS_red_w.numEntries()
-            if sample in MCsampleList :
-                nevts["effective"+sample+channel+cut]= myRDS_red_w.numEntries()*(lumi["DATA"]/lumi[sample])
-                nevts["weighted"+sample+channel+cut] = myRDS_red_w.sumEntries()*(lumi["DATA"]/lumi[sample])
+            if sample in MCsamples :
+                nevts["effective"+sample+channel+cut]= myRDS_red_w.numEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
+                nevts["weighted"+sample+channel+cut] = myRDS_red_w.sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
             
-            if sample in bkgMCsampleList :
-                if sample==bkgMCsampleList[0]:
+            if sample in bkgMCsamples :
+                if sample==bkgMCsamples[0]:
                     sumbkgMC["pure"+channel+cut]     = 0
                     sumbkgMC["effective"+channel+cut]= 0
                     sumbkgMC["weighted"+channel+cut] = 0
                 sumbkgMC["pure"+channel+cut]+=myRDS_red_w.numEntries()
-                sumbkgMC["effective"+channel+cut]+=myRDS_red_w.numEntries()*(lumi["DATA"]/lumi[sample])
-                sumbkgMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(lumi["DATA"]/lumi[sample])
+                sumbkgMC["effective"+channel+cut]+=myRDS_red_w.numEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
+                sumbkgMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
             sumsigMC["pure"+channel+cut]     = 0
             sumsigMC["effective"+channel+cut]= 0
             sumsigMC["weighted"+channel+cut] = 0
-            if sample in sigMCsampleList :
+            if sample in sigMCsamples :
                 sumsigMC["pure"+channel+cut]+=myRDS_red_w.numEntries()
-                sumsigMC["effective"+channel+cut]+=myRDS_red_w.numEntries()*(lumi["DATA"]/lumi[sample])
-                sumsigMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(lumi["DATA"]/lumi[sample])
+                sumsigMC["effective"+channel+cut]+=myRDS_red_w.numEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
+                sumsigMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
             if sample=="DATA":
                 sumDATA[channel+cut]=myRDS_red_w.numEntries()
             for name in namePlotList:
@@ -355,29 +334,29 @@ for channel in channels:
     print " "
     print "pure MC yields  ............................................................"
     print "Cuts".ljust(10),
-    for sample in MCsampleList : print sample.ljust(10),
+    for sample in MCsamples : print sample.ljust(10),
     print "totbkgMC".ljust(10), "totsigMC".ljust(10)
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
-        for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+channel+cut]),
+        for sample in MCsamples : print '{0}'.ljust(10).format(nevts["pure"+sample+channel+cut]),
         print '{0}'.ljust(10).format(sumbkgMC["pure"+channel+cut]), '{0}'.ljust(10).format(sumsigMC["pure"+channel+cut])
     print " "
     print "normalized MC yields ......................................................."
     print "Cuts".ljust(10),
-    for sample in MCsampleList : print sample.ljust(10),
+    for sample in MCsamples : print sample.ljust(10),
     print "totbkgMC".ljust(10), "totsigMC".ljust(10)
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
-        for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+channel+cut]).ljust(10),
+        for sample in MCsamples : print '{0:.2f}'.format(nevts["effective"+sample+channel+cut]).ljust(10),
         print '{0:.2f}'.format(sumbkgMC["effective"+channel+cut]).ljust(10), '{0:.2f}'.format(sumsigMC["effective"+channel+cut]).ljust(10)
     print " "
     print "weighted and normalized MC yields vs DATA yield ............................"
     print "Cuts".ljust(10),
-    for sample in MCsampleList : print sample.ljust(10),
+    for sample in MCsamples : print sample.ljust(10),
     print "totbkgMC".ljust(10), "totsigMC".ljust(10), "DATA".ljust(10)
     for cut in extraCuts:
         print stringCut[cut].ljust(10),
-        for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+channel+cut]).ljust(10),
+        for sample in MCsamples : print '{0:.2f}'.format(nevts["weighted"+sample+channel+cut]).ljust(10),
         print '{0:.2f}'.format(sumbkgMC["weighted"+channel+cut]).ljust(10), '{0:.2f}'.format( sumsigMC["weighted"+channel+cut]).ljust(10), '{0}'.ljust(10).format( nevts["pure"+"DATA"+channel+cut])
     print "............................................................................"
     print "............................................................................"
@@ -389,30 +368,30 @@ print "Channel .. Combined .....................................................
 print " "
 print "pure MC yields  ............................................................"
 print "Cuts".ljust(10),
-for sample in MCsampleList : print sample.ljust(10),
+for sample in MCsamples : print sample.ljust(10),
 print "totbkgMC".ljust(10), "totsigMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+"EEChannel"+cut]+nevts["pure"+sample+"MuMuChannel"+cut]),
-    print '{0}'.ljust(10).format(sumbkgMC["pure"+"EEChannel"+cut]+sumbkgMC["pure"+"MuMuChannel"+cut]), '{0}'.ljust(10).format(sumsigMC["pure"+"EEChannel"+cut]+sumsigMC["pure"+"MuMuChannel"+cut])
+    for sample in MCsamples : print '{0}'.ljust(10).format(nevts["pure"+sample+"El"+cut]+nevts["pure"+sample+"Mu"+cut]),
+    print '{0}'.ljust(10).format(sumbkgMC["pure"+"El"+cut]+sumbkgMC["pure"+"Mu"+cut]), '{0}'.ljust(10).format(sumsigMC["pure"+"El"+cut]+sumsigMC["pure"+"Mu"+cut])
 print " "
 print "normalized MC yields ......................................................."
 print "Cuts".ljust(10),
-for sample in MCsampleList : print sample.ljust(10),
+for sample in MCsamples : print sample.ljust(10),
 print "totbkgMC".ljust(10), "totsigMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+"EEChannel"+cut]+nevts["effective"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumbkgMC["effective"+"EEChannel"+cut]+sumbkgMC["effective"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumsigMC["effective"+"EEChannel"+cut]+sumsigMC["effective"+"MuMuChannel"+cut]).ljust(10)
+    for sample in MCsamples : print '{0:.2f}'.format(nevts["effective"+sample+"El"+cut]+nevts["effective"+sample+"Mu"+cut]).ljust(10),
+    print '{0:.2f}'.format(sumbkgMC["effective"+"El"+cut]+sumbkgMC["effective"+"Mu"+cut]).ljust(10), '{0:.2f}'.format(sumsigMC["effective"+"El"+cut]+sumsigMC["effective"+"Mu"+cut]).ljust(10)
 print " "
 print "weighted and normalized MC yields vs DATA yield ............................"
 print "Cuts".ljust(10),
-for sample in MCsampleList : print sample.ljust(10),
+for sample in MCsamples : print sample.ljust(10),
 print "totbkgMC".ljust(10), "totsigMC".ljust(10), "DATA".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+"EEChannel"+cut]+nevts["weighted"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumbkgMC["weighted"+"EEChannel"+cut]+sumbkgMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumsigMC["weighted"+"EEChannel"+cut]+sumsigMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"EEChannel"+cut]+nevts["pure"+"DATA"+"MuMuChannel"+cut])
+    for sample in MCsamples : print '{0:.2f}'.format(nevts["weighted"+sample+"El"+cut]+nevts["weighted"+sample+"Mu"+cut]).ljust(10),
+    print '{0:.2f}'.format(sumbkgMC["weighted"+"El"+cut]+sumbkgMC["weighted"+"Mu"+cut]).ljust(10), '{0:.2f}'.format(sumsigMC["weighted"+"El"+cut]+sumsigMC["weighted"+"Mu"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"El"+cut]+nevts["pure"+"DATA"+"Mu"+cut])
 print "............................................................................"
 print "............................................................................"
 print " "
@@ -432,20 +411,20 @@ if goTotCLS :
         if channel=="Combined" : continue
         chDir=file["Out"].mkdir(channel,channel)
         file["Out"].cd(channel)
-        for sample in totsampleList:
+        for sample in totsamples:
             for name in namePlotList:
                 if not name in PlotForCLs : continue
-                if not sample == "DATA" : th1[channel+sample+name+cut].Scale(lumi["DATA"]/lumi[sample])
+                if not sample == "DATA" : th1[channel+sample+name+cut].Scale(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
                 th1[channel+sample+name+cut].Write()
                 Nbin=th1[channel+sample+name+cut].GetNbinsX();
                 for bin in range(1,Nbin+1):
-                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Down"].Scale(lumi["DATA"]/lumi[sample])
+                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Down"].Scale(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
                     th1[channel+sample+name+cut+"stat"+str(bin)+"Down"].Write()
-                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Up"].Scale(lumi["DATA"]/lumi[sample])
+                    if not sample == "DATA" :th1[channel+sample+name+cut+"stat"+str(bin)+"Up"].Scale(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
                     th1[channel+sample+name+cut+"stat"+str(bin)+"Up"].Write()
     file["Out"].Close()
 else :
-    for sample in totsampleList:
+    for sample in totsamples:
         file[sample]=TFile(DirOut+"/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
         for channel in channels:
             if channel=="Combined" : continue

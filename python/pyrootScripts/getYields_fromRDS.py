@@ -9,7 +9,7 @@
 #####################################################
 
 from ROOT import *
-from zbbCommons import zbbnorm
+from zbbSamples import getSample, getDataLuminosity, getSamples
 
 def RemoveErrorsHisto(h):
 
@@ -49,24 +49,15 @@ totalCutString = ""+extraCut
 MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
 totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
-sampleList  = ["DATA","DY","TT","ZZ","ZH125"]
+sampleList     = ["DATA","DY","TT","ZZ","ZH125"]
 
-
-lumi = { "DATA"   : zbbnorm.lumi_tot2011,
-         "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
-         "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zl"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZZ"     : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
-         "ZH125"  : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV/1000.
-         }
-print lumi["DATA"]
+print getDataLuminosity(channel)
 
 MCweight = {}
 
 for sample in MCsampleList:
-    print "the lumi of ", sample, " = ", lumi[sample]
-    MCweight[sample] = lumi["DATA"]/lumi[sample]
+    print "the lumi of ", sample, " = ", getSample(sample,channel,"RDS").getLuminosity()
+    MCweight[sample] = getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity()
     print "the weight of ", sample," = ", MCweight[sample]
 
 #############
@@ -81,50 +72,6 @@ myRDS_red_w = {}
 ###########################################
 ##########INPUT FILES SELECTED HERE#######
 ###########################################
-#if channel  == "El" :
-#  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElA_DATA.root",
-#                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElB_DATA.root",
-#                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_El_MC.root",
-#                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_El_MC.root",
-#                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_El_MC.root",
-#                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_El_MC.root"
-#                 }
-#		 
-#elif channel == "Mu" :
-#  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuA_DATA.root",
-#                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuB_DATA.root",
-#                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_Mu_MC.root",
-#                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_Mu_MC.root",
-#                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_Mu_MC.root",
-#                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_Mu_MC.root"
-#                 }
-#else :
-#  print "Invalid channel name = ", channel, ". Exitting!"
-#  exit()
-#
-inputfolder ="/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/"
-
-if channel  == "El" :
-  filename = {"DATA_A" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ElA_DATA.root",
-                 "DATA_B" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ElB_DATA.root",
-                 "TT"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_TT_El_MC.root",
-                 "DY"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_El_MC.root",
-                 "ZZ"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZZ_El_MC.root",
-                 "ZH125"  : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZH125_El_MC.root"
-                 }
-		 
-elif channel == "Mu" :
-  filename = {"DATA_A" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_MuA_DATA.root",
-                 "DATA_B" : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_MuB_DATA.root",
-                 "TT"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_TT_Mu_MC.root",
-                 "DY"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_Mu_MC.root",
-                 "ZZ"     : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZZ_Mu_MC.root",
-                 "ZH125"  : inputfolder+"testsMergeRDSnoWS120721/RDS_rdsME_ZH125_Mu_MC.root"
-                 }
-else :
-  print "Invalid channel name = ", channel, ". Exitting!"
-  exit()
-
 
 for sample in sampleList :
 
@@ -132,7 +79,7 @@ for sample in sampleList :
 
     if sample != "DATA":
         
-        file_mc  = TFile(filename[sample])
+        file_mc  = TFile(getSample(sample,channel,"RDS").path)
         
         nEntries = file_mc.Get("rds_zbb").numEntries()
 
@@ -150,19 +97,17 @@ for sample in sampleList :
         file_mc.Close()
 
     else :
-        file_A  = TFile(filename["DATA_A"])
-        file_B  = TFile(filename["DATA_B"])
-
-        nEntries = file_A.Get("rds_zbb").numEntries()+file_B.Get("rds_zbb").numEntries()
-
-        myRDS[sample] = file_A.Get("rds_zbb").reduce(redStage)
-        tmp = file_B.Get("rds_zbb").reduce(redStage)
-        myRDS[sample].append(tmp)
-
+        nEntries = 0
+        myRDS[sample] = None
+        for datasample in getSamples(["DATA"],[channel],["RDS"])
+          file = TFile(datasample.path)
+          nEntries += file.Get("rds_zbb").numEntries()
+          if myRDS[sample] is None:
+            myRDS[sample] = file.Get("rds_zbb").reduce(redStage)
+          else:
+            myRDS[sample].append(file.Get("rds_zbb").reduce(redStage))
+          file.Close()
         print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[sample].numEntries()
-
-        file_A.Close()
-        file_B.Close()
 
 ###############
 ### weights ###
@@ -262,8 +207,8 @@ print "===> the pure # of DATA ............... ", myRDS_red_w["DATA"].numEntries
 print "***"
 sum_MC=0
 for sample in MCsampleList:
-    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample]))[:6]
-    sum_MC+=myRDS_red_w[sample].numEntries()*(lumi["DATA"]/lumi[sample])
+    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity()))[:6]
+    sum_MC+=myRDS_red_w[sample].numEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity())
 print "===> the effective # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
@@ -271,8 +216,8 @@ print "***"
 
 sum_MC=0
 for sample in MCsampleList:
-    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample]))[:6]
-    sum_MC+=myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample])
+    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity()))[:6]
+    sum_MC+=myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity())
 print "===> the effective, weighted # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective, weighted # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
@@ -519,7 +464,7 @@ numList = RooArgList()
 
 for sample in MCsampleList:
     num_MC[sample] = RooRealVar("num_MC_"+sample,"num_MC_"+sample,
-                                myRDS_red_w[sample].sumEntries()*(lumi["DATA"]/lumi[sample]))
+                                myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity()))
 for sample in SMMCsampleList:
     numList.add(num_MC[sample])
 
@@ -534,7 +479,7 @@ for sample in MCsampleList:
     norm[sample] = num_MC[sample].getVal()/myRDS_red_w["DATA"].numEntries()
     print "num MC for ", sample, " = ", num_MC[sample].getVal()
     print "MC normalization for ", sample, " = ", norm[sample]
-    lumiratio[sample]=lumi["DATA"]/lumi[sample]
+    lumiratio[sample]=getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity()
     print "lumi ratio for ", sample, " = ", lumiratio[sample]
 
 #norm["ZHbb"] = 50*norm["ZHbb"]

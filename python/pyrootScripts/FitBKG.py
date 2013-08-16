@@ -1,50 +1,42 @@
 from ROOT import *
 gROOT.SetStyle("Plain")
+from zbbSamples import channelList, getSample, getDataLuminosity
 
+# WARNING: this code has been reworked to use the database as date source for lumi and path.
+# it now references zbbSamples but no functional test has been performed.
+# It should be verified that the code still does what it should.
 
-  
 ###############################################
-
 ### settings you want to give from outside ###
 # to adjust by user:
 
-channelList   = ["Mu","El"]
-
 dataLabel = "2012"
-
 frac      = False
 WP        = "HPHPMETsig"
 #extraCut  = "&jetmetMETsignificance < 10 &mlphiggsvsbkg_125_comb_MM_N<0.5&mlphiggsvsbkg_125_comb_MM_N>=0."
 extraCut  = "&jetmetMETsignificance < 10 &(eventSelectiondijetM<80.||eventSelectiondijetM>150)"
 keys      = False
-
 extraCutList = {"mwnn"     : "jetmetMETsignificance < 10",#&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5&mlpZbbvsTT_mu_MM_N>-0.1",
                 "mmumu"    : "jetmetMETsignificance < 10",#&mlphiggsvsbkg_125_comb_MM_N>-0.1&mlphiggsvsbkg_125_comb_MM_N<0.5&mlpZbbvsTT_mu_MM_N>-0.1",
 		}
-		
 ttbarVarList  = ["mwnn"]
 mistagVarList = ["msv2"]
-#if channel=="Mu": ttbarVarList  = [ "mmumu" ]>-0.1
-#if channel=="El": ttbarVarList  = [ "melel" ]
-
 totVarList = ttbarVarList+mistagVarList
 
 ###############################################
 
 # fixed definitions:
 X={}
-
 RHP_tt={}
 Ntt={}
 ftt={}
 RDH_tt={}
-
 ttbarData={}
-
 ttMCNameList = ["TT","ZZ"]
+
 # maybe different if using QCD:
 mistagMCNameList  = ["Zxx","Zbx","Zbb"]
-dataNameList      = [dataLabel]
+dataNameList      = ["DATA"]
 MCNameList        = ttMCNameList+mistagMCNameList
 dataAndMCNameList = ttMCNameList+mistagMCNameList+dataNameList
 
@@ -60,6 +52,7 @@ category={"HE"         : "rc_eventSelection_5",
           "HPHPMETsig" : "rc_eventSelection_18",
           }
 
+#TODO: these dictionaries could be combined, but that's just for clarity.
 
 varNamesList = { "msv1"  : "jetmetbjet1pt"          ,
                  #"msv2"  : "mlpZbbvsTT_MM_N",
@@ -152,57 +145,6 @@ color = {"msv1" : kRed,
 C={}
 myFrame={}
 
-#path = "~acaudron/scratch/Pat444/CMSSW_4_4_4/src/UserCode/zbb_louvain/python/condorRDSmakerNoWS/outputs/"
-path = "/nfs/user/acaudron/Tree2_537/"
-pathData = "/nfs/user/acaudron/Tree2_537/"
-fileNameList = {}
-
-for chan in channelList:
-    if chan=="El" : chanData="Ele"
-    else : chanData=chan
-    fileNameList["2012"+chan] = pathData+"RDS_rdsME_Double"+chanData+"_Data.root"
-    fileNameList["ref"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    fileNameList["DY"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    #fileNameList["TT"+chan] = path+"RDS_rdsME_TT_"+chan+"_MC.root"
-    fileNameList["TT"+chan] = path+"RDS_rdsME_TT-FullLept_"+chan+"_MC.root"
-    fileNameList["ZZ"+chan] = path+"RDS_rdsME_ZZ_"+chan+"_MC.root"
-    fileNameList["Zbb"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    fileNameList["Zbx"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    fileNameList["Zxx"+chan] = path+"RDS_rdsME_DY_"+chan+"_MC.root"
-    fileNameList["ZH125"+chan] = path+"RDS_rdsME_ZH125_"+chan+"_MC.root"	
-for name in fileNameList:
-	print name		    		  
-				  
-				  
-from zbbCommons import zbbnorm
-
-lumi = { "DATAMu"   : zbbnorm.lumi_tot2012,
-         "DATAEl"     : zbbnorm.lumi_tot2012,
-         #"TTEl"       : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
-         "TTEl"       : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000./(46492./15000.),
-         "ZbbEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZbxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZxxEl"       : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZZEl"       : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(11936./10000.),
-         #"TTMu"     : zbbnorm.nev_TTjets_summer12/zbbnorm.xsec_TTjets_8TeV/1000.,
-         "TTMu"     : zbbnorm.nev_TTFullLept_summer12/zbbnorm.xsec_TTFullLept_8TeV/1000./(62506./15000.), 
-         "ZbbMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZbxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZxxMu"     : zbbnorm.nev_DYjets_summer12/zbbnorm.xsec_DYjets_8TeV/1000.,
-         "ZZMu"     : zbbnorm.nev_ZZ_summer12/zbbnorm.xsec_ZZ_8TeV/1000./(16986./10000.),
-	 "ZH115El"    : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
-         "ZH120El"    : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
-	 "ZH115Mu"  : zbbnorm.nev_ZH115_summer12/zbbnorm.xsec_ZH115_8TeV/1000.,
-         "ZH120Mu"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
-	 "ZH125El"    : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(48726./10000.),
-	 "ZH125Mu"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000./(65412./10000.),
-         "ZH130El"    : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
-         "ZH135El"    : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.,
-         "ZH130Mu"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
-         "ZH135Mu"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.
-	         }
-		 
-		 
 def getVariables(varNamesList,varName,dataAndMCListZH) :
     var=varNamesList[varName]
     #y=dataAndMCList["Zl"]
@@ -232,23 +174,23 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList,channel) :
 
     for name in dataAndMCNameList :
         print "name = ", name
-        if name=="2012":
+        if name in dataNameList:
             print "making 2012 dataset"
-            file["2012"+channel]  = TFile.Open(fileNameList["2012"+channel])
-            tree_zbb = file["2012"+channel].Get("rds_zbb")
-            ws_zbb = file["2012"+channel].Get("ws_ras")
+            file[dataLabel+channel]  = TFile.Open(getSample(name,channel,type="RDS").path)
+            tree_zbb = file[dataLabel+channel].Get("rds_zbb")
+            ws_zbb = file[dataLabel+channel].Get("ws_ras")
             ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
-            myRDS["2012"+channel] = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
-            print "Data numEntries() = ", myRDS["2012"+channel].numEntries()
+            myRDS[dataLabel+channel] = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
+            print "Data numEntries() = ", myRDS[dataLabel+channel].numEntries()
         else :
-            print "fileNameList[name+channel] = ", fileNameList[name+channel]
-            file[name+channel]  = TFile.Open(fileNameList[name+channel])
+            print "path[name+channel] = ", getSample(name,channel,type="RDS").path
+            file[name+channel]  = TFile.Open(getSample(name,channel,type="RDS").path)
             tree_zbb = file[name+channel].Get("rds_zbb")
             ws_zbb = file[name+channel].Get("ws_ras")
             ras_zbb = RooArgSet(ws_zbb.allVars(),ws_zbb.allCats())
             myRDS[name+channel] = RooDataSet("rds_zbb","rds_zbb",tree_zbb,ras_zbb)
             myRDS[name+channel].SetName(name+channel)
-        print "*** Going to reduce RDS ", name        
+        print "*** Going to reduce RDS ", name
 	print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name+channel].numEntries() 
 	myRDS[name+channel] = myRDS[name+channel].reduce(category[WP]+"==1"+extraCut)
 	print "#entries for sample", name , " at WP ",  WP ," =", myRDS[name+channel].numEntries() 
@@ -404,7 +346,7 @@ def main():
 		        PdfList2D[channel].add(myRHP_2D[mcnames+channel])
 		    
 		        N_exp[mcnames+channel]=RooConstVar("N_exp_"+mcnames+channel,"N_exp_"+mcnames+channel,
-                                               (AlldataAndMCList[mcnames+channel].sumEntries()*(lumi["DATA"+channel]/lumi[mcnames+channel])))
+                                               (AlldataAndMCList[mcnames+channel].sumEntries()*(getDataLuminosity(channel)/getSample(mcnames,channel,type="RDS").getLuminosity())))
 						     
 		        N[mcnames+channel] = RooFormulaVar("N_"+mcnames,"N_"+mcnames+channel,"@0*@1",RooArgList(N_exp[mcnames+channel],SF[mcnames+channel]))
 		  
@@ -584,4 +526,3 @@ def main():
     CANVAS.SaveAs("FIT.pdf")
     
     plot.Close()
-    bla
