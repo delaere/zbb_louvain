@@ -19,7 +19,7 @@ from ROOT import *
 from eventSelection import categoryNames
 from zbbSamples import getSample, getDataLuminosity
 from zbbSamples import channels, MCsamples, datasamples, sigMCsamples, bkgMCsamples, totsamples
-from listForRDS import Extra_norm, namePlotList, namePlotListOnMerged, min, max, binning, PlotForCLs, SFs_fit, blindList
+from listForRDS import Extra_norm, plotList, plotListOnMerged, PlotForCLs, SFs_fit, blindList
 import os
 
 #####################################################
@@ -206,15 +206,15 @@ for channel in channels :
 #############
 ### PLOTS ###
 #############
-        
-if sampleType=="MERDS" : namePlotList+=namePlotListOnMerged
+
+if sampleType=="MERDS" : plotList.update(plotListOnMerged)
 var = {}
-for name in namePlotList:
+for name in plotList:
     print "name = ", name
     var[name] = ras_zbb[name]
-    var[name].setMin(min[name])
-    var[name].setMax(max[name])
-    var[name].setBins(binning[name])
+    var[name].setMin(plotList[name][1])
+    var[name].setMax(plotList[name][2])
+    var[name].setBins(plotList[name][0])
 
 th1 = {}
 
@@ -271,7 +271,7 @@ for channel in channels :
                 sumsigMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
             if sample=="DATA":
                 sumDATA[channel+cut]=myRDS_red_w.numEntries()
-            for name in namePlotList:
+            for name in plotList:
                 if not goTotCLS :
                     th1[channel+sample+name+cut] = TH1D(name,name,var[name].getBins(),var[name].getMin(),var[name].getMax())
                     myRDS_red_w.fillHistogram(th1[channel+sample+name+cut], RooArgList(var[name]))
@@ -412,7 +412,7 @@ if goTotCLS :
         chDir=file["Out"].mkdir(channel,channel)
         file["Out"].cd(channel)
         for sample in totsamples:
-            for name in namePlotList:
+            for name in plotList:
                 if not name in PlotForCLs : continue
                 if not sample == "DATA" : th1[channel+sample+name+cut].Scale(getDataLuminosity(channel)/getSample(sample,channel,sampleType).getLuminosity())
                 th1[channel+sample+name+cut].Write()
@@ -432,6 +432,6 @@ else :
             for cut in extraCuts:
                 chDir.mkdir(stringCut[cut],cut)
                 chDir.cd(stringCut[cut])
-                for name in namePlotList:
+                for name in plotList:
                     th1[channel+sample+name+cut].Write()
         file[sample].Close()

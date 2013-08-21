@@ -19,6 +19,17 @@ from ROOT import *
 from eventSelection import categoryNames
 from zbbSamples import getSample, getDataLuminosity, getSamples
 
+#####################################
+### lists of samples and channels ###
+#####################################
+
+from zbbSamples import channels
+from zbbSamples import MCsamples as MCsampleList
+from zbbSamples import bkgMCsamples as SMMCsampleList
+from zbbSamples import sigMCsamples as NSMMCsampleList
+from zbbSamples import totsamples as totsampleList
+from zbbSamples import samples_RDS as sampleList
+
 #####################################################
 ### sample/wp/selection of interest
 #####################################################
@@ -35,14 +46,9 @@ for cat in categoryNames:
                 break
     wp+=1
 
-print "working point: ",wp
 wp = 18
 WP=str(wp)
-
-channels  = [
-    "El",
-    "Mu",
-    ]
+print "working point: ",wp
 
 #choose you set of cuts
 extraCuts = [
@@ -74,19 +80,6 @@ for i in range(0,len(extraCuts)) :
     stringCut[extraCuts[i]]="Cut"+str(i+1)
     #if titleCuts[i] : titleCut[extraCuts[i]]=titleCuts[i]
     #titleCut[extraCuts[i]]=""
-
-#####################################################
-### settings (this should move somewhere central) ### 
-#####################################################
-
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
-NSMMCsampleList= ["ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]#,"ZA"]
-from zbbSamples import samples_RDS as sampleList
-#sampleList     = ["DATA","DY","TT","ZZ","ZH125","ZH120","ZH115","ZH130","ZH135"]
-
-MCweight = {}
 
 #############
 ### files ###
@@ -132,7 +125,7 @@ for sample in sampleList :
 ###############
 ### weights ###
 ###############
-tmp=myRDS["EEChannelZc"].reduce("mcSelectioneventType==1")
+tmp=myRDS["ElZc"].reduce("mcSelectioneventType==1")
 ras_zbb = tmp.get()
 tmp=0
 
@@ -152,14 +145,14 @@ for b in btagRew:
 rrv_w_lep  = ras_zbb["LeptonsReweightingweight"]
 rrv_w_lumi = ras_zbb["lumiReweightingLumiWeight"]
 
-#if channel=="EEChannel" :
+#if channel=="El" :
 rrv_w_ptze = ras_zbb["eventSelectionbestzptEle"]
 
 #w2_e = RooFormulaVar("w2","w2", "@0*@1*@2", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi))
 w2_e = RooFormulaVar("w2","w2", "@0*@1*@2*(574.2/542.89)*((@3<10)+(@3>170) + ((@3>10)*(@3<170)*(-3.379031e-07 * pow(@3,3) +5.74726e-05 *@3*@3 +0.003684317*@3 +0.5997106)))", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptze))
 #w2_e = RooFormulaVar("w2","w2", "@0*@1*@2*@3", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lumi,rrv_w_ptz))
 
-#if channel=="MuMuChannel" :
+#if channel=="Mu" :
 rrv_w_ptzm = ras_zbb["eventSelectionbestzptMu"]    
 
 # param from Control region Muon Correct
@@ -176,96 +169,31 @@ w1 = RooFormulaVar("w1","w1", "@0*@1*@2", RooArgList(rrv_w_b,rrv_w_lep,rrv_w_lum
 #################
 #here put all variables you want to plot and don't forget the binning
 
-namePlotList = [
-#    "mlphiggsvsbkg_115_MM_N",
-#    "mlphiggsvsbkg_120_MM_N",
-#    "mlphiggsvsbkg_125_MM_N",
-#    "mlphiggsvsbkg_130_MM_N",
-#    "mlphiggsvsbkg_135_MM_N",
-#    "mlphiggsvsbkg_115_mu_MM_N",
-#    "mlphiggsvsbkg_120_mu_MM_N",
-#    "mlphiggsvsbkg_125_mu_MM_N",
-#    "mlphiggsvsbkg_130_mu_MM_N",
-#    "mlphiggsvsbkg_135_mu_MM_N",
-    "mlphiggsvsbkg_115_comb_MM_N",
-    "mlphiggsvsbkg_120_comb_MM_N",
-    "mlphiggsvsbkg_125_comb_MM_N",
-    "mlphiggsvsbkg_130_comb_MM_N",
-    "mlphiggsvsbkg_135_comb_MM_N"
+plotList = [
+#   "mlphiggsvsbkg_115_MM_N"      : (15.,0.,1.),
+#   "mlphiggsvsbkg_120_MM_N"      : (15.,0.,1.),
+#   "mlphiggsvsbkg_125_MM_N"      : (15.,0.,1.),
+#   "mlphiggsvsbkg_130_MM_N"      : (15.,0.,1.),
+#   "mlphiggsvsbkg_135_MM_N"      : (15.,0.,1.),
+#   "mlphiggsvsbkg_115_mu_MM_N"   : (15.,0.,1.),
+#   "mlphiggsvsbkg_120_mu_MM_N"   : (15.,0.,1.),
+#   "mlphiggsvsbkg_125_mu_MM_N"   : (15.,0.,1.),
+#   "mlphiggsvsbkg_130_mu_MM_N"   : (15.,0.,1.),
+#   "mlphiggsvsbkg_135_mu_MM_N"   : (15.,0.,1.),
+    "mlphiggsvsbkg_115_comb_MM_N" : (20.,0.,1.),
+    "mlphiggsvsbkg_120_comb_MM_N" : (20.,0.,1.),
+    "mlphiggsvsbkg_125_comb_MM_N" : (20.,0.,1.),
+    "mlphiggsvsbkg_130_comb_MM_N" : (20.,0.,1.),
+    "mlphiggsvsbkg_135_comb_MM_N" : (20.,0.,1.),
     ]
 
-################
-### minimums ###
-################
-min = {
-    "mlphiggsvsbkg_115_MM_N"             :    0,
-    "mlphiggsvsbkg_120_MM_N"             :    0,
-    "mlphiggsvsbkg_125_MM_N"             :    0,
-    "mlphiggsvsbkg_130_MM_N"             :    0,
-    "mlphiggsvsbkg_135_MM_N"             :    0,
-    "mlphiggsvsbkg_115_mu_MM_N"             :    0,
-    "mlphiggsvsbkg_120_mu_MM_N"             :    0,
-    "mlphiggsvsbkg_125_mu_MM_N"             :    0,
-    "mlphiggsvsbkg_130_mu_MM_N"             :    0,
-    "mlphiggsvsbkg_135_mu_MM_N"             :    0,
-    "mlphiggsvsbkg_115_comb_MM_N"             :    0,
-    "mlphiggsvsbkg_120_comb_MM_N"             :    0,
-    "mlphiggsvsbkg_125_comb_MM_N"             :    0,
-    "mlphiggsvsbkg_130_comb_MM_N"             :    0,
-    "mlphiggsvsbkg_135_comb_MM_N"             :    0
-    }
-
-################
-### maximums ###
-################
-
-max = {
-    "mlphiggsvsbkg_115_MM_N"            :    1.,
-    "mlphiggsvsbkg_120_MM_N"            :    1.,
-    "mlphiggsvsbkg_125_MM_N"            :    1.,
-    "mlphiggsvsbkg_130_MM_N"            :    1.,
-    "mlphiggsvsbkg_135_MM_N"            :    1.,
-    "mlphiggsvsbkg_115_mu_MM_N"            :    1.,
-    "mlphiggsvsbkg_120_mu_MM_N"            :    1.,
-    "mlphiggsvsbkg_125_mu_MM_N"            :    1.,
-    "mlphiggsvsbkg_130_mu_MM_N"            :    1.,
-    "mlphiggsvsbkg_135_mu_MM_N"            :    1.,
-    "mlphiggsvsbkg_115_comb_MM_N"             :    1.,
-    "mlphiggsvsbkg_120_comb_MM_N"             :    1.,
-    "mlphiggsvsbkg_125_comb_MM_N"             :    1.,
-    "mlphiggsvsbkg_130_comb_MM_N"             :    1.,
-    "mlphiggsvsbkg_135_comb_MM_N"             :    1.
-    }
-
-################
-### binning  ###
-################
-
-binning = {
-    "mlphiggsvsbkg_115_MM_N"           :     1,
-    "mlphiggsvsbkg_120_MM_N"           :     15,
-    "mlphiggsvsbkg_125_MM_N"           :     15,
-    "mlphiggsvsbkg_130_MM_N"           :     15,
-    "mlphiggsvsbkg_135_MM_N"           :     15,
-    "mlphiggsvsbkg_115_mu_MM_N"           :     15,
-    "mlphiggsvsbkg_120_mu_MM_N"           :     15,
-    "mlphiggsvsbkg_125_mu_MM_N"           :     15,
-    "mlphiggsvsbkg_130_mu_MM_N"           :     15,
-    "mlphiggsvsbkg_135_mu_MM_N"           :     15,
-    "mlphiggsvsbkg_115_comb_MM_N"             :    20,
-    "mlphiggsvsbkg_120_comb_MM_N"             :    20,
-    "mlphiggsvsbkg_125_comb_MM_N"             :    20,
-    "mlphiggsvsbkg_130_comb_MM_N"             :    20,
-    "mlphiggsvsbkg_135_comb_MM_N"             :    20   
-    }
-
 var = {}
-for name in namePlotList:
+for name in plotList:
     print "name = ", name
     var[name] = ras_zbb[name]
-    var[name].setMin(min[name])
-    var[name].setMax(max[name])
-    var[name].setBins(binning[name])
+    var[name].setMin(plotList[name][1])
+    var[name].setMax(plotList[name][2])
+    var[name].setBins(plotList[name][0])
 
 th1 = {}
 
@@ -283,8 +211,8 @@ w2=1
 
 for channel in channels :
     print "channel ... ", channel
-    if channel=="MuMuChannel":w2=w2_m
-    if channel=="EEChannel":w2=w2_e
+    if channel=="Mu":w2=w2_m
+    if channel=="El":w2=w2_e
     for sample in totsampleList :
         print "sample ... ", sample
         for cut in extraCuts :
@@ -331,9 +259,9 @@ for channel in channels :
                 sumNSMMC["weighted"+channel+cut]+=myRDS_red_w.sumEntries()*(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity())
             if sample=="DATA":
                 sumDATA[channel+cut]=myRDS_red_w.numEntries()
-            for name in namePlotList:
-                if channel=="EEChannel" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
-                if channel=="MuMuChannel" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue	
+            for name in plotList:
+                if channel=="El" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
+                if channel=="Mu" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue	
 		
 		m1=name.replace("mlphiggsvsbkg_","")
 		mass=m1.replace("_comb_MM_N","")
@@ -423,8 +351,8 @@ for sample in MCsampleList : print sample.ljust(10),
 print "totSMMC".ljust(10), "totNSMMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+"EEChannel"+cut]+nevts["pure"+sample+"MuMuChannel"+cut]),
-    print '{0}'.ljust(10).format(sumSMMC["pure"+"EEChannel"+cut]+sumSMMC["pure"+"MuMuChannel"+cut]), '{0}'.ljust(10).format(sumNSMMC["pure"+"EEChannel"+cut]+sumNSMMC["pure"+"MuMuChannel"+cut])
+    for sample in MCsampleList : print '{0}'.ljust(10).format(nevts["pure"+sample+"El"+cut]+nevts["pure"+sample+"Mu"+cut]),
+    print '{0}'.ljust(10).format(sumSMMC["pure"+"El"+cut]+sumSMMC["pure"+"Mu"+cut]), '{0}'.ljust(10).format(sumNSMMC["pure"+"El"+cut]+sumNSMMC["pure"+"Mu"+cut])
 print " "
 print "normalized MC yields ......................................................."
 print "Cuts".ljust(10),
@@ -432,8 +360,8 @@ for sample in MCsampleList : print sample.ljust(10),
 print "totSMMC".ljust(10), "totNSMMC".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+"EEChannel"+cut]+nevts["effective"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumSMMC["effective"+"EEChannel"+cut]+sumSMMC["effective"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["effective"+"EEChannel"+cut]+sumNSMMC["effective"+"MuMuChannel"+cut]).ljust(10)
+    for sample in MCsampleList : print '{0:.2f}'.format(nevts["effective"+sample+"El"+cut]+nevts["effective"+sample+"Mu"+cut]).ljust(10),
+    print '{0:.2f}'.format(sumSMMC["effective"+"El"+cut]+sumSMMC["effective"+"Mu"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["effective"+"El"+cut]+sumNSMMC["effective"+"Mu"+cut]).ljust(10)
 print " "
 print "weighted and normalized MC yields vs DATA yield ............................"
 print "Cuts".ljust(10),
@@ -441,8 +369,8 @@ for sample in MCsampleList : print sample.ljust(10),
 print "totSMMC".ljust(10), "totNSMMC".ljust(10), "DATA".ljust(10)
 for cut in extraCuts:
     print stringCut[cut].ljust(10),
-    for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+"EEChannel"+cut]+nevts["weighted"+sample+"MuMuChannel"+cut]).ljust(10),
-    print '{0:.2f}'.format(sumSMMC["weighted"+"EEChannel"+cut]+sumSMMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["weighted"+"EEChannel"+cut]+sumNSMMC["weighted"+"MuMuChannel"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"EEChannel"+cut]+nevts["pure"+"DATA"+"MuMuChannel"+cut])
+    for sample in MCsampleList : print '{0:.2f}'.format(nevts["weighted"+sample+"El"+cut]+nevts["weighted"+sample+"Mu"+cut]).ljust(10),
+    print '{0:.2f}'.format(sumSMMC["weighted"+"El"+cut]+sumSMMC["weighted"+"Mu"+cut]).ljust(10), '{0:.2f}'.format(sumNSMMC["weighted"+"El"+cut]+sumNSMMC["weighted"+"Mu"+cut]).ljust(10), '{0}'.ljust(10).format(nevts["pure"+"DATA"+"El"+cut]+nevts["pure"+"DATA"+"Mu"+cut])
 print "............................................................................"
 print "............................................................................"
 print " "
@@ -463,9 +391,9 @@ for channel in channels:
     #file[sample]=TFile("CSV_CLS/histoStage"+WP+"extraCuts"+sample+".root","RECREATE")
         #for cut in extraCuts:
         #    chDir.mkdir(stringCut[cut],stringCut[cut])  
-        for name in namePlotList:
-            if channel=="EEChannel" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
-            if channel=="MuMuChannel" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue
+        for name in plotList:
+            if channel=="El" and (name.find("Mu")>-1 or name.find("mumu")>-1) : continue
+            if channel=="Mu" and (name.find("Ele")>-1 or name.find("elel")>-1) : continue
             if not sample == "DATA" : th1[channel+sample+name+cut].Scale(getDataLuminosity(channel)/getSample(sample,channel,"RDS").getLuminosity())
             th1[channel+sample+name+cut].Write()
 	    Nbin=th1[channel+sample+name+cut].GetNbinsX();
