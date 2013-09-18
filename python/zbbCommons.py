@@ -60,21 +60,21 @@ class zbbnorm:
   xsec_TTjets_7TeV=  157.5    #NLO inclusive
   xsec_TTlept_7TeV=   16.7    #ttbar->llvvbb_
   xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
-  xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
-  xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
-  xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_section
-  xsec_ZH130_7TeV =    0.0143 #ZHxsec"0.2778", BR(H->bb)"0.494" 
-  xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404
-  xsec_ZH115_7TeV_El =    0.0300 *51013./12753 #ZHxsec"0.4107", BR(H->bb)"0.703"
-  xsec_ZH120_7TeV_El =    0.0242 *52298./13074#ZHxsec"0.3598", BR(H->bb)"0.648" 
-  xsec_ZH125_7TeV_El =      0.0189*55586./13896. #for El ME
-  xsec_ZH130_7TeV_El =    0.0143 *56888./14222#ZHxsec"0.2778", BR(H->bb)"0.494" 
-  xsec_ZH135_7TeV_El =    0.0103 *58371./14592#ZHxsec"0.2453", BR(H->bb)"0.404" 
-  xsec_ZH115_7TeV_Mu =    0.0300 *72638./14527 #ZHxsec"0.4107", BR(H->bb)"0.703"
-  xsec_ZH120_7TeV_Mu =    0.0242 *74039./14807#ZHxsec"0.3598", BR(H->bb)"0.648" 
-  xsec_ZH125_7TeV_Mu =      0.0189*77923./15584. #for Mu ME
-  xsec_ZH130_7TeV_Mu =    0.0143 *80290./16058#ZHxsec"0.2778", BR(H->bb)"0.494" 
-  xsec_ZH135_7TeV_Mu =    0.0103 *82020./16404#ZHxsec"0.2453", BR(H->bb)"0.404"
+  xsec_ZH115_7TeV =    0.0318 #ZHxsec"0.4345", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV =    0.0257 #ZHxsec"0.3808", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV =    0.0201 #ZHxsec"0.3351"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
+  xsec_ZH130_7TeV =    0.0152 #ZHxsec"0.2957", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV =    0.0110 #ZHxsec"0.2616", BR(H->bb)"0.404"  
+  xsec_ZH115_7TeV_El =    0.0318 *51013./12753 #ZHxsec"0.4107", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV_El =    0.0257 *52298./13074#ZHxsec"0.3598", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV_El =    0.0201 *55586./13896. #for El ME
+  xsec_ZH130_7TeV_El =    0.0152 *56888./14222#ZHxsec"0.2778", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV_El =    0.0110 *58371./14592#ZHxsec"0.2453", BR(H->bb)"0.404" 
+  xsec_ZH115_7TeV_Mu =    0.0318 *72638./14527 #ZHxsec"0.4107", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV_Mu =    0.0257 *74039./14807#ZHxsec"0.3598", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV_Mu =    0.0201 *77923./15584. #for Mu ME
+  xsec_ZH130_7TeV_Mu =    0.0152 *80290./16058#ZHxsec"0.2778", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV_Mu =    0.0110 *82020./16404#ZHxsec"0.2453", BR(H->bb)"0.404"
   xsec_tW_7TeV    =    5.3    #NLO inclusive
   xsec_tbarW_7TeV =    5.3    #NLO inclusive
 
