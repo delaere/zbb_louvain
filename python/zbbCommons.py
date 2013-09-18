@@ -56,12 +56,12 @@ class zbbnorm:
   xsec_TTjets_7TeV=  157.5    #NLO inclusive
   xsec_TTlept_7TeV=   16.7    #ttbar->llvvbb_
   xsec_ZZ_7TeV    =    6.206  #cms measurement EWK-11-010 (2011)
-  xsec_ZH110_7TeV =    0.0365 #ZHxsec"0.4721", BR(H->bb)"0.744"
-  xsec_ZH115_7TeV =    0.0300 #ZHxsec"0.4107", BR(H->bb)"0.703"
-  xsec_ZH120_7TeV =    0.0242 #ZHxsec"0.3598", BR(H->bb)"0.648" 
-  xsec_ZH125_7TeV =    0.0189 #ZHxsec"0.3158"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
-  xsec_ZH130_7TeV =    0.0143 #ZHxsec"0.2778", BR(H->bb)"0.494" 
-  xsec_ZH135_7TeV =    0.0103 #ZHxsec"0.2453", BR(H->bb)"0.404" 
+  xsec_ZH110_7TeV =    0.0385 #ZHxsec"0.4978", BR(H->bb)"0.744"
+  xsec_ZH115_7TeV =    0.0318 #ZHxsec"0.4345", BR(H->bb)"0.703"
+  xsec_ZH120_7TeV =    0.0257 #ZHxsec"0.3808", BR(H->bb)"0.648" 
+  xsec_ZH125_7TeV =    0.0201 #ZHxsec"0.3351"*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau : https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CrossSections#Higgs_cross_sections_at_7_8_and
+  xsec_ZH130_7TeV =    0.0152 #ZHxsec"0.2957", BR(H->bb)"0.494" 
+  xsec_ZH135_7TeV =    0.0110 #ZHxsec"0.2616", BR(H->bb)"0.404" 
   xsec_tW_7TeV    =    5.3    #NLO inclusive
   xsec_tbarW_7TeV =    5.3    #NLO inclusive
   
