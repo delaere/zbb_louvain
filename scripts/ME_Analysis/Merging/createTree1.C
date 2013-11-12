@@ -11,8 +11,8 @@
 
 using namespace std;
 
-TString inputFolder = "/nfs/user/acaudron/RDS537_JESdown/";
-TString outputFolder = "/nfs/user/acaudron/LHCO537_JESdown/";
+TString inputFolder = "/nfs/user/acaudron/RDS537/";
+TString outputFolder = "/nfs/user/acaudron/LHCO537/";
 
 void CreateTree(TString InputFile){ 
  

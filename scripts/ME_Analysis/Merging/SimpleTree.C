@@ -115,7 +115,7 @@ using namespace TMVA;
 #include <map>
 
 //define list of NNs
-int nNNs = 38+16;
+int nNNs = 38+10;
 std::string NNs [] = {
   //Maximum 60 chs
   "NN_Higgs125vsDY_MM_N_CSV_2011_comb",//1
@@ -167,11 +167,14 @@ std::string NNs [] = {
   "NN_Higgs125vsBkg_2jcomb_4_2_500_Nj2Mbb80_150Pt402520",
   "NN_Higgs125vsBkg_3jcomb_prodCSV_5_3_1000_Nj3Mbb50_150Pt",
   "NN_Higgs125vsBkg_3jcomb_prodCSV_3_2_1000_Nj3Mbb50_150Pt",
+};
+int nNNsZZ = 6;
+std::string NNsZZ [] = {
   "NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20",
-  "NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520",//50
+  "NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520",
   "NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520",
   "NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520",
-  "NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520",
+  "NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520",//5
   "NN_ZZvsBkg_3jcomb_prodCSV_9_200_Nj3Mbb15_115Pt402520"
 };
 //------------------------------------------------------------
@@ -187,7 +190,7 @@ TH1D* hZbbReweight_dijetdR_El = 0;
 TH1D* hZbbReweight_bestzpt_El = 0;
 
 //for the branch address
-Double_t        Pt_elplus;
+/*Double_t        Pt_elplus;
 Double_t        Pt_elminus;
 Double_t        Pt_Muplus;
 Double_t        Pt_Muminus;
@@ -215,13 +218,13 @@ Double_t        dPhiJ2Met;
 Double_t        Inv_Mass_bb;
 Double_t        Inv_Mass_lept;
 Double_t        DR_jets;
-Int_t           flavour;
+Int_t           flavour;*/
 long int        eventNumber;
 long int        runNumber;
 Double_t        Wgg;
 Double_t        Wqq;
 Double_t        Wtt;
-Double_t        Wtwb;
+//Double_t        Wtwb;
 Double_t        Wzz3;
 Double_t        Wzz0;
 
@@ -237,24 +240,9 @@ Double_t       bdt;
 
 std::map< std::string , Double_t > Whi0;
 std::map< std::string , Double_t > Whi3;
-int nmasses = 9;
-string masses[] = {"110","115","120","125","130","135","140","145","150"};
-//for (int m = 0; m<nmasses; m++) {
-//  Whi0[masses[m]]=0;
-//  Whi3[masses[m]]=0;
-//  }
-/*
-Double_t        Whi3_115;
-Double_t        Whi0_115;
-Double_t        Whi3_120;
-Double_t        Whi0_120;
-Double_t        Whi3_125;
-Double_t        Whi0_125;
-Double_t        Whi3_130;
-Double_t        Whi0_130;
-Double_t        Whi3_135;
-Double_t        Whi0_135;
-  */
+int nmasses = 6;//9;
+string masses[] = {"110","115","120","125","130","135"};//,"140","145","150"};
+
 Double_t        jetmetbjetMinCSVdisc;
 Double_t        jetmetbjetMaxCSVdisc;   
 Double_t        jetmetbjetProdCSVdisc;
@@ -431,7 +419,7 @@ void CreateParentTree(TString InputFile) {
    }
 
 //b) Define branches
-   t_RDSME->Branch("Pt_elplus", &Pt_elplus, "Pt_elplus/D");
+/*   t_RDSME->Branch("Pt_elplus", &Pt_elplus, "Pt_elplus/D");
    t_RDSME->Branch("Pt_elminus", &Pt_elminus, "Pt_elminus/D");
    t_RDSME->Branch("Pt_Muplus", &Pt_Muplus, "Pt_Muplus/D");
    t_RDSME->Branch("Pt_Muminus", &Pt_Muminus, "Pt_Muminus/D");
@@ -461,14 +449,14 @@ void CreateParentTree(TString InputFile) {
    t_RDSME->Branch("Inv_Mass_bb", &Inv_Mass_bb, "Inv_Mass_bb/D");
    t_RDSME->Branch("Inv_Mass_lept", &Inv_Mass_lept, "Inv_Mass_lept/D");
    t_RDSME->Branch("DR_jets", &DR_jets, "DR_jets/D");
-   t_RDSME->Branch("flavour", &flavour, "flavour/I");
+   t_RDSME->Branch("flavour", &flavour, "flavour/I");*/
    t_RDSME->Branch("eventNumber", &eventNumber, "eventNumber/l");
    t_RDSME->Branch("runNumber", &runNumber, "runNumber/l");
    t_RDSME->Branch("bdt", &bdt, "bdt/D");
    t_RDSME->Branch("Wgg", &Wgg, "Wgg/D");
    t_RDSME->Branch("Wqq", &Wqq, "Wqq/D");
    t_RDSME->Branch("Wtt", &Wtt, "Wtt/D");
-   t_RDSME->Branch("Wtwb", &Wtwb, "Wtwb/D");
+   //   t_RDSME->Branch("Wtwb", &Wtwb, "Wtwb/D");
    t_RDSME->Branch("Wzz3", &Wzz3, "Wzz3/D");
    t_RDSME->Branch("Wzz0", &Wzz0, "Wzz0/D");
    for(int m=0; m < (nmasses) ; m++){
@@ -498,26 +486,15 @@ void CreateParentTree(TString InputFile) {
        t_RDSME->Branch((NNs[n]+"_"+masses[m]).c_str(), &NNvalue[NNs[n]+"_"+masses[m]],(NNs[n]+"_"+masses[m]+"/D").c_str());
      }
    }
-   /*   T _RDSME->Branch("Whi0_115", &Whi0_115, "Whi0_115/D");
-   t_RDSME->Branch("Whi3_120", &Whi3_120, "Whi3_120/D");
-   t_RDSME->Branch("Whi0_120", &Whi0_120, "Whi0_120/D");
-   t_RDSME->Branch("Whi3_125", &Whi3_125, "Whi3_125/D");
-   t_RDSME->Branch("Whi0_125", &Whi0_125, "Whi0_125/D");
-   t_RDSME->Branch("Whi3_130", &Whi3_130, "Whi3_130/D");
-   t_RDSME->Branch("Whi0_130", &Whi0_130, "Whi0_130/D");
-   t_RDSME->Branch("Whi3_135", &Whi3_135, "Whi3_135/D");
-   t_RDSME->Branch("Whi0_135", &Whi0_135, "Whi0_135/D");
-   */
+   for(int n=0; n<nNNsZZ; n++) {
+     t_RDSME->Branch((NNsZZ[n]).c_str(), &NNvalue[NNsZZ[n]],(NNsZZ[n]+"/D").c_str());
+   }
+
    //Extra variables MLP's or variables not included in tree2
    t_RDSME->Branch("jetmetbjetMinCSVdisc",&jetmetbjetMinCSVdisc,"jetmetbjetMinCSVdisc/D");
    t_RDSME->Branch("jetmetbjetMaxCSVdisc",&jetmetbjetMaxCSVdisc,"jetmetbjetMaxCSVdisc/D");
    t_RDSME->Branch("jetmetbjetProdCSVdisc",&jetmetbjetProdCSVdisc,"jetmetbjetProdCSVdisc/D");     
 
-   /*   for(int n=0; n<nNNs; n++) {
-     for(int m=0; m<nmasses; m++) {
-       t_RDSME->Branch((NNs[n]+"_"+masses[m]).c_str(), &NNvalue[NNs[n]+masses[m]],(NNs[n]+"_"masses[m]+"/D").c_str());
-       }
-       }*/
    t_RDSME->Branch("mlpZbbvsTT_MM" , &mlpZbbvsTT_MM,"mlpZbbvsTT_MM/D");
    t_RDSME->Branch("mlpZbbvsTT_MM_N" , &mlpZbbvsTT_MM_N,"mlpZbbvsTT_MM_N/D");
    t_RDSME->Branch("mlpZbbvsTT_ML" , &mlpZbbvsTT_ML,"mlpZbbvsTT_ML/D");
@@ -586,39 +563,29 @@ void CreateParentTree(TString InputFile) {
         //std:: cout << "MEentry for " << mc_RDS->eventSelectionrun << ", " << mc_RDS->eventSelectionevent << "]= " << MEentry << std::endl;
         MEentry -= 1; //I substract the unity I added when creating the map 
 	
-        MeT = 0;
+        //MeT = 0;
 	Wtt = 0;
 	Wqq = 0;
 	Wgg = 0;
-        Wtwb = 0;
+	//        Wtwb = 0;
         Wzz3 = 0;
         Wzz0 = 0;
 	for (int m = 0; m<nmasses; m++) {
 	  Whi0[masses[m]]=0;
 	  Whi3[masses[m]]=0;
 	}
-	/*        Whi3_115 = 0;
-        Whi0_115 = 0;
-        Whi3_120 = 0;
-        Whi0_120 = 0;
-        Whi3_125 = 0;
-        Whi0_125 = 0;
-        Whi3_130 = 0;
-        Whi0_130 = 0;
-        Whi3_135 = 0;
-        Whi0_135 = 0;
-	*/
-        Inv_Mass_bb = 0;
-        Inv_Mass_lept = 0;
+
+        //Inv_Mass_bb = 0;
+        //Inv_Mass_lept = 0;
        
         mc_ME->LoadTree(MEentry);
         mc_ME->GetEntry(MEentry);
       
-        MeT = mc_ME->MeT;
+	//        MeT = mc_ME->MeT;
 	Wtt = mc_ME->Wtt;
 	Wqq = mc_ME->Wqq;
  	Wgg = mc_ME->Wgg;
-        Wtwb = mc_ME->Wtwb;
+	//        Wtwb = mc_ME->Wtwb;
         Wzz3 = mc_ME->Wzz3;
         Wzz0 = mc_ME->Wzz0;
         Whi3["110"] = mc_ME->Whi3_110;
@@ -639,14 +606,7 @@ void CreateParentTree(TString InputFile) {
         Whi0["145"] = mc_ME->Whi0_145;
         Whi3["150"] = mc_ME->Whi3_150;
         Whi0["150"] = mc_ME->Whi0_150;
-	  /*	Whi3_120 = mc_ME->Whi3_120;
-        Whi0_120 = mc_ME->Whi0_120;
-	Whi3_125 = mc_ME->Whi3_125;
-        Whi0_125 = mc_ME->Whi0_125;
-	Whi3_130 = mc_ME->Whi3_130;
-        Whi0_130 = mc_ME->Whi0_130;
-	Whi3_135 = mc_ME->Whi3_135;
-        Whi0_135 = mc_ME->Whi0_135;*/
+
 	jetmetbjetMinCSVdisc=std::min(mc_RDS->jetmetbjet1CSVdisc,mc_RDS->jetmetbjet2CSVdisc);
 	jetmetbjetMaxCSVdisc=std::max(mc_RDS->jetmetbjet1CSVdisc,mc_RDS->jetmetbjet2CSVdisc);
 	jetmetbjetProdCSVdisc=mc_RDS->jetmetbjet1CSVdisc*mc_RDS->jetmetbjet2CSVdisc;
@@ -662,8 +622,8 @@ void CreateParentTree(TString InputFile) {
 	jetmetbjetprodCSVdisc=jetmetbjetProdCSVdisc;
         bdt = reader->EvaluateMVA("BDT");
 
-        Inv_Mass_bb = mc_ME->Inv_Mass_bb;
-        Inv_Mass_lept = mc_ME->Inv_Mass_lept;
+	//        Inv_Mass_bb = mc_ME->Inv_Mass_bb;
+        //Inv_Mass_lept = mc_ME->Inv_Mass_lept;
 	
 //---------------------- NN  output here ---------------------------------
         // For DY vs TT
@@ -759,21 +719,21 @@ void CreateParentTree(TString InputFile) {
 	  NNvalue["NN_Higgs125vsBkg_3jcomb_prodCSV_5_3_1000_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_5_3_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
 	  NNvalue["NN_Higgs125vsBkg_3jcomb_prodCSV_3_2_1000_Nj3Mbb50_150Pt_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_higgs_vs_Bkg_3j_ZH125_comb_prodCSV_3_2_1000_Nj3_Mbb50_150_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_Higgs125vsDYcombMbbjdRbjdRbb_12_9_6_3_210_Nj3MbbPt_"+masses[m]],NNvalue["NN_Higgs125vsZZcombMbbjdRbjdRbb_9_100_Nj3Mbb50_150_Pt_"+masses[m]],NNvalue["NN_Higgs125vsTTcombMbbjdRbjdRbb_2_2_600_Nj3Mbb50_150_Pt_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
 
-
-
-	  NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]])));
-	  NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]])));
-
-	  NNvalue["NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20_"+masses[m]],NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520_"+masses[m]])));
-
-
-	  NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
-	  NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Whi0[masses[m]] , Whi3[masses[m]],mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
-
-	  NNvalue["NN_ZZvsBkg_3jcomb_prodCSV_9_200_Nj3Mbb15_115Pt402520_"+masses[m]] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520_"+masses[m]],NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520_"+masses[m]],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
-
 	  
 	}
+
+
+
+	NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20"] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Wzz0 , Wzz3)));
+	NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520"] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_2_1000_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Wzz0 , Wzz3)));
+	
+	NNvalue["NN_ZZvsBkg_2jcomb_12_50_Nj2Mbb45_115Pt402520"] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_2j_ZH125_comb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcomb_12_50_Nj2_Mbb45_115_Ptb1j40_Ptb2j25_Ptll20"],NNvalue["NN_ZZvsTTcomb_2_1000_Nj2Mbb45_115Pt402520"])));
+	
+	
+	NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520"] = std::max(0.0,std::min(1.0,MLP_zz_vs_DY_ZH125_comb_trijetMdr_fsrDR_12_50_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wgg, Wqq, Wzz0 , Wzz3,mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520"] = std::max(0.0,std::min(1.0,MLP_zz_vs_TT_ZH125_comb_trijetMdr_fsrDR_3_2_500_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0, Wtt, Wzz0 , Wzz3,mc_RDS->jetmettrijetMdr,mc_RDS->jetmetfsrDR)));
+	
+	NNvalue["NN_ZZvsBkg_3jcomb_prodCSV_9_200_Nj3Mbb15_115Pt402520"] = std::max(0.0,std::min(1.0,MLP_zz_vs_Bkg_3j_ZH125_comb_prodCSV_9_200_Nj3_Mbb15_115_Ptb1j40_Ptb2j25_Ptll20->Value(0,NNvalue["NN_ZZvsDYcombMbbjdRbjdRbb_12_50_Nj3Mbb15_115Pt402520"],NNvalue["NN_ZZvsTTcombMbbjdRbjdRbb_3_2_500_Nj3Mbb15_115Pt402520"],mc_RDS->jetmetbjet2CSVdisc*mc_RDS->jetmetbjet1CSVdisc)));
 
 
 	//Reweighting stuff here:
@@ -894,10 +854,12 @@ void SimpleTree() {
   CreateParentTree("DY180_Mu_MC");
   CreateParentTree("DY180_El_MC");
   
-  CreateParentTree("TT_Mu_MC");
-  CreateParentTree("TT_El_MC");
+  //CreateParentTree("TT_Mu_MC");
+  //CreateParentTree("TT_El_MC");
   CreateParentTree("TT-FullLept_Mu_MC");
   CreateParentTree("TT-FullLept_El_MC");
+  CreateParentTree("TT-SemiLept_Mu_MC");
+  CreateParentTree("TT-SemiLept_El_MC");
   CreateParentTree("Zbb_Mu_MC");
   CreateParentTree("Zbb_El_MC");
   CreateParentTree("ZZ_Mu_MC");

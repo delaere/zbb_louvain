@@ -1,10 +1,13 @@
 
 from ROOT import *
-from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS, PlotForCLsRaw
+from UserCode.zbb_louvain.globalLists import dirTree2, dirRDS, dirTree2_bcBTAGup, dirTree2_bcBTAGdown, dirTree2_lBTAGup, dirTree2_lBTAGdown, dirTree2_JESup, dirTree2_JESdown, dirTree2_JERup
+from UserCode.zbb_louvain.listForRDS import PlotForCLsRaw
 RooAbsData.setDefaultStorageType(RooAbsData.Tree)
 
 listNNs = PlotForCLsRaw
 RAS = {}
+
+dirTree2=dirTree2
 
 def tree2RDSoneSample(InputFile = "Mu_DATA"):
 
@@ -18,19 +21,22 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myWttRRV = RooRealVar("Wtt", "Wtt", -10, 300)
   myWggRRV = RooRealVar("Wgg", "Wgg", -10, 300)
   myWqqRRV = RooRealVar("Wqq", "Wqq", -10, 300)
-  myWtwbRRV = RooRealVar("Wtwb", "Wtwb", -10, 3300)
+  #myWtwbRRV = RooRealVar("Wtwb", "Wtwb", -10, 3300)
   myWzz3RRV = RooRealVar("Wzz3", "Wzz3", -10, 300)
   myWzz0RRV = RooRealVar("Wzz0", "Wzz0", -10, 300)
   mybdtRRV = RooRealVar("bdt", "bdt", -10, 300)
   for m in ["110","115","120","125","130","135","140","145","150"] :
     RAS["hi0"+m]=RooRealVar("Whi0_"+m, "Whi0_"+m, -10, 300)
     RAS["hi3"+m]=RooRealVar("Whi3_"+m, "Whi3_"+m, -10, 300)
-    for nn in listNNs : RAS[nn+m] = RooRealVar(nn+"_"+m, nn+"_"+m, -10000, 600)
+    for nn in listNNs :
+      if not "ZZvs" in nn and not "bdt" in nn : RAS[nn+m] = RooRealVar(nn+"_"+m, nn+"_"+m, -10000, 600)
+  for nn in listNNs :
+    if "ZZvs" in nn : RAS[nn] = RooRealVar(nn, nn, -10000, 600)
   myjetmetbjetMinCSVdiscRRV = RooRealVar("jetmetbjetMinCSVdisc","jetmetbjetMinCSVdisc",-10, 10)
   myjetmetbjetMaxCSVdiscRRV = RooRealVar("jetmetbjetMaxCSVdisc","jetmetbjetMaxCSVdisc",-10, 10)
   myjetmetbjetProdCSVdiscRRV = RooRealVar("jetmetbjetProdCSVdisc","jetmetbjetProdCSVdisc",-10, 10)
 
-  myMeTRRV = RooRealVar("MeT", "MeT", 0, 600)#met to check the matching
+  #myMeTRRV = RooRealVar("MeT", "MeT", 0, 600)#met to check the matching
 
   mymlpZbbvsTT_MM = RooRealVar("mlpZbbvsTT_MM", "mlpZbbvsTT_MM", -10000, 600)
   mymlpZbbvsTT_MM_N = RooRealVar("mlpZbbvsTT_MM_N", "mlpZbbvsTT_MM_N", -10000, 600)
@@ -46,7 +52,7 @@ def tree2RDSoneSample(InputFile = "Mu_DATA"):
   myRDSRAS.add(myWqqRRV)
   myRDSRAS.add(myWzz3RRV)
   myRDSRAS.add(myWzz0RRV)
-  myRDSRAS.add(myMeTRRV)
+  #myRDSRAS.add(myMeTRRV)
   myRDSRAS.add(mybdtRRV)
   myRDSRAS.add(myjetmetbjetMinCSVdiscRRV)
   myRDSRAS.add(myjetmetbjetMaxCSVdiscRRV)
@@ -118,6 +124,8 @@ list=[
       "ZH150_El_MC",
       "TT-FullLept_Mu_MC",
       "TT-FullLept_El_MC",
+      "TT-SemiLept_Mu_MC",
+      "TT-SemiLept_El_MC",
       "Zbb_Mu_MC",
       "Zbb_El_MC",
       "DY1j_Mu_MC",
@@ -126,8 +134,8 @@ list=[
       "DY2j_El_MC",
       "DY3j_Mu_MC",
       "DY3j_El_MC",
-      #"DY4j_Mu_MC",
-      #"DY4j_El_MC",
+      "DY4j_Mu_MC",
+      "DY4j_El_MC",
       "DY50-70_Mu_MC",
       "DY50-70_El_MC",
       "DY70-100_Mu_MC",
