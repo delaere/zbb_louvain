@@ -72,13 +72,24 @@ btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
 
-from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS, dirRDS_JESup, dirRDS_JESdown
+from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS, dirRDS_JESup, dirRDS_JESdown, dirRDS_BTAGup, dirRDS_BTAGdown, dirRDS_bcBTAGup, dirRDS_bcBTAGdown, dirRDS_lBTAGup, dirRDS_lBTAGdown, dirRDS_JERup
 path = pathSkimEMu
 outputDir=dirRDS
 #outputDir=""
 if zbbsystematics.JESfactor==1 : outputDir=dirRDS_JESup
 elif zbbsystematics.JESfactor==-1 : outputDir=dirRDS_JESdown
 print "zbbsystematics.JESfactor", zbbsystematics.JESfactor, ", outputDir", outputDir
+if zbbsystematics.JERfactor==2 : outputDir=dirRDS_JERup
+print "zbbsystematics.JERfactor", zbbsystematics.JERfactor, ", outputDir", outputDir
+if zbbsystematics.SF_uncert=="max" : outputDir=dirRDS_BTAGup
+elif zbbsystematics.SF_uncert=="min" : outputDir=dirRDS_BTAGdown
+print "zbbsystematics.SF_uncert", zbbsystematics.SF_uncert, ", outputDir", outputDir
+if zbbsystematics.SF_uncert=="max_bc" : outputDir=dirRDS_bcBTAGup
+elif zbbsystematics.SF_uncert=="min_bc" : outputDir=dirRDS_bcBTAGdown
+print "zbbsystematics.SF_uncert", zbbsystematics.SF_uncert, ", outputDir", outputDir
+if zbbsystematics.SF_uncert=="max_l" : outputDir=dirRDS_lBTAGup
+elif zbbsystematics.SF_uncert=="min_l" : outputDir=dirRDS_lBTAGdown
+print "zbbsystematics.SF_uncert", zbbsystematics.SF_uncert, ", outputDir", outputDir
 postfix=""
 #postfix="_testtau"
 if jobNumber>0 : postfix=postfix+"_"+str(jobNumber)

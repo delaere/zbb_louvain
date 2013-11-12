@@ -39,6 +39,7 @@ channelList   = ["Mu","El"]
 jetcategoryList = ["2jet", "P2jet"]
 dataLabel = "DATA"
 
+syst = ""
 useDYptBins = True
 useDYjetBins = False
 useMCTruth = True
@@ -221,7 +222,8 @@ for sample in sampleList:
     #else : s = sample
     s = sample
     for c in ["Mu","El"]:
-      fileNameList[sample+c] = path[s+"_"+c+"_MC"]
+      fileNameList[sample+c] = path[s+"_"+c+"_MC"].replace("Tree2_537","Tree2_537"+syst)
+      print fileNameList[sample+c]
       #if sample=="Zbb" :
       #  fileNameList["ref"+c] = fileNameList[sample+c]
       #  fileNameList["DY"+c] = fileNameList[sample+c]
@@ -334,7 +336,7 @@ def getDataAndMC(dataAndMCNameList,dataAndMCList,channel, jetcat) :
 
 def setWeights(dataAndMCList,MCNameList,vars,channel,jetcat) :
     for name in MCNameList :      
-      if True : ext="Extra_norm"
+      if not "JES" in syst : ext="Extra_norm"
       else : ext=""
       if channel=="Mu" : ch="MuMuChannel"
       else : ch="EEChannel"
@@ -476,35 +478,46 @@ def main():
       SF_zbx_P2jet=RooRealVar("SF_zbb_P2jet","SF_zbx_P2jet",1.,0.5, 2.)
       SF_zxx_P2jet=RooRealVar("SF_zxx_P2jet","SF_zxx_P2jet",1.,0.5, 2.)
     elif (numbersf=="4Rad"):
-      SF_zbb_2jet=RooRealVar("SF_zbb_2jet","SF_zbb_2jet",1.,0.5, 2.)
-      SF_zbx_2jet=RooRealVar("SF_zbx_2jet","SF_zbx_2jet",1.,0.5, 2.)
-      SF_zxx_2jet=RooRealVar("SF_zxx_2jet","SF_zxx_2jet",1.,0.5, 2.)
+      SF_zbb_2jet=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 2.)
+      SF_zbx_2jet=RooRealVar("SF_zbx","SF_zbx",1.,0.5, 2.)
+      SF_zxx_2jet=RooRealVar("SF_zxx","SF_zxx",1.,0.5, 2.)
       SF_zbb_P2jet=SF_zbx_2jet
       SF_zbx_P2jet=SF_zbx_2jet
       SF_zxx_P2jet=SF_zxx_2jet
+    elif (numbersf=="5Rad"):                                                                       
+    SF_zbb_2jet=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 2.)                                         
+    SF_zbx_2jet=RooRealVar("SF_zbx","SF_zbx",1.,0.5, 2.)                                         
+    SF_zxx_2jet=RooRealVar("SF_zxx","SF_zxx",1.,0.5, 2.)                                         
+    SF_zbb_P2jet=RooRealVar("SF_zbb3j","SF_zbb3j",1.,0.5, 2.)                                    
+    SF_zbx_P2jet=SF_zbx_2jet                                                                     
+    SF_zxx_P2jet=SF_zxx_2jet                    
     else:
       print "Unkwnonwn value for numbersf=",numbersf, " valid values are 7, 5ZbbZbx, 5ZxxZbx, 5, 5P"
-    SF_tt_m=RooRealVar("SF_tt_m","SF_tt",1.,0.5, 2.)    
-    SF_zz=RooRealVar("SF_zz","SF_zz",1.,1. , 1.)
+    SF_tt_m=RooRealVar("SF_tt","SF_tt",1.,0.5, 2.)    
+    SF_zz=RooRealVar("SF_zz","SF_zz", 8.4/7.7, 8.4/7.7, 8.4/7.7)
 
     SF={
     	"TT-FullLeptEl2jet":SF_tt_m,
+        "TT-SemiLeptEl2jet":SF_tt_m,
         "ZbbEl2jet":SF_zbb_2jet,
         "ZbxEl2jet":SF_zbx_2jet,
 	"ZxxEl2jet":SF_zxx_2jet,
 	"ZZEl2jet":SF_zz,
 	"TT-FullLeptMu2jet":SF_tt_m,
+        "TT-SemiLeptMu2jet":SF_tt_m, 
         "ZbbMu2jet":SF_zbb_2jet,
         "ZbxMu2jet":SF_zbx_2jet,
 	"ZxxMu2jet":SF_zxx_2jet,
 	"ZZMu2jet":SF_zz,
 
     	"TT-FullLeptElP2jet":SF_tt_m,
+        "TT-SemiLeptElP2jet":SF_tt_m,
         "ZbbElP2jet":SF_zbb_P2jet,
         "ZbxElP2jet":SF_zbx_P2jet,
         "ZxxElP2jet":SF_zxx_P2jet,
 	"ZZElP2jet":SF_zz,
 	"TT-FullLeptMuP2jet":SF_tt_m,
+        "TT-SemiLeptMuP2jet":SF_tt_m,
         "ZbbMuP2jet":SF_zbb_P2jet,
         "ZbxMuP2jet":SF_zbx_P2jet,
 	"ZxxMuP2jet":SF_zxx_P2jet,
@@ -561,8 +574,10 @@ def main():
 		        PdfList2D[channel+jetcat].add(myRHP_2D[mcnames+channel+jetcat])
                         if channel=="Mu" : c="MuMuChannel"
                         else : c="EEChannel"
-		        N_exp[mcnames+channel+jetcat]=RooConstVar("N_exp_"+mcnames+channel+jetcat,"N_exp_"+mcnames+channel+jetcat,
-                                               (AlldataAndMCList[mcnames+channel+jetcat].sumEntries()*(lumi["DATA"]/lumi[mcnames]/Extra_norm[c+mcnames])))
+                        if not "JES" in syst : N_exp[mcnames+channel+jetcat]=RooConstVar("N_exp_"+mcnames+channel+jetcat,"N_exp_"+mcnames+channel+jetcat,
+                                                                                         (AlldataAndMCList[mcnames+channel+jetcat].sumEntries()*(lumi["DATA"]/lumi[mcnames]/Extra_norm[c+mcnames])))
+                        else : N_exp[mcnames+channel+jetcat]=RooConstVar("N_exp_"+mcnames+channel+jetcat,"N_exp_"+mcnames+channel+jetcat,
+                                                                         (AlldataAndMCList[mcnames+channel+jetcat].sumEntries()*(lumi["DATA"]/lumi[mcnames])))
 						     
 		        N[mcnames+channel+jetcat] = RooFormulaVar("N_"+mcnames,"N_"+mcnames+channel+jetcat,"@0*@1",RooArgList(N_exp[mcnames+channel+jetcat],SF[mcnames+channel+jetcat]))
 		  

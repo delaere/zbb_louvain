@@ -23,7 +23,7 @@ class zbblabel:
 
 class zbbsystematics:
   # btagging reweighting
-  SF_uncert="mean" ## choose among min/max/mean
+  SF_uncert="mean" ## choose among min/max/mean/min_bc/max_bc/min_l/max_l 
   SF_running_mode= "hardcoded_nofit" ## choose between hardcoded/database
   #SF_running_mode= "database" ## choose between "hardcoded" and "database"
   # Jet Energy corrections for MC. For data, these factors must be (forced to) zero!
@@ -68,17 +68,21 @@ class zbbnorm:
   #x_section 8 TeV in pb, yet under construction, to be checked later
   #https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSectionsat8TeV
   xsec_DYjets_8TeV=3503.71  #Ml+l->50, NNLO for Z->ll
-  xsec_TTjets_8TeV=225.197  #NLO inclusive
+  #xsec_TTjets_8TeV=225.197  #NLO inclusive
+  xsec_TTjets_8TeV=245.8    #NNLO inclusive 
   xsec_TTFullLept_8TeV = xsec_TTjets_8TeV*(1/3.)*(1/3.) #0.308 is W to lnu with l = e, mu, tau from PDG
   xsec_TTSemiLept_8TeV = xsec_TTjets_8TeV*(1/3.)*(2/3.)*2
-  xsec_ZZ_8TeV = 8.25561    #NLO inclusive Ml+l->12
+  xsec_ZZ_8TeV = 8.258     #NLO inclusive Ml+l->40 NNPDF
   xsec_Zbb_8TeV = 76.75     #LO form MCFM : Ml+l->50, massive b-quark
-  xsec_ZH110_8TeV=0.0454    #xsec=0.5869
-  xsec_ZH115_8TeV=0.0374    #xsec=0.5117 
-  xsec_ZH120_8TeV=0.0302    #xsec=0.4483
-  xsec_ZH125_8TeV=0.0237    #ZHxsec"0.3943 "*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau
-  xsec_ZH130_8TeV=0.0178    #xsec=0.3473 
-  xsec_ZH135_8TeV=0.0129    #xsec=0.3074 
+  xsec_ZH110_8TeV=0.0474    #xsec=0.6125
+  xsec_ZH115_8TeV=0.0392    #xsec=0.5358
+  xsec_ZH120_8TeV=0.0317    #xsec=0.4710
+  xsec_ZH125_8TeV=0.0249    #ZHxsec"0.4153 "*BR(H->bb)"0.577"*BR(Z->ll)"0.10399" , here l=e, mu or tau
+  xsec_ZH130_8TeV=0.0189    #xsec=0.3671
+  xsec_ZH135_8TeV=0.0137    #xsec=0.3259
+  xsec_ZH140_8TeV=0.0095    #xsec=0.2898 BR=0.315
+  xsec_ZH145_8TeV=0.0062    #xsec=0.2583 BR=0.232
+  xsec_ZH150_8TeV=0.0038    #xsec=0.2308 BR=0.157
   xsec_tW_8TeV=11.1         #approx. NNLO inclusive
   xsec_tbarW_8TeV=11.1      #approx. NNLO inclusive
 

@@ -181,10 +181,18 @@ listsamplesEMu = []
 
 #use to produce RDS and LHCO and to acces to RDS, LHCO
 #dirRDS = "/nfs/user/acaudron/RDS537/"
-#dirRDS = "/nfs/user/acaudron/RDS53X_update19fb/"
 dirRDS = "/nfs/user/acaudron/RDS537/"
 dirRDS_PUup = "/nfs/user/acaudron/RDS537_PUup/"
 dirRDS_PUdown = "/nfs/user/acaudron/RDS537_PUdown/"
+dirRDS_JERup = "/nfs/user/acaudron/RDS537_JERup/"
+dirRDS_JESup = "/nfs/user/acaudron/RDS537_JESup/"
+dirRDS_JESdown = "/nfs/user/acaudron/RDS537_JESdown/"
+dirRDS_BTAGup = "/nfs/user/acaudron/RDS537_BTAGup/"
+dirRDS_BTAGdown = "/nfs/user/acaudron/RDS537_BTAGdown/"
+dirRDS_bcBTAGup = "/nfs/user/acaudron/RDS537_bcBTAGup/"
+dirRDS_bcBTAGdown = "/nfs/user/acaudron/RDS537_bcBTAGdown/"
+dirRDS_lBTAGup = "/nfs/user/acaudron/RDS537_lBTAGup/"
+dirRDS_lBTAGdown = "/nfs/user/acaudron/RDS537_lBTAGdown/"
 dirLHCO = "/nfs/user/acaudron/LHCO537/"
 pathSkimEMu = {}
 pathRDS = {}
@@ -194,6 +202,17 @@ checkTrigger = {}
 
 #use to produce/access to Tree2, MergedTree and MergedRDS
 dirTree2 = "/nfs/user/acaudron/Tree2_537/"
+dirTree2_PUup = "/nfs/user/acaudron/Tree2_537_PUup/"
+dirTree2_PUdown = "/nfs/user/acaudron/Tree2_537_PUdown/"
+dirTree2_JERup = "/nfs/user/acaudron/Tree2_537_JERup/"
+dirTree2_JESup = "/nfs/user/acaudron/Tree2_537_JESup/"
+dirTree2_JESdown = "/nfs/user/acaudron/Tree2_537_JESdown/"
+dirTree2_BTAGup = "/nfs/user/acaudron/Tree2_537_BTAGup/"
+dirTree2_BTAGdown = "/nfs/user/acaudron/Tree2_537_BTAGdown/"
+dirTree2_bcBTAGup = "/nfs/user/acaudron/Tree2_537_bcBTAGup/"
+dirTree2_bcBTAGdown = "/nfs/user/acaudron/Tree2_537_bcBTAGdown/"
+dirTree2_lBTAGup = "/nfs/user/acaudron/Tree2_537_lBTAGup/"
+dirTree2_lBTAGdown = "/nfs/user/acaudron/Tree2_537_lBTAGdown/"
 pathTree2 = {}
 pathMergedTree = {}
 pathMergedRDS = {}
