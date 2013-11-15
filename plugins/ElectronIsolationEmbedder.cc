@@ -82,7 +82,6 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     pat::Electron & el = (*electronColl)[i];
     float eta = el.superCluster()->eta();
     reco::GsfElectronRef gsfele(els_h, el.originalObjectRef().key());
-    //reco::GsfElectron gsfEle = *gsfele;
     const IsoDepositVals * electronIsoVals = &electronIsoValPFId;
 
     // use the reference to the original gsfElectron from PAT::electron
@@ -93,7 +92,6 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     // introduce the new definition of the medium WP, approved on June 1st.
     LogDebug("ElectronIsolationEmbedder") << "WP inputs: " << charged << " " << photon << " " << neutral << " " << rho;
     bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, gsfele, conversions_h, beamSpot, vtx_h, charged, photon, neutral, rho);
-    //bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, gsfEle, conversions_h, beamSpot, vtx_h, charged, photon, neutral, rho);
     el.addUserInt("MediumWP", medium);
     LogDebug("ElectronIsolationEmbedder") << "MediumWP: " << medium;
 
