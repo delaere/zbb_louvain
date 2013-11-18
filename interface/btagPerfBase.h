@@ -6,7 +6,7 @@
 class btagPerfBase {
   public:
     // defines the possible modes for systematics
-    enum SystematicVariation { MIN=-1, MEAN=0, MAX=1 };
+    enum SystematicVariation { MIN=-1, MEAN=0, MAX=1, MIN_BC=-2, MAX_BC=2, MIN_L=-3, MAX_L=3};
     // return value + error
     typedef std::pair<double, double> value;
     // usual constructor and destructor

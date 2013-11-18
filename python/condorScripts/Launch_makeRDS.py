@@ -14,8 +14,11 @@ from optparse import OptionParser
 from zbbSamples import getSamples, samples_PAT
 
 FarmDirectory = "FARM_RDSmaker_TEST"
-print "I will run over ", len(processesToRun), "processes"
 
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
+
+print "I will run over ", len(processesToRun), "processes"
 JobName = "File_rds"
 LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)

@@ -11,6 +11,8 @@ import os
 import LaunchOnCondor
 
 from zbbSamples import samples_PAT, getSamples, dirSkim
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
 
 FarmDirectory = "FARM_skim_V5"
 JobName = "Skim_pats"

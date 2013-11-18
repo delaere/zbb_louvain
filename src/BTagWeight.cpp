@@ -40,6 +40,10 @@ void JetSet::addJet(std::string uncert, int flavor, double et, double eta) {
   btagPerfBase::SystematicVariation mode = btagPerfBase::MEAN;
   if(uncert=="min") mode = btagPerfBase::MIN;
   if(uncert=="max") mode = btagPerfBase::MAX;
+  if(uncert=="min_bc") mode = btagPerfBase::MIN_BC;
+  if(uncert=="max_bc") mode = btagPerfBase::MAX_BC;
+  if(uncert=="min_l") mode = btagPerfBase::MIN_L;
+  if(uncert=="max_l") mode = btagPerfBase::MAX_L;
   addJet(JetInfo(interface_->getbEfficiency(mode,flavor,1,et,eta),
                  interface_->getbEffScaleFactor(mode,flavor,1,et,eta),
                  interface_->getbEfficiency(mode,flavor,2,et,eta),

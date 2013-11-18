@@ -1,6 +1,13 @@
 from ROOT import *
 from zbbSamples import channels, getSample, getDataLuminosity
 from zbbSamples import samples_RDS as allSamples
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+
+channels  = [
+    "EEChannel",
+    "MuMuChannel",
+    ]
 
 var = {
     "El" : "EEChannel/Cut2/eventSelectionbestzptEle",

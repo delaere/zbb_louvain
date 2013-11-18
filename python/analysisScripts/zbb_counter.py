@@ -1,6 +1,8 @@
 #!/usr/bin/env python 
 import os
 import sys
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 import PatAnalysis.CMSSW
 from ROOT import TLorentzVector
 from PatAnalysis.AnalysisEvent import AnalysisEvent
@@ -28,6 +30,8 @@ def countEvents(path="", output="-", muChannel=True, Njobs=1, jobNumber=1):
 
   # counters
   event_num=0
+
+
   NrGen1b=0
   NrGen2b=0
   NrGenZj=0

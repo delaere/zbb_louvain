@@ -6,7 +6,7 @@
 <use   name="CommonTools/Utils"/>
 <use   name="CommonTools/UtilAlgos"/>
 <use   name="DataFormats/PatCandidates" />
-<use   name="EGamma/EGammaAnalysisTools" />
+<use   name="EgammaAnalysis/ElectronTools" />
 
 <library   file="*.cc" name="UserCodezbb_louvainPlugins">
   <flags   EDM_PLUGIN="1"/>

@@ -15,6 +15,9 @@
 from ROOT import *
 import math
 from zbbSamples import getSample, getDataLuminosity, getSamples
+import os, sys
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
 
 def RemoveErrorsHisto(h):
 

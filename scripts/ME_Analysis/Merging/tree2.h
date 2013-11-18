@@ -1,7 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Nov 30 15:56:42 2012 by ROOT version 5.27/06b
-// from TChain tree2/
+// Thu Jul  4 22:50:36 2013 by ROOT version 5.32/00
+// from TTree tree2/data
+// found on file: /nfs/user/acaudron/Tree2_537/ME_zbb_ZZ_Mu_MC.root
 //////////////////////////////////////////////////////////
 
 #ifndef tree2_h
@@ -10,6 +11,10 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+
+// Header file for the classes stored in the TTree if any.
+
+// Fixed size dimensions of array or collections stored in the TTree if any.
 
 class tree2 {
 public :
@@ -37,8 +42,8 @@ public :
    Double_t        Phi_j2;
    Double_t        Pt_j2;
    Double_t        E_j2;
-   Int_t           btagj1;
-   Int_t           btagj2;
+   Double_t        btagj1;
+   Double_t        btagj2;
    Double_t        MeTPhi;
    Double_t        Met_signi;
    Double_t        MeT;
@@ -63,6 +68,8 @@ public :
    Double_t        Wtwb;
    Double_t        Wzz3;
    Double_t        Wzz0;
+   Double_t        Whi3_110;
+   Double_t        Whi0_110;
    Double_t        Whi3_115;
    Double_t        Whi0_115;
    Double_t        Whi3_120;
@@ -73,6 +80,12 @@ public :
    Double_t        Whi0_130;
    Double_t        Whi3_135;
    Double_t        Whi0_135;
+   Double_t        Whi3_140;
+   Double_t        Whi0_140;
+   Double_t        Whi3_145;
+   Double_t        Whi0_145;
+   Double_t        Whi3_150;
+   Double_t        Whi0_150;
 
    // List of branches
    TBranch        *b_Pt_elplus;   //!
@@ -121,6 +134,8 @@ public :
    TBranch        *b_Wtwb;   //!
    TBranch        *b_Wzz3;   //!
    TBranch        *b_Wzz0;   //!
+   TBranch        *b_Whi3_110;   //!
+   TBranch        *b_Whi0_110;   //!
    TBranch        *b_Whi3_115;   //!
    TBranch        *b_Whi0_115;   //!
    TBranch        *b_Whi3_120;   //!
@@ -131,6 +146,12 @@ public :
    TBranch        *b_Whi0_130;   //!
    TBranch        *b_Whi3_135;   //!
    TBranch        *b_Whi0_135;   //!
+   TBranch        *b_Whi3_140;   //!
+   TBranch        *b_Whi0_140;   //!
+   TBranch        *b_Whi3_145;   //!
+   TBranch        *b_Whi0_145;   //!
+   TBranch        *b_Whi3_150;   //!
+   TBranch        *b_Whi0_150;   //!
 
    tree2(TTree *tree=0);
    virtual ~tree2();
@@ -146,39 +167,16 @@ public :
 #endif
 
 #ifdef tree2_cxx
-tree2::tree2(TTree *tree)
+tree2::tree2(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-
-#ifdef SINGLE_TREE
-      // The following code should be used if you want this class to access
-      // a single tree instead of a chain
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("Memory Directory");
-      if (!f) {
-         f = new TFile("Memory Directory");
-         f->cd("Rint:/");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/nfs/user/acaudron/Tree2_537/ME_zbb_ZZ_Mu_MC.root");
+      if (!f || !f->IsOpen()) {
+         f = new TFile("/nfs/user/acaudron/Tree2_537/ME_zbb_ZZ_Mu_MC.root");
       }
-      tree = (TTree*)gDirectory->Get("tree2");
-
-#else // SINGLE_TREE
-
-      // The following code should be used if you want this class to access a chain
-      // of trees.
-      TChain * chain = new TChain("tree2","");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/DY_ee_824_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/DY_mm_1186_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/Data_ee_709_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/Data_mm_988_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/TT_ee_31029_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/TT_mm_10000_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZH_m125_ee_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZH_m125_mm_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZZ_ee_1374_TREE2.root/tree2");
-      chain->Add("/nfs/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsSMP-12-003_v0_121114_JER0_allHmass/ZZ_mm_2017_TREE2.root/tree2");
-      tree = chain;
-#endif // SINGLE_TREE
+      f->GetObject("tree2",tree);
 
    }
    Init(tree);
@@ -202,10 +200,8 @@ Long64_t tree2::LoadTree(Long64_t entry)
    if (!fChain) return -5;
    Long64_t centry = fChain->LoadTree(entry);
    if (centry < 0) return centry;
-   if (!fChain->InheritsFrom(TChain::Class()))  return centry;
-   TChain *chain = (TChain*)fChain;
-   if (chain->GetTreeNumber() != fCurrent) {
-      fCurrent = chain->GetTreeNumber();
+   if (fChain->GetTreeNumber() != fCurrent) {
+      fCurrent = fChain->GetTreeNumber();
       Notify();
    }
    return centry;
@@ -273,6 +269,8 @@ void tree2::Init(TTree *tree)
    fChain->SetBranchAddress("Wtwb", &Wtwb, &b_Wtwb);
    fChain->SetBranchAddress("Wzz3", &Wzz3, &b_Wzz3);
    fChain->SetBranchAddress("Wzz0", &Wzz0, &b_Wzz0);
+   fChain->SetBranchAddress("Whi3_110", &Whi3_110, &b_Whi3_110);
+   fChain->SetBranchAddress("Whi0_110", &Whi0_110, &b_Whi0_110);
    fChain->SetBranchAddress("Whi3_115", &Whi3_115, &b_Whi3_115);
    fChain->SetBranchAddress("Whi0_115", &Whi0_115, &b_Whi0_115);
    fChain->SetBranchAddress("Whi3_120", &Whi3_120, &b_Whi3_120);
@@ -283,6 +281,12 @@ void tree2::Init(TTree *tree)
    fChain->SetBranchAddress("Whi0_130", &Whi0_130, &b_Whi0_130);
    fChain->SetBranchAddress("Whi3_135", &Whi3_135, &b_Whi3_135);
    fChain->SetBranchAddress("Whi0_135", &Whi0_135, &b_Whi0_135);
+   fChain->SetBranchAddress("Whi3_140", &Whi3_140, &b_Whi3_140);
+   fChain->SetBranchAddress("Whi0_140", &Whi0_140, &b_Whi0_140);
+   fChain->SetBranchAddress("Whi3_145", &Whi3_145, &b_Whi3_145);
+   fChain->SetBranchAddress("Whi0_145", &Whi0_145, &b_Whi0_145);
+   fChain->SetBranchAddress("Whi3_150", &Whi3_150, &b_Whi3_150);
+   fChain->SetBranchAddress("Whi0_150", &Whi0_150, &b_Whi0_150);
    Notify();
 }
 

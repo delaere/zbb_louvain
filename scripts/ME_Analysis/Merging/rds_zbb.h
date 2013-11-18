@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr  9 23:01:21 2013 by ROOT version 5.32/00
+// Tue Jun 25 18:43:57 2013 by ROOT version 5.32/00
 // from TTree rds_zbb/rds_zbb
-// found on file: /nfs/user/acaudron/RDS537/File_rds_zbb_DY_Mu_MC.root
+// found on file: /nfs/user/acaudron/RDS537/File_rds_zbb_TT_El_MC.root
 //////////////////////////////////////////////////////////
 
 #ifndef rds_zbb_h
@@ -214,6 +214,61 @@ public :
    Double_t        jetmetcef;
    Double_t        jetmetjetid;
    Double_t        jetmetrho;
+   Double_t        jetmetisrjetpt;
+   Double_t        jetmetisrjetetapm;
+   Double_t        jetmetisrjetphi;
+   Double_t        jetmetisrjetmass;
+   Double_t        jetmetfsrjetDRpt;
+   Double_t        jetmetfsrjetDRetapm;
+   Double_t        jetmetfsrjetDRphi;
+   Double_t        jetmetfsrjetDRmass;
+   Double_t        jetmetfsrDR;
+   Double_t        jetmettrijetMdr;
+   Double_t        jetmetfsrjetpt_110;
+   Double_t        jetmetfsrjetetapm_110;
+   Double_t        jetmetfsrjetphi_110;
+   Double_t        jetmetfsrjetmass_110;
+   Double_t        jetmettrijetM_110;
+   Double_t        jetmetfsrjetpt_115;
+   Double_t        jetmetfsrjetetapm_115;
+   Double_t        jetmetfsrjetphi_115;
+   Double_t        jetmetfsrjetmass_115;
+   Double_t        jetmettrijetM_115;
+   Double_t        jetmetfsrjetpt_120;
+   Double_t        jetmetfsrjetetapm_120;
+   Double_t        jetmetfsrjetphi_120;
+   Double_t        jetmetfsrjetmass_120;
+   Double_t        jetmettrijetM_120;
+   Double_t        jetmetfsrjetpt_125;
+   Double_t        jetmetfsrjetetapm_125;
+   Double_t        jetmetfsrjetphi_125;
+   Double_t        jetmetfsrjetmass_125;
+   Double_t        jetmettrijetM_125;
+   Double_t        jetmetfsrjetpt_130;
+   Double_t        jetmetfsrjetetapm_130;
+   Double_t        jetmetfsrjetphi_130;
+   Double_t        jetmetfsrjetmass_130;
+   Double_t        jetmettrijetM_130;
+   Double_t        jetmetfsrjetpt_135;
+   Double_t        jetmetfsrjetetapm_135;
+   Double_t        jetmetfsrjetphi_135;
+   Double_t        jetmetfsrjetmass_135;
+   Double_t        jetmettrijetM_135;
+   Double_t        jetmetfsrjetpt_140;
+   Double_t        jetmetfsrjetetapm_140;
+   Double_t        jetmetfsrjetphi_140;
+   Double_t        jetmetfsrjetmass_140;
+   Double_t        jetmettrijetM_140;
+   Double_t        jetmetfsrjetpt_145;
+   Double_t        jetmetfsrjetetapm_145;
+   Double_t        jetmetfsrjetphi_145;
+   Double_t        jetmetfsrjetmass_145;
+   Double_t        jetmettrijetM_145;
+   Double_t        jetmetfsrjetpt_150;
+   Double_t        jetmetfsrjetetapm_150;
+   Double_t        jetmetfsrjetphi_150;
+   Double_t        jetmetfsrjetmass_150;
+   Double_t        jetmettrijetM_150;
    Double_t        vertexAssociationnvertices;
    Double_t        vertexAssociationvx;
    Double_t        vertexAssociationvy;
@@ -318,6 +373,12 @@ public :
    Double_t        BtaggingReweightingHPHP;
    Double_t        LeptonsReweightingweight;
    Double_t        mcSelectioneventType;
+   Double_t        mcSelectionisZ;
+   Double_t        mcSelectionnLeptons;
+   Double_t        mcSelectionllpt;
+   Double_t        mcSelectionnJets;
+   Double_t        mcSelectionnbJets;
+   Double_t        mcSelectionncJets;
    Double_t        mcSelectionLepPosPx;
    Double_t        mcSelectionLepPosPy;
    Double_t        mcSelectionLepPosPz;
@@ -575,6 +636,61 @@ public :
    TBranch        *b_jetmetcef;   //!
    TBranch        *b_jetmetjetid;   //!
    TBranch        *b_jetmetrho;   //!
+   TBranch        *b_jetmetisrjetpt;   //!
+   TBranch        *b_jetmetisrjetetapm;   //!
+   TBranch        *b_jetmetisrjetphi;   //!
+   TBranch        *b_jetmetisrjetmass;   //!
+   TBranch        *b_jetmetfsrjetDRpt;   //!
+   TBranch        *b_jetmetfsrjetDRetapm;   //!
+   TBranch        *b_jetmetfsrjetDRphi;   //!
+   TBranch        *b_jetmetfsrjetDRmass;   //!
+   TBranch        *b_jetmetfsrDR;   //!
+   TBranch        *b_jetmettrijetMdr;   //!
+   TBranch        *b_jetmetfsrjetpt_110;   //!
+   TBranch        *b_jetmetfsrjetetapm_110;   //!
+   TBranch        *b_jetmetfsrjetphi_110;   //!
+   TBranch        *b_jetmetfsrjetmass_110;   //!
+   TBranch        *b_jetmettrijetM_110;   //!
+   TBranch        *b_jetmetfsrjetpt_115;   //!
+   TBranch        *b_jetmetfsrjetetapm_115;   //!
+   TBranch        *b_jetmetfsrjetphi_115;   //!
+   TBranch        *b_jetmetfsrjetmass_115;   //!
+   TBranch        *b_jetmettrijetM_115;   //!
+   TBranch        *b_jetmetfsrjetpt_120;   //!
+   TBranch        *b_jetmetfsrjetetapm_120;   //!
+   TBranch        *b_jetmetfsrjetphi_120;   //!
+   TBranch        *b_jetmetfsrjetmass_120;   //!
+   TBranch        *b_jetmettrijetM_120;   //!
+   TBranch        *b_jetmetfsrjetpt_125;   //!
+   TBranch        *b_jetmetfsrjetetapm_125;   //!
+   TBranch        *b_jetmetfsrjetphi_125;   //!
+   TBranch        *b_jetmetfsrjetmass_125;   //!
+   TBranch        *b_jetmettrijetM_125;   //!
+   TBranch        *b_jetmetfsrjetpt_130;   //!
+   TBranch        *b_jetmetfsrjetetapm_130;   //!
+   TBranch        *b_jetmetfsrjetphi_130;   //!
+   TBranch        *b_jetmetfsrjetmass_130;   //!
+   TBranch        *b_jetmettrijetM_130;   //!
+   TBranch        *b_jetmetfsrjetpt_135;   //!
+   TBranch        *b_jetmetfsrjetetapm_135;   //!
+   TBranch        *b_jetmetfsrjetphi_135;   //!
+   TBranch        *b_jetmetfsrjetmass_135;   //!
+   TBranch        *b_jetmettrijetM_135;   //!
+   TBranch        *b_jetmetfsrjetpt_140;   //!
+   TBranch        *b_jetmetfsrjetetapm_140;   //!
+   TBranch        *b_jetmetfsrjetphi_140;   //!
+   TBranch        *b_jetmetfsrjetmass_140;   //!
+   TBranch        *b_jetmettrijetM_140;   //!
+   TBranch        *b_jetmetfsrjetpt_145;   //!
+   TBranch        *b_jetmetfsrjetetapm_145;   //!
+   TBranch        *b_jetmetfsrjetphi_145;   //!
+   TBranch        *b_jetmetfsrjetmass_145;   //!
+   TBranch        *b_jetmettrijetM_145;   //!
+   TBranch        *b_jetmetfsrjetpt_150;   //!
+   TBranch        *b_jetmetfsrjetetapm_150;   //!
+   TBranch        *b_jetmetfsrjetphi_150;   //!
+   TBranch        *b_jetmetfsrjetmass_150;   //!
+   TBranch        *b_jetmettrijetM_150;   //!
    TBranch        *b_vertexAssociationnvertices;   //!
    TBranch        *b_vertexAssociationvx;   //!
    TBranch        *b_vertexAssociationvy;   //!
@@ -679,6 +795,12 @@ public :
    TBranch        *b_BtaggingReweightingHPHP;   //!
    TBranch        *b_LeptonsReweightingweight;   //!
    TBranch        *b_mcSelectioneventType;   //!
+   TBranch        *b_mcSelectionisZ;   //!
+   TBranch        *b_mcSelectionnLeptons;   //!
+   TBranch        *b_mcSelectionllpt;   //!
+   TBranch        *b_mcSelectionnJets;   //!
+   TBranch        *b_mcSelectionnbJets;   //!
+   TBranch        *b_mcSelectionncJets;   //!
    TBranch        *b_mcSelectionLepPosPx;   //!
    TBranch        *b_mcSelectionLepPosPy;   //!
    TBranch        *b_mcSelectionLepPosPz;   //!
@@ -762,9 +884,9 @@ rds_zbb::rds_zbb(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/nfs/user/acaudron/RDS537/File_rds_zbb_DY_Mu_MC.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/nfs/user/acaudron/RDS537/File_rds_zbb_TT_El_MC.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/nfs/user/acaudron/RDS537/File_rds_zbb_DY_Mu_MC.root");
+         f = new TFile("/nfs/user/acaudron/RDS537/File_rds_zbb_TT_El_MC.root");
       }
       f->GetObject("rds_zbb",tree);
 
@@ -1005,6 +1127,61 @@ void rds_zbb::Init(TTree *tree)
    fChain->SetBranchAddress("jetmetcef", &jetmetcef, &b_jetmetcef);
    fChain->SetBranchAddress("jetmetjetid", &jetmetjetid, &b_jetmetjetid);
    fChain->SetBranchAddress("jetmetrho", &jetmetrho, &b_jetmetrho);
+   fChain->SetBranchAddress("jetmetisrjetpt", &jetmetisrjetpt, &b_jetmetisrjetpt);
+   fChain->SetBranchAddress("jetmetisrjetetapm", &jetmetisrjetetapm, &b_jetmetisrjetetapm);
+   fChain->SetBranchAddress("jetmetisrjetphi", &jetmetisrjetphi, &b_jetmetisrjetphi);
+   fChain->SetBranchAddress("jetmetisrjetmass", &jetmetisrjetmass, &b_jetmetisrjetmass);
+   fChain->SetBranchAddress("jetmetfsrjetDRpt", &jetmetfsrjetDRpt, &b_jetmetfsrjetDRpt);
+   fChain->SetBranchAddress("jetmetfsrjetDRetapm", &jetmetfsrjetDRetapm, &b_jetmetfsrjetDRetapm);
+   fChain->SetBranchAddress("jetmetfsrjetDRphi", &jetmetfsrjetDRphi, &b_jetmetfsrjetDRphi);
+   fChain->SetBranchAddress("jetmetfsrjetDRmass", &jetmetfsrjetDRmass, &b_jetmetfsrjetDRmass);
+   fChain->SetBranchAddress("jetmetfsrDR", &jetmetfsrDR, &b_jetmetfsrDR);
+   fChain->SetBranchAddress("jetmettrijetMdr", &jetmettrijetMdr, &b_jetmettrijetMdr);
+   fChain->SetBranchAddress("jetmetfsrjetpt_110", &jetmetfsrjetpt_110, &b_jetmetfsrjetpt_110);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_110", &jetmetfsrjetetapm_110, &b_jetmetfsrjetetapm_110);
+   fChain->SetBranchAddress("jetmetfsrjetphi_110", &jetmetfsrjetphi_110, &b_jetmetfsrjetphi_110);
+   fChain->SetBranchAddress("jetmetfsrjetmass_110", &jetmetfsrjetmass_110, &b_jetmetfsrjetmass_110);
+   fChain->SetBranchAddress("jetmettrijetM_110", &jetmettrijetM_110, &b_jetmettrijetM_110);
+   fChain->SetBranchAddress("jetmetfsrjetpt_115", &jetmetfsrjetpt_115, &b_jetmetfsrjetpt_115);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_115", &jetmetfsrjetetapm_115, &b_jetmetfsrjetetapm_115);
+   fChain->SetBranchAddress("jetmetfsrjetphi_115", &jetmetfsrjetphi_115, &b_jetmetfsrjetphi_115);
+   fChain->SetBranchAddress("jetmetfsrjetmass_115", &jetmetfsrjetmass_115, &b_jetmetfsrjetmass_115);
+   fChain->SetBranchAddress("jetmettrijetM_115", &jetmettrijetM_115, &b_jetmettrijetM_115);
+   fChain->SetBranchAddress("jetmetfsrjetpt_120", &jetmetfsrjetpt_120, &b_jetmetfsrjetpt_120);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_120", &jetmetfsrjetetapm_120, &b_jetmetfsrjetetapm_120);
+   fChain->SetBranchAddress("jetmetfsrjetphi_120", &jetmetfsrjetphi_120, &b_jetmetfsrjetphi_120);
+   fChain->SetBranchAddress("jetmetfsrjetmass_120", &jetmetfsrjetmass_120, &b_jetmetfsrjetmass_120);
+   fChain->SetBranchAddress("jetmettrijetM_120", &jetmettrijetM_120, &b_jetmettrijetM_120);
+   fChain->SetBranchAddress("jetmetfsrjetpt_125", &jetmetfsrjetpt_125, &b_jetmetfsrjetpt_125);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_125", &jetmetfsrjetetapm_125, &b_jetmetfsrjetetapm_125);
+   fChain->SetBranchAddress("jetmetfsrjetphi_125", &jetmetfsrjetphi_125, &b_jetmetfsrjetphi_125);
+   fChain->SetBranchAddress("jetmetfsrjetmass_125", &jetmetfsrjetmass_125, &b_jetmetfsrjetmass_125);
+   fChain->SetBranchAddress("jetmettrijetM_125", &jetmettrijetM_125, &b_jetmettrijetM_125);
+   fChain->SetBranchAddress("jetmetfsrjetpt_130", &jetmetfsrjetpt_130, &b_jetmetfsrjetpt_130);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_130", &jetmetfsrjetetapm_130, &b_jetmetfsrjetetapm_130);
+   fChain->SetBranchAddress("jetmetfsrjetphi_130", &jetmetfsrjetphi_130, &b_jetmetfsrjetphi_130);
+   fChain->SetBranchAddress("jetmetfsrjetmass_130", &jetmetfsrjetmass_130, &b_jetmetfsrjetmass_130);
+   fChain->SetBranchAddress("jetmettrijetM_130", &jetmettrijetM_130, &b_jetmettrijetM_130);
+   fChain->SetBranchAddress("jetmetfsrjetpt_135", &jetmetfsrjetpt_135, &b_jetmetfsrjetpt_135);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_135", &jetmetfsrjetetapm_135, &b_jetmetfsrjetetapm_135);
+   fChain->SetBranchAddress("jetmetfsrjetphi_135", &jetmetfsrjetphi_135, &b_jetmetfsrjetphi_135);
+   fChain->SetBranchAddress("jetmetfsrjetmass_135", &jetmetfsrjetmass_135, &b_jetmetfsrjetmass_135);
+   fChain->SetBranchAddress("jetmettrijetM_135", &jetmettrijetM_135, &b_jetmettrijetM_135);
+   fChain->SetBranchAddress("jetmetfsrjetpt_140", &jetmetfsrjetpt_140, &b_jetmetfsrjetpt_140);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_140", &jetmetfsrjetetapm_140, &b_jetmetfsrjetetapm_140);
+   fChain->SetBranchAddress("jetmetfsrjetphi_140", &jetmetfsrjetphi_140, &b_jetmetfsrjetphi_140);
+   fChain->SetBranchAddress("jetmetfsrjetmass_140", &jetmetfsrjetmass_140, &b_jetmetfsrjetmass_140);
+   fChain->SetBranchAddress("jetmettrijetM_140", &jetmettrijetM_140, &b_jetmettrijetM_140);
+   fChain->SetBranchAddress("jetmetfsrjetpt_145", &jetmetfsrjetpt_145, &b_jetmetfsrjetpt_145);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_145", &jetmetfsrjetetapm_145, &b_jetmetfsrjetetapm_145);
+   fChain->SetBranchAddress("jetmetfsrjetphi_145", &jetmetfsrjetphi_145, &b_jetmetfsrjetphi_145);
+   fChain->SetBranchAddress("jetmetfsrjetmass_145", &jetmetfsrjetmass_145, &b_jetmetfsrjetmass_145);
+   fChain->SetBranchAddress("jetmettrijetM_145", &jetmettrijetM_145, &b_jetmettrijetM_145);
+   fChain->SetBranchAddress("jetmetfsrjetpt_150", &jetmetfsrjetpt_150, &b_jetmetfsrjetpt_150);
+   fChain->SetBranchAddress("jetmetfsrjetetapm_150", &jetmetfsrjetetapm_150, &b_jetmetfsrjetetapm_150);
+   fChain->SetBranchAddress("jetmetfsrjetphi_150", &jetmetfsrjetphi_150, &b_jetmetfsrjetphi_150);
+   fChain->SetBranchAddress("jetmetfsrjetmass_150", &jetmetfsrjetmass_150, &b_jetmetfsrjetmass_150);
+   fChain->SetBranchAddress("jetmettrijetM_150", &jetmettrijetM_150, &b_jetmettrijetM_150);
    fChain->SetBranchAddress("vertexAssociationnvertices", &vertexAssociationnvertices, &b_vertexAssociationnvertices);
    fChain->SetBranchAddress("vertexAssociationvx", &vertexAssociationvx, &b_vertexAssociationvx);
    fChain->SetBranchAddress("vertexAssociationvy", &vertexAssociationvy, &b_vertexAssociationvy);
@@ -1109,6 +1286,12 @@ void rds_zbb::Init(TTree *tree)
    fChain->SetBranchAddress("BtaggingReweightingHPHP", &BtaggingReweightingHPHP, &b_BtaggingReweightingHPHP);
    fChain->SetBranchAddress("LeptonsReweightingweight", &LeptonsReweightingweight, &b_LeptonsReweightingweight);
    fChain->SetBranchAddress("mcSelectioneventType", &mcSelectioneventType, &b_mcSelectioneventType);
+   fChain->SetBranchAddress("mcSelectionisZ", &mcSelectionisZ, &b_mcSelectionisZ);
+   fChain->SetBranchAddress("mcSelectionnLeptons", &mcSelectionnLeptons, &b_mcSelectionnLeptons);
+   fChain->SetBranchAddress("mcSelectionllpt", &mcSelectionllpt, &b_mcSelectionllpt);
+   fChain->SetBranchAddress("mcSelectionnJets", &mcSelectionnJets, &b_mcSelectionnJets);
+   fChain->SetBranchAddress("mcSelectionnbJets", &mcSelectionnbJets, &b_mcSelectionnbJets);
+   fChain->SetBranchAddress("mcSelectionncJets", &mcSelectionncJets, &b_mcSelectionncJets);
    fChain->SetBranchAddress("mcSelectionLepPosPx", &mcSelectionLepPosPx, &b_mcSelectionLepPosPx);
    fChain->SetBranchAddress("mcSelectionLepPosPy", &mcSelectionLepPosPy, &b_mcSelectionLepPosPy);
    fChain->SetBranchAddress("mcSelectionLepPosPz", &mcSelectionLepPosPz, &b_mcSelectionLepPosPz);

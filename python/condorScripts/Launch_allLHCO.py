@@ -2,8 +2,9 @@
 
 import os
 import LaunchOnCondor
-
 from zbbSamples import samples_PAT,getSamples
+lib_path = os.path.abspath('../analysisScripts/')
+sys.path.append(lib_path)
 version = "V2"
 
 FarmDirectory = "FARM_CMSToLHCO_"+version
