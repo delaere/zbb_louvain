@@ -121,7 +121,7 @@ for sample in sampleList :
     else :
         nEntries = 0
         myRDS[sample] = None
-        for datasample in getSamples(datasampleList,[channel],["RDS"])
+        for datasample in getSamples(datasampleList,[channel],["RDS"]) :
           file = TFile(datasample.path)
           nEntries += file.Get("rds_zbb").numEntries()
           if myRDS[sample] is None:

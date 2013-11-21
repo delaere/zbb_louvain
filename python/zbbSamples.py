@@ -169,7 +169,12 @@ def filterSamples(sampleList, processList, channelList, typeList):
     channelList = channels + [""]
   if typeList is None:
     typeList = types
-  return { samplekey: sampleList[samplekey] for samplekey in [(a,b,c) for a in processList for b in channelList for c in typeList] if samplekey in sampleList }  
+  spl = {}
+  for samplekey in [(a,b,c) for a in processList for b in channelList for c in typeList] :
+    if samplekey in sampleList:
+      spl = {samplekey: sampleList[samplekey]}
+  return spl
+  #return { samplekey: sampleList[samplekey] for samplekey in [(a,b,c) for a in processList for b in channelList for c in typeList] if samplekey in sampleList }  #from python 2.7 only
 
 def getSamples(processList=None, channelList=None, typeList=None):
   """Method to get a list of SAMADhi samples from a dictionary of samples"""
