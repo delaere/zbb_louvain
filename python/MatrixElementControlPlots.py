@@ -1,15 +1,10 @@
-#! /usr/bin/env python
 import ROOT
-import sys
-import os
 import array
 from math import sqrt, pi
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
+from PatAnalysis.EventSelection import *
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbbme
-#from myFuncTimer import print_timing
+from zbbConfig import configuration
 
 class MatrixElementControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -31,11 +26,9 @@ class MatrixElementControlPlots(BaseControlPlots):
     var_met = array.array('f', [0])
     var_rho = array.array('f', [0])
 
-    def __init__(self, dir=None, muChannel=True, checkTrigger=False, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
-      self.muChannel = muChannel
-      self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self):
@@ -74,10 +67,8 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("el2charge","subleading electron charge",3,-1.5,1.5)
       self.add("MET","MET",1,0,99999.)
       self.add("METphi","MET #phi",70,-3.5,3.5)
-
       self.add("bbM","",1000,0,1000)
       self.add("bbNNCorrM","",1000,0,1000)
-
 
       #Jet Block for TF study
   
@@ -95,7 +86,6 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("DeltaNNCorrE_jet","DeltaNNCorrE_jet", 1, -99999., 99999.)
       self.add("NNCorrE_jab","NNCorrE_jab", 1, -99999., 99999.)
       self.add("DeltaNNCorrE_ajet","DeltaNNCorrE_ajet", 1, -99999., 99999.)  
-
 
       self.add("phi_b","phi_b", 1, -99999., 99999.);
       self.add("phi_ab","phi_ab", 1, -99999., 99999.);
@@ -138,7 +128,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("DeltaPtInv_lm","DeltaPtInv_lm", 1, -99999., 99999.);
 
       #Initialize Reader for NN Correction
-      if zbbme.doNNJetRegression == True:
+      if configuration.doNNJetRegression == True:
         self.readerREG.AddVariable("jetBtag"   ,self.var_jetBtag)
         self.readerREG.AddVariable("jetPt"     ,self.var_jetPt)
         self.readerREG.AddVariable("jetEta"    ,self.var_jetEta)
@@ -156,12 +146,17 @@ class MatrixElementControlPlots(BaseControlPlots):
         self.readerREG.AddVariable("rho"       ,self.var_rho)
         self.readerREG.BookMVA("BDT_REG","/nfs/user/llbb/TMVAregression/factoryJetReg_BDT.weights.xml")
       
-
-
-    #@print_timing
     def process(self, event):
       """matrixElementControlPlots"""
       result = { }
+      # disable JES/JER corrections for data (should already be done elsewhere)
+      if event.object().event().eventAuxiliary().isRealData():
+        configuration.JERfactor = 0
+        configuration.JESfactor = 0
+      # in all cases, we need a reco Z
+      bestZcandidate = event.bestZcandidate
+      if bestZcandidate is None:
+        return result
       ## First initialize generator level infor for Transfer Function if MC sample\
       
       # partonic information for the b-quark matching
@@ -176,13 +171,13 @@ class MatrixElementControlPlots(BaseControlPlots):
       #gen level info and matching 
       lp=[]
       lm=[]
+
       #dRxy; x=gen, y=rec, p=positive, n=negative charge
       dRpp=10
       dRnn=10
       dRpn=10
       dRnp=10
 
-      #print "is this real data  = ",event.object().event().eventAuxiliary().isRealData()
       result["FilledJetTF"]=0
       result["FilledLepTF"]=0      
       if not event.object().event().eventAuxiliary().isRealData():
@@ -198,16 +193,16 @@ class MatrixElementControlPlots(BaseControlPlots):
 	    #print "found bbar"
             
           #If mu channel search for dimuon pair, if el channel search for dielectron pair
-          if self.muChannel and partg.pdgId()==13 and partg.status()==3:
+          if bestZcandidate.daughter(0).isMuon() and partg.pdgId()==13 and partg.status()==3:
             lm+=[partg]
 	    #print "found lm"
-          elif self.muChannel and partg.pdgId()==-13 and partg.status()==3:
+          elif bestZcandidate.daughter(0).isMuon() and partg.pdgId()==-13 and partg.status()==3:
             lp+=[partg]
 	    #print "found lp"
-          elif self.muChannel==False and partg.pdgId()==11 and partg.status()==3:
+          elif bestZcandidate.daughter(0).isElectron() and partg.pdgId()==11 and partg.status()==3:
             lm+=[partg]
 	    #print "found lm"
-          elif self.muChannel==False and partg.pdgId()==-11 and partg.status()==3:
+          elif bestZcandidate.daughter(0).isElectron() and partg.pdgId()==-11 and partg.status()==3:
             lp+=[partg]
 	    #print "found lp"
 
@@ -217,7 +212,6 @@ class MatrixElementControlPlots(BaseControlPlots):
 
       #Then Fill ME inputs related to leptons and if MC event and matching lep rec-gen fill info for TF
       #both leptons should be matched in order to fill the TF info
-      bestZcandidate = event.bestZmumuCandidate if self.muChannel else event.bestZelelCandidate
       if not bestZcandidate is None:
         lrecpos = None
 	lrecneg = None
@@ -330,7 +324,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       #Then Fill ME inputs related to jets and if MC event and matching jet rec-gen fill info for TF
       #both jets should be matched in order to fill the TF info
       if not bestZcandidate is None:
-        dijet = event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+        dijet = event.dijet_all
         if not dijet[0] is None:
           b1 = self._JECuncertainty.jet(dijet[0])
 	  jetPt = b1.Pt()
@@ -341,7 +335,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet1phi"] = dijet[0].phi()
           result["bjet1mass"] = dijet[0].mass()
 	  corrDijet0 = 1.
-          if zbbme.doNNJetRegression == True:
+          if configuration.doNNJetRegression == True:
             self.var_jetBtag[0] = dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[0].eta()
@@ -388,7 +382,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet2phi"] = dijet[1].phi()
           result["bjet2mass"] = dijet[1].mass()
 	  corrDijet1 = 1.
-          if zbbme.doNNJetRegression == True:
+          if configuration.doNNJetRegression == True:
             self.var_jetBtag[0] = dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
             self.var_jetPt[0] = jetPt
             self.var_jetEta[0] = dijet[1].eta()
@@ -503,30 +497,15 @@ class MatrixElementControlPlots(BaseControlPlots):
       
       return result
 
-def runTest(path='../testfiles/'):
-  controlPlots = MatrixElementControlPlots(muChannel=True)
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%1000==0 : print "Processing... event ", i
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
-
 def Delta(par1,par2):
   delta_phi=abs(par2.phi()-par1.phi())
   if delta_phi>pi:
     delta_phi=(2*pi)-delta_phi;
   delta=sqrt((delta_phi)**2 + (par1.eta()-par2.eta())**2)
   return delta
+
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], MatrixElementControlPlots())
+

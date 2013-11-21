@@ -1,7 +1,8 @@
 from ROOT import *
+from zbbSamples import channels, getSample, getDataLuminosity
+from zbbSamples import samples_RDS as allSamples
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
-from zbbCommons import zbbnorm
 
 channels  = [
     "EEChannel",
@@ -9,20 +10,10 @@ channels  = [
     ]
 
 var = {
-    "EEChannel"   : "EEChannel/Cut2/eventSelectionbestzptEle",
-    "MuMuChannel" : "MuMuChannel/Cut2/eventSelectionbestzptMu",
+    "El" : "EEChannel/Cut2/eventSelectionbestzptEle",
+    "Mu" : "MuMuChannel/Cut2/eventSelectionbestzptMu",
     }
 
-list = [
-        "DATA",
-        "Zbb",
-        "Zbx",
-        "Zxx",
-        "TT-FullLept",
-        "ZZ",
-        ]
-
-from listForRDS import lumi
 
 DataZbRatio = {}
 zptRew = {}
@@ -30,9 +21,9 @@ zptRew = {}
 for c in channels :
     files = {}
     histos = {}
-    
-    for l in list :
-        files[l]=TFile("~acaudron/scratch/CMSSW_5_3_7/src/UserCode/zbb_louvain/python/hist_cuts_fullleptTTbar_norm_zpt2/histoStage18extraCuts"+l+".root","READ")
+
+    for l in allSamples :
+        files[l]=TFile(getSample(l,c,"RDS").path,"READ")
         histos[l]=files[l].Get(var[c])
 
     nbins = histos["DATA"].GetNbinsX()
@@ -43,10 +34,12 @@ for c in channels :
         x1=histos["DATA"].GetBinLowEdge(i)
         x2=x1+histos["DATA"].GetBinWidth(i)
         DataZbRatio[c]=histos["DATA"].GetBinContent(i)
-        for l in list :
+        for l in allSamples :
             if l=="Zbx" or l=="Zbb" or l=="DATA" : continue
-            DataZbRatio[c]=DataZbRatio[c]-histos[l].GetBinContent(i)*(lumi["DATA"]/lumi[l])
-        if (histos["Zbb"].GetBinContent(i)+histos["Zbx"].GetBinContent(i))>0 : DataZbRatio[c]=float(DataZbRatio[c])/(histos["Zbb"].GetBinContent(i)*(lumi["DATA"]/lumi["Zbb"])+histos["Zbx"].GetBinContent(i)*(lumi["DATA"]/lumi["Zbx"]))
+            DataZbRatio[c]=DataZbRatio[c]-histos[l].GetBinContent(i)*(getDataLuminosity(c)/getSample(l,c,"RDS").getLuminosity())
+        if (histos["Zbb"].GetBinContent(i)+histos["Zbx"].GetBinContent(i))>0 : 
+            DataZbRatio[c]=float(DataZbRatio[c])/(histos["Zbb"].GetBinContent(i)*(getDataLuminosity(c)/getSample("Zbb",c,"RDS").getLuminosity())+
+                                                  histos["Zbx"].GetBinContent(i)*(getDataLuminosity(c)/getSample("Zbx",c,"RDS").getLuminosity()))
         else : DataZbRatio[c]=0
         if DataZbRatio[c]<0 : DataZbRatio[c]=1.0
         print DataZbRatio[c]

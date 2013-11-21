@@ -1,30 +1,19 @@
-#! /usr/bin/env python
 import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import *
+from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
-#event_list = open("eventlist.txt","w")
+from ObjectSelection import selectedTriggers
+from zbbConfig import configuration
 
-class EventSelectionControlPlots(BaseControlPlots):
+class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, muChannel=True, checkTrigger=False, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
-      self.muChannel = muChannel
-      self.checkTrigger = checkTrigger
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self):
       # declare histograms
-      self.add("run","Run number",50000,160000,210000)
-      self.add("event","Event number",1000,0,5e9)
-      self.add("ls","Lumi section",2000,0,2000)
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("triggerDouble","Double trigger",2,0,2)
@@ -48,13 +37,12 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("dijetdR","#Delta R (b bbar)",100,0,5)
       self.add("dijetSVdR","#Delta R (b bbar SV)",100,0,5)
       self.add("dphidijetMET","#Delta #phi (b bbar MET)",40,0,3.15)
-      self.add("ZbM","Zb invariant mass",3000,0,3000)
-      self.add("ZbPt","Zb Pt",1000,0,1000)
-      self.add("ZbbM","Zbb invariant mass",3000,0,3000)
-      self.add("ZbbPt","Zbb Pt",1000,0,1000)
-      self.add("category","event category",eventCategories()+1,0,eventCategories()+1)  
-      self.add("mu1pt","leading muon Pt",1000,0,1000)
-      self.add("mu2pt","subleading muon Pt",1000,0,1000)
+      self.add("ZbM","Zb invariant mass",1000,0,1000)
+      self.add("ZbPt","Zb Pt",500,0,500)
+      self.add("ZbbM","Zbb invariant mass",1000,0,1000)
+      self.add("ZbbPt","Zbb Pt",500,0,500)
+      self.add("mu1pt","leading muon Pt",500,0,500)
+      self.add("mu2pt","subleading muon Pt",500,0,500)
       self.add("mu1eta","leading muon Eta",25,0,2.5)
       self.add("mu2eta","subleading muon Eta",25,0,2.5)
       self.add("mu1etapm","leading muon Eta",50,-2.5,2.5)
@@ -68,12 +56,17 @@ class EventSelectionControlPlots(BaseControlPlots):
       self.add("el2etapm","subleading electron Eta",50,-2.5,2.5)
       self.add("drllEle","drllEle",100,0,5)
 
-    #@print_timing
     def process(self, event):
       """eventSelectionControlPlots"""
       result = { }
+      if event.object().event().eventAuxiliary().isRealData():
+        checkTrigger = True
+        configuration.JERfactor = 0
+        configuration.JESfactor = 0
+      else:
+        checkTrigger = False
       ## trigger
-      result["triggerSelection"] = self.checkTrigger==False or (self.muChannel and event.isMuTriggerOK) or ((not self.muChannel) and event.isEleTriggerOK)
+      result["triggerSelection"] = checkTrigger==False or event.isTriggerOK 
       #result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       triggerList = []
       paths = event.triggerInfo.acceptedPaths()
@@ -104,15 +97,6 @@ class EventSelectionControlPlots(BaseControlPlots):
       result["triggerSingle"] = SingleTrig
       result["triggerDouble"] = DoubleTrig
       
-      ## event category
-      categoryData = event.catMu if self.muChannel else event.catEle
-      result["category"] = [ ]
-      for category in range(eventCategories()):
-        if isInCategory(category, categoryData):
-          result["category"].append(category)
-      result["run"] = event.run()
-      result["event"] = event.event()
-      result["ls"] = event.lumi()
       ## Z boson
       result["zmassMu"] = [ ]
       result["zptMu"] = [ ]
@@ -124,7 +108,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       for z in event.Zelel:
         result["zmassEle"].append(z.mass())
         result["zptEle"].append(z.pt())
-      bestZcandidate = event.bestZmumuCandidate if self.muChannel else event.bestZelelCandidate
+      bestZcandidate = event.bestZcandidate
       if not bestZcandidate is None:
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
@@ -165,7 +149,7 @@ class EventSelectionControlPlots(BaseControlPlots):
       # when two bjets are present, these are the two.
       # later on, variables are refering to b-jets, even if some are light jets
       if not bestZcandidate is None:
-        dijet = event.dijet_muChannel if self.muChannel else event.dijet_eleChannel
+        dijet = event.dijet_all
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
           b1 = self._JECuncertainty.jet(dijet[0])
@@ -203,44 +187,8 @@ class EventSelectionControlPlots(BaseControlPlots):
       
       return result
 
-def runTest(path='/nfs/user/llbb/Pat_8TeV_537/DoubleMu2012D/'):
-  controlPlots = EventSelectionControlPlots(muChannel=True)
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    j=0
-    for fname in dirList:
-      files.append(path+fname)
-      j+=1
-      if j>5 : break
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=True)
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    if i%100==0 : print "Processing... event ", i
-    #if i > 1000 : break
-    controlPlots.processEvent(event)
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], EventSelectionControlPlots())
 
-def dumpEventList(stage=3, muChannel=True, path='../testfiles/'):
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-  for event in events:
-    categoryData = event.catMu if muChannel else event.catEle
-    if isInCategory(stage, categoryData):
-      print >> event_list , "Run", event.run(), ", Lumisection", event.lumi(), ", Event", event.event()

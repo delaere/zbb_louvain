@@ -7,17 +7,12 @@
 #python Launch.py --which=Mu_Data
 ###
 
-import urllib
-import string
 import os
-import sys
 import LaunchOnCondor
-import glob
 
+from zbbSamples import samples_PAT, getSamples, dirSkim
 lib_path = os.path.abspath('../analysisScripts/')
 sys.path.append(lib_path)
-from globalLists import listToProcess, dirSkim
-samples = listToProcess
 
 FarmDirectory = "FARM_skim_V5"
 JobName = "Skim_pats"
@@ -26,13 +21,11 @@ LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 LaunchOnCondor.Jobs_RunHere= 1
 
 j=0
-for s in samples :
-    whichSample = s 
-    os.system('mkdir '+dirSkim+whichSample)
-            
+for sample in getSamples(processList=samples_PAT,typeList=["PAT"]):
+    os.system('mkdir '+dirSkim+'/'+sample.name)
     for i in range(1,11):
         command = "../test/skimDY_423_cfg.py"  
-        option  = " sample="+whichSample+" slice="+str(i)  
+        option  = " sample="+sample.path+" slice="+str(i)  
         print "command = ", command
         print "option  = ", option
         LaunchOnCondor.SendCluster_Push(["CMSSW", command, option ])

@@ -1,10 +1,7 @@
-from AnalysisEvent import AnalysisEvent
-from eventSelection import *
-from zbbCommons import zbblabel, zbbsystematics
+from PatAnalysis.EventSelection import categoryName
+from zbbConfig import configuration
 from math import sqrt
 import pickle
-
-#from myFuncTimer import print_timing
 
 ##______General functions______
 
@@ -88,8 +85,6 @@ def get_pt_key(pt):
 
    return range
          
-   
-
 class PtEtaMap:
    """A binned map in pt and eta.
       Bins are defined at construction time by defining the bin edges.
@@ -162,7 +157,7 @@ class MuonSFMap:
 
    def __init__(self):
      """Construct a MuonSFMap using pikle files."""
-     f = open('./reweighting_files_V2/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._range = ''
@@ -194,7 +189,7 @@ class MuonTriggerEffMap_leg17_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
@@ -229,7 +224,7 @@ class MuonTriggerEffMap_leg8_AB:
 
    def __init__(self):
      """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
@@ -350,10 +345,10 @@ class LeptonsReWeighting:
 
      lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
 
-     if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
+     if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
 
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
@@ -413,13 +408,12 @@ class LeptonsReWeighting:
      lw *= (0.5*hlt_sf_run2012_a + 0.5*hlt_sf_run2012_b) ##percentage according to the lumi in which they were not prescaled (apparently same efficinecy for AB)
      #lw *= 0.966 ## temporary solution!
 
-     if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
+     if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw + zbbsystematics.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
-   #@print_timing
-   def weight( self, fwevent=None, electrons=None, muons=None, muChannel=True):
+   def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
      # if fwevent is defined, get electrons and muons from there
      if not(fwevent is None):
@@ -433,11 +427,16 @@ class LeptonsReWeighting:
          return 1.
        # extract the electrons and muons collections from the event.
        else :
-         bestZcandidate = fwevent.bestZmumuCandidate if muChannel else fwevent.bestZelelCandidate 
+         if forceMode == "Muon":
+           bestZcandidate = fwevent.bestZmumuCandidate
+         elif forceMode == "Electron":
+           bestZcandidate = fwevent.bestZelelCandidate
+         else:
+           bestZcandidate = fwevent.bestZcandidate
          if not bestZcandidate is None:
-           if muChannel :
+           if bestZcandidate.daughter(0).isMuon():
              muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
-           else :
+           else:
              electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
      # sanity check
      if not(electrons is None) and not(muons is None):

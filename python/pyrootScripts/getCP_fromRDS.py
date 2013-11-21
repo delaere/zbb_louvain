@@ -8,12 +8,16 @@
 ###                                               ###
 #####################################################
 
+# WARNING: this code has been reworked to use the database as date source for lumi and path.
+# it now references zbbSamples but no functional test has been performed.
+# It should be verified that the code still does what it should.
+
 from ROOT import *
 import math
+from zbbSamples import getSample, getDataLuminosity, getSamples
 import os, sys
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
-from zbbCommons import zbbnorm
 
 def RemoveErrorsHisto(h):
 
@@ -51,21 +55,13 @@ totalCutString = ""+extraCut
 ### settings (this should move somewhere central) ### 
 #####################################################
 
-MCsampleList   = ["Zb","Zc","Zl","TT","ZZ","ZH125"]
+from zbbSamples import samples_RDS as sampleList
 SMMCsampleList = ["Zb","Zc","Zl","TT","ZZ"]
-totsampleList  = ["DATA","Zb","Zc","Zl","TT","ZZ","ZH125"]
-sampleList  = ["DATA","DY","TT","ZZ","ZH125"]
+sigsampleList  = ["ZH125"]
+datasampleList = ["DATA"]
+MCsampleList   = SMMCsampleList+sigsampleList
+totsampleList  = datasampleList+MCsampleList
 
-
-lumi = { "DATA"   : zbbnorm.lumi_totEl2011,
-         "TT"     : zbbnorm.nev_TTjets_fall11/zbbnorm.xsec_TTjets_7TeV/1000.,
-         "Zb"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zc"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "Zl"     : zbbnorm.nev_DYjets_fall11/zbbnorm.xsec_DYjets_7TeV/1000.,
-         "ZZ"     : zbbnorm.nev_ZZ_fall11/zbbnorm.xsec_ZZ_7TeV/1000.,
-         "ZH125"  : zbbnorm.nev_ZH125_fall11/zbbnorm.xsec_ZH125_7TeV_Mu/1000.
-         }
-	 
 Extra_norm={ "DATA" : 1.0,
              "TT"    : 0.91,
 	     "Zb"    : 1.035,
@@ -75,13 +71,12 @@ Extra_norm={ "DATA" : 1.0,
 	     "ZH125" : 100.0	      	      	      
             }
 	    	 
-print lumi["DATA"]
+print "Data luminosity: ",getDataLuminosity(channel)
 
 MCweight = {}
-
 for sample in MCsampleList:
-    print "the lumi of ", sample, " = ", (lumi[sample]*Extra_norm[sample])
-    MCweight[sample] = lumi["DATA"]*Extra_norm[sample]/(lumi[sample])
+    print "the lumi of ", sample, " = ", (getSample(sample,channel,"RDS").getLuminosity()*Extra_norm[sample])
+    MCweight[sample] = getDataLuminosity(channel)*Extra_norm[sample]/(getSample(sample,channel,"RDS").getLuminosity())
     print "the weight of ", sample," = ", MCweight[sample]
 
 #############
@@ -92,58 +87,9 @@ myRDS       = {}
 myRDS_red   = {} 
 myRDS_red_w = {} 
 
-
 ###########################################
 ##########INPUT FILES SELECTED HERE#######
 ###########################################
-#if channel  == "El" :
-#  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElA_DATA.root",
-#                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ElB_DATA.root",
-#                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_El_MC.root",
-#                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_El_MC.root",
-#                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_El_MC.root",
-#                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_El_MC.root"
-#                 }
-#		 
-#elif channel == "Mu" :
-#  filename = {"DATA_A" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuA_DATA.root",
-#                 "DATA_B" : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_MuB_DATA.root",
-#                 "TT"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_TT_Mu_MC.root",
-#                 "DY"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_Mu_MC.root",
-#                 "ZZ"     : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZZ_Mu_MC.root",
-#                 "ZH125"  : "FARM_makeRDSnoWS120718Adrien/File_rds_zbb_ZH125_Mu_MC.root"
-#                 }
-#else :
-#  print "Invalid channel name = ", channel, ". Exitting!"
-#  exit()
-#
-
-inputfolder ="/home/fynu/arnaudp/scratch/Zbb_2012/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/"
-#inputfolder ="/home/fynu/vizangarciaj/CMSSW44btag_120711/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testsCSV2011/"
-#inputfolder ="/home/fynu/vizangarciaj/storage/CMSSW444_121207_forCSV2011Branch/CMSSW_4_4_4/src/UserCode/zbb_louvain/scripts/ME_Analysis/Merging/testCSV2011_124110/"
-
-
-if channel  == "El" :
-  filename = {"DATA_A" : inputfolder+"RDS_rdsME_ElA_DATA.root",
-                 "DATA_B" : inputfolder+"RDS_rdsME_ElB_DATA.root",
-                 "TT"     : inputfolder+"RDS_rdsME_TT_El_MC.root",
-                 "DY"     : inputfolder+"RDS_rdsME_El_MC.root",
-                 "ZZ"     : inputfolder+"RDS_rdsME_ZZ_El_MC.root",
-                 "ZH125"  : inputfolder+"RDS_rdsME_ZH125_El_MC.root"
-                 }
-		 
-elif channel == "Mu" :
-  filename = {"DATA_A" : inputfolder+"RDS_rdsME_MuA_DATA.root",
-                 "DATA_B" : inputfolder+"RDS_rdsME_MuB_DATA.root",
-                 "TT"     : inputfolder+"RDS_rdsME_TT_Mu_MC.root",
-                 "DY"     : inputfolder+"RDS_rdsME_Mu_MC.root",
-                 "ZZ"     : inputfolder+"RDS_rdsME_ZZ_Mu_MC.root",
-                 "ZH125"  : inputfolder+"RDS_rdsME_ZH125_Mu_MC.root"
-                 }
-else :
-  print "Invalid channel name = ", channel, ". Exitting!"
-  exit()
-
 
 for sample in sampleList :
 
@@ -151,7 +97,7 @@ for sample in sampleList :
 
     if sample != "DATA":
         
-        file_mc  = TFile(filename[sample])
+        file_mc  = TFile(getSample(sample,channel,"RDS").path)
         
         nEntries = file_mc.Get("rds_zbb").numEntries()
 
@@ -173,19 +119,17 @@ for sample in sampleList :
         file_mc.Close()
 
     else :
-        file_A  = TFile(filename["DATA_A"])
-        file_B  = TFile(filename["DATA_B"])
-
-        nEntries = file_A.Get("rds_zbb").numEntries()+file_B.Get("rds_zbb").numEntries()
-
-        myRDS[sample] = file_A.Get("rds_zbb").reduce(redStage)
-        tmp = file_B.Get("rds_zbb").reduce(redStage)
-        myRDS[sample].append(tmp)
-
+        nEntries = 0
+        myRDS[sample] = None
+        for datasample in getSamples(datasampleList,[channel],["RDS"])
+          file = TFile(datasample.path)
+          nEntries += file.Get("rds_zbb").numEntries()
+          if myRDS[sample] is None:
+            myRDS[sample] = file.Get("rds_zbb").reduce(redStage)
+          else:
+            myRDS[sample].append(file.Get("rds_zbb").reduce(redStage))
+          file.Close()
         print "myRDS.numEntries() for ", sample , " = ", nEntries, ". After stage ", WP, " : ", myRDS[sample].numEntries()
-
-        file_A.Close()
-        file_B.Close()
 
 ###############
 ### weights ###
@@ -309,8 +253,8 @@ print "===> the pure # of DATA ............... ", myRDS_red_w["DATA"].numEntries
 print "***"
 sum_MC=0
 for sample in MCsampleList:
-    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(lumi["DATA"]*Extra_norm[sample]/lumi[sample]))[:6]
-    sum_MC+=myRDS_red_w[sample].numEntries()*(lumi["DATA"]*Extra_norm[sample]/lumi[sample])
+    print "the effective # of ", sample, " MC for this lumi ... ", str(myRDS_red_w[sample].numEntries()*(getDataLuminosity(channel)*Extra_norm[sample]/getSample(sample,channel,"RDS").getLuminosity()))[:6]
+    sum_MC+=myRDS_red_w[sample].numEntries()*(getDataLuminosity(channel)*Extra_norm[sample]/getSample(sample,channel,"RDS").getLuminosity())
 print "===> the effective # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
@@ -318,8 +262,8 @@ print "***"
 
 sum_MC=0
 for sample in MCsampleList:
-    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(lumi["DATA"]*Extra_norm[sample]/(lumi[sample])))[:6]
-    sum_MC+=myRDS_red_w[sample].sumEntries()*(lumi["DATA"]*Extra_norm[sample]/(lumi[sample]))
+    print "the weighted effective # of ", sample, " MC for this data lumi = ", str(myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)*Extra_norm[sample]/(getSample(sample,channel,"RDS").getLuminosity())))[:6]
+    sum_MC+=myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)*Extra_norm[sample]/(getSample(sample,channel,"RDS").getLuminosity()))
 print "===> the effective, weighted # of MC    ............... ", str(sum_MC)[:6]
 print "===> the effective, weighted # of DATA  ............... ", myRDS_red_w["DATA"].numEntries()
 
@@ -666,7 +610,7 @@ numList = RooArgList()
 
 for sample in MCsampleList:
     num_MC[sample] = RooRealVar("num_MC_"+sample,"num_MC_"+sample,
-                                myRDS_red_w[sample].sumEntries()*(lumi["DATA"]*Extra_norm[sample]/lumi[sample]))
+                                myRDS_red_w[sample].sumEntries()*(getDataLuminosity(channel)*Extra_norm[sample]/getSample(sample,channel,"RDS").getLuminosity()))
 for sample in SMMCsampleList:
     numList.add(num_MC[sample])
 
@@ -681,7 +625,7 @@ for sample in MCsampleList:
     norm[sample] = num_MC[sample].getVal()/myRDS_red_w["DATA"].numEntries()
     print "num MC for ", sample, " = ", num_MC[sample].getVal()
     print "MC normalization for ", sample, " = ", norm[sample]
-    lumiratio[sample]=lumi["DATA"]*Extra_norm[sample]/lumi[sample]
+    lumiratio[sample]=getDataLuminosity(channel)*Extra_norm[sample]/getSample(sample,channel,"RDS").getLuminosity()
     print "lumi ratio for ", sample, " = ", lumiratio[sample]
     
 

@@ -1,9 +1,8 @@
+import CMSSW
 from DataFormats.FWLite import Events, Handle
 from FWCore.ParameterSet.Types import InputTag
 from inspect import getargspec
-from ROOT import TLorentzVector,TVector3
 from datetime import datetime
-from math import sin
 from collections import Iterable
 from types import StringTypes
 
@@ -103,10 +102,10 @@ class AnalysisEvent(Events):
        raise AttributeError("%r object has no attribute %r" % name)
      if not name in self.vardict:
        try:
-          self.getByLabel(self._collections[name]["collection"],self._collections[name]["handle"])
-          self.vardict[name] = self._collections[name]["handle"].product()
+         self.getByLabel(self._collections[name]["collection"],self._collections[name]["handle"])
+         self.vardict[name] = self._collections[name]["handle"].product()
        except:
-          return None
+         self.vardict[name] = None
      return getattr(self,name)
 
    def addProducer(self,name,producer,**kwargs):
@@ -195,11 +194,11 @@ class AnalysisEvent(Events):
      if attr in self.__dict__["vardict"]:
        return self.vardict[attr]
      if attr in self._collections:
-       try: 
-          self.getByLabel(self._collections[attr]["collection"],self._collections[attr]["handle"])
-          return self.vardict.setdefault(attr, self._collections[attr]["handle"].product())
+       try:
+         self.getByLabel(self._collections[attr]["collection"],self._collections[attr]["handle"])
+         return self.vardict.setdefault(attr, self._collections[attr]["handle"].product())
        except:
-          return None
+         return self.vardict.setdefault(attr, None)
      if attr in self._producers:
        return self.vardict.setdefault(attr, self._producers[attr][0](self, **self._producers[attr][1]))
      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
@@ -248,22 +247,20 @@ class AnalysisEvent(Events):
      mystring += "Collections:\n"
      for colname in self._collections.keys():
        collection = self.getCollection(colname)
-       handle = str(self._collections[colname]["handle"])
+       if mystring[-1]!='\n': mystring += '\n'
        try:
+         if isinstance(collection[0],float): # protection... DoubleBuffer is seen with a large size
+           mystring += "*** %s is a float whose value is %f\n"%(colname,collection[0])
+         else:
+           mystring += "*** %s has %d elements\n" % (colname,len(collection))
+           mystring += reduce(lambda a,b: a+b,map(str,collection),"")
+       except IndexError:
          mystring += "*** %s has %d elements\n" % (colname,len(collection))
-         if "reco::Vertex" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._vertexString,collection))
-         elif "pat::Electron" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._electronString,collection))
-         elif "pat::Muon" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._muonString,collection))
-         elif "pat::Jet" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._jetString,collection))
-         elif "pat::MET" in handle:
-           mystring += reduce(lambda a,b: a+b,map(self._metString,collection))
-         elif "reco::CompositeCandidate" in handle:
-           mystring += reduce(lambda a,b: a+b,map(lambda x: self._candidateString(colname,x),collection))
        except TypeError:
+         if collection is not None:
+           mystring += "*** %s has 1 element\n" % colname
+           mystring += str(collection)
+       except:
          pass
      mystring += "\n-----------------------------------------------------------------\n"
      # list the registered producers
@@ -278,115 +275,16 @@ class AnalysisEvent(Events):
          try:
            thisstring = "%s => vector of %d objects(s)\n" % (k,len(v))
          except:
-           mystring += self._genericString(k,v)
+           mystring += "%s => %s\n"%(k,str(v))
          else:
            try:
-             for vec in v:
-               thisstring += self._genericString(k,vec, useDefault=False)
+             for it,vec in enumerate(v):
+               thisstring += "%s[%d] = %s\n"%(k,it,str(vec))
            except: 
              mystring += "%s => %s\n"%(k,str(v))
            else:
              mystring += thisstring
        else:
-         mystring += self._genericString(k,v)
+         mystring += "%s => %s\n"%(k,str(v))
      return mystring
-
-   def _genericString(self,name,item, useDefault=True):
-     for method in [self._metString,self._jetString,self._electronString,self._muonString,self._vertexString, 
-                    lambda i:self._candidateString(name,i),lambda i:self._lorentzVectorString(name,i)]:
-       try:
-         return "%s => %s"%(name,method(item))
-       except:
-         pass
-     if useDefault==True:
-       return "%s => %s\n"%(name,str(item))
-     else:
-       raise TypeError
-
-   def _vertexString(self, vertex):
-     theString =  "Vertex position: (%f,%f,%f) +/- (%f,%f,%f)\n" % (vertex.x(), vertex.y(),vertex.z(),vertex.xError(),vertex.yError(),vertex.zError())
-     theString += "  Number of tracks: %d\n" % vertex.tracksSize()
-     theString += "  chi2/ndof: %f/%d\n" % (vertex.chi2(),vertex.ndof())
-     return theString
-
-   def _candidateString(self, label, candidate):
-     theString =  "%s candidate\n" % label
-     theString += "  (pt, eta, phi) = (%f,%f,%f)\n" % (candidate.pt(), candidate.eta(), candidate.phi())
-     theString += "  mass = %f GeV\n" % candidate.mass()
-     theString += "  charge: %d\n" % candidate.charge()
-     theString += "  p = %f GeV; mt = %f GeV\n" % (candidate.p(), candidate.mt())
-     return theString
-
-   def _metString(self, met):
-     theString = "Missing Et: %f at phi= %f with a significance of %f\n" % (met.et(),met.phi(),met.significance())
-     return theString
-
-   def _jetString(self, jet):
-     theString =  self._candidateString("jet",jet)
-     theString += "  nhf=%f\n" % (( jet.neutralHadronEnergy() + jet.HFHadronEnergy() ) / jet.energy())
-     theString += "  nef=%f\n" % (jet.neutralEmEnergyFraction())
-     theString += "  nconstituents=%d\n" % (jet.numberOfDaughters())
-     theString += "  chf=%f\n" % (jet.chargedHadronEnergyFraction())
-     theString += "  nch=%d\n" % (jet.chargedMultiplicity())
-     theString += "  cef=%f\n" % (jet.chargedEmEnergyFraction())
-     theString += "  B-tagging information:\n"
-     theString += "     SSVHE: %f\n" % jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-     theString += "     SSVHP: %f\n" % jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-     taginfo = jet.tagInfoSecondaryVertex("secondaryVertex")
-     if not taginfo is None and jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")>0:
-       sv = taginfo.secondaryVertex(0)
-       if not sv is None:
-         distance = taginfo.flightDistance(0,True)
-         dir = taginfo.flightDirection(0)
-         dirv = TVector3(dir.x(),dir.y(),dir.z())
-         dirj = TVector3(jet.px(),jet.py(),jet.pz())
-         theString += "     details about the secondary vertex:\n"
-         theString += "     * number of tracks: %d\n" % sv.tracksSize()
-         theString += "     * chi2: %f\n" % sv.chi2()
-         theString += "     * distance: %f+/-%f\n" % (distance.value(),distance.error())
-         theString += "     * distance significance: %f\n" % distance.significance()
-         theString += "     * flight direction: %f,%f,%f\n" % (dir.x(),dir.y(),dir.z())
-         theString += "     * dR(jet): %f\n" % dirv.DeltaR(dirj)
-         theString += "     * mass: %f\n" % sv.p4().M()
-     return theString
-
-   def _electronString(self, electron):
-     theString =  self._candidateString("electron",electron)
-     scEt = (electron.ecalEnergy()*sin(electron.theta()))
-     superclusterEta = abs(electron.superCluster().eta())
-     theString += "  Number of missing hits: %d\n" % electron.gsfTrack().numberOfLostHits()
-     theString += "  SuperCluster Et: %f\n" % scEt
-     theString += "  HCAL isolation: %f\n"  % electron.dr03HcalTowerSumEt()/scEt
-     theString += "  ECAL isolation: %f\n"  % electron.dr03EcalRecHitSumEt()/scEt
-     theString += "  Tk   isolation: %f\n"  % electron.dr03TkSumPt()/scEt
-     theString += "  H over E: %f\n" % electron.hadronicOverEm()
-     theString += "  dphi: %f\n" % electron.deltaPhiEleClusterTrackAtCalo()
-     theString += "  deta: %f\n" % electron.deltaEtaEleClusterTrackAtCalo()
-     theString += "  inin: %f\n" % electron.scSigmaIEtaIEta()
-     theString += "  d0: %f\n"   % abs(electron.dB())
-     theString += "  supercluster eta: %f\n" % electron.superCluster().eta(),
-     if superclusterEta<1.4442 or (superclusterEta>1.566 and superclusterEta<2.5 ):
-       theString += " => in fiducial region\n"
-     else:
-       theString += " => out of fiducial region\n"
-     return theString
-
-   def _muonString(self, muon):
-     theString =  self._candidateString("muon",muon)
-     if muon.isTrackerMuon():
-       theString += "  Number of hits (all, pixels, strips): %d,%d,%d\n" % (muon.innerTrack().numberOfValidHits(),
-                                                                            muon.innerTrack().hitPattern().numberOfValidPixelHits(),
-                                                                            muon.innerTrack().hitPattern().numberOfValidStripHits())
-     if muon.isGlobalMuon():
-       theString += "  Number of muon hits: %d\n" % muon.globalTrack().hitPattern().numberOfValidMuonHits()
-     if muon.isTrackerMuon() and muon.isGlobalMuon():
-       theString += "  Chi2: %f\n" % muon.normChi2()
-     theString += "  Isolation: (%f+%f)/pt = %f\n" % (muon.trackIso(),muon.caloIso(),(muon.trackIso()+muon.caloIso())/muon.pt())
-     return theString
-
-   def _lorentzVectorString(self, label, lorentzVector):
-     theString  = "%s candidate:\n" % str(label)
-     theString += "  (pt, eta, phi) = (%f,%f,%f)\n" % (lorentzVector.Pt(), lorentzVector.Eta(), lorentzVector.Phi())
-     theString += "  mass = %f, p = %f, mt = %f\n"  % (lorentzVector.M(), lorentzVector.P(), lorentzVector.Mt())
-     return theString
 

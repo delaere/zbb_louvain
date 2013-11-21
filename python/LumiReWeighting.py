@@ -1,22 +1,16 @@
 import ROOT
-from AnalysisEvent import AnalysisEvent
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.AutoLibraryLoader.enable()
-ROOT.gSystem.Load("libPhysicsToolsUtilities.so")
-from zbbCommons import zbblabel,zbbfile
-#from myFuncTimer import print_timing
+import PatAnalysis.CMSSW
 
 class LumiReWeighting:
    """A class to reweight MC according to number of pileup events."""
 
-   def __init__(self, MonteCarloFileName=zbbfile.pileupMC, DataFileName=zbbfile.pileupData, systematicShift=0):
+   def __init__(self, MonteCarloFileName, DataFileName, systematicShift=0):
       # set the names for histograms. In the new scheme, the data file contains three histograms for nominal and +/-1sigma.
       MonteCarloHistName = "pileup"
       DataHistName = { 0 : "pileup", -1 : "pileupDOWN1", 1 : "pileupUP1" }
       # access histograms and initialize the weights
       self.engine = ROOT.edm.LumiReWeighting(MonteCarloFileName,DataFileName,MonteCarloHistName,DataHistName[systematicShift])
 
-   #@print_timing
    def weight( self, event=None, npu=None):
      """Lumi (PU) weight"""
      # returns the weight computed from the true number of interactions. 
@@ -39,3 +33,4 @@ class LumiReWeighting:
        if pvi.getBunchCrossing()==0:
          return pvi.getTrueNumInteractions()
      return None
+

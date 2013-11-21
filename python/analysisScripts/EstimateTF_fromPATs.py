@@ -41,7 +41,6 @@ sys.path.append(lib_path)
 from eventSelection import eventCategories, eventCategory, isInCategory, findBestCandidate, isGoodJet, isBJet,findDijetPair,hasNoOverlap,isZcandidate
 from LumiReWeighting import LumiReWeighting
 from monteCarloSelection import isZbEvent, isZcEvent, isZlEvent
-from zbbCommons import zbblabel
 from math import *
 from ROOT import TFile, TTree, TH1F
 from array import array
@@ -56,6 +55,25 @@ idMothers_1 = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
 nDYmothers = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
 nDY2mothers = n.zeros(1, dtype=int) #gen-level origin of Z for DY production
 
+class zbblabel:
+  """labels used in the PAT configuration.
+     Note that the use of labels is deprecated in favor of the AnalysisEvent interface."""
+  allmuonslabel="allMuons"
+  muonlabel="tightMuons"
+  allelectronslabel="allElectrons"
+  electronlabel="tightElectrons"
+  #jetlabel="smearedPatJetsResDown"
+  jetlabel="cleanPatJets"
+  zmumulabel="zmuTightmuTight"
+  zelelabel="zelTightelTight"
+  vertexlabel="goodPV"
+  pulabel="addPileupInfo"
+  triggerlabel="patTriggerEvent"
+  metlabel="patType01SCorrectedPFMet"
+  rholabel="kt6PFJets"
+  genlabel="genParticles" #genlabel="prunedGen"
+  genjetlabel="ak5GenJets"
+  genInfolabel="generator"
 
 def CodeDYprod(genParticles):
 

@@ -1,21 +1,12 @@
-#! /usr/bin/env python
-
-import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from baseControlPlots import BaseControlPlots
-from eventSelection import prepareAnalysisEvent
-from vertexAssociation import *
-from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
+from PatAnalysis.BaseControlPlots import BaseControlPlots
+from VertexAssociation import *
 
 class VertexAssociationControlPlots(BaseControlPlots):
     """A class to create control plots for vertex association"""
 
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="vertexAssociation", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose="VertexAssociation", dataset=dataset, mode=mode)
     
     def beginJob(self, sigcut = 2.):
       self.sigcut = sigcut
@@ -32,9 +23,8 @@ class VertexAssociationControlPlots(BaseControlPlots):
       self.add("l2v_dz","z distance between lepton and vertex",100,0,1.)
       self.add("lvertex","index of the lepton vertex",20,-0.5,19.5)
 
-    #@print_timing
     def process(self,event):
-      """vertexAssociationControlPlots"""
+      """VertexAssociationControlPlots"""
       result = { }
       result["nvertices"] = event.vertices.size()
       if event.vertices.size()==0 : return result
@@ -56,26 +46,8 @@ class VertexAssociationControlPlots(BaseControlPlots):
       result["lvertex"] = findPrimaryVertexIndex(bestZ,event.vertices)
       return result
 
-def runTest(path="../testfiles/ttbar/"):
-  controlPlots = VertexAssociationControlPlots()
-
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-
-  controlPlots.beginJob()
-  i = 0
-  for event in events:
-    controlPlots.processEvent(event)
-    if i%1000==0 : print "Processing... event ", i
-    i += 1
-  controlPlots.endJob()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], VertexAssociationControlPlots())
 

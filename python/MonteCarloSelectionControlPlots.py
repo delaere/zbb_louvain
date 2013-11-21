@@ -1,14 +1,5 @@
-#! /usr/bin/env python
-
-import ROOT
-import sys
-import os
-from AnalysisEvent import AnalysisEvent
-from eventSelection import prepareAnalysisEvent
-from baseControlPlots import BaseControlPlots
-from monteCarloSelection import *
-from zbbCommons import zbblabel
-#from myFuncTimer import print_timing
+from PatAnalysis.BaseControlPlots import BaseControlPlots
+from MonteCarloSelection import isZbbEvent, isZbcEvent, isZblEvent, isZccEvent, isZclEvent, isZlEvent, LHEinfo
 
 class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
@@ -61,11 +52,12 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       self.bjet = 0
       self.ljet = 0
       self.i = 0
+      self._ran = False
 
-    #@print_timing      
     def process(self,event):
       """monteCarloSelectionControlPlots"""
       result = { }
+      self._ran = True
      
       #Fill some gen information for the status 3 leptons and b, and bbar quarks
       nLepPos = 0
@@ -201,30 +193,11 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 
     def endJob(self):
       BaseControlPlots.endJob(self)
-      print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
+      if self._ran:
+        print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
 
-def runTest(path="/home/fynu/tdupree/store/zbb_13Sep/TT_MC/skim/"):
-  controlplots = MonteCarloSelectionControlPlots()
+if __name__=="__main__":
+  import sys
+  from BaseControlPlots import runTest
+  runTest(sys.argv[1], MonteCarloSelectionControlPlots())
 
-  if os.path.isdir(path):
-    dirList=os.listdir(path)
-    files=[]
-    for fname in dirList:
-      files.append(path+fname)
-  elif os.path.isfile(path):
-    files=[path]
-  else:
-    files=[]
-  events = AnalysisEvent(files)
-  prepareAnalysisEvent(events,checkTrigger=False)
-
-  controlplots.beginJob()
-  i = 0
-  for event in events:
-    if i==10000: break
-    if i%1000==0 : print "Processing... event ", i
-    controlplots.processEvent(event)
-    i += 1
-  controlplots.endJob()
-
-#runTest()
