@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.setName_("llbbX")
-#process.options.wantSummary = False
+process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 ## Source
@@ -19,15 +19,37 @@ process.source = cms.Source(
 ## Maximal Number of Events
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
-process.p = cms.Path(process.patDefaultSequence)
+runOnMC = True
+
+#muons
+from UserCode.zbb_louvain.PATconfig.muon_cff import *
+setupPatMuons(process, runOnMC)
+
+process.preSequence = cms.Sequence(
+    process.pfNoPileUpSequence+
+    process.pfParticleSelectionSequence+
+    process.pfParticleSelectionSequence +
+    process.preMuonSeq
+    )
+
+print "These modules will be removed from the pat defualt sequence as already produced before:"
+for name in process.preSequence.moduleNames() :
+    if name in process.patDefaultSequence.moduleNames() :
+        print name
+        process.patDefaultSequence.remove(getattr(process,name))
+        if name in process.patDefaultSequence.moduleNames() : print "Error : module not removed from pat default sequence"
+print "...done."
+
+process.p = cms.Path(process.preSequence+process.patDefaultSequence+process.postMuonSeq)
 
 ## Output Module Configuration (expects a path 'p')
-from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule(
     "PoolOutputModule",
     fileName = cms.untracked.string('patTuple.root'),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-    outputCommands = cms.untracked.vstring('drop *', *patEventContentNoCleaning )
+    outputCommands = cms.untracked.vstring('drop *',
+                                           'keep *_*Muons*_*_llbbX',
+                                           )
     )
 
 
