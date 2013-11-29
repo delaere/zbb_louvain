@@ -10,11 +10,12 @@ def setupGoodVertex (process):
     
 def changeVertexCollection (process,seqName='patDefaultSequence'):
     pvCollection=cms.InputTag('goodPV')
+    print ""
     print "Switching PV collection for PAT:", pvCollection
     print "***********************************"
 
     # PV sources to be exchanged:
-    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs']
+    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','vertexes']
     # PV sources NOT to be exchanged:
     #noPvExchange = ['src','PVProducer','primaryVertexSrc','vertexSrc','primaryVertex']
 

@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.tools.pfTools import *
+from PhysicsTools.PatAlgos.tools.trigTools import *
 
 def setupPatMuons (process, runOnMC):
-
-     process.patMuons.pfMuonSource = cms.InputTag("pfSelectedMuons") #FIX: pfSelectedMuons is used instead of pfIsolatedMuons in ZH anlysis, reason no obvious need to use pre isolated muons -> isolation done after
+     process.patMuons.pfMuonSource = cms.InputTag("pfSelectedMuons") #FIX: pfSelectedMuons is used instead of pfIsolatedMuons used in the ZH anlysis, reason no obvious need to use pre isolated muons -> isolation done after
      process.patMuons.useParticleFlow=True
      # embedding objects FIX: done in H to llqq  
      process.patMuons.embedTcMETMuonCorrs = False
@@ -16,6 +16,7 @@ def setupPatMuons (process, runOnMC):
      process.patMuons.embedTpfmsMuon = cms.bool(False)
      process.patMuons.embedPFCandidate = cms.bool(True) 
 
+     #important for MCtruth matching
      if runOnMC : process.muonMatch.src = "pfSelectedMuons"
 
      # use PFIsolation
@@ -42,20 +43,40 @@ def setupPatMuons (process, runOnMC):
      # Kinematic cuts on electrons: tight to reduce ntuple size:
      #process.selectedPatMuons.src = cms.InputTag("MuScleFit")
      
+
      process.selectedPatMuons.cut = (
          "pt > 18 && abs(eta) < 2.4"
          )
 
      # Classic Muons with UserData
-     process.selectedMuonsWithIsolationData = cms.EDProducer(
-         "MuonIsolationEmbedder",
+     process.selectedMuonsWithIsolationData = cms.EDProducer("MuonIsolationEmbedder",
          src = cms.InputTag("selectedPatMuons"),
          rho = cms.InputTag("kt6PFJets:rho"),
          )
 
+     process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
+                                                       src = cms.InputTag( 'selectedPatMuons' ) ,
+                                                       matched = cms.InputTag( 'patTrigger' ), # selections of trigger objects ,
+                                                       matchedCuts = cms.string( 'path( "HLT_*Mu*_*" )' ), # selection of matches ,
+                                                       maxDPtRel = cms.double( 0.5 ),
+                                                       maxDeltaR = cms.double( 0.3 ) ,
+                                                       resolveAmbiguities = cms.bool( True ) ,
+                                                       resolveByMatchQuality = cms.bool( True )
+                                                       )
+     switchOnTriggerMatchEmbedding(process ,triggerMatchers = ['muonTriggerMatchHLTMuons'],)
+     process.muonTriggerMatchHLTMuons.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
+     process.selectedPatMuonsTriggerMatch = cms.EDProducer(
+          "PATTriggerMatchMuonEmbedder"
+          , src     = cms.InputTag( 'selectedMuonsWithIsolationData' )
+          , matches = cms.VInputTag('muonTriggerMatchHLTMuons')
+          )
+
+     process.allMuons = process.selectedPatMuons.clone(
+          src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+          )
+     
      process.tightMuons = process.selectedPatMuons.clone(
-         #src = cms.InputTag('selectedPatMuonsTriggerMatch'),
-         src = cms.InputTag('selectedPatMuons'),
+         src = cms.InputTag('selectedPatMuonsTriggerMatch'),
          cut = cms.string('isGlobalMuon &'
                           'isPFMuon &'
                           'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &'
@@ -75,7 +96,31 @@ def setupPatMuons (process, runOnMC):
           process.pfMuonSequence
           )
      #process.patDefaultSequence.replace(process.patMuons, process.patMuons+process.MuScleFit)
+     process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons+process.selectedMuonsWithIsolationData)
+
      process.postMuonSeq = cms.Sequence (    
-          process.selectedMuonsWithIsolationData +
+          process.muonTriggerMatchHLTMuons +
+          process.selectedPatMuonsTriggerMatch +
+          process.allMuons +          
           process.tightMuons
           )
+
+
+     process.zmuAllmuAll = cms.EDProducer('CandViewShallowCloneCombiner',
+                                          decay = cms.string('allMuons@+ allMuons@-'),
+                                          cut = cms.string('mass > 50.0'),
+                                          name = cms.string('Zmuallmuall'),
+                                          roles = cms.vstring('all1', 'all2')
+                                          )
+
+     process.zmuTightmuTight = cms.EDProducer('CandViewShallowCloneCombiner',
+                                              decay = cms.string('tightMuons@+ tightMuons@-'),
+                                              cut = cms.string('mass > 50.0'),
+                                              name = cms.string('Zmutightmutight'),
+                                              roles = cms.vstring('tight1', 'tight2')
+                                              )
+     process.muonComposite = cms.Sequence (
+          process.zmuAllmuAll +
+          process.zmuTightmuTight
+          )
+     

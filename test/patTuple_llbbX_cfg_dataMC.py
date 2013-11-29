@@ -28,12 +28,19 @@ process.source = cms.Source(
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 #objects
+if not runOnMC : removeMCMatching(process, ['All'])
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger(process,sequence='patDefaultSequence',hltProcess = '*')
 from UserCode.zbb_louvain.PATconfig.vertex_cff import *
 setupGoodVertex(process)
 from UserCode.zbb_louvain.PATconfig.muon_cff import *
 setupPatMuons(process, runOnMC)
+from UserCode.zbb_louvain.PATconfig.electron_cff import *
+setupPatElectrons(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
 setupPatJets(process, runOnMC)
+#from UserCode.zbb_louvain.PATconfig.subjet_cff import *
+#setupPatSubJets(process, runOnMC)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
@@ -54,7 +61,8 @@ print "...done."
 print ""
 
 #global sequence
-process.llbbXSequence = cms.Sequence(process.preSequence+process.patDefaultSequence+process.postMuonSeq)
+removeCleaningFromTriggerMatching(process)
+process.llbbXSequence = cms.Sequence(process.preSequence+process.patDefaultSequence+process.postMuonSeq+process.muonComposite)
 
 #adapt the collection of vertices
 changeVertexCollection(process,seqName='llbbXSequence')
@@ -68,7 +76,10 @@ process.out = cms.OutputModule(
     fileName = cms.untracked.string('patTuple.root'),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     outputCommands = cms.untracked.vstring('drop *',
-                                           #PVs
+                                           #TRIGGER
+                                           'keep *_patTriggerEvent_*_*',
+                                           'keep patTriggerPaths_patTrigger_*_*',
+                                           #PV
                                            'keep *_offlinePrimaryVertices*_*_*',
                                            'keep *_goodPV*_*_*',
                                            #MUON
