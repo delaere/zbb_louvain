@@ -61,3 +61,23 @@ def setupPatJets (process, runOnMC):
      )
      process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
      
+     #PU JetID
+     process.load("CMGTools.External.pujetidsequence_cff")
+     process.puJetIdChs.jets = cms.InputTag("patJets")
+     process.puJetMvaChs.jets = cms.InputTag("patJets")
+     process.puJetMvaChs.algos[0].tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml')
+
+     process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
+                                              src = cms.InputTag("patJets"),
+                                              primaryVertices = cms.InputTag("goodPV"),
+                                              puJetIdMVA = cms.InputTag("puJetMvaChs","fullDiscriminant"),
+                                              puJetIdFlag = cms.InputTag("puJetMvaChs","fullId"),
+                                              puJetIdentifier = cms.InputTag("puJetIdChs"),
+                                              )
+
+     #jet selection
+     process.selectedPatJets.src = cms.InputTag("patJetsWithBeta")
+     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5 '
+
+     #add everything to the sequence
+     process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuenceChs+process.patJetsWithBeta))
