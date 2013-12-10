@@ -15,7 +15,7 @@ def changeVertexCollection (process,seqName='patDefaultSequence'):
     print "***********************************"
 
     # PV sources to be exchanged:
-    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','vertexes']
+    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','vertexes','primaryVertex']
     # PV sources NOT to be exchanged:
     #noPvExchange = ['src','PVProducer','primaryVertexSrc','vertexSrc','primaryVertex']
 

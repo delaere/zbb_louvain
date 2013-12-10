@@ -45,8 +45,7 @@ setupPatJets(process, runOnMC)
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
     process.goodPV+
-    process.PF2PAT+
-    process.preMuonSeq
+    process.PF2PAT
     )
 
 #clean pat default sequence
@@ -62,7 +61,7 @@ print ""
 
 #global sequence
 removeCleaningFromTriggerMatching(process)
-process.llbbXSequence = cms.Sequence(process.preSequence+process.patDefaultSequence+process.postMuonSeq+process.muonComposite)
+process.llbbXSequence = cms.Sequence(process.preSequence+process.patDefaultSequence+process.postMuonSeq+process.muonComposite+process.postElectronSeq+process.electronComposite)
 
 #adapt the collection of vertices
 changeVertexCollection(process,seqName='llbbXSequence')
@@ -84,6 +83,8 @@ process.out = cms.OutputModule(
                                            'keep *_goodPV*_*_*',
                                            #MUON
                                            'keep *_*Muons*_*_llbbX',
+                                           #Electron
+                                           'keep *_*Electrons*_*_llbbX',
                                            #JET
                                            'keep *_*atJets*_*_*',
                                            'keep *_pfNoTau_*_*',

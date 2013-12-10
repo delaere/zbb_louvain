@@ -6,6 +6,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"
+#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include <vector>
 #include <TMath.h>
 
@@ -96,14 +97,8 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     LogDebug("ElectronIsolationEmbedder") << "MediumWP: " << medium;
 
     // Effective area for 2012 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Isolation_cone_R_0_3)
-    double  A_eff_PHNH;
-    if     (abs(eta)<=1.0)                   { A_eff_PHNH=0.13; }
-    else if(abs(eta)>1.0 && abs(eta)<=1.479) { A_eff_PHNH=0.14; }
-    else if(abs(eta)>1.479 && abs(eta)<=2.0) { A_eff_PHNH=0.07; }
-    else if(abs(eta)>2.0 && abs(eta)<=2.2)   { A_eff_PHNH=0.09; }
-    else if(abs(eta)>2.2 && abs(eta)<=2.3)   { A_eff_PHNH=0.11; }
-    else if(abs(eta)>2.3 && abs(eta)<=2.4)   { A_eff_PHNH=0.11; }   
-    else                                     { A_eff_PHNH=0.14; }
+    ElectronEffectiveArea *EEA;
+    double A_eff_PHNH = EEA->GetElectronEffectiveArea(EEA->kEleGammaAndNeutralHadronIso03, abs(eta), EEA->kEleEAData2012);
 
     LogDebug("ElectronIsolationEmbedder") << "Effective area, PH+NH: " << A_eff_PHNH ;
     float PFIsoPUCorrected =(charged + max(photon+neutral - rho*A_eff_PHNH  , 0.))/std::max(0.5, el.pt());
@@ -111,14 +106,8 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
     LogDebug("ElectronIsolationEmbedder") << "PFIsoPUCorrected=" << PFIsoPUCorrected;
 
     // Effective area for 2012 MC (as in data). (taken from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Isolation_cone_R_0_3)
-    if     (abs(eta)<=1.0)                   { A_eff_PHNH=0.13; }
-    else if(abs(eta)>1.0 && abs(eta)<=1.479) { A_eff_PHNH=0.14; }
-    else if(abs(eta)>1.479 && abs(eta)<=2.0) { A_eff_PHNH=0.07; }
-    else if(abs(eta)>2.0 && abs(eta)<=2.2)   { A_eff_PHNH=0.09; }
-    else if(abs(eta)>2.2 && abs(eta)<=2.3)   { A_eff_PHNH=0.11; }
-    else if(abs(eta)>2.3 && abs(eta)<=2.4)   { A_eff_PHNH=0.11; }   
-    else                                     { A_eff_PHNH=0.14; }
 
+    A_eff_PHNH = EEA->GetElectronEffectiveArea(EEA->kEleGammaAndNeutralHadronIso03, abs(eta), EEA->kEleEAData2012);
     LogDebug("ElectronIsolationEmbedder") << "Effective area for MC, PH and NH: " << A_eff_PHNH ;
     float PFIsoPUCorrectedMC = (charged + max(photon+neutral - rho*A_eff_PHNH  , 0.))/std::max(0.5, el.pt());
     el.addUserFloat("PFIsoPUCorrectedMC", PFIsoPUCorrectedMC);

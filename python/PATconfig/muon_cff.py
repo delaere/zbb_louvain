@@ -95,6 +95,8 @@ def setupPatMuons (process, runOnMC):
           process.muIsoSequence +
           process.pfMuonSequence
           )
+     process.PF2PAT.replace(process.pfMuonSequence,process.preMuonSeq)
+     
      #process.patDefaultSequence.replace(process.patMuons, process.patMuons+process.MuScleFit)
      process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons+process.selectedMuonsWithIsolationData)
 
