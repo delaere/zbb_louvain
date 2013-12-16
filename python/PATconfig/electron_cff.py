@@ -74,7 +74,6 @@ def setupPatElectrons (process, runOnMC):
             'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -82,7 +81,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -90,7 +88,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsTrigNoIP = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -98,7 +95,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaTrigNoIPV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
     else :
         process.tightElectrons = process.selectedPatElectrons.clone(
@@ -107,7 +103,6 @@ def setupPatElectrons (process, runOnMC):
             'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -115,7 +110,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -123,7 +117,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
         process.tightMVAElectronsTrigNoIP = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -131,7 +124,6 @@ def setupPatElectrons (process, runOnMC):
             'electronID("mvaTrigNoIPV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15 &' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            'abs(dB) < 0.02'
             )
 
     process.preElectronSeq = cms.Sequence (

@@ -39,8 +39,8 @@ from UserCode.zbb_louvain.PATconfig.electron_cff import *
 setupPatElectrons(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
 setupPatJets(process, runOnMC)
-#from UserCode.zbb_louvain.PATconfig.subjet_cff import *
-#setupPatSubJets(process, runOnMC)
+from UserCode.zbb_louvain.PATconfig.subjet_cff import *
+setupPatSubJets(process, runOnMC)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
