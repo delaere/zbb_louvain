@@ -39,8 +39,10 @@ from UserCode.zbb_louvain.PATconfig.electron_cff import *
 setupPatElectrons(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
 setupPatJets(process, runOnMC)
-from UserCode.zbb_louvain.PATconfig.subjet_cff import *
-setupPatSubJets(process, runOnMC)
+from UserCode.zbb_louvain.PATconfig.met_cff import *
+setupPatMets(process, runOnMC)
+#from UserCode.zbb_louvain.PATconfig.subjet_cff import *
+#setupPatSubJets(process, runOnMC)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
@@ -98,6 +100,10 @@ process.out = cms.OutputModule(
                                            #'keep *_jetProbabilityBJetTags*_*_llbbX',
                                            'keep *_*JetTags*_*_llbbX',
                                            'keep *_kt6PFJets*_*_*',
+					   #MET
+					   'keep *_*MET*_*_*',      #Do we need the correction parameters or the corrected MET is sufficient?
+					   'keep *_*MEt*_*_*',
+					   'keep *_*Met*_*_*',
                                            #GEN
                                            'keep GenEventInfoProduct_generator_*_*',
                                            'keep *_genMetTrue_*_*',
