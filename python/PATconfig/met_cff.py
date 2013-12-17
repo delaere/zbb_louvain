@@ -2,16 +2,13 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 
 def setupPatMets (process, runOnMC):
-	addPfMET(process, 'PF')		
 	process.MetSequence = cms.Sequence()
 	
 	##Filters
-	
 	process.load("RecoMET.METFilters.metFilters_cff")  
-	if not runOnMC : MetSequence += process.metFilters
+	if not runOnMC : process.MetSequence += process.metFilters
 	
 	##Corrections
-
 	process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
 	#Type 0 Corrections
 	process.patPFMETtype0Corr.src = cms.InputTag('goodPV')
@@ -26,58 +23,55 @@ def setupPatMets (process, runOnMC):
 	#SysShift correction (to turn the MET flat with respect to Phi)
 	process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 	process.selectedVerticesForMEtCorr.src = cms.InputTag('goodPV')
-	if runOnMC : process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc	
-	process.patType01CorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
-    		src = cms.InputTag('patPFMet'),
-    		applyType1Corrections = cms.bool(True),
-    		srcType1Corrections = cms.VInputTag(
-        	cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
-        	cms.InputTag('patPFMETtype0Corr')
-    		),
-    		applyType2Corrections = cms.bool(False)
-	)
-	process.patType01SysCorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
-          	src = cms.InputTag('patPFMet'),
-          	applyType1Corrections = cms.bool(True),
-          	srcType1Corrections = cms.VInputTag(
-              	cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
-              	cms.InputTag('patPFMETtype0Corr'),
-              	cms.InputTag('pfMEtSysShiftCorr'),
-          	),
-          	applyType2Corrections = cms.bool(False)
-      	)      		
-	process.MetSequence *= cms.Sequence(
-                  process.patPFMet
-                  *process.pfMEtSysShiftCorrSequence
-                  *process.pfCandsNotInJet
-                  *process.selectedPatJetsForMETtype1p2Corr
-                  *process.patPFJetMETtype1p2Corr
-                  *process.type0PFMEtCorrection
-                  *process.patPFMETtype0Corr
-                  *process.pfCandMETcorr
-                  *process.patType1CorrectedPFMet
-                  *process.patType01CorrectedPFMet
-                  *process.patType01SysCorrectedPFMet
-              )
-	process.patDefaultSequence.replace(process.patMETsPF,process.MetSequence)
-	#Suggested Modules to remove :
-	#process.patDefaultSequence.remove(process.pfType1p2CorrectedMet)
-	#process.patDefaultSequence.remove(process.pfType1CorrectedMet)
-	#process.patDefaultSequence.remove(process.patMETs)
-	#process.patDefaultSequence.remove(process.caloType1p2CorrectedMet)
-	#process.patDefaultSequence.remove(process.caloType1CorrectedMet)
-	#process.patDefaultSequence.remove(process.muonCaloMETcorr)
 	
 	##Uncertainties      Does not work for now
+        if runOnMC : runMEtUncertainties(process,
+					 makeType1p2corrPFMEt=False,
+					 doApplyType0corr=True,
+					 sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
+					 doApplySysShiftCorr=True,
+					 jetCorrPayloadName='AK5PFchs',
+					 addToPatDefaultSequence=False,
+					 postfix='')
+        else : runMEtUncertainties(process,
+				   makeType1p2corrPFMEt=False,
+				   doApplyType0corr=True,
+				   sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
+				   doApplySysShiftCorr=True,
+				   jetCorrPayloadName='AK5PFchs',
+				   addToPatDefaultSequence=False,
+				   doSmearJets=False,
+				   postfix='')
 
-	#if runOnMC :
-	#       runMEtUncertainties(process,doApplyType0corr=True,makeType1p2corrPFMEt=False,sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,doApplySysShiftCorr=True,addToPatDefaultSequence=True)
+	process.metUncertaintySequence.replace(process.patType1CorrectedPFMet,cms.Sequence(process.type0PFMEtCorrection+process.patPFMETtype0Corr+process.patType1CorrectedPFMet))
 
- 
+	process.pfCandsNotInJet.topCollection = cms.InputTag("pfNoTau")
+	
 
-
-
-
+	#clean metUncertaintySequence
+	print ""
+	print "These modules will be removed from the metUncertaintySequence as already produced before:"
+	for name in process.patDefaultSequence.moduleNames() :
+		if name in process.metUncertaintySequence.moduleNames() :
+			print name
+			process.metUncertaintySequence.remove(getattr(process,name))
+			if name in process.metUncertaintySequence.moduleNames() : print "Error : module not removed from metUncertaintySequence"
+	print "...done."
+	print ""
+					
+	#clean metUncertaintySequence for data
+	print ""
+	print "These modules will be removed from the metUncertaintySequence as useless for data:"
+	for name in process.metUncertaintySequence.moduleNames() :
+		if name[-2:]=="Up" or name[-4:]=="Down" :
+			print "Run on data: remove uncertainty variation,", name
+			process.metUncertaintySequence.remove(getattr(process,name))
+			if name in process.metUncertaintySequence.moduleNames() :
+				process.metUncertaintySequence.remove(getattr(process,name))
+			if name in process.metUncertaintySequence.moduleNames() :
+				print "Error : module not removed from metUncertaintySequence"
+	print "...done."
+	print ""
 
 
 

@@ -17,11 +17,11 @@ def changeVertexCollection (process,seqName='patDefaultSequence'):
 
     # find out all added jet collections (they don't belong to PAT)
     interPostfixes = []
-    for m in getattr(process,seqName).moduleNames():
-        if m.startswith('patJets') and not len(m)==len('patJets'):
-            print m
-            interPostfix = m.replace('patJets','')
-            interPostfixes.append(interPostfix)
+    #for m in getattr(process,seqName).moduleNames():
+    #    if m.startswith('patJets') and not len(m)==len('patJets'):
+    #        print m
+    #        interPostfix = m.replace('patJets','')
+    #        interPostfixes.append(interPostfix)
             
     # exchange the primary vertex source of all relevant modules
     for m in getattr(process,seqName).moduleNames():
@@ -37,6 +37,8 @@ def changeVertexCollection (process,seqName='patDefaultSequence'):
                         interPostFixFlag = True
                         break
                 if not interPostFixFlag:
-                    print m
-                    setattr(getattr(process,m),namePvSrc,pvCollection)
-                                                                                                                                                                                        
+                    if getattr(getattr(process,m),namePvSrc) == cms.InputTag("offlinePrimaryVertices"):
+                        setattr(getattr(process,m),namePvSrc,pvCollection)
+                        print m, "REPLACED"
+                    else :
+                        print m, "UNCHANGED", getattr(getattr(process,m),namePvSrc)
