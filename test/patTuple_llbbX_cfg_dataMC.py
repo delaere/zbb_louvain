@@ -49,7 +49,8 @@ setupPatMets(process, runOnMC)
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
     process.goodPV+
-    process.PF2PAT
+    process.PF2PAT+
+    process.preMetSequence
     )
 
 #clean pat default sequence
@@ -76,7 +77,7 @@ process.p = cms.Path(process.llbbXSequence)
 #output
 process.out = cms.OutputModule(
     "PoolOutputModule",
-    fileName = cms.untracked.string('patTuple.root'),
+    fileName = cms.untracked.string('patTuple_withoutMET_MEt.root'),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     outputCommands = cms.untracked.vstring('drop *',
                                            #TRIGGER
@@ -103,7 +104,7 @@ process.out = cms.OutputModule(
                                            'keep *_*JetTags*_*_llbbX',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
-					   'keep *_*MET*_*_*',      #Do we need the correction parameters or the corrected MET is sufficient?
+					   'keep *_*MET*_*_*',      
 					   'keep *_*MEt*_*_*',
 					   'keep *_*Met*_*_*',
                                            #GEN
