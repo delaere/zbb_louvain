@@ -74,6 +74,17 @@ def setupPatMets (process, runOnMC):
                 ),
                 applyType2Corrections = cms.bool(False)
         )       
+	
+	process.patTypeSysCorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
+                src = cms.InputTag('patPFMet'),
+                applyType1Corrections = cms.bool(True),
+                srcType1Corrections = cms.VInputTag(
+                    cms.InputTag('pfMEtSysShiftCorr')
+		),
+                applyType2Corrections = cms.bool(False)
+        )
+
+
  	
 	process.patType0sysCorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
                 src = cms.InputTag('patPFMet'),
@@ -94,9 +105,9 @@ def setupPatMets (process, runOnMC):
                 ),
                 applyType2Corrections = cms.bool(False)
         )  
+	
 
-
-	process.metUncertaintySequence += cms.Sequence(process.patTypeOnly1CorrectedPFMet+process.patType01CorrectedPFMet+process.patType1sysCorrectedPFMet+process.patType0sysCorrectedPFMet)
+	process.metUncertaintySequence += cms.Sequence(process.patTypeOnly1CorrectedPFMet+process.patType0CorrectedPFMet+process.patTypeSysCorrectedPFMet+process.patType01CorrectedPFMet+process.patType1sysCorrectedPFMet+process.patType0sysCorrectedPFMet)
  
 
 	#clean metUncertaintySequence
