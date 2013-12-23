@@ -6,7 +6,7 @@ def setupPatMets (process, runOnMC):
 	
 	##Filters
 	process.load("RecoMET.METFilters.metFilters_cff")  
-	if not runOnMC : process.preMetSequence += process.metFilters
+ 	process.preMetSequence += process.metFilters
 	
 	##Corrections
 	process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
