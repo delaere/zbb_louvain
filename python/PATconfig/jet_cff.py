@@ -1,35 +1,36 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
-def setupPatJets (process, runOnMC):
-     #b-tagging algo and tag infos
-     btagInfo = [
-          'impactParameterTagInfos'
-          ,'secondaryVertexTagInfos'
-          ,'softPFMuonsTagInfos'
-          ,'softPFElectronsTagInfos'
-          ,'inclusiveSecondaryVertexFinderTagInfos'
-          ,'inclusiveSecondaryVertexFinderFilteredTagInfos'
-          ]
+#b-tagging algo and tag infos
+btagInfo = [
+     'impactParameterTagInfos'
+     ,'secondaryVertexTagInfos'
+     ,'softPFMuonsTagInfos'
+     ,'softPFElectronsTagInfos'
+     ,'inclusiveSecondaryVertexFinderTagInfos'
+     ,'inclusiveSecondaryVertexFinderFilteredTagInfos'
+     ]
 
-     btagdiscriminators = [
-          'jetBProbabilityBJetTags'
-          ,'jetProbabilityBJetTags'
-          ,'trackCountingHighPurBJetTags'
-          ,'trackCountingHighEffBJetTags'
-          ,'simpleSecondaryVertexHighEffBJetTags'
-          ,'simpleSecondaryVertexHighPurBJetTags'
-          ,'combinedSecondaryVertexBJetTags'
-          ,'combinedSecondaryVertexV1BJetTags'
-          ,'softPFMuonBJetTags'
-          ,'softPFElectronBJetTags'
-          ,'simpleInclusiveSecondaryVertexHighEffBJetTags'
-          ,'simpleInclusiveSecondaryVertexHighPurBJetTags'
-          ,'doubleSecondaryVertexHighEffBJetTags'
-          ,'combinedInclusiveSecondaryVertexBJetTags'
-          ,'combinedInclusiveSecondaryVertexPositiveBJetTags'
-          ,'combinedSecondaryVertexSoftPFLeptonV1BJetTags'
-          ]
+btagdiscriminators = [
+     'jetBProbabilityBJetTags'
+     ,'jetProbabilityBJetTags'
+     ,'trackCountingHighPurBJetTags'
+     ,'trackCountingHighEffBJetTags'
+     ,'simpleSecondaryVertexHighEffBJetTags'
+     ,'simpleSecondaryVertexHighPurBJetTags'
+     ,'combinedSecondaryVertexBJetTags'
+     ,'combinedSecondaryVertexV1BJetTags'
+     ,'softPFMuonBJetTags'
+     ,'softPFElectronBJetTags'
+     ,'simpleInclusiveSecondaryVertexHighEffBJetTags'
+     ,'simpleInclusiveSecondaryVertexHighPurBJetTags'
+     ,'doubleSecondaryVertexHighEffBJetTags'
+     ,'combinedInclusiveSecondaryVertexBJetTags'
+     ,'combinedInclusiveSecondaryVertexPositiveBJetTags'
+     ,'combinedSecondaryVertexSoftPFLeptonV1BJetTags'
+     ]
+
+def setupPatJets (process, runOnMC):
      #jets
      inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
      if runOnMC : inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute'])

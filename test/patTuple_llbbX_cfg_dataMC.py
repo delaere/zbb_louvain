@@ -8,7 +8,7 @@ process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 #options
-runOnMC = False
+runOnMC = True
 
 #GT
 if runOnMC : process.GlobalTag.globaltag = 'START53_V27::All'
@@ -17,8 +17,8 @@ else : process.GlobalTag.globaltag = 'FT_53_V21_AN5::All'
 ## Source
 readFiles = cms.untracked.vstring()
 readFiles.extend([
-    #'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
-    'file:/storage/data/cms/store/data/Run2012D/JetMon/AOD/22Jan2013-v1/10000/0CD0D545-1492-E211-97CC-782BCB67A0FA.root'
+    'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
+    #'file:/storage/data/cms/store/data/Run2012D/JetMon/AOD/22Jan2013-v1/10000/0CD0D545-1492-E211-97CC-782BCB67A0FA.root'
     ])
 process.source = cms.Source(
     "PoolSource",
@@ -41,15 +41,16 @@ from UserCode.zbb_louvain.PATconfig.electron_cff import *
 setupPatElectrons(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
 setupPatJets(process, runOnMC)
-#from UserCode.zbb_louvain.PATconfig.subjet_cff import *
-#setupPatSubJets(process, runOnMC)
+from UserCode.zbb_louvain.PATconfig.subjet_cff import *
+setupPatSubJets(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.met_cff import *
 setupPatMets(process, runOnMC)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
-    process.goodPV+
-    process.PF2PAT
+    process.goodPV*
+    process.PF2PAT*
+    process.preSequenceCA8CHS
     )
 
 #clean pat default sequence
@@ -65,41 +66,66 @@ print ""
 
 #global sequence
 removeCleaningFromTriggerMatching(process)
-process.llbbXSequence = cms.Sequence(process.preSequence+process.patDefaultSequence+process.postMuonSeq+process.muonComposite+process.postElectronSeq+process.electronComposite+process.metUncertaintySequence)
+process.llbbXSequence = cms.Sequence(
+    process.preSequence*
+    process.patDefaultSequence*
+    process.postMuonSeq*
+    process.muonComposite+
+    process.postElectronSeq*
+    process.electronComposite+
+    process.selectedPatJetsCA8CHSPrunedPacked +
+    process.metUncertaintySequence)
 
 #adapt the collection of vertices
 changeVertexCollection(process,seqName='llbbXSequence')
 
 #path to run
-process.p = cms.Path(process.llbbXSequence)
+process.ZMMFilter = cms.EDFilter("CandViewCountFilter",
+                                 src = cms.InputTag("zmuAllmuAll"),
+                                 minNumber = cms.uint32(1),
+                                 )
+
+process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
+                                 src = cms.InputTag("zelAllelAll"),
+                                 minNumber = cms.uint32(1),
+                                 )
+
+#process.p = cms.Path(process.llbbXSequence)
+process.p1 = cms.Path(process.llbbXSequence*process.ZMMFilter)
+process.p2 = cms.Path(process.llbbXSequence*process.ZEEFilter)
+
 
 #output
 process.out = cms.OutputModule(
     "PoolOutputModule",
     fileName = cms.untracked.string('patTuple.root'),
-    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
+    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1','p2') ),
     outputCommands = cms.untracked.vstring('drop *',
                                            #TRIGGER
                                            'keep *_patTriggerEvent_*_*',
                                            'keep patTriggerPaths_patTrigger_*_*',
+                                           #Tracks
+                                           'keep *_*Tracks_*_*',
                                            #PV
                                            'keep *_offlinePrimaryVertices*_*_*',
                                            'keep *_goodPV*_*_*',
+                                           'keep edmMergeableCounter_*_*_*', #???
+                                           'keep *_offlineBeamSpot*_*_*',
                                            #MUON
-                                           'keep *_*Muons*_*_llbbX',
+                                           'keep *_*Muons*_*_*',
                                            #Electron
-                                           'keep *_*Electrons*_*_llbbX',
+                                           'keep *_*Electrons*_*_*',
+                                           'keep *_allConversions_*_*',
+                                           #Z candidates
+                                           'keep *_z*_*_*',
                                            #JET
                                            'keep *_*atJets*_*_*',
                                            'keep *_pfNoTau_*_*',
                                            'keep *_*5PFJets*_*_*',
-                                           'keep *_puJetId_*_*',
-                                           'keep *_puJetMva_*_*',
+                                           'keep *_*ca8PFJets*_*_*',
+                                           'keep *_puJetId*_*_*',
+                                           'keep *_puJetMva*_*_*',
                                            'keep *_*bjets*_*_*',
-                                           #'keep *_simpleSecondaryVertex*BJetTags*_*_llbbX',
-                                           #'keep *_combinedSecondaryVertexBJetTags*_*_llbbX',
-                                           #'keep *_combinedInclusiveSecondaryVertexBJetTags*_*_llbbX',
-                                           #'keep *_jetProbabilityBJetTags*_*_llbbX',
                                            'keep *_*JetTags*_*_llbbX',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
@@ -112,7 +138,8 @@ process.out = cms.OutputModule(
                                            'keep recoGenJets_ak5GenJets_*_*',
                                            'keep *_addPileupInfo_*_*',
                                            'keep LHEEventProduct_*_*_*',
-                                           'keep *_genParticles_*_*'
+                                           'keep *_genParticles_*_*',
+                                           'keep recoGenJets_ca8GenJetsNoNu*_*_*'
                                            )
     )
 

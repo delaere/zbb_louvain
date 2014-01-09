@@ -6,7 +6,7 @@ def setupPatMets (process, runOnMC):
 	
 	##Filters
 	process.load("RecoMET.METFilters.metFilters_cff")  
-	if not runOnMC : process.MetSequence += process.metFilters
+	process.MetSequence += process.metFilters
 	
 	##Corrections
 	process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
@@ -43,8 +43,11 @@ def setupPatMets (process, runOnMC):
 				   doSmearJets=False,
 				   postfix='')
 
-	process.metUncertaintySequence.replace(process.patType1CorrectedPFMet,cms.Sequence(process.type0PFMEtCorrection+process.patPFMETtype0Corr+process.patType1CorrectedPFMet))
-
+	process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone()
+	process.metUncertaintySequence.replace(process.patType1CorrectedPFMet,
+					       cms.Sequence(process.type0PFMEtCorrection*process.patPFMETtype0Corr*process.patType1CorrectedPFMet*process.patType01SCorrectedPFMet)
+					       )
+	
 	process.pfCandsNotInJet.topCollection = cms.InputTag("pfNoTau")
 	
 
@@ -60,18 +63,19 @@ def setupPatMets (process, runOnMC):
 	print ""
 					
 	#clean metUncertaintySequence for data
-	print ""
-	print "These modules will be removed from the metUncertaintySequence as useless for data:"
-	for name in process.metUncertaintySequence.moduleNames() :
-		if name[-2:]=="Up" or name[-4:]=="Down" :
-			print "Run on data: remove uncertainty variation,", name
-			process.metUncertaintySequence.remove(getattr(process,name))
-			if name in process.metUncertaintySequence.moduleNames() :
+	if not runOnMC:
+		print ""
+		print "These modules will be removed from the metUncertaintySequence as useless for data:"
+		for name in process.metUncertaintySequence.moduleNames() :
+			if name[-2:]=="Up" or name[-4:]=="Down" :
+				print "Run on data: remove uncertainty variation,", name
 				process.metUncertaintySequence.remove(getattr(process,name))
-			if name in process.metUncertaintySequence.moduleNames() :
-				print "Error : module not removed from metUncertaintySequence"
-	print "...done."
-	print ""
+				if name in process.metUncertaintySequence.moduleNames() :
+					process.metUncertaintySequence.remove(getattr(process,name))
+				if name in process.metUncertaintySequence.moduleNames() :
+					print "Error : module not removed from metUncertaintySequence"
+		print "...done."
+		print ""
 
 
 
