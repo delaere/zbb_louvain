@@ -7,21 +7,16 @@ def setupPatElectrons (process, runOnMC):
     #adaptPFIsoElectrons( process, applyPostfix(process,"patElectrons",""), 'PFIso') #use in llqq
     #process.pfAllElectrons.src = "particleFlow" #WHY? see more at https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#PAT_configuration
     #really useful: not defined in llqq and not explained how to get this in https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
-    #process.patElectrons.electronIDSources = cms.PSet(
-    #    simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
-    #    simpleEleId85relIso= cms.InputTag("simpleEleId85relIso"),
-    #    simpleEleId80relIso= cms.InputTag("simpleEleId80relIso")
-    #    )
-
+    
     #Add MVA Id
     process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
-    process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaTrigNoIPV0 + process.mvaNonTrigV0 )
+    process.mvaID = cms.Sequence(process.mvaNonTrigV0 + process.mvaTrigV0 + process.mvaTrigNoIPV0)
     #Electron ID
     process.patElectrons.electronIDSources = cms.PSet(
         #MVA
-        mvaTrigV0 = cms.InputTag("mvaTrigV0"),
         mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0"),
-        mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0"),
+        mvaTrigV0 = cms.InputTag("mvaTrigV0"),
+        mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
         )
 
     #what about: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#Current_version_previously_known , something to do or correctedin releases
@@ -82,20 +77,6 @@ def setupPatElectrons (process, runOnMC):
             'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
-        process.tightMVAElectronsTrig = process.selectedPatElectrons.clone(
-            src = "allElectrons",
-            cut =
-            'electronID("mvaTrigV0") &' #Medium WP agreed in June 2012
-            'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            )
-        process.tightMVAElectronsTrigNoIP = process.selectedPatElectrons.clone(
-            src = "allElectrons",
-            cut =
-            'electronID("mvaTrigNoIPV0") &' #Medium WP agreed in June 2012
-            'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            )
     else :
         process.tightElectrons = process.selectedPatElectrons.clone(
             src = "allElectrons",
@@ -111,38 +92,22 @@ def setupPatElectrons (process, runOnMC):
             'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
             #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
-        process.tightMVAElectronsTrig = process.selectedPatElectrons.clone(
-            src = "allElectrons",
-            cut =
-            'electronID("mvaTrigV0") &' #Medium WP agreed in June 2012
-            'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            )
-        process.tightMVAElectronsTrigNoIP = process.selectedPatElectrons.clone(
-            src = "allElectrons",
-            cut =
-            'electronID("mvaTrigNoIPV0") &' #Medium WP agreed in June 2012
-            'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
-            )
-
+        
     process.preElectronSeq = cms.Sequence (
-        process.eleIsoSequence +
-        process.pfElectronSequence +
+        process.eleIsoSequence *
+        process.pfElectronSequence *
         process.mvaID
         )
     process.PF2PAT.replace(process.pfElectronSequence,process.preElectronSeq)
 
-    process.patDefaultSequence.replace(process.selectedPatElectrons,process.selectedPatElectrons+process.selectedElectronsWithIsolationData)
+    process.patDefaultSequence.replace(process.selectedPatElectrons,process.selectedPatElectrons*process.selectedElectronsWithIsolationData)
 
     process.postElectronSeq = cms.Sequence (
-        process.eleTriggerMatchHLT +
-        process.patElectronsWithTrigger +
-        process.allElectrons +
+        process.eleTriggerMatchHLT *
+        process.patElectronsWithTrigger *
+        process.allElectrons *
         process.tightElectrons +
-        process.tightMVAElectronsNonTrig +
-        process.tightMVAElectronsTrig +
-        process.tightMVAElectronsTrigNoIP
+        process.tightMVAElectronsNonTrig
         )
     
     
@@ -159,9 +124,16 @@ def setupPatElectrons (process, runOnMC):
                                              name = cms.string('Zeltighteltight'),
                                              roles = cms.vstring('tight1', 'tight2')
                                              )
+    process.zmvaelTightmvaelTight = cms.EDProducer('CandViewShallowCloneCombiner',
+                                             decay = cms.string('tightMVAElectronsNonTrig@+ tightMVAElectronsNonTrig@-'),
+                                             cut = cms.string('mass > 50.0'),
+                                             name = cms.string('Zmvaeltightmvaeltight'),
+                                             roles = cms.vstring('tight1', 'tight2')
+                                             )
     process.electronComposite = cms.Sequence (
         process.zelAllelAll +
-        process.zelTightelTight
+        process.zelTightelTight +
+        process.zmvaelTightmvaelTight
         )
     
     

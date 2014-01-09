@@ -7,6 +7,7 @@
 <use   name="CommonTools/UtilAlgos"/>
 <use   name="DataFormats/PatCandidates" />
 <use   name="EgammaAnalysis/ElectronTools" />
+<use   name="fastjet"/>
 
 <library   file="*.cc" name="UserCodezbb_louvainPlugins">
   <flags   EDM_PLUGIN="1"/>

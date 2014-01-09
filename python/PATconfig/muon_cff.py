@@ -89,22 +89,37 @@ def setupPatMuons (process, runOnMC):
                           'globalTrack.hitPattern.numberOfValidMuonHits > 0'
                           )
          )    
+
+     process.tightNoIsoMuons = process.selectedPatMuons.clone(
+         src = cms.InputTag('selectedPatMuonsTriggerMatch'),
+         cut = cms.string('isGlobalMuon &'
+                          'isPFMuon &'
+                          'innerTrack.hitPattern.trackerLayersWithMeasurement>5 &'
+                          #fabs(recoMu.innerTrack()->dz(vertex->position())) < 0.5 # to be applied offline
+                          'abs(dB) < 0.2 &' #not anymore 0.02? effect should be small anyway
+                          'normChi2 < 10 &'
+                          'innerTrack.hitPattern.numberOfValidPixelHits > 0 &'
+                          'numberOfMatchedStations>1 &'
+                          'globalTrack.hitPattern.numberOfValidMuonHits > 0'
+                          )
+         )    
      
      # Sequence for muons:
      process.preMuonSeq = cms.Sequence (
-          process.muIsoSequence +
+          process.muIsoSequence *
           process.pfMuonSequence
           )
      process.PF2PAT.replace(process.pfMuonSequence,process.preMuonSeq)
      
      #process.patDefaultSequence.replace(process.patMuons, process.patMuons+process.MuScleFit)
-     process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons+process.selectedMuonsWithIsolationData)
+     process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons*process.selectedMuonsWithIsolationData)
 
      process.postMuonSeq = cms.Sequence (    
-          process.muonTriggerMatchHLTMuons +
-          process.selectedPatMuonsTriggerMatch +
-          process.allMuons +          
-          process.tightMuons
+          process.muonTriggerMatchHLTMuons *
+          process.selectedPatMuonsTriggerMatch *
+          process.allMuons *          
+          process.tightMuons +
+          process.tightNoIsoMuons
           )
 
 
@@ -121,8 +136,15 @@ def setupPatMuons (process, runOnMC):
                                               name = cms.string('Zmutightmutight'),
                                               roles = cms.vstring('tight1', 'tight2')
                                               )
+     process.znoisomuTightnoisomuTight = cms.EDProducer('CandViewShallowCloneCombiner',
+                                              decay = cms.string('tightNoIsoMuons@+ tightNoIsoMuons@-'),
+                                              cut = cms.string('mass > 50.0'),
+                                              name = cms.string('Znoisomutightnoisomutight'),
+                                              roles = cms.vstring('tight1', 'tight2')
+                                              )
      process.muonComposite = cms.Sequence (
           process.zmuAllmuAll +
-          process.zmuTightmuTight
+          process.zmuTightmuTight +
+          process.znoisomuTightnoisomuTight
           )
      

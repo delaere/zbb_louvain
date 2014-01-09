@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi import goodOfflinePrimaryVertices
 
 def setupGoodVertex (process):
-    process.goodPV = goodOfflinePrimaryVertices.clone()
+    process.goodPV = goodOfflinePrimaryVertices.clone(filter=cms.bool(True))
     
 def changeVertexCollection (process,seqName='patDefaultSequence'):
     pvCollection=cms.InputTag('goodPV')
@@ -11,7 +11,7 @@ def changeVertexCollection (process,seqName='patDefaultSequence'):
     print "***********************************"
 
     # PV sources to be exchanged:
-    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','vertexes','primaryVertex']
+    pvExchange = ['Vertices','vertices','pvSrc','primaryVertices','srcPVs','vertexes','primaryVertex','vertexTag']
     # PV sources NOT to be exchanged:
     #noPvExchange = ['src','PVProducer','primaryVertexSrc','vertexSrc','primaryVertex']
 
