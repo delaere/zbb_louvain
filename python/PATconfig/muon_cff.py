@@ -23,25 +23,21 @@ def setupPatMuons (process, runOnMC):
      process.muIsoSequence = setupPFMuonIso(process, 'muons', 'PFIso')
      #adaptPFIsoMuons( process, applyPostfix(process,"patMuons",""), 'PFIso') #FIX: done in H to llqq
            
-     #
      # MuscleFit for muons:
-     #
-     
+          
      # identifier of the MuScleFit is Data2012_53X_ReReco for data
      # and Summer12_DR53X_smearReReco for MC (to compare with ReReco data)
-     #muscleid = 'Data2012_53X_ReReco'
-     #if runOnMC : muscleid = 'Summer12_DR53X_smearReReco'
+     muscleid = 'Data2012_53X_ReReco'
+     if runOnMC : muscleid = 'Summer12_DR53X_smearReReco'
      
-     #process.MuScleFit = cms.EDProducer("MuScleFitPATMuonCorrector",
-     #                                   src = cms.InputTag("patMuons"),
-     #                                   debug = cms.bool(True),
-     #                                   identifier = cms.string(muscleid),
-     #                                   applySmearing = cms.bool(runOnMC), # Must be false in data
-     #                                   fakeSmearing = cms.bool(False)
-     #                                   )
-
-     # Kinematic cuts on electrons: tight to reduce ntuple size:
-     #process.selectedPatMuons.src = cms.InputTag("MuScleFit")
+     process.MuScleFit = cms.EDProducer("MuScleFitPATMuonCorrector",
+                                        src = cms.InputTag("patMuons"),
+                                        debug = cms.bool(True),
+                                        identifier = cms.string(muscleid),
+                                        applySmearing = cms.bool(runOnMC), # Must be false in data
+                                        fakeSmearing = cms.bool(False)
+                                        )
+     process.selectedPatMuons.src = cms.InputTag("MuScleFit")
      
 
      process.selectedPatMuons.cut = (
@@ -111,7 +107,7 @@ def setupPatMuons (process, runOnMC):
           )
      process.PF2PAT.replace(process.pfMuonSequence,process.preMuonSeq)
      
-     #process.patDefaultSequence.replace(process.patMuons, process.patMuons+process.MuScleFit)
+     process.patDefaultSequence.replace(process.patMuons, process.patMuons+process.MuScleFit)
      process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons*process.selectedMuonsWithIsolationData)
 
      process.postMuonSeq = cms.Sequence (    

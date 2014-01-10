@@ -48,8 +48,9 @@ setupPatMets(process, runOnMC)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
-    process.goodPV*
-    process.PF2PAT*
+    process.goodPV *
+    process.PF2PAT *
+    process.preJetSequence *
     process.preSequenceCA8CHS +
     process.preMetSequence
     )
@@ -136,11 +137,11 @@ process.out = cms.OutputModule(
                                            #GEN
                                            'keep GenEventInfoProduct_generator_*_*',
                                            'keep *_genMetTrue_*_*',
-                                           'keep recoGenJets_ak5GenJets_*_*',
+                                           'keep recoGenJets_ak5GenJets*_*_*',
                                            'keep *_addPileupInfo_*_*',
                                            'keep LHEEventProduct_*_*_*',
                                            'keep *_genParticles_*_*',
-                                           'keep recoGenJets_ca8GenJetsNoNu*_*_*'
+                                           'keep recoGenJets_ca8GenJets*_*_*'
                                            )
     )
 

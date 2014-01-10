@@ -2,8 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
 from RecoJets.JetProducers.ak5PFJetsPruned_cfi import ak5PFJetsPruned
 from PhysicsTools.PatAlgos.tools.jetTools import *
-from RecoJets.Configuration.RecoGenJets_cff import ak7GenJetsNoNu
-from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJetsNoNu
+#from RecoJets.Configuration.RecoGenJets_cff import ak7GenJetsNoNu, ak7GenJets
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
 from UserCode.zbb_louvain.PATconfig.jet_cff import btagInfo, btagdiscriminators
 
@@ -98,11 +97,23 @@ def setupPatSubJets (process, runOnMC):
     process.patJetsCA8PrunedSubjetsPF.embedPFCandidates = False
 
     #CA8 genJets
-    process.ca8GenJetsNoNu = ak7GenJetsNoNu.clone()
+    process.ca8GenJetsNoNu = process.ak7GenJetsNoNu.clone()
     process.ca8GenJetsNoNu.rParam = 0.8
     process.ca8GenJetsNoNu.jetAlgorithm = "CambridgeAachen"
 
+    process.ca8GenJets = process.ak7GenJets.clone()
+    process.ca8GenJets.rParam = 0.8
+    process.ca8GenJets.jetAlgorithm = "CambridgeAachen"
+
     process.ca8GenJetsNoNuPruned = process.ca8GenJetsNoNu.clone( #Pruned gen jets
+        SubJetParameters,
+        usePruning = cms.bool(True),
+        useExplicitGhosts = cms.bool(True),
+        writeCompound = cms.bool(True),
+        jetCollInstanceName=cms.string("SubJets")
+        )
+
+    process.ca8GenJetsPruned = process.ca8GenJets.clone( #Pruned gen jets
         SubJetParameters,
         usePruning = cms.bool(True),
         useExplicitGhosts = cms.bool(True),
@@ -124,11 +135,10 @@ def setupPatSubJets (process, runOnMC):
 
     #Sequences
     process.jetMCSequenceCA8CHS = cms.Sequence(
-        process.patJetPartonMatchCA8CHS *
-        process.genParticlesForJetsNoNu *
         process.ca8GenJetsNoNu *
-        process.patJetGenJetMatchCA8CHS *
-        process.ca8GenJetsNoNuPruned
+        process.ca8GenJets *
+        process.ca8GenJetsNoNuPruned *
+        process.ca8GenJetsPruned
         )
 
     process.preSequenceCA8CHS = cms.Sequence(

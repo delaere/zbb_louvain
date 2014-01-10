@@ -7,7 +7,7 @@ def setupPatElectrons (process, runOnMC):
     #adaptPFIsoElectrons( process, applyPostfix(process,"patElectrons",""), 'PFIso') #use in llqq
     #process.pfAllElectrons.src = "particleFlow" #WHY? see more at https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#PAT_configuration
     #really useful: not defined in llqq and not explained how to get this in https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
-    
+
     #Add MVA Id
     process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
     process.mvaID = cms.Sequence(process.mvaNonTrigV0 + process.mvaTrigV0 + process.mvaTrigNoIPV0)
@@ -18,6 +18,22 @@ def setupPatElectrons (process, runOnMC):
         mvaTrigV0 = cms.InputTag("mvaTrigV0"),
         mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
         )
+
+    #electron momentum scale
+    process.load("EgammaAnalysis.ElectronTools.electronRegressionEnergyProducer_cfi")
+    process.eleRegressionEnergy.inputElectronsTag = cms.InputTag('patElectrons')
+    process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+                                                       calibratedPatElectrons = cms.PSet(
+                                                         initialSeed = cms.untracked.uint32(975312468),
+                                                         engineName = cms.untracked.string('TRandom3')
+                                                         )
+                                                       )
+    process.load("EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi")
+    if runOnMC: # For MC need to change defauls
+        process.calibratedPatElectrons.isMC = runOnMC
+        process.calibratedPatElectrons.inputDataset = cms.string("Summer12_LegacyPaper")
+        process.calibratedPatElectrons.lumiRatio = 0.607
+    process.selectedPatElectrons.src = cms.InputTag("calibratedPatElectrons")
 
     #what about: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#Current_version_previously_known , something to do or correctedin releases
     process.load("RecoParticleFlow.PFProducer.electronPFIsolationValues_cff")
@@ -38,8 +54,6 @@ def setupPatElectrons (process, runOnMC):
                                        cms.InputTag('elPFIsoDepositNeutralPFIso')),
            )
     
-
-    #Use of calibration ??? done in qqll: process.load("EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi")
     process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
                                                  src = cms.InputTag( "selectedPatElectrons" ),
                                                  matched = cms.InputTag( "patTrigger"),
@@ -68,14 +82,12 @@ def setupPatElectrons (process, runOnMC):
             cut =
             'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
             cut =
             'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
     else :
         process.tightElectrons = process.selectedPatElectrons.clone(
@@ -83,14 +95,12 @@ def setupPatElectrons (process, runOnMC):
             cut =
             'userInt("MediumWP")==1 &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
             cut =
             'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
             'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
-            #'((abs(superCluster.eta)< 1.442)||((1.566<(abs(superCluster.eta)))&&((abs(superCluster.eta))<2.50))) &' # fiducial cut
             )
         
     process.preElectronSeq = cms.Sequence (
@@ -100,7 +110,10 @@ def setupPatElectrons (process, runOnMC):
         )
     process.PF2PAT.replace(process.pfElectronSequence,process.preElectronSeq)
 
-    process.patDefaultSequence.replace(process.selectedPatElectrons,process.selectedPatElectrons*process.selectedElectronsWithIsolationData)
+    process.patDefaultSequence.replace(
+        process.selectedPatElectrons,
+        process.eleRegressionEnergy*process.calibratedPatElectrons*process.selectedPatElectrons*process.selectedElectronsWithIsolationData
+        )
 
     process.postElectronSeq = cms.Sequence (
         process.eleTriggerMatchHLT *
