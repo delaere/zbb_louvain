@@ -66,17 +66,34 @@ def setupPatJets (process, runOnMC):
      process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
      
      #PU JetID
-     process.load("CMGTools.External.pujetidsequence_cff")
-     process.puJetIdChs.jets = cms.InputTag("patJets")
-     process.puJetMvaChs.jets = cms.InputTag("patJets")
-     process.puJetMvaChs.algos[0].tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml')
+     process.load("RecoJets.JetProducers.PileupJetID_cfi")
+     process.pileupJetIdProducerChs.jets = cms.InputTag("patJets")
+     process.pileupJetIdProducerChs.vertexes = cms.InputTag("goodPV")
+     process.pileupJetIdProducerChs.residualsTxt = cms.FileInPath("RecoJets/JetProducers/data/mva_JetID_v1.weights.xml")
+     process.puJetIdChs = process.pileupJetIdProducerChs.clone(
+          produceJetIds = cms.bool(True),
+          jetids = cms.InputTag(""),
+          runMvas = cms.bool(False),
+          algos = cms.VPSet(process.cutbased),
+          )
+     
+     process.puJetMvaChs = process.pileupJetIdProducerChs.clone(
+          produceJetIds = cms.bool(False),
+          jetids = cms.InputTag("puJetIdChs"),
+          runMvas = cms.bool(True),
+          )
+
+     process.puJetIdSqeuenceChs = cms.Sequence(process.puJetIdChs*process.puJetMvaChs)
 
      process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
                                               src = cms.InputTag("patJets"),
                                               primaryVertices = cms.InputTag("goodPV"),
-                                              puJetIdMVA = cms.InputTag("puJetMvaChs","fullDiscriminant"),
-                                              puJetIdFlag = cms.InputTag("puJetMvaChs","fullId"),
-                                              puJetIdentifier = cms.InputTag("puJetIdChs"),
+                                              #puJetIdMVA = cms.InputTag("puJetMvaChs","fullDiscriminant"),
+                                              #puJetIdFlag = cms.InputTag("puJetMvaChs","fullId"),
+                                              #puJetIdentifier = cms.InputTag("puJetIdChs"),
+                                              puJetIdMVA = cms.InputTag("pileupJetIdProducerChs","fullDiscriminant"),
+                                              puJetIdFlag = cms.InputTag("pileupJetIdProducerChs","fullId"),
+                                              puJetIdentifier = cms.InputTag("pileupJetIdProducerChs"),
                                               )
 
      #jet selection
@@ -84,4 +101,6 @@ def setupPatJets (process, runOnMC):
      process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5 '
 
      #add everything to the sequence
-     process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets+process.puJetIdSqeuenceChs+process.patJetsWithBeta))
+     process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets*process.pileupJetIdProducerChs*process.patJetsWithBeta))
+     #process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets*process.pileupJetIdProducerChs*process.puJetIdSqeuenceChs*process.patJetsWithBeta))
+     

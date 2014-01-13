@@ -9,7 +9,7 @@ from UserCode.zbb_louvain.PATconfig.jet_cff import btagInfo, btagdiscriminators
 def setupPatSubJets (process, runOnMC):
     #CA8 jets
     process.ca8PFJetsCHS = ak5PFJets.clone(
-        src = 'pfNoPileUp',
+        src = 'pfNoElectron', #or pfNoPileUp, does it make a difference?
         jetPtMin = cms.double(10.0),
         doAreaFastjet = cms.bool(True),
         rParam = cms.double(0.8),
@@ -17,7 +17,7 @@ def setupPatSubJets (process, runOnMC):
         )
 
     process.ca8PFJetsCHSpruned = ak5PFJetsPruned.clone( #Pruned CA8 jets
-        src = 'pfNoPileUp',
+        src = 'pfNoElectron', #or pfNoPileUp, does it make a difference?
         jetPtMin = cms.double(10.0),
         doAreaFastjet = cms.bool(True),
         rParam = cms.double(0.8),
@@ -43,7 +43,11 @@ def setupPatSubJets (process, runOnMC):
     process.patJetsCA8CHS.embedCaloTowers = False
     process.patJetsCA8CHS.embedPFCandidates = False
     process.selectedPatJetsCA8CHS.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
-    
+
+    process.pileupJetIdProducerChsCA8 = process.pileupJetIdProducerChs.clone(
+        jets = cms.InputTag("patJetsCA8CHS"),
+        jec  = cms.string("AK7PFchs")
+        )
     process.puJetIdChsCA8 = process.puJetIdChs.clone() #configure beta/beta* for CA8 jets
     process.puJetMvaChsCA8 = process.puJetMvaChs.clone()
     
@@ -52,12 +56,15 @@ def setupPatSubJets (process, runOnMC):
     process.puJetMvaChsCA8.jetids = cms.InputTag("puJetIdChsCA8")
     
     process.patJetsCA8CHSWithBeta = cms.EDProducer('JetBetaProducer',
-                                                               src = cms.InputTag("patJetsCA8CHS"),
-                                                               primaryVertices = cms.InputTag("goodPV"),
-                                                               puJetIdMVA = cms.InputTag("puJetMvaChsCA8","fullDiscriminant"),
-                                                               puJetIdFlag = cms.InputTag("puJetMvaChsCA8","fullId"),
-                                                               puJetIdentifier = cms.InputTag("puJetIdChsCA8"),
-                                                               )
+                                                   src = cms.InputTag("patJetsCA8CHS"),
+                                                   primaryVertices = cms.InputTag("goodPV"),
+                                                   #puJetIdMVA = cms.InputTag("puJetMvaChsCA8","fullDiscriminant"),
+                                                   #puJetIdFlag = cms.InputTag("puJetMvaChsCA8","fullId"),
+                                                   #puJetIdentifier = cms.InputTag("puJetIdChsCA8"),
+                                                   puJetIdMVA = cms.InputTag("pileupJetIdProducerChsCA8","fullDiscriminant"),
+                                                   puJetIdFlag = cms.InputTag("pileupJetIdProducerChsCA8","fullId"),
+                                                   puJetIdentifier = cms.InputTag("pileupJetIdProducerChsCA8"),
+                                                   )
     process.selectedPatJetsCA8CHS.src = cms.InputTag("patJetsCA8CHSWithBeta")
 
                             
@@ -149,7 +156,8 @@ def setupPatSubJets (process, runOnMC):
 
     process.patDefaultSequence.replace(
         process.selectedPatJetsCA8CHS,
-        cms.Sequence(process.puJetIdChsCA8 * process.puJetMvaChsCA8 * process.patJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHS * process.selectedPatJetsCA8CHSwithNsub)
+        #cms.Sequence(process.puJetIdChsCA8 * process.puJetMvaChsCA8 * process.patJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHS * process.selectedPatJetsCA8CHSwithNsub)
+        cms.Sequence(process.pileupJetIdProducerChsCA8 * process.patJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHS * process.selectedPatJetsCA8CHSwithNsub)
         )
      
 
