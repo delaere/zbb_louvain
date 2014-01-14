@@ -32,8 +32,10 @@ btagdiscriminators = [
 
 def setupPatJets (process, runOnMC):
      #genJets
-     process.load('RecoJets.Configuration.RecoGenJets_cff')
-     process.preJetSequence = cms.Sequence(process.genParticlesForJets * process.genParticlesForJetsNoNu * process.ak5GenJetsNoNu)
+     if runOnMC:
+          process.load('RecoJets.Configuration.RecoGenJets_cff')
+          process.preJetSequence = cms.Sequence(process.genParticlesForJets * process.genParticlesForJetsNoNu * process.ak5GenJetsNoNu)
+     else : process.preJetSequence = cms.Sequence()
      #jets
      inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
      if runOnMC : inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute'])

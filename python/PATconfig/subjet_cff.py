@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
 from RecoJets.JetProducers.ak5PFJetsPruned_cfi import ak5PFJetsPruned
 from PhysicsTools.PatAlgos.tools.jetTools import *
-#from RecoJets.Configuration.RecoGenJets_cff import ak7GenJetsNoNu, ak7GenJets
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
 from UserCode.zbb_louvain.PATconfig.jet_cff import btagInfo, btagdiscriminators
 
