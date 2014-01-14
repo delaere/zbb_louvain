@@ -1,32 +1,61 @@
 import FWCore.ParameterSet.Config as cms
 
+#Options
+
+#"""""""" Use as 'cmsRun patTuple_llbbX_cfg_dataMC.py option' to run locally or with crab, where option is a string containing 'Data' or/and 'AllEv' """"""""
+#"""""""" Use as 'cmsRun patTuple_llbbX_cfg_dataMC.py option=Condor slice=X sample=NAME' where slice is an integer, sample is a string 'DY' ot 'TT' for example, other condor options are defined in runPATcondor.py """"""""""
+
+runOnMC = True
+runOnCondor = False
+nevents = 100
+
+import sys
+
+if len(sys.argv)>1 :
+    if sys.argv[0]=="cmsRun" : option = sys.argv[2]
+    else : option = sys.argv[1]
+    if "Condor" in option :
+        runOnCondor = True
+        print "Run on condor"
+    if "Data" in option : runOnMC = False
+    if "AllEv" in option : nevents = -1
+
+if runOnCondor:
+    from UserCode.zbb_louvain.condorScripts.runPATcondor import *
+    files = cms.untracked.vstring(files)
+else :
+    readFiles = cms.untracked.vstring()
+    if runOnMC:
+        readFiles.extend([
+            'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
+            ])
+    else :
+        readFiles.extend([
+            'file:/storage/data/cms/store/data/Run2012D/JetMon/AOD/22Jan2013-v1/10000/0CD0D545-1492-E211-97CC-782BCB67A0FA.root'
+            ])
+    files=readFiles
+    out_fileName = "test.root"
+
 #setup
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.load("CommonTools.ParticleFlow.PF2PAT_cff") # load PF2PAT sequence
 process.setName_("llbbX")
 process.options.wantSummary = False
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
-
-#options
-runOnMC = True
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+if nevents > 0 : process.MessageLogger.cerr.FwkReport.reportEvery = nevents/10 
 
 #GT
 if runOnMC : process.GlobalTag.globaltag = 'START53_V27::All'
 else : process.GlobalTag.globaltag = 'FT_53_V21_AN5::All'
   
 ## Source
-readFiles = cms.untracked.vstring()
-readFiles.extend([
-    'file:/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/0AE169B1-01D3-E111-9939-001E673968F1.root'
-    #'file:/storage/data/cms/store/data/Run2012D/JetMon/AOD/22Jan2013-v1/10000/0CD0D545-1492-E211-97CC-782BCB67A0FA.root'
-    ])
 process.source = cms.Source(
     "PoolSource",
-    fileNames = readFiles
+    fileNames = files
     )
 
 ## Maximal Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(nevents) )
 
 #objects
 from PhysicsTools.PatAlgos.tools.coreTools import removeMCMatching
@@ -100,7 +129,7 @@ process.p2 = cms.Path(process.llbbXSequence*process.ZEEFilter)
 #output
 process.out = cms.OutputModule(
     "PoolOutputModule",
-    fileName = cms.untracked.string('patTuple.root'),
+    fileName = cms.untracked.string(out_fileName),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1','p2') ),
     outputCommands = cms.untracked.vstring('drop *',
                                            #TRIGGER
@@ -125,8 +154,9 @@ process.out = cms.OutputModule(
                                            'keep *_pfNoTau_*_*',
                                            'keep *_*5PFJets*_*_*',
                                            'keep *_*ca8PFJets*_*_*',
-                                           'keep *_puJetId*_*_*',
-                                           'keep *_puJetMva*_*_*',
+                                           'keep *_pileupJetIdProducerChs*_*_*',
+                                           #'keep *_puJetId*_*_*',
+                                           #'keep *_puJetMva*_*_*',
                                            'keep *_*bjets*_*_*',
                                            'keep *_*JetTags*_*_llbbX',
                                            'keep *_kt6PFJets*_*_*',

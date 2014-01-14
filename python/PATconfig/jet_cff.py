@@ -35,7 +35,7 @@ def setupPatJets (process, runOnMC):
      process.load('RecoJets.Configuration.RecoGenJets_cff')
      process.preJetSequence = cms.Sequence(process.genParticlesForJets * process.genParticlesForJetsNoNu * process.ak5GenJetsNoNu)
      #jets
-     Inputjetcorrlabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
+     inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
      if runOnMC : inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute'])
      switchJetCollection(process,cms.InputTag('pfNoTau'), #==ak5PFJetsCHS
                          doJTA = True,
