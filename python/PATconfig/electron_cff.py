@@ -86,7 +86,7 @@ def setupPatElectrons (process, runOnMC):
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
             cut =
-            'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
+            'electronID("mvaNonTrigV0")>0.5 &' #from top analysis
             'userFloat("PFIsoPUCorrectedMC") < 0.15' # isolation for MC
             )
     else :
@@ -99,7 +99,7 @@ def setupPatElectrons (process, runOnMC):
         process.tightMVAElectronsNonTrig = process.selectedPatElectrons.clone(
             src = "allElectrons",
             cut =
-            'electronID("mvaNonTrigV0") &' #Medium WP agreed in June 2012
+            'electronID("mvaNonTrigV0")>0.5 &' #from top analysis  
             'userFloat("PFIsoPUCorrected") < 0.15' # isolation for MC
             )
         

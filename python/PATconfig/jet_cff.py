@@ -50,6 +50,7 @@ def setupPatJets (process, runOnMC):
                          btagInfo = btagInfo,
                          btagdiscriminators = btagdiscriminators
                          )
+     process.patJets.addTagInfos = cms.bool(True)
      #b-tagging mva
      process.load('CondCore.DBCommon.CondDBSetup_cfi')
      process.BTauMVAJetTagComputerRecord = cms.ESSource(
@@ -72,20 +73,20 @@ def setupPatJets (process, runOnMC):
      process.pileupJetIdProducerChs.jets = cms.InputTag("patJets")
      process.pileupJetIdProducerChs.vertexes = cms.InputTag("goodPV")
      process.pileupJetIdProducerChs.residualsTxt = cms.FileInPath("RecoJets/JetProducers/data/mva_JetID_v1.weights.xml")
-     process.puJetIdChs = process.pileupJetIdProducerChs.clone(
-          produceJetIds = cms.bool(True),
-          jetids = cms.InputTag(""),
-          runMvas = cms.bool(False),
-          algos = cms.VPSet(process.cutbased),
-          )
+     #process.puJetIdChs = process.pileupJetIdProducerChs.clone(
+     #     produceJetIds = cms.bool(True),
+     #     jetids = cms.InputTag(""),
+     #     runMvas = cms.bool(False),
+     #     algos = cms.VPSet(process.cutbased),
+     #     )
      
-     process.puJetMvaChs = process.pileupJetIdProducerChs.clone(
-          produceJetIds = cms.bool(False),
-          jetids = cms.InputTag("puJetIdChs"),
-          runMvas = cms.bool(True),
-          )
+     #process.puJetMvaChs = process.pileupJetIdProducerChs.clone(
+     #     produceJetIds = cms.bool(False),
+     #     jetids = cms.InputTag("puJetIdChs"),
+     #     runMvas = cms.bool(True),
+     #     )
 
-     process.puJetIdSqeuenceChs = cms.Sequence(process.puJetIdChs*process.puJetMvaChs)
+     #process.puJetIdSqeuenceChs = cms.Sequence(process.puJetIdChs*process.puJetMvaChs)
 
      process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
                                               src = cms.InputTag("patJets"),

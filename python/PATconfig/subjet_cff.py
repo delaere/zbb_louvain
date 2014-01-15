@@ -41,18 +41,19 @@ def setupPatSubJets (process, runOnMC):
                      )
     process.patJetsCA8CHS.embedCaloTowers = False
     process.patJetsCA8CHS.embedPFCandidates = False
+    process.patJetsCA8CHS.addTagInfos = cms.bool(True)
     process.selectedPatJetsCA8CHS.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
 
     process.pileupJetIdProducerChsCA8 = process.pileupJetIdProducerChs.clone(
         jets = cms.InputTag("patJetsCA8CHS"),
         jec  = cms.string("AK7PFchs")
         )
-    process.puJetIdChsCA8 = process.puJetIdChs.clone() #configure beta/beta* for CA8 jets
-    process.puJetMvaChsCA8 = process.puJetMvaChs.clone()
+    #process.puJetIdChsCA8 = process.puJetIdChs.clone() #configure beta/beta* for CA8 jets
+    #process.puJetMvaChsCA8 = process.puJetMvaChs.clone()
     
-    process.puJetIdChsCA8.jets = cms.InputTag("patJetsCA8CHS")
-    process.puJetMvaChsCA8.jets = cms.InputTag("patJetsCA8CHS")
-    process.puJetMvaChsCA8.jetids = cms.InputTag("puJetIdChsCA8")
+    #process.puJetIdChsCA8.jets = cms.InputTag("patJetsCA8CHS")
+    #process.puJetMvaChsCA8.jets = cms.InputTag("patJetsCA8CHS")
+    #process.puJetMvaChsCA8.jetids = cms.InputTag("puJetIdChsCA8")
     
     process.patJetsCA8CHSWithBeta = cms.EDProducer('JetBetaProducer',
                                                    src = cms.InputTag("patJetsCA8CHS"),
@@ -81,6 +82,7 @@ def setupPatSubJets (process, runOnMC):
                      )
     process.patJetsCA8CHSpruned.embedCaloTowers = False
     process.patJetsCA8CHSpruned.embedPFCandidates = False
+    process.patJetsCA8CHSpruned.addTagInfos = cms.bool(True)
     process.selectedPatJetsCA8CHSpruned.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
 
     #subjets
@@ -101,7 +103,8 @@ def setupPatSubJets (process, runOnMC):
     process.patJetsCA8PrunedSubjetsPF.addJetCharge = False
     process.patJetsCA8PrunedSubjetsPF.embedCaloTowers = False
     process.patJetsCA8PrunedSubjetsPF.embedPFCandidates = False
-
+    process.patJetsCA8PrunedSubjetsPF.addTagInfos = cms.bool(True)
+    
     #CA8 genJets
     process.ca8GenJetsNoNu = process.ak7GenJetsNoNu.clone()
     process.ca8GenJetsNoNu.rParam = 0.8

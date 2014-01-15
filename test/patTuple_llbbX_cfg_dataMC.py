@@ -11,7 +11,7 @@ nevents = 100
 
 import sys
 
-if len(sys.argv)>1 :
+if (len(sys.argv)>1 and sys.argv[0]!="cmsRun") or (sys.argv[0]=="cmsRun" and len(sys.argv)>2):
     if sys.argv[0]=="cmsRun" : option = sys.argv[2]
     else : option = sys.argv[1]
     if "Condor" in option :
@@ -46,7 +46,7 @@ if nevents > 0 : process.MessageLogger.cerr.FwkReport.reportEvery = nevents/10
 
 #GT
 if runOnMC : process.GlobalTag.globaltag = 'START53_V27::All'
-else : process.GlobalTag.globaltag = 'FT_53_V21_AN5::All'
+else : process.GlobalTag.globaltag = 'FT_53_V21_AN6::All'
   
 ## Source
 process.source = cms.Source(
@@ -144,8 +144,10 @@ process.out = cms.OutputModule(
                                            'keep *_offlineBeamSpot*_*_*',
                                            #MUON
                                            'keep *_*Muons*_*_*',
+                                           'keep *_MuScleFit_*_*',
                                            #Electron
                                            'keep *_*Electrons*_*_*',
+                                           'keep *_elPFIso*_*_*',
                                            'keep *_allConversions_*_*',
                                            #Z candidates
                                            'keep *_z*_*_*',
@@ -158,7 +160,8 @@ process.out = cms.OutputModule(
                                            #'keep *_puJetId*_*_*',
                                            #'keep *_puJetMva*_*_*',
                                            'keep *_*bjets*_*_*',
-                                           'keep *_*JetTags*_*_llbbX',
+                                           'keep *_*JetTags*_*_*',
+                                           'keep *_*TagInfos*_*_*',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
 					   'keep *_*MET*_*_*',      

@@ -13,7 +13,7 @@ sample="DY"
 if len(sys.argv)>1:
     sample=sys.argv[1]
 
-FarmDirectory = "FARM_"+sample
+FarmDirectory = "FARM_"+sample+"_V2"
 JobName = sample+"pat"
 LaunchOnCondor.Jobs_RunHere = 1
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)

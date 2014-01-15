@@ -32,10 +32,10 @@ def setupPatMuons (process, runOnMC):
      
      process.MuScleFit = cms.EDProducer("MuScleFitPATMuonCorrector",
                                         src = cms.InputTag("patMuons"),
-                                        debug = cms.bool(True),
+                                        debug = cms.bool(False),
                                         identifier = cms.string(muscleid),
                                         applySmearing = cms.bool(runOnMC), # Must be false in data
-                                        fakeSmearing = cms.bool(False)
+                                        fakeSmearing = cms.bool(False),
                                         )
      process.selectedPatMuons.src = cms.InputTag("MuScleFit")
      
