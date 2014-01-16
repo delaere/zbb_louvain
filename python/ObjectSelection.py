@@ -166,7 +166,8 @@ def isLooseMuon(muon):
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything on top of PAT cfg ?
   # cleaning ?
-  return True
+  #return True
+  return muon.pt()>20.
 
 def isTightMuon(muon):
   """Perform additional checks that define a tight muon"""
@@ -205,8 +206,7 @@ def isLooseElectron(electron):
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return abs(electron.eta())<2.5 # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) )
-  ##return electron.eta()<2.5
+  return electron.pt()>20. # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
   #return True
 
 def isTightElectron(electron):

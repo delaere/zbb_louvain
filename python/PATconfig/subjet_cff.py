@@ -40,7 +40,7 @@ def setupPatSubJets (process, runOnMC):
                      btagdiscriminators = btagdiscriminators
                      )
     process.patJetsCA8CHS.embedCaloTowers = False
-    process.patJetsCA8CHS.embedPFCandidates = False
+    process.patJetsCA8CHS.embedPFCandidates = True
     process.patJetsCA8CHS.addTagInfos = cms.bool(True)
     process.selectedPatJetsCA8CHS.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
 
@@ -81,7 +81,7 @@ def setupPatSubJets (process, runOnMC):
                      btagdiscriminators = btagdiscriminators
                      )
     process.patJetsCA8CHSpruned.embedCaloTowers = False
-    process.patJetsCA8CHSpruned.embedPFCandidates = False
+    process.patJetsCA8CHSpruned.embedPFCandidates = True
     process.patJetsCA8CHSpruned.addTagInfos = cms.bool(True)
     process.selectedPatJetsCA8CHSpruned.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
 
@@ -102,7 +102,7 @@ def setupPatSubJets (process, runOnMC):
                      )
     process.patJetsCA8PrunedSubjetsPF.addJetCharge = False
     process.patJetsCA8PrunedSubjetsPF.embedCaloTowers = False
-    process.patJetsCA8PrunedSubjetsPF.embedPFCandidates = False
+    process.patJetsCA8PrunedSubjetsPF.embedPFCandidates = True
     process.patJetsCA8PrunedSubjetsPF.addTagInfos = cms.bool(True)
     
     #CA8 genJets

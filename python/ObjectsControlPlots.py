@@ -50,6 +50,8 @@ class MuonsControlPlots(BaseControlPlots):
       nmu = 0
       for muon in getattr(event, self.muonList):
         # for muons:
+        if muon.pt()<20. : continue
+        
         chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt
         chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt  
         neutralHadronIso  = muon.pfIsolationR04().sumNeutralHadronEt
@@ -138,6 +140,8 @@ class ElectronsControlPlots(BaseControlPlots):
       nel = 0
       for electron in getattr(event, self.electronList):
         # for electrons
+        if electron.pt()<20. : continue
+        
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
         result["eleid"].append(electron.userInt("MediumWP"))
         result["elemisshits"].append(electron.gsfTrack().numberOfLostHits())
