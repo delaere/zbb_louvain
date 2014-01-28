@@ -39,6 +39,11 @@ else :
 #setup
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.load("CommonTools.ParticleFlow.PF2PAT_cff") # load PF2PAT sequence
+#process.pfPileUp.checkClosestZVertex = cms.bool(False) #??
+process.pfNoElectron.enable = cms.bool(False)
+process.pfNoMuon.enable = cms.bool(False)
+process.pfJets.srcPVs = cms.InputTag("goodPV")
+process.pfNoTau.enable = cms.bool(False)
 process.setName_("llbbX")
 process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -68,6 +73,8 @@ from UserCode.zbb_louvain.PATconfig.muon_cff import *
 setupPatMuons(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.electron_cff import *
 setupPatElectrons(process, runOnMC)
+from UserCode.zbb_louvain.PATconfig.tau_cff import *
+setupPatTaus(process)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
 setupPatJets(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.subjet_cff import *
@@ -79,6 +86,7 @@ setupPatMets(process, runOnMC)
 process.preSequence = cms.Sequence(
     process.goodPV *
     process.PF2PAT *
+    #process.preTauSequence *
     process.preJetSequence *
     process.preSequenceCA8CHS +
     process.preMetSequence
@@ -136,7 +144,7 @@ process.out = cms.OutputModule(
                                            'keep *_patTriggerEvent_*_*',
                                            'keep patTriggerPaths_patTrigger_*_*',
                                            #Tracks
-                                           'keep *_*Tracks_*_*',
+                                           #'keep *_*Tracks_*_*', #needed?
                                            #PV
                                            'keep *_offlinePrimaryVertices*_*_*',
                                            'keep *_goodPV*_*_*',
@@ -149,6 +157,9 @@ process.out = cms.OutputModule(
                                            'keep *_*Electrons*_*_*',
                                            'keep *_elPFIso*_*_*',
                                            'keep *_allConversions_*_*',
+                                           #Taus
+                                           'keep *_*atTaus*_*_*',
+                                           'keep *_hpsPFTauProducer_*_*',
                                            #Z candidates
                                            'keep *_z*_*_*',
                                            #JET
@@ -160,8 +171,8 @@ process.out = cms.OutputModule(
                                            #'keep *_puJetId*_*_*',
                                            #'keep *_puJetMva*_*_*',
                                            'keep *_*bjets*_*_*',
-                                           'keep *_*JetTags*_*_*',
-                                           'keep *_*TagInfos*_*_*',
+                                           #'keep *_*JetTags*_*_*',
+                                           #'keep *_*TagInfos*_*_*',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
 					   'keep *_*MET*_*_*',      

@@ -4,9 +4,7 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 
 def setupPatElectrons (process, runOnMC):
     process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons', 'PFIso')
-    #adaptPFIsoElectrons( process, applyPostfix(process,"patElectrons",""), 'PFIso') #use in llqq
-    #process.pfAllElectrons.src = "particleFlow" #WHY? see more at https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPFBasedIsolation#PAT_configuration
-    #really useful: not defined in llqq and not explained how to get this in https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
+    process.patElectrons.pfElectronSource = cms.InputTag("pfSelectedElectrons")
 
     #Add MVA Id
     process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
