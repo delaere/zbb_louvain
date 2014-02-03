@@ -39,11 +39,12 @@ else :
 #setup
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.load("CommonTools.ParticleFlow.PF2PAT_cff") # load PF2PAT sequence
-#process.pfPileUp.checkClosestZVertex = cms.bool(False) #??
+process.pfPileUp.checkClosestZVertex = cms.bool(False)
 process.pfNoElectron.enable = cms.bool(False)
 process.pfNoMuon.enable = cms.bool(False)
 process.pfJets.srcPVs = cms.InputTag("goodPV")
 process.pfNoTau.enable = cms.bool(False)
+
 process.setName_("llbbX")
 process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
