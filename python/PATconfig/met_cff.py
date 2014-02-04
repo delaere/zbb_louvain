@@ -1,7 +1,7 @@
 from PhysicsTools.PatAlgos.tools.metTools import *
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 
-def setupPatMets (process, runOnMC):
+def setupPatMets (process, runOnMC, makeNoPUMet):
 	process.preMetSequence = cms.Sequence()
 	
 	##Filters
@@ -20,30 +20,75 @@ def setupPatMets (process, runOnMC):
         	process.patPFMet.addGenMET = cms.bool(False)
 	process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
 	process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
-	#SysShift correction (to turn the MET flat with respect to Phi)
+	#SysShift correction to turn the MET flat(ter) with respect to Phi
 	process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 	process.selectedVerticesForMEtCorr.src = cms.InputTag('goodPV')
+        
+	#MVA MET                        !!! Based on AK5PFJets and not on AK5PFchsJets (the same holds for noPUMET)
+	process.load("RecoMET.METPUSubtraction.mvaPFMET_cff")
+        process.pfMEtMVA.srcVertices = cms.InputTag('goodPV')
+        process.pfMEtMVA.srcLeptons = cms.VInputTag("tightMuons","tightElectrons")
+
 	
 	##Uncertainties
-        if runOnMC :
-		runMEtUncertainties(process,
-				    makeType1p2corrPFMEt=False,
-				    doApplyType0corr=True,
-				    sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
-				    doApplySysShiftCorr=True,
-				    jetCorrPayloadName='AK5PFchs',
-				    addToPatDefaultSequence=False,
-				    postfix='')
-	else :
-		runMEtUncertainties(process,
-				    makeType1p2corrPFMEt=False,
-				    doApplyType0corr=True,
-				    sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
-				    doApplySysShiftCorr=True,
-				    jetCorrPayloadName='AK5PFchs',
-				    addToPatDefaultSequence=False,
-				    doSmearJets=False,
-				    postfix='')
+	if makeNoPUMet : 
+		process.load("RecoMET.METPUSubtraction.noPileUpPFMET_cff")
+                process.noPileUpPFMEt.srcLeptons = cms.VInputTag("tightMuons","tightElectrons")
+		if runOnMC :
+                        process.calibratedAK5PFJetsForNoPileUpPFMEt.correctors = cms.vstring("ak5PFL1FastL2L3")
+			process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3")
+			runMEtUncertainties(process,
+					makeType1p2corrPFMEt=False,
+					doApplyType0corr=True,
+				    	sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
+				    	doApplySysShiftCorr=True,
+				    	jetCorrPayloadName='AK5PFchs',
+                                    	makePFMEtByMVA=True,
+				    	makeNoPileUpPFMEt=True,
+				    	addToPatDefaultSequence=False,
+				   	postfix='')
+		else :
+                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
+                        process.calibratedAK5PFJetsForNoPileUpPFMEt.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
+			runMEtUncertainties(process,
+				    	makeType1p2corrPFMEt=False,
+				    	doApplyType0corr=True,
+				    	sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
+				    	doApplySysShiftCorr=True,
+				    	jetCorrPayloadName='AK5PFchs',
+                                    	makePFMEtByMVA=True,
+					makeNoPileUpPFMEt=True,
+				    	addToPatDefaultSequence=False,
+				    	doSmearJets=False,
+				    	postfix='')
+
+	else : 
+		if runOnMC :
+                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3")
+                        runMEtUncertainties(process,
+                                        makeType1p2corrPFMEt=False,
+                                        doApplyType0corr=True,
+                                        sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
+                                        doApplySysShiftCorr=True,
+                                        jetCorrPayloadName='AK5PFchs',
+                                        makePFMEtByMVA=True,
+                                        addToPatDefaultSequence=False,
+                                        postfix='')
+                else :
+                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
+                        runMEtUncertainties(process,
+                                        makeType1p2corrPFMEt=False,
+                                        doApplyType0corr=True,
+                                        sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
+                                        doApplySysShiftCorr=True,
+                                        jetCorrPayloadName='AK5PFchs',
+                                        makePFMEtByMVA=True,
+                                        addToPatDefaultSequence=False,
+                                        doSmearJets=False,
+                                        postfix='')
+
+	
+
 
 	process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone()
 	process.metUncertaintySequence.replace(process.patType1CorrectedPFMet,

@@ -8,6 +8,7 @@ import FWCore.ParameterSet.Config as cms
 runOnMC = True
 runOnCondor = False
 nevents = 100
+makeNoPUMet = True
 
 import sys
 
@@ -81,7 +82,7 @@ setupPatJets(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.subjet_cff import *
 setupPatSubJets(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.met_cff import *
-setupPatMets(process, runOnMC)
+setupPatMets(process, runOnMC, makeNoPUMet)
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
