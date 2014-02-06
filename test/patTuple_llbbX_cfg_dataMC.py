@@ -88,7 +88,6 @@ setupPatMets(process, runOnMC, makeNoPUMet)
 process.preSequence = cms.Sequence(
     process.goodPV *
     process.PF2PAT *
-    #process.preTauSequence *
     process.preJetSequence *
     process.preSequenceCA8CHS +
     process.preMetSequence
@@ -114,33 +113,46 @@ process.llbbXSequence = cms.Sequence(
     process.muonComposite+
     process.postElectronSeq*
     process.electronComposite+
-    process.selectedPatJetsCA8CHSPrunedPacked +
-    process.metUncertaintySequence)
-
+    process.selectedPatJetsCA8CHSPrunedPacked
+    )
 #adapt the collection of vertices
 changeVertexCollection(process,seqName='llbbXSequence')
 
 #path to run
-process.ZMMFilter = cms.EDFilter("CandViewCountFilter",
-                                 src = cms.InputTag("zmuAllmuAll"),
+process.LeptMerger = cms.EDProducer("CandViewMerger",
+                                    src = cms.VInputTag( "allMuons","allElectrons")
+                                    )
+
+process.LeptFilter = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("LeptMerger"),
+                                  minNumber = cms.uint32(2),
+                                  )
+
+process.AllMerger = cms.EDProducer("CandViewMerger",
+                                    src = cms.VInputTag("LeptMerger","cleanPatJets","cleanPatJetsCA8CHS","cleanPatJetsCA8CHSpruned")
+                                    )
+
+process.AllFilter = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("AllMerger"),
+                                  minNumber = cms.uint32(3),
+                                  )
+
+process.zMerger = cms.EDProducer("CandViewMerger",
+                                 src = cms.VInputTag("zmuAllmuAll","zelAllelAll")
+                                 )
+
+process.zFilter = cms.EDFilter("CandViewCountFilter",
+                                 src = cms.InputTag("zMerger"),
                                  minNumber = cms.uint32(1),
                                  )
 
-process.ZEEFilter = cms.EDFilter("CandViewCountFilter",
-                                 src = cms.InputTag("zelAllelAll"),
-                                 minNumber = cms.uint32(1),
-                                 )
-
-#process.p = cms.Path(process.llbbXSequence)
-process.p1 = cms.Path(process.llbbXSequence*process.ZMMFilter)
-process.p2 = cms.Path(process.llbbXSequence*process.ZEEFilter)
-
+process.p1 = cms.Path(process.llbbXSequence*process.LeptMerger*process.LeptFilter*process.AllMerger*process.AllFilter*process.metUncertaintySequence)
 
 #output
 process.out = cms.OutputModule(
     "PoolOutputModule",
     fileName = cms.untracked.string(out_fileName),
-    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1','p2') ),
+    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1') ),
     outputCommands = cms.untracked.vstring('drop *',
                                            #TRIGGER
                                            'keep *_patTriggerEvent_*_*',
@@ -177,9 +189,9 @@ process.out = cms.OutputModule(
                                            #'keep *_*TagInfos*_*_*',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
-					   'keep *_*MET*_*_*',      
-					   'keep *_*MEt*_*_*',
-					   'keep *_*Met*_*_*',
+					   #'keep *_*MET*_*_*',      
+					   #'keep *_*MEt*_*_*',
+					   #'keep *_*Met*_*_*',
                                            #GEN
                                            'keep GenEventInfoProduct_generator_*_*',
                                            'keep *_genMetTrue_*_*',

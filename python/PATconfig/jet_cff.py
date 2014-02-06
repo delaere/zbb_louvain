@@ -73,27 +73,10 @@ def setupPatJets (process, runOnMC):
      process.pileupJetIdProducerChs.jets = cms.InputTag("patJets")
      process.pileupJetIdProducerChs.vertexes = cms.InputTag("goodPV")
      process.pileupJetIdProducerChs.residualsTxt = cms.FileInPath("RecoJets/JetProducers/data/mva_JetID_v1.weights.xml")
-     #process.puJetIdChs = process.pileupJetIdProducerChs.clone(
-     #     produceJetIds = cms.bool(True),
-     #     jetids = cms.InputTag(""),
-     #     runMvas = cms.bool(False),
-     #     algos = cms.VPSet(process.cutbased),
-     #     )
-     
-     #process.puJetMvaChs = process.pileupJetIdProducerChs.clone(
-     #     produceJetIds = cms.bool(False),
-     #     jetids = cms.InputTag("puJetIdChs"),
-     #     runMvas = cms.bool(True),
-     #     )
-
-     #process.puJetIdSqeuenceChs = cms.Sequence(process.puJetIdChs*process.puJetMvaChs)
 
      process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
                                               src = cms.InputTag("patJets"),
                                               primaryVertices = cms.InputTag("goodPV"),
-                                              #puJetIdMVA = cms.InputTag("puJetMvaChs","fullDiscriminant"),
-                                              #puJetIdFlag = cms.InputTag("puJetMvaChs","fullId"),
-                                              #puJetIdentifier = cms.InputTag("puJetIdChs"),
                                               puJetIdMVA = cms.InputTag("pileupJetIdProducerChs","fullDiscriminant"),
                                               puJetIdFlag = cms.InputTag("pileupJetIdProducerChs","fullId"),
                                               puJetIdentifier = cms.InputTag("pileupJetIdProducerChs"),
@@ -101,9 +84,10 @@ def setupPatJets (process, runOnMC):
 
      #jet selection
      process.selectedPatJets.src = cms.InputTag("patJetsWithBeta")
-     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5 '
-
+     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5'
+     #cleaning for skimming
+     process.cleanPatJets.checkOverlaps.muons.requireNoOverlaps = cms.bool(True)
+     process.cleanPatJets.checkOverlaps.electrons.requireNoOverlaps = cms.bool(True)
      #add everything to the sequence
      process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets*process.pileupJetIdProducerChs*process.patJetsWithBeta))
-     #process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets*process.pileupJetIdProducerChs*process.puJetIdSqeuenceChs*process.patJetsWithBeta))
      
