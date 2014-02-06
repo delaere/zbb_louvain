@@ -177,9 +177,7 @@ process.out = cms.OutputModule(
                                            #'keep *_*TagInfos*_*_*',
                                            'keep *_kt6PFJets*_*_*',
 					   #MET
-					   'keep *_*MET*_*_*',      
-					   'keep *_*MEt*_*_*',
-					   'keep *_*Met*_*_*',
+					   'keep patMETs_*_*_*',
                                            #GEN
                                            'keep GenEventInfoProduct_generator_*_*',
                                            'keep *_genMetTrue_*_*',
