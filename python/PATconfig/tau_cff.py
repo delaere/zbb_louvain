@@ -5,3 +5,7 @@ def setupPatTaus (process):
         process.hpsPFTauDiscriminationByDecayModeFinding,
         process.ak5PFJetTracksAssociatorAtVertex*process.recoTauAK5PFJets08Region*process.recoTauPileUpVertices*process.pfRecoTauTagInfoProducer*process.ak5PFJetsLegacyHPSPiZeros*process.combinatoricRecoTaus*process.hpsSelectionDiscriminator*process.hpsPFTauProducerSansRefs*process.hpsPFTauProducer*process.hpsPFTauDiscriminationByDecayModeFinding
         )
+
+    process.selectedPatTaus.cut = (
+        "pt > 15 && abs(eta) < 2.5"
+        )

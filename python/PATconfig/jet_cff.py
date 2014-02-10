@@ -68,26 +68,27 @@ def setupPatJets (process, runOnMC):
      )
      process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
      
+     #jet selection
+     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5'
+
      #PU JetID
      process.load("RecoJets.JetProducers.PileupJetID_cfi")
-     process.pileupJetIdProducerChs.jets = cms.InputTag("patJets")
+     process.pileupJetIdProducerChs.jets = cms.InputTag("selectedPatJets")
      process.pileupJetIdProducerChs.vertexes = cms.InputTag("goodPV")
      process.pileupJetIdProducerChs.residualsTxt = cms.FileInPath("RecoJets/JetProducers/data/mva_JetID_v1.weights.xml")
 
-     process.patJetsWithBeta = cms.EDProducer('JetBetaProducer',
-                                              src = cms.InputTag("patJets"),
+     process.selectedPatJetsWithBeta = cms.EDProducer('JetBetaProducer',
+                                              src = cms.InputTag("selectedPatJets"),
                                               primaryVertices = cms.InputTag("goodPV"),
                                               puJetIdMVA = cms.InputTag("pileupJetIdProducerChs","fullDiscriminant"),
                                               puJetIdFlag = cms.InputTag("pileupJetIdProducerChs","fullId"),
                                               puJetIdentifier = cms.InputTag("pileupJetIdProducerChs"),
                                               )
 
-     #jet selection
-     process.selectedPatJets.src = cms.InputTag("patJetsWithBeta")
-     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5'
      #cleaning for skimming
+     process.cleanPatJets.src = cms.InputTag("selectedPatJetsWithBeta")
      process.cleanPatJets.checkOverlaps.muons.requireNoOverlaps = cms.bool(True)
      process.cleanPatJets.checkOverlaps.electrons.requireNoOverlaps = cms.bool(True)
      #add everything to the sequence
-     process.patDefaultSequence.replace(process.patJets,cms.Sequence(process.patJets*process.pileupJetIdProducerChs*process.patJetsWithBeta))
+     process.patDefaultSequence.replace(process.selectedPatJets,cms.Sequence(process.selectedPatJets*process.pileupJetIdProducerChs*process.selectedPatJetsWithBeta))
      

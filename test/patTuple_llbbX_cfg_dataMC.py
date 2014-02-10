@@ -32,7 +32,7 @@ else :
             ])
     else :
         readFiles.extend([
-            'file:/storage/data/cms/store/data/Run2012D/JetMon/AOD/22Jan2013-v1/10000/0CD0D545-1492-E211-97CC-782BCB67A0FA.root'
+            'file:/storage/data/cms/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/981DCC90-A167-E211-9E70-0026189438E1.root'
             ])
     files=readFiles
     out_fileName = "test.root"
@@ -158,7 +158,7 @@ process.out = cms.OutputModule(
                                            'keep *_patTriggerEvent_*_*',
                                            'keep patTriggerPaths_patTrigger_*_*',
                                            #Tracks
-                                           #'keep *_*Tracks_*_*', #needed?
+                                           'keep *_*Tracks_*_*',
                                            #PV
                                            'keep *_offlinePrimaryVertices*_*_*',
                                            'keep *_goodPV*_*_*',
@@ -172,22 +172,17 @@ process.out = cms.OutputModule(
                                            'keep *_elPFIso*_*_*',
                                            'keep *_allConversions_*_*',
                                            #Taus
-                                           'keep *_*atTaus*_*_*',
-                                           'keep *_hpsPFTauProducer_*_*',
+                                           'keep *_*PatTaus*_*_*',
+                                           'keep *_hpsPFTauProducer_*_llbbX',
                                            #Z candidates
                                            'keep *_z*_*_*',
                                            #JET
                                            'keep *_*atJets*_*_*',
                                            'keep *_pfNoTau_*_*',
-                                           'keep *_*5PFJets*_*_*',
+                                           'keep *_ak5PFJets_*_*',
                                            'keep *_*ca8PFJets*_*_*',
                                            'keep *_pileupJetIdProducerChs*_*_*',
-                                           #'keep *_puJetId*_*_*',
-                                           #'keep *_puJetMva*_*_*',
-                                           'keep *_*bjets*_*_*',
-                                           #'keep *_*JetTags*_*_*',
-                                           #'keep *_*TagInfos*_*_*',
-                                           'keep *_kt6PFJets*_*_*',
+                                           'keep double*_kt6PFJets*_*_*',
 					   #MET
 					   'keep patMETs_*_*_*',
                                            #GEN
