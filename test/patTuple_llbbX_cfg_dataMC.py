@@ -1,17 +1,17 @@
 import FWCore.ParameterSet.Config as cms
 
 #Options
-
 #"""""""" Use as 'cmsRun patTuple_llbbX_cfg_dataMC.py option' to run locally or with crab, where option is a string containing 'Data' or/and 'AllEv' """"""""
 #"""""""" Use as 'cmsRun patTuple_llbbX_cfg_dataMC.py option=Condor slice=X sample=NAME' where slice is an integer, sample is a string 'DY' ot 'TT' for example, other condor options are defined in runPATcondor.py """"""""""
 
+#default
 runOnMC = True
 runOnCondor = False
 nevents = 100
 makeNoPUMet = True
 
+#read options
 import sys
-
 if (len(sys.argv)>1 and sys.argv[0]!="cmsRun") or (sys.argv[0]=="cmsRun" and len(sys.argv)>2):
     if sys.argv[0]=="cmsRun" : option = sys.argv[2]
     else : option = sys.argv[1]
@@ -21,6 +21,7 @@ if (len(sys.argv)>1 and sys.argv[0]!="cmsRun") or (sys.argv[0]=="cmsRun" and len
     if "Data" in option : runOnMC = False
     if "AllEv" in option : nevents = -1
 
+#define input/output, read condor parameters
 if runOnCondor:
     from UserCode.zbb_louvain.condorScripts.runPATcondor import *
     files = cms.untracked.vstring(files)
@@ -33,9 +34,15 @@ else :
     else :
         readFiles.extend([
             'file:/storage/data/cms/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/981DCC90-A167-E211-9E70-0026189438E1.root'
+            #'file:/storage/data/cms/store/data/Run2012A/DoubleMu/AOD/22Jan2013-v1/20000/3AB96F52-3E82-E211-8561-00248C0BE018.root'
             ])
     files=readFiles
     out_fileName = "test.root"
+
+print ""
+print "isMC:", runOnMC
+print "process n events:", nevents
+print ""
 
 #setup
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
@@ -128,6 +135,43 @@ process.LeptFilter = cms.EDFilter("CandViewCountFilter",
                                   minNumber = cms.uint32(2),
                                   )
 
+process.llCands1 = cms.EDProducer("CandViewShallowCloneCombiner",
+                                  decay = cms.string("allMuons@+ allElectrons@-"),
+                                  name = cms.string('llCands1'),
+                                  roles = cms.vstring('l1', 'l2'),
+                                  cut = cms.string('mass > 0.0')
+                                  )
+
+process.llCands2 = cms.EDProducer("CandViewShallowCloneCombiner",
+                                  decay = cms.string("allElectrons@+ allMuons@-"),
+                                  name = cms.string('llCands2'),
+                                  roles = cms.vstring('l1', 'l2'),
+                                  cut = cms.string('mass > 0.0')
+                                  )
+
+process.llCands3 = cms.EDProducer("CandViewShallowCloneCombiner",
+                                  decay = cms.string("LeptMerger@+ LeptMerger@+"),
+                                  name = cms.string('llCands3'),
+                                  roles = cms.vstring('l1', 'l2'),
+                                  cut = cms.string('mass > 0.0')
+                                  )
+
+process.llCands4 = cms.EDProducer("CandViewShallowCloneCombiner",
+                                  decay = cms.string("LeptMerger@- LeptMerger@-"),
+                                  name = cms.string('llCands4'),
+                                  roles = cms.vstring('l1', 'l2'),
+                                  cut = cms.string('mass > 0.0')
+                                  )
+
+process.llMerger = cms.EDProducer("CandViewMerger",
+                                  src = cms.VInputTag( "llCands1","llCands2","llCands3","llCands4","zelAllelAll","zmuAllmuAll")
+                                  )
+
+process.llFilter = cms.EDFilter("CandViewCountFilter",
+                                src = cms.InputTag("llMerger"),
+                                minNumber = cms.uint32(1),
+                                )
+
 process.AllMerger = cms.EDProducer("CandViewMerger",
                                     src = cms.VInputTag("LeptMerger","cleanPatJets","cleanPatJetsCA8CHS","cleanPatJetsCA8CHSpruned")
                                     )
@@ -146,7 +190,12 @@ process.zFilter = cms.EDFilter("CandViewCountFilter",
                                  minNumber = cms.uint32(1),
                                  )
 
-process.p1 = cms.Path(process.llbbXSequence*process.LeptMerger*process.LeptFilter*process.AllMerger*process.AllFilter*process.metUncertaintySequence)
+process.p1 = cms.Path(process.llbbXSequence*
+                      process.LeptMerger*process.LeptFilter*
+                      process.AllMerger*process.AllFilter*
+                      process.llCands1*process.llCands2*process.llCands3*process.llCands4*process.llMerger*process.llFilter*
+                      process.metUncertaintySequence
+                      )
 
 #output
 process.out = cms.OutputModule(

@@ -34,7 +34,11 @@ class eventDumpConfig:
 import os
 theConfig = os.getenv("PatAnalysisCfg")
 if theConfig is not None:
-  configImplementation = __import__(os.path.splitext(theConfig)[0])
+  configImplementation = __import__(theConfig)
+  atts=theConfig.split(".")[1:]
+  for att in atts:
+    configImplementation = getattr(configImplementation,att)
+    print configImplementation
   configuration = configImplementation.configuration
   eventDumpConfig = configImplementation.eventDumpConfig
 

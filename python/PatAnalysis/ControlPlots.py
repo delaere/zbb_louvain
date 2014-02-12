@@ -119,11 +119,17 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
     for levelDir in leafList:
       levelPlots=[]
       for cp in configuration.controlPlots:
-        levelPlots.append(getattr(__import__(cp.module),cp.classname)(dir=levelDir.mkdir(cp.label),mode="plots"))
+          mod= __import__(configuration.pythonpath+cp.module)
+          atts=(configuration.pythonpath+cp.module).split(".")[1:]
+          for att in atts : mod = getattr(mod,att)
+          levelPlots.append(getattr(mod,cp.classname)(dir=levelDir.mkdir(cp.label),mode="plots"))
       controlPlots.append(levelPlots)
   else:
     for cp in configuration.controlPlots:
-      controlPlots.append(getattr(__import__(cp.module),cp.classname)(dir=None, mode="dataset", dataset=rds))
+        mod= __import__(configuration.pythonpath+cp.module)
+        atts=(configuration.pythonpath+cp.module).split(".")[1:]
+        for att in atts : mod = getattr(mod,att)
+        controlPlots.append(getattr(mod,cp.classname)(dir=None, mode="dataset", dataset=rds))
 
   # book histograms (separate iteration for clarity)
   if configuration.runningMode=="plots":

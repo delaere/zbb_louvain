@@ -124,20 +124,20 @@ def setupPatElectrons (process, runOnMC):
     
     process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                          decay = cms.string('allElectrons@+ allElectrons@-'),
-                                         cut = cms.string('mass > 50.0'),
+                                         cut = cms.string('mass > 10.0'),
                                          name = cms.string('Zelallelall'),
                                          roles = cms.vstring('all1', 'all2')
                                          )
     
     process.zelTightelTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                              decay = cms.string('tightElectrons@+ tightElectrons@-'),
-                                             cut = cms.string('mass > 50.0'),
+                                             cut = cms.string('mass > 10.0'),
                                              name = cms.string('Zeltighteltight'),
                                              roles = cms.vstring('tight1', 'tight2')
                                              )
     process.zmvaelTightmvaelTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                              decay = cms.string('tightMVAElectronsNonTrig@+ tightMVAElectronsNonTrig@-'),
-                                             cut = cms.string('mass > 50.0'),
+                                             cut = cms.string('mass > 10.0'),
                                              name = cms.string('Zmvaeltightmvaeltight'),
                                              roles = cms.vstring('tight1', 'tight2')
                                              )

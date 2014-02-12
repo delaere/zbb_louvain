@@ -9,6 +9,7 @@ eventWeight     = namedtuple("eventWeight",    ["label","module","classname","kw
 
 class configuration:
   # default I/O
+  pythonpath = "UserCode.zbb_louvain."
   defaultFilename = "controlPlots"
   RDSname = "rds_zbb"
   WSname = "workspace_ras"
@@ -18,7 +19,7 @@ class configuration:
   #runningMode = "dataset"
 
   # event selection class
-  eventSelection = "ZbbEventSelection"
+  eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
   btagging = "CSV" 
@@ -62,7 +63,7 @@ class configuration:
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
                        eventCollection("jets","vector<pat::Jet>","cleanPatJets"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
-                       eventCollection("METNNregression","vector<pat::MET>","patMETsPF"),
+                       eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
                        eventCollection("Zelel","vector<reco::CompositeCandidate>","zelTightelTight"),
                        eventCollection("triggerInfo","pat::TriggerEvent","patTriggerEvent"),
@@ -82,7 +83,7 @@ class configuration:
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
-                       eventProducer("category", "EventSelection", "eventCategory", { "btagging":btagging, "ZjetFilter":"bcl" } ),
+                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "ZjetFilter":"bcl" } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
