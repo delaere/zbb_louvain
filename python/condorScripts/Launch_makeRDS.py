@@ -43,12 +43,12 @@ for x in processesToRun[:]:
   if events.size()>n :
     print "jobs will be splited as the number of events to process exceed "+str(n)
     for i in range(0,((events.size()/n)+1)) :
-      command = "./makeRDS_usingFramework.py" + " " + x + " " + str(i+1)
+      command = "../makeRDS_usingFramework.py" + " " + x + " " + str(i+1)
       print "command  = ", command
       print "jobs will run from event", i*n, "to event",(i+1)*n 
       LaunchOnCondor.SendCluster_Push(["PYTHON", command])
   else :
-    command = "./makeRDS_usingFramework.py" + " " + x
+    command = "../makeRDS_usingFramework.py" + " " + x
     print "command  = ", command
     LaunchOnCondor.SendCluster_Push(["PYTHON", command])
 

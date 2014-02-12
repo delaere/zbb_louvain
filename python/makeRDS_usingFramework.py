@@ -72,6 +72,9 @@ btagPerfData=zbbfile.ssvperfData
 
 btagAlgo="CSV"
 
+
+lib_path2 = os.path.abspath('analysisScripts/')
+sys.path.append(lib_path2)
 from globalLists import pathSkimEMu, checkTrigger, muChannel, dirRDS, dirRDS_JESup, dirRDS_JESdown, dirRDS_BTAGup, dirRDS_BTAGdown, dirRDS_bcBTAGup, dirRDS_bcBTAGdown, dirRDS_lBTAGup, dirRDS_lBTAGdown, dirRDS_JERup
 path = pathSkimEMu
 outputDir=dirRDS
