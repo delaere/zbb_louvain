@@ -2,93 +2,8 @@ from AnalysisEvent import AnalysisEvent
 from eventSelection import *
 from zbbCommons import zbblabel, zbbsystematics
 from math import sqrt
-import pickle
 
 #from myFuncTimer import print_timing
-
-##______General functions______
-
-def get_eta_key(eta):
-
-   range =''
-   if ( abs(eta)<=0.9):
-      range = 'ptabseta<0.9'                  
-   elif (abs(eta)> 0.9 and abs(eta)<=1.2):
-      range = 'ptabseta0.9-1.2'
-   elif (abs(eta)> 1.2 and  abs(eta)<= 2.4 ):
-      range = 'ptabseta1.2-2.4'   
-   else:
-      print 'ERROR: value not in range'
-        
-   return range
-
-def get_etaFiner_key(eta):
-
-   range= ''
-   if (eta>=-2.4 and eta< -2.1):
-      range = '-2.4_-2.1'
-   elif (eta>=-2.1 and eta< -1.6):
-      range = '-2.1_-1.6'
-   elif (eta>=-1.6 and  eta< -1.2 ):
-      range = '-1.6_-1.2'
-   elif (eta>=-1.2 and  eta< -0.9 ):
-      range = '-1.2_-0.9'
-   elif (eta>=-0.9 and  eta< -0.6 ):
-      range = '-0.9_-0.6'
-   elif (eta>=-0.6 and  eta< -0.3 ):
-      range = '-0.6_-0.3'
-   elif (eta>=-0.3 and  eta< -0.2 ):
-      range = '-0.3_-0.2'
-   elif (eta>=-0.2 and  eta< 0.2 ):
-      range = '-0.2_0.2'
-   elif (eta>= 0.2 and  eta< 0.3 ):
-      range = '0.2_0.3'
-   elif (eta>= 0.3 and  eta< 0.6 ):
-      range = '0.3_0.6'
-   elif (eta>= 0.6 and  eta< 0.9 ):
-      range = '0.6_0.9'
-   elif (eta>= 0.9 and  eta< 1.2 ):
-      range = '0.9_1.2'
-   elif (eta>= 1.2 and  eta< 1.6 ):
-      range = '1.2_1.6'
-   elif (eta>= 1.6 and  eta< 2.1 ):
-      range = '1.6_2.1'
-   elif (eta>= 2.1 and  eta<= 2.4 ):
-      range = '2.1_2.4'
-   else:
-      print 'ERROR: value not in eta range'
-
-   return range
-  
-def get_pt_key(pt):
-   
-   range = ''
-   if (pt>=10 and  pt< 20 ):
-      range = '10_20'   
-   elif (pt>=20 and  pt< 25 ):
-      range = '20_25'
-   elif (pt>=25 and  pt< 30 ):
-      range = '25_30'
-   elif (pt>=30 and  pt< 35 ):
-      range = '30_35'
-   elif (pt>=35 and  pt< 40 ):
-      range = '35_40'
-   elif (pt>=40 and  pt< 50 ):
-      range = '40_50'
-   elif (pt>=50 and  pt< 60 ):
-      range = '50_60'
-   elif (pt>=60 and  pt< 90 ):
-      range = '60_90'
-   elif (pt>=90 and  pt<140 ):
-      range = '90_140'
-   elif (pt>= 140 ):
-      range = '140_500'
-   else:
-      print 'ERROR: value not in range'
-
-   return range
-         
-   
 
 class PtEtaMap:
    """A binned map in pt and eta.
@@ -154,112 +69,12 @@ class PtEtaMap:
    def __len__(self): 
      return (len(self._etabins)+1)*(len(self._ptbins)+1)
 
-##### period_ABCD______ ID+ISO_SF
-
-class MuonSFMap:
-   """A binned map in eta (for the moment) for muon SF.
-      Values can be extracted are (value,error). """
-
-   def __init__(self):
-     """Construct a MuonSFMap using pikle files."""
-     f = open('./reweighting_files_V2/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
-     if f :
-        self._map = pickle.load(f)
-        self._range = ''
-     else :
-        print 'ERROR: Input file for muon SF not existing!'
-
-   def value(self,pt,eta,mode):
-
-     """Return the SF or the uncertainty for a given pt and eta."""
-
-     self._range= get_etaFiner_key(eta)
-
-     if mode == '0'  :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['efficiency_ratio']
-     elif mode == '+1'  :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['err_hi'] 
-     elif mode == '-1' :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['err_low']
-     else:  
-        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
-        return 0
-        
-
-##### period_AB______Mu17_Mu8_____Leg17
-        
-class MuonTriggerEffMap_leg17_AB:
-   """A binned map in eta only (for the moment) for Trigger efficiencies.
-      Values can be extracted are (value,error). """
-
-   def __init__(self):
-     """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
-     if f :
-        self._map = pickle.load(f)
-        self._eta_range = ''
-        self._pt_range = ''
-     else :
-        print 'ERROR: Input file for Trigger efficiencies not existing!'
-
-   def value(self,pt,eta,mode):
-
-     """Return the eff or the uncertainty for a given pt and eta."""
-     
-     self._eta_range= get_eta_key(eta)+'_2012B'
-     self._pt_range= get_pt_key(pt)
-
-     if mode == '0'  :
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['efficiency'] 
-     elif mode == '+1'  :
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['err_hi']
-     elif mode == '-1' : 
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['err_low']
-     else:  
-        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
-        return 0
-        
-
-
-##### period_AB________Mu17_Mu8_____Leg8
-
-class MuonTriggerEffMap_leg8_AB:
-   """A binned map in eta only (for the moment) for Trigger efficiencies.
-      Values can be extracted are (value,error). """
-
-   def __init__(self):
-     """Construct a MuonTriggerEffMap using pikle files."""
-     f = open('./reweighting_files_V2/MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
-     if f :
-        self._map = pickle.load(f)
-        self._eta_range = ''
-        self._pt_range = ''
-     else :
-        print 'ERROR: Input file for Trigger efficiencies not existing!'
-   
-   def value(self,pt,eta,mode):
-
-     """Return the eff or the uncertainty for a given pt and eta."""
-
-     self._eta_range= get_eta_key(eta)+'_2012B'
-     self._pt_range= get_pt_key(pt)
-
-     if mode == '0'  :
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['efficiency'] 
-     elif mode == '+1'  :
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['err_hi']
-     elif mode == '-1' : 
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['err_low']
-     else:  
-        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''     
-        return 0
-
 class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
 
    def __init__(self):
-
-     
+     # the efficiency maps
+   
      # ===================== ELECTRONS 2012 A+B+C+D (WP medium) : https://twiki.cern.ch/twiki/bin/view/Main/EGammaScaleFactors2012#2012_8_TeV_data_53X  ==========
      # ===================== ELECTRONS RECO SF assumed ~1 according to e-gamma POG==========
      
@@ -290,35 +105,46 @@ class LeptonsReWeighting:
      
      ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
 
-     # ===================== Muon ID-ISO 2012A+B+C+D ==========
-     # Updated to the values provided by muon POG: https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs#2012_data
+     # ===================== MUONS 2012A+B+C+D ========== error is not updated and SFs gave up to 2.1, we assume they are the same between 2.1 and 2.4
+     ## CAVEAT: systematics assumed to come only from background modelling and added in quadrature ( https://twiki.cern.ch/twiki/bin/view/CMS/MuonTagAndProbe#Systematic_uncertainties )
+     ## recommandation : https://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=233592
+     self._muPidWeight  = PtEtaMap([],[0.9,1.2],
+                                   [[(0.9939,sqrt(0.0002**2+0.002**2)), (0.9902,sqrt(0.0003**2+0.004**2)), (0.9970,sqrt(0.0003**2+0.004**2))]])
+     self._muIsoWeight  = PtEtaMap([],[0.9,1.2],
+                                   [[(0.9999,sqrt(0.0001**2+0.002**2)), (1.0013,sqrt(0.0002**2+0.004**2)), (1.0023,sqrt(0.0001**2+0.004**2))]]) 
 
-     self._muIDISOWeight  = MuonSFMap()
-
-     ## ==================== Muon Trigger ==================
-
-     self._muTRIGGERWeight_leg17_A  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_A  = MuonTriggerEffMap_leg8_AB()
-
-     self._muTRIGGERWeight_leg17_B  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_B  = MuonTriggerEffMap_leg8_AB()
-
-     ## CAVEAT: C and D have to be updated once available in the muon POG
+     ## ============= muon  trigger==================
+     ## ============ periodA (calculating the dz cut efficiency)=============
+     self._mu8Trg_Mu17Mu8_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.959,sqrt(0.0014**2+0.0005**2)), (0.932,sqrt(0.003**2+0.0005**2)),(0.917,sqrt(0.002**2+0.0005**2)),(0.898,sqrt(0.004**2+0.0005**2))],
+                                    [(0.955,sqrt(0.0005**2+0.0005**2)), (0.930,sqrt(0.0011**2+0.0005**2)),(0.905,sqrt(0.001**2+0.0005**2)),(0.913,sqrt(0.0019**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.957,sqrt(0.0014**2+0.0005**2)), (0.919,sqrt(0.0034**2+0.0005**2)),(0.900,sqrt(0.0021**2+0.0005**2)),(0.824,sqrt(0.005**2+0.0005**2))],
+                                    [(0.954,sqrt(0.0049**2+0.0005**2)), (0.923,sqrt(0.0017**2+0.0005**2)),(0.896,sqrt(0.0013**2+0.0005**2)),(0.869,sqrt(0.003**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_dz_A_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.899,sqrt(0.0021**2+0.0005**2)), (0.912,sqrt(0.0036**2+0.0005**2)),(0.871,sqrt(0.0026**2+0.0005**2)),(0.879,sqrt(0.005**2+0.0005**2))],
+                                    [(0.92,sqrt(0.0006**2+0.0005**2)), (0.897,sqrt(0.0014**2+0.0005**2)),(0.841,sqrt(0.0011**2+0.0005**2)),(0.856,sqrt(0.0025**2+0.0005**2))]
+                                    ])
      
-     self._muTRIGGERWeight_leg17_C  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_C  = MuonTriggerEffMap_leg8_AB()
-
-     self._muTRIGGERWeight_leg17_D  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_D  = MuonTriggerEffMap_leg8_AB()
-         
+     ## ============= periodB (dz cut removed) ==============
+     self._mu8Trg_Mu17Mu8_B_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.956,sqrt(0.0061**2+0.0005**2)), (0.928,sqrt(0.0013**2+0.0005**2)),(0.908,sqrt(0.00086**2+0.0005**2)),(0.898,sqrt(0.0018**2+0.0005**2))],
+                                    [(0.954,sqrt(0.0021**2+0.0005**2)), (0.925,sqrt(0.0005**2+0.0005**2)),(0.897,sqrt(0.00038**2+0.0005**2)),(0.905,sqrt(0.0008**2+0.0005**2))]
+                                    ])
+     self._mu17Trg_Mu17Mu8_B_Weight = PtEtaMap([30],[0.9,1.2,2.1],
+                                   [[(0.953,sqrt(0.00062**2+0.0005**2)), (0.914,sqrt(0.0014**2+0.0005**2)),(0.891,sqrt(0.0009**2+0.0005**2)),(0.829,sqrt(0.0022**2+0.0005**2))],
+                                    [(0.952,sqrt(0.0002**2+0.0005**2)), (0.916,sqrt(0.0005**2+0.0005**2)),(0.887,sqrt(0.0004**2+0.0005**2)),(0.863,sqrt(0.001**2+0.0005**2))]
+                                    ])
     
    def uncertainty_ee(self,e1,e2):
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     # reco
+     # particle id
      unc =  (self._eleRecoWeight[(e1.pt(),e1.eta())][1]/self._eleRecoWeight[(e1.pt(),e1.eta())][0] +  \
              self._eleRecoWeight[(e2.pt(),e2.eta())][1]/self._eleRecoWeight[(e2.pt(),e2.eta())][0])**2
-     # id-isolation
+     # isolation
      unc += (self._eleIdIsoWeight[(e1.pt(),e1.eta())][1]/self._eleIdIsoWeight[(e1.pt(),e1.eta())][0] +  \
              self._eleIdIsoWeight[(e2.pt(),e2.eta())][1]/self._eleIdIsoWeight[(e2.pt(),e2.eta())][0])**2
      # trigger (approximate)
@@ -358,60 +184,65 @@ class LeptonsReWeighting:
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     # ID and isolation uncertainty (TO BE FIXED)
-     unc =  (self._muIDISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDISOWeight.value(m1.pt(),m1.eta(),'+1')+  \
-             self._muIDISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDISOWeight.value(m2.pt(),m2.eta(),'+1'))**2
-     
-##    # trigger (approximate) ==== FIXME!! ===============
-##    hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
-##                            self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
-##    hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-##                            (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-##                            (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-##                            (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-##                            (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
-    
+     # particle ID
+     unc =  (self._muPidWeight[(m1.pt(),m1.eta())][1]/self._muPidWeight[(m1.pt(),m1.eta())][0] +  \
+             self._muPidWeight[(m2.pt(),m2.eta())][1]/self._muPidWeight[(m2.pt(),m2.eta())][0])**2
+     # isolation
+     unc += (self._muIsoWeight[(m1.pt(),m1.eta())][1]/self._muIsoWeight[(m1.pt(),m1.eta())][0] +  \
+             self._muIsoWeight[(m2.pt(),m2.eta())][1]/self._muIsoWeight[(m2.pt(),m2.eta())][0])**2
+##      # trigger (approximate) ==== FIXME!! ===============
+##      hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
+##                              self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
+##      hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+##                                  self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+##                              (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+##                              (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+##                               self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
+##                                  self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
+##                              (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
+##                              (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
+##                               self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
+##      unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
+     #outcome
      return sqrt(unc)
 
    def weight_mm(self,m1,m2):
      """Event weight for di-muons."""
      lw = 1.
+     # particle id
+     lw *= self._muPidWeight[(m1.pt(),m1.eta())][0]
+     lw *= self._muPidWeight[(m2.pt(),m2.eta())][0]
+     # isolation
+     lw *= self._muIsoWeight[(m1.pt(),m1.eta())][0]
+     lw *= self._muIsoWeight[(m2.pt(),m2.eta())][0]
+     # trigger
+     #hlt_sf_run2011_a = self._mu7TrgWeight [(m1.pt(),m1.eta())][0]*self._mu7TrgWeight [(m2.pt(),m2.eta())][0]
 
-     # particle id and isolation
-     lw *= self._muIDISOWeight.value(m1.pt(),m1.eta(),'0')
-     lw *= self._muIDISOWeight.value(m2.pt(),m2.eta(),'0')
+     hlt_sf_run2011_a = self._mu17Trg_Mu17Mu8_dz_A_Weight[(m1.pt(),m1.eta())][0] *\
+                        (self._mu8Trg_Mu17Mu8_A_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_A_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu17Trg_Mu17Mu8_A_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_A_Weight[(m2.pt(),m2.eta())][0])
 
-     # Trigger
-     hlt_sf_run2012_a = (self._muTRIGGERWeight_leg8_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_A.value(m2.pt(),m2.eta(),'0') +\
-                         self._muTRIGGERWeight_leg17_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg8_A.value(m2.pt(),m2.eta(),'0') -\
-                         self._muTRIGGERWeight_leg17_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_A.value(m2.pt(),m2.eta(),'0'))
-
-     hlt_sf_run2012_b = (self._muTRIGGERWeight_leg8_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_B.value(m2.pt(),m2.eta(),'0') +\
-                         self._muTRIGGERWeight_leg17_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg8_B.value(m2.pt(),m2.eta(),'0') -\
-                         self._muTRIGGERWeight_leg17_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_B.value(m2.pt(),m2.eta(),'0'))
-                         
-     lw *= (0.5*hlt_sf_run2012_a + 0.5*hlt_sf_run2012_b) ##percentage according to the lumi in which they were not prescaled (apparently same efficinecy for AB)
-     #lw *= 0.966 ## temporary solution!
+     hlt_sf_run2011_b = self._mu8Trg_Mu17Mu8_B_Weight [(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0] + \
+                        self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_B_Weight [(m2.pt(),m2.eta())][0] - \
+                        self._mu17Trg_Mu17Mu8_B_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_B_Weight[(m2.pt(),m2.eta())][0]
+     
+     lw *= 0.966 #(0.13*hlt_sf_run2011_a+0.87* hlt_sf_run2011_b) ##percentage according to the lumi in which they were not prescaled.
 
      if abs(zbbsystematics.LeptonTnPfactor)<0.01 :
        return lw
