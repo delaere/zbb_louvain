@@ -36,9 +36,7 @@ theConfig = os.getenv("PatAnalysisCfg")
 if theConfig is not None:
   configImplementation = __import__(theConfig)
   atts=theConfig.split(".")[1:]
-  for att in atts:
-    configImplementation = getattr(configImplementation,att)
-    print configImplementation
+  for att in atts : configImplementation = getattr(configImplementation,att)
   configuration = configImplementation.configuration
   eventDumpConfig = configImplementation.eventDumpConfig
 
