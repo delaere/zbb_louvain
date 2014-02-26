@@ -41,7 +41,7 @@ else :
 
 print ""
 print "isMC:", runOnMC
-print "process n events:", nevents
+print "process n events to be processed:", nevents, "this number is true except for crab jobs"
 print ""
 
 #setup
@@ -57,6 +57,13 @@ process.setName_("llbbX")
 process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 if nevents > 0 : process.MessageLogger.cerr.FwkReport.reportEvery = nevents/10 
+
+if runOnCondor and not runOnMC:
+    import FWCore.PythonUtilities.LumiList as LumiList
+    import FWCore.ParameterSet.Types as CfgTypes
+    myLumis = LumiList.LumiList(filename = '/nfs/user/llbb/JSON/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt').getCMSSWString().split(',')
+    process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
+    process.source.lumisToProcess.extend(myLumis)
 
 #GT
 if runOnMC : process.GlobalTag.globaltag = 'START53_V27::All'

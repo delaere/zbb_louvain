@@ -35,29 +35,25 @@ if sampleName=="DY":
     path2 = "/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0001/"
     path3 = "/storage/data/cms/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0002/"
     pathList = [path1,path2,path3]
-    njobs=859
-    outDir='DYjets_Summer12_S10_2014'
+    njobs=1500
     
 if sampleName=="TT":
     runOnMC = True
     path = "/storage/data/cms/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7A-v1/0000/"
     pathList = [path]
     njobs=722
-    outDir='TTjets_Summer12_S10_2014'
 
 if sampleName=="DataMuD":
     runOnMC = False
     path = "/storage/data/cms/store/data/Run2012D/DoubleMuParked/AOD/22Jan2013-v1/30001/"
     pathList = [path]
-    njobs=1000
-    outDir='DataMuD_2014'
+    njobs=300
 
-if sampleName=="DataElB":
+if sampleName=="DataElD":
     runOnMC = False
-    path = "/storage/data/cms/store/data/Run2012B/DoubleElectron/AOD/22Jan2013-v1/20001/"
+    path = "/storage/data/cms/store/data/Run2012D/DoubleElectron/AOD/22Jan2013-v1/10001/"
     pathList = [path]
-    njobs=500
-    outDir='DataElB_2014'
+    njobs=300
     
     
 import os
@@ -73,9 +69,7 @@ if slice: files = files[len(files)*(slice-1)/njobs:len(files)*slice/njobs]
 print "input files are", files
 print ""
 
-pathdir = '/nfs/user/acaudron/'
-
-if slice : out_fileName = pathdir+outDir+'/pat53_'+str(slice)+'.root'
+if slice : out_fileName = 'pat53_'+str(slice)+'.root'
 else     : out_fileName ='test.root'
 print "output file is", out_fileName
 print ""
