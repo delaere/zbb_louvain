@@ -434,7 +434,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
   if l1.isMuon() :
-    return True
+    #return True
     if runNumber>=160410 and runNumber<163269 :
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
         return True
@@ -449,20 +449,22 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
         return True
 ### data 2012
     if runNumber >= 180253 :
-      #if (l1.triggerObjectMatchesByPath("HLT_Mu17_*Mu8_*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_*Mu8_*",0,1).size()>0) : # and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0) :
-        #print runNumber
+      #print "runNumber", runNumber
+      #print 'l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()', l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size(),
+      #print 'l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()', l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()
+      #print 'hltDiMuonGlbFiltered17TrkFiltered8', l1.triggerObjectMatchesByFilter("hltDiMuonGlbFiltered17TrkFiltered8").size(),
+      #print l2.triggerObjectMatchesByFilter("hltDiMuonGlbFiltered17TrkFiltered8").size()
+      #if ((l1.triggerObjectMatchesByPath("HLT_Mu17_TkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_TkMu8_*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltDiMuonGlbFiltered17TrkFiltered8").size()>0 and l2.triggerObjectMatchesByFilter("hltDiMuonGlbFiltered17TrkFiltered8").size()>0)) or ((l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 and l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0)) :
+      #if ((l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 and l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0)) :
+      if ((l1.triggerObjectMatchesByPath("HLT_Mu17_TkMu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_TkMu8_*",0,1).size()>0) or (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_*",0,1).size()>0)) :
+          #for i in range(0,l1.triggerObjectMatch(0).conditionNames().size()) : print "conditions "+str(i), l1.triggerObjectMatch(0).conditionNames()[i],
+          #print ''
+          #for i in range(0,l1.triggerObjectMatch(0).filterLabels().size()) : print "labels "+str(i), l1.triggerObjectMatch(0).filterLabels()[i],
+          #print ''
+          #for i in range(0,l1.triggerObjectMatch(0).pathNames().size()) : print "path "+str(i), l1.triggerObjectMatch(0).pathNames()[i],
+          #print ''
+          return True
         
-        #print l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0			
-        #print l2.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0	
-        
-        #print l1.triggerObjectMatchesByFilter("*").size()>0
-        #for i in range(0,l1.triggerObjectMatch(0).conditionNames().size()) : print "conditions", l1.triggerObjectMatch(0).conditionNames()[i]
-        #for i in range(0,l1.triggerObjectMatch(0).filterLabels().size()) : print "labels", l1.triggerObjectMatch(0).filterLabels()[i]
-        #for i in range(0,l1.triggerObjectMatch(0).pathNames().size()) : print "labels", l1.triggerObjectMatch(0).pathNames()[i]
-      
-      
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltL3pfL1DoubleMu10MuOpen*L1f0L2pf0L3PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltL3fL1DoubleMu10MuOpen*L1f0L2f10L3Filtered17").size()>0): 
-        return True
   if l1.isElectron() :
     if electron_iswrongPS(l1, runNumber, lumi_section):
       return False

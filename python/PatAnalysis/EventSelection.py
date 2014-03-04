@@ -26,7 +26,6 @@ EventSelectionImplementation = __import__(configuration.eventSelection)
 atts=configuration.eventSelection.split(".")[1:]
 for att in atts:
   EventSelectionImplementation = getattr(EventSelectionImplementation,att)
-  print EventSelectionImplementation  
 categoryNames  = EventSelectionImplementation.categoryNames
 eventCategory  = EventSelectionImplementation.eventCategory
 isInCategory   = EventSelectionImplementation.isInCategory
