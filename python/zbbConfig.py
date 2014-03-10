@@ -27,7 +27,7 @@ class configuration:
   eleChannel = True
   SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
   SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
-  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
+  JERfactor = 1. # 1 = recommended smearing for MC, use 0 for MadWeight
   JESfactor = 0. # 1 = +1sigma
   LeptonTnPfactor = 0 # Lepton reweighting uncertainty
   doMEcontrolPlots = True
@@ -40,10 +40,6 @@ class configuration:
 
   # control plot classes
   controlPlots = [ 
-                   controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
-                   controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
-                   controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
-                   controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
                    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging }),
                    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
                    controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
@@ -55,6 +51,15 @@ class configuration:
                    controlPlot("btaggingReweighting", "BtaggingReWeightingControlPlots", "BtaggingReWeightingControlPlots", { })
                  ]
 
+  if runningMode == "plots" :
+    plotCP = [
+      controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
+      controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
+      controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
+      controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
+      ]
+    for cp in plotCP : controlPlots.append(cp)
+    
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
   eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>","genParticles"),
                        eventCollection("lheParticles","LHEEventProduct","source"),

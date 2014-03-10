@@ -87,8 +87,8 @@ void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* outpu
 
 void sumChannels(const char* filename, const char* outputfile=NULL)
 {
-   char chan1[16] = "MuMuChannel";
-   char chan2[16] = "EEChannel";
+   char chan1[16] = "Muon";
+   char chan2[16] = "Electron";
    char sum[16] = "Combined";
    TFile* file = NULL;
    TDirectory* sumdir = NULL;

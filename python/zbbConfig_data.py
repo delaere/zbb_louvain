@@ -15,8 +15,8 @@ class configuration:
   WSname = "workspace_ras"
 
   # mode: plots or dataset
-  #runningMode = "plots"
-  runningMode = "dataset"
+  runningMode = "plots"
+  #runningMode = "dataset"
 
   # event selection class
   eventSelection = pythonpath+"ZbbEventSelection"
@@ -43,14 +43,10 @@ class configuration:
                    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging }),
                    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
                    controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
-#                   controlPlot("MCselection", "MonteCarloSelectionControlPlots", "MonteCarloSelectionControlPlots", { }),
                    controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
-#                   controlPlot("leptonsReweighting", "LeptonsReweightingControlPlots", "LeptonsReweightingControlPlots", { }),
-#                   controlPlot("mcReweighting", "MonteCarloReweightingControlPlots", "MonteCarloReweightingControlPlots", { }),
-#                   controlPlot("lumiReweighting", "LumiReWeightingControlPlots", "LumiReWeightingControlPlots", { }),
-#                   controlPlot("btaggingReweighting", "BtaggingReWeightingControlPlots", "BtaggingReWeightingControlPlots", { })
                  ]
-  if(runningMode == "dataset") :
+
+  if runningMode == "plots" :
     plotCP = [
       controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
       controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
