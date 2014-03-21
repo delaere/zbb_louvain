@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 #default
 runOnMC = True
 runOnCondor = False
-nevents = 100
+nevents = 1000
 makeNoPUMet = True
 
 #read options
@@ -33,8 +33,8 @@ else :
             ])
     else :
         readFiles.extend([
-            'file:/storage/data/cms/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/981DCC90-A167-E211-9E70-0026189438E1.root'
-            #'file:/storage/data/cms/store/data/Run2012A/DoubleMu/AOD/22Jan2013-v1/20000/3AB96F52-3E82-E211-8561-00248C0BE018.root'
+            #'file:/storage/data/cms/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/981DCC90-A167-E211-9E70-0026189438E1.root'
+            'file:/storage/data/cms/store/data/Run2012A/DoubleMu/AOD/22Jan2013-v1/20000/3AB96F52-3E82-E211-8561-00248C0BE018.root'
             ])
     files=readFiles
     out_fileName = "test.root"
@@ -142,36 +142,36 @@ process.LeptFilter = cms.EDFilter("CandViewCountFilter",
                                   minNumber = cms.uint32(2),
                                   )
 
-process.llCands1 = cms.EDProducer("CandViewShallowCloneCombiner",
+process.MuElCands = cms.EDProducer("CandViewShallowCloneCombiner",
                                   decay = cms.string("allMuons@+ allElectrons@-"),
-                                  name = cms.string('llCands1'),
+                                  name = cms.string('MuElCands'),
                                   roles = cms.vstring('l1', 'l2'),
                                   cut = cms.string('mass > 0.0')
                                   )
 
-process.llCands2 = cms.EDProducer("CandViewShallowCloneCombiner",
+process.ElMuCands = cms.EDProducer("CandViewShallowCloneCombiner",
                                   decay = cms.string("allElectrons@+ allMuons@-"),
-                                  name = cms.string('llCands2'),
+                                  name = cms.string('ElMuCands'),
                                   roles = cms.vstring('l1', 'l2'),
                                   cut = cms.string('mass > 0.0')
                                   )
 
-process.llCands3 = cms.EDProducer("CandViewShallowCloneCombiner",
+process.SSplusCands = cms.EDProducer("CandViewShallowCloneCombiner",
                                   decay = cms.string("LeptMerger@+ LeptMerger@+"),
-                                  name = cms.string('llCands3'),
+                                  name = cms.string('SSplusCands'),
                                   roles = cms.vstring('l1', 'l2'),
                                   cut = cms.string('mass > 0.0')
                                   )
 
-process.llCands4 = cms.EDProducer("CandViewShallowCloneCombiner",
+process.SSminusCands = cms.EDProducer("CandViewShallowCloneCombiner",
                                   decay = cms.string("LeptMerger@- LeptMerger@-"),
-                                  name = cms.string('llCands4'),
+                                  name = cms.string('SSminusCands'),
                                   roles = cms.vstring('l1', 'l2'),
                                   cut = cms.string('mass > 0.0')
                                   )
 
 process.llMerger = cms.EDProducer("CandViewMerger",
-                                  src = cms.VInputTag( "llCands1","llCands2","llCands3","llCands4","zelAllelAll","zmuAllmuAll")
+                                  src = cms.VInputTag( "MuElCands","ElMuCands","SSplusCands","SSminusCands","zelAllelAll","zmuAllmuAll")
                                   )
 
 process.llFilter = cms.EDFilter("CandViewCountFilter",
@@ -200,7 +200,7 @@ process.zFilter = cms.EDFilter("CandViewCountFilter",
 process.p1 = cms.Path(process.llbbXSequence*
                       process.LeptMerger*process.LeptFilter*
                       process.AllMerger*process.AllFilter*
-                      process.llCands1*process.llCands2*process.llCands3*process.llCands4*process.llMerger*process.llFilter*
+                      process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
                       process.metUncertaintySequence
                       )
 
@@ -232,6 +232,7 @@ process.out = cms.OutputModule(
                                            'keep *_hpsPFTauProducer_*_llbbX',
                                            #Z candidates
                                            'keep *_z*_*_*',
+                                           'keep *_*Cands_*_*',
                                            #JET
                                            'keep *_*atJets*_*_*',
                                            'keep *_pfNoTau_*_*',

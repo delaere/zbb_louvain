@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.trigTools import *
+from triggerList import singleMuPath, doubleMuPath, MuEGPath
 
 def setupPatMuons (process, runOnMC):
      process.patMuons.pfMuonSource = cms.InputTag("pfSelectedMuons") #FIX: pfSelectedMuons is used instead of pfIsolatedMuons used in the ZH anlysis, reason no obvious need to use pre isolated muons -> isolation done after
@@ -50,21 +51,40 @@ def setupPatMuons (process, runOnMC):
          rho = cms.InputTag("kt6PFJets:rho"),
          )
 
-     process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
-                                                       src = cms.InputTag( 'selectedPatMuons' ) ,
-                                                       matched = cms.InputTag( 'patTrigger' ), # selections of trigger objects ,
-                                                       matchedCuts = cms.string( 'path( "HLT_*Mu*_*" )' ), # selection of matches ,
-                                                       maxDPtRel = cms.double( 0.5 ),
-                                                       maxDeltaR = cms.double( 0.3 ) ,
-                                                       resolveAmbiguities = cms.bool( True ) ,
-                                                       resolveByMatchQuality = cms.bool( True )
-                                                       )
-     switchOnTriggerMatchEmbedding(process ,triggerMatchers = ['muonTriggerMatchHLTMuons'],)
-     process.muonTriggerMatchHLTMuons.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
+     #process.muonTriggerMatchHLTMuons = cms.EDProducer("PATTriggerMatcherDRLessByR",
+     #src = cms.InputTag( 'selectedPatMuons' ) ,
+     #matched = cms.InputTag( 'patTrigger' ), # selections of trigger objects ,
+     #matchedCuts = cms.string( 'path( "HLT_*Mu*_*" )' ), # selection of matches ,
+     #matchedCuts = cms.string( 'path( "HLT_Mu17_Mu8_v*" )' ), # selection of matches ,
+     #maxDPtRel = cms.double( 0.5 ),
+     #maxDeltaR = cms.double( 0.3 ) ,
+     #resolveAmbiguities = cms.bool( True ) ,
+     #resolveByMatchQuality = cms.bool( True )
+     #)
+
+     triggerMatchersList = []
+     process.triggerMatchingSeq = cms.Sequence()
+     for HLTMu in singleMuPath+doubleMuPath+MuEGPath :
+          matcher = cms.EDProducer("PATTriggerMatcherDRLessByR",
+                                   src = cms.InputTag( 'selectedPatMuons' ) ,
+                                   matched = cms.InputTag( 'patTrigger' ), # selections of trigger objects ,
+                                   matchedCuts = cms.string(HLTMu), # selection of matches ,
+                                   maxDPtRel = cms.double( 0.5 ),
+                                   maxDeltaR = cms.double( 0.3 ) ,
+                                   resolveAmbiguities = cms.bool( True ) ,
+                                   resolveByMatchQuality = cms.bool( True )
+                                   )
+          setattr(process,'muonTriggerMatchHLTMuons'+HLTMu[6:-5].replace("_",""),matcher)
+          triggerMatchersList.append('muonTriggerMatchHLTMuons'+HLTMu[6:-5].replace("_",""))
+          process.triggerMatchingSeq += getattr(process,'muonTriggerMatchHLTMuons'+HLTMu[6:-5].replace("_",""))
+
+     switchOnTriggerMatchEmbedding(process ,triggerMatchers = triggerMatchersList,)
+     #process.muonTriggerMatchHLTMuons.src = cms.InputTag( 'selectedMuonsWithIsolationData' )
+     for HLTMu in singleMuPath+doubleMuPath+MuEGPath : getattr(process,'muonTriggerMatchHLTMuons'+HLTMu[6:-5].replace("_","")).src = cms.InputTag( 'selectedMuonsWithIsolationData' )
      process.selectedPatMuonsTriggerMatch = cms.EDProducer(
           "PATTriggerMatchMuonEmbedder"
           , src     = cms.InputTag( 'selectedMuonsWithIsolationData' )
-          , matches = cms.VInputTag('muonTriggerMatchHLTMuons')
+          , matches = cms.VInputTag(triggerMatchersList)
           )
 
      process.allMuons = process.selectedPatMuons.clone(
@@ -111,7 +131,8 @@ def setupPatMuons (process, runOnMC):
      process.patDefaultSequence.replace(process.selectedPatMuons,process.selectedPatMuons*process.selectedMuonsWithIsolationData)
 
      process.postMuonSeq = cms.Sequence (    
-          process.muonTriggerMatchHLTMuons *
+          #process.muonTriggerMatchHLTMuons *
+          process.triggerMatchingSeq *
           process.selectedPatMuonsTriggerMatch *
           process.allMuons *          
           process.tightMuons +
