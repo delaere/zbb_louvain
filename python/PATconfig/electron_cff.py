@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.trigTools import *
+from triggerList import singleElePath, doubleElePath, MuEGPath
 
 def setupPatElectrons (process, runOnMC):
     process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons', 'PFIso')
@@ -52,21 +53,39 @@ def setupPatElectrons (process, runOnMC):
                                        cms.InputTag('elPFIsoDepositNeutralPFIso')),
            )
     
-    process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
-                                                 src = cms.InputTag( "selectedPatElectrons" ),
-                                                 matched = cms.InputTag( "patTrigger"),
-                                                 matchedCuts = cms.string('path( "HLT_*Ele*_*" )'),
-                                                 maxDPtRel = cms.double( 0.5 ),
-                                                 maxDeltaR = cms.double( 0.3 ),
-                                                 resolveAmbiguities = cms.bool( True ),
-                                                 resolveByMatchQuality = cms.bool( True )
-                                                 )
-    switchOnTriggerMatchEmbedding(process ,triggerMatchers = ['eleTriggerMatchHLT'],)
-    process.eleTriggerMatchHLT.src = cms.InputTag("selectedElectronsWithIsolationData")
+    #process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRLessByR",
+    #src = cms.InputTag( "selectedPatElectrons" ),
+    #matched = cms.InputTag( "patTrigger"),
+    #matchedCuts = cms.string('path( "HLT_*Ele*_*" )'),
+    #maxDPtRel = cms.double( 0.5 ),
+    #maxDeltaR = cms.double( 0.3 ),
+    #resolveAmbiguities = cms.bool( True ),
+    #resolveByMatchQuality = cms.bool( True )
+    #)
+
+    triggerMatchersList = []
+    process.triggerMatchingSeq = cms.Sequence()
+    for HLTEle in singleElePath+doubleElePath+MuEGPath :
+        matcher = cms.EDProducer( "PATTriggerMatcherDRLessByR",
+                                  src = cms.InputTag( "selectedPatElectrons" ),
+                                  matched = cms.InputTag( "patTrigger"),
+                                  matchedCuts = cms.string(HLTEle),
+                                  maxDPtRel = cms.double( 0.5 ),
+                                  maxDeltaR = cms.double( 0.3 ),
+                                  resolveAmbiguities = cms.bool( True ),
+                                  resolveByMatchQuality = cms.bool( True )
+                                  )
+        setattr(process,'eleTriggerMatchHLT'+HLTEle[6:-5].replace("_",""),matcher)
+        triggerMatchersList.append('eleTriggerMatchHLT'+HLTEle[6:-5].replace("_",""))
+        process.triggerMatchingSeq += getattr(process,'eleTriggerMatchHLT'+HLTEle[6:-5].replace("_",""))
+        
+    switchOnTriggerMatchEmbedding(process ,triggerMatchers = triggerMatchersList,)
+    #process.eleTriggerMatchHLT.src = cms.InputTag("selectedElectronsWithIsolationData")
+    for HLTEle in singleElePath+doubleElePath+MuEGPath : getattr(process,'eleTriggerMatchHLT'+HLTEle[6:-5].replace("_","")).src = cms.InputTag("selectedElectronsWithIsolationData")
         
     process.patElectronsWithTrigger = cms.EDProducer("PATTriggerMatchElectronEmbedder",
                                                      src = cms.InputTag("selectedElectronsWithIsolationData"),
-                                                     matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'))
+                                                     matches = cms.VInputTag(triggerMatchersList)
                                                      )
     
     #switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' ) #needed ?? seems not
@@ -114,7 +133,8 @@ def setupPatElectrons (process, runOnMC):
         )
 
     process.postElectronSeq = cms.Sequence (
-        process.eleTriggerMatchHLT *
+        #process.eleTriggerMatchHLT *
+        process.triggerMatchingSeq *
         process.patElectronsWithTrigger *
         process.allElectrons *
         process.tightElectrons +
@@ -124,20 +144,20 @@ def setupPatElectrons (process, runOnMC):
     
     process.zelAllelAll = cms.EDProducer('CandViewShallowCloneCombiner',
                                          decay = cms.string('allElectrons@+ allElectrons@-'),
-                                         cut = cms.string('mass > 50.0'),
+                                         cut = cms.string('mass > 10.0'),
                                          name = cms.string('Zelallelall'),
                                          roles = cms.vstring('all1', 'all2')
                                          )
     
     process.zelTightelTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                              decay = cms.string('tightElectrons@+ tightElectrons@-'),
-                                             cut = cms.string('mass > 50.0'),
+                                             cut = cms.string('mass > 10.0'),
                                              name = cms.string('Zeltighteltight'),
                                              roles = cms.vstring('tight1', 'tight2')
                                              )
     process.zmvaelTightmvaelTight = cms.EDProducer('CandViewShallowCloneCombiner',
                                              decay = cms.string('tightMVAElectronsNonTrig@+ tightMVAElectronsNonTrig@-'),
-                                             cut = cms.string('mass > 50.0'),
+                                             cut = cms.string('mass > 10.0'),
                                              name = cms.string('Zmvaeltightmvaeltight'),
                                              roles = cms.vstring('tight1', 'tight2')
                                              )

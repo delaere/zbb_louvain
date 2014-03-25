@@ -33,7 +33,7 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
 
     def processEvent(self,event,weight = 1.,btagging="CSV"):
       """process event and fill histograms"""
-      self.fill(self.process(event,btagging),weight)
+      self.fill(self.process(event),weight)
 
 if __name__=="__main__":
   import sys

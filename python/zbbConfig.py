@@ -9,6 +9,7 @@ eventWeight     = namedtuple("eventWeight",    ["label","module","classname","kw
 
 class configuration:
   # default I/O
+  pythonpath = "UserCode.zbb_louvain."
   defaultFilename = "controlPlots"
   RDSname = "rds_zbb"
   WSname = "workspace_ras"
@@ -18,7 +19,7 @@ class configuration:
   #runningMode = "dataset"
 
   # event selection class
-  eventSelection = "ZbbEventSelection"
+  eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
   btagging = "CSV" 
@@ -26,7 +27,7 @@ class configuration:
   eleChannel = True
   SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
   SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
-  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
+  JERfactor = 1. # 1 = recommended smearing for MC, use 0 for MadWeight
   JESfactor = 0. # 1 = +1sigma
   LeptonTnPfactor = 0 # Lepton reweighting uncertainty
   doMEcontrolPlots = True
@@ -39,10 +40,6 @@ class configuration:
 
   # control plot classes
   controlPlots = [ 
-                   controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
-                   controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
-                   controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
-                   controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
                    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging }),
                    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
                    controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
@@ -54,6 +51,15 @@ class configuration:
                    controlPlot("btaggingReweighting", "BtaggingReWeightingControlPlots", "BtaggingReWeightingControlPlots", { })
                  ]
 
+  if runningMode == "plots" :
+    plotCP = [
+      controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
+      controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
+      controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
+      controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
+      ]
+    for cp in plotCP : controlPlots.append(cp)
+    
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
   eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>","genParticles"),
                        eventCollection("lheParticles","LHEEventProduct","source"),
@@ -62,7 +68,7 @@ class configuration:
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
                        eventCollection("jets","vector<pat::Jet>","cleanPatJets"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
-                       eventCollection("METNNregression","vector<pat::MET>","patMETsPF"),
+                       eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
                        eventCollection("Zelel","vector<reco::CompositeCandidate>","zelTightelTight"),
                        eventCollection("triggerInfo","pat::TriggerEvent","patTriggerEvent"),
@@ -82,7 +88,7 @@ class configuration:
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
-                       eventProducer("category", "EventSelection", "eventCategory", { "btagging":btagging, "ZjetFilter":"bcl" } ),
+                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "ZjetFilter":"bcl" } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),

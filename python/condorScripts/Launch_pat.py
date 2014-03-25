@@ -7,18 +7,27 @@ import sys
 import LaunchOnCondor
 import glob
 
-njobs=100
+#first to last jobs
+start = 1
+njobs = 5
 
+#sample name
 sample="DY"
 if len(sys.argv)>1:
     sample=sys.argv[1]
 
-FarmDirectory = "FARM_"+sample+"_V2"
+#output directory
+OUTDIR = '/nfs/user/'+str(os.environ["USER"])+'/'+sample+'_PAT2014'
+os.system('if [[ -d '+OUTDIR+' ]]; then echo "Directory '+OUTDIR+' exists";  else mkdir '+OUTDIR+'; fi;')
+
+#LaunchOnCondor
+FarmDirectory = "FARM_"+sample+"_"+str(start)+"to"+str(start+njobs-1)
+#FarmDirectory = "FARM_"+sample+"_testMemory"
 JobName = sample+"pat"
-LaunchOnCondor.Jobs_RunHere = 1
+LaunchOnCondor.Jobs_FinalCmds = ['mv pat53_*.root '+OUTDIR+'/ \n']
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
-LaunchOnCondor.Jobs_RunHere= 1
-for i in range(1,njobs+1):
+
+for i in range(start,start+njobs):
     command = "../../test/patTuple_llbbX_cfg_dataMC.py"  
     option  = " option=Condor slice="+str(i)+" sample="+sample  
     print "command = ", command

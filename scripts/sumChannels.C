@@ -71,12 +71,19 @@ void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* outpu
    TList* keys = dir1->GetListOfKeys();
    TIter next(keys);
    TKey *key;
+   int delta = keys->GetEntries();
+   TString nameB;
    while ((key = (TKey*) next())) {
      if(key->IsFolder()) {
         TDirectory* dirA;
         dir1->GetObject(key->GetName(),dirA);
         TDirectory* dirB;
-        dir2->GetObject(key->GetName(),dirB);
+        if(TString(key->GetName()).BeginsWith("stage_")) {
+          nameB.Form("stage_%d",TString(key->GetName()+6).Atoi()+delta);
+        } else {
+          nameB.Form("%s",key->GetName());
+        }
+        dir2->GetObject((const char*)nameB,dirB);
 	if(!dirA || !dirB) continue;
         sumDir(dirA,dirB, output->mkdir(key->GetName(),key->GetTitle()));
      } else if (key->ReadObj()->InheritsFrom("TH1")) {
@@ -87,8 +94,8 @@ void CategoryAdder::sumDir(TDirectory* dir1, TDirectory* dir2, TDirectory* outpu
 
 void sumChannels(const char* filename, const char* outputfile=NULL)
 {
-   char chan1[16] = "MuMuChannel";
-   char chan2[16] = "EEChannel";
+   char chan1[16] = "Muon";
+   char chan2[16] = "Electron";
    char sum[16] = "Combined";
    TFile* file = NULL;
    TDirectory* sumdir = NULL;
@@ -123,8 +130,10 @@ void sumChannels(const char* filename, const char* outputfile=NULL)
    adder.setChannel1(chan1,"Mu");
    adder.setChannel2(chan2,"Ele");
    adder.sumDir(chan1dir,chan2dir,sumdir);
-   file->Write();
+   std::cout << "Closing input" << std::endl;
+   if(file->IsWritable())  file->Write();
    file->Close();
+   std::cout << "Saving output" << std::endl;
    if(outputfile && output) {
      output->Write();
      output->Close();

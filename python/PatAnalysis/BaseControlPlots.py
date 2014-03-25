@@ -73,7 +73,7 @@ class BaseControlPlots:
       """Define the categories, given a list of names. Only works for datasets"""
       if self._mode!="dataset": return
       for i, name in enumerate(categories):
-        rc = ROOT.RooCategory("rc_"+self._purpose+"_"+str(i),name.split('/')[-1])
+        rc = ROOT.RooCategory("rc_stage_"+str(i),name.split('/')[-1])
 	rc.defineType("not_acc",0)
 	rc.defineType("acc",1)
 	self._rooCategories[i] = rc

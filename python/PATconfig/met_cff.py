@@ -13,11 +13,6 @@ def setupPatMets (process, runOnMC, makeNoPUMet):
 	#Type 0 Corrections
 	process.patPFMETtype0Corr.src = cms.InputTag('goodPV')
 	#Type 1 correction
-	if runOnMC :
-        	process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string("L3Absolute")
-	else :
-        	process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string("L2L3Residual")
-        	process.patPFMet.addGenMET = cms.bool(False)
 	process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
 	process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
 	#SysShift correction to turn the MET flat(ter) with respect to Phi
@@ -29,75 +24,51 @@ def setupPatMets (process, runOnMC, makeNoPUMet):
         process.pfMEtMVA.srcVertices = cms.InputTag('goodPV')
         process.pfMEtMVA.srcLeptons = cms.VInputTag("tightMuons","tightElectrons")
 
-	
-	##Uncertainties
-	if makeNoPUMet : 
+	#noPUMET
+	if makeNoPUMet :
 		process.load("RecoMET.METPUSubtraction.noPileUpPFMET_cff")
-                process.noPileUpPFMEt.srcLeptons = cms.VInputTag("tightMuons","tightElectrons")
-		if runOnMC :
-                        process.calibratedAK5PFJetsForNoPileUpPFMEt.correctors = cms.vstring("ak5PFL1FastL2L3")
-			process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3")
-			runMEtUncertainties(process,
-					makeType1p2corrPFMEt=False,
-					doApplyType0corr=True,
-				    	sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
-				    	doApplySysShiftCorr=True,
-				    	jetCorrPayloadName='AK5PFchs',
-                                    	makePFMEtByMVA=True,
-				    	makeNoPileUpPFMEt=True,
-				    	addToPatDefaultSequence=False,
-				   	postfix='')
-		else :
-                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
-                        process.calibratedAK5PFJetsForNoPileUpPFMEt.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
-			runMEtUncertainties(process,
-				    	makeType1p2corrPFMEt=False,
-				    	doApplyType0corr=True,
-				    	sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
-				    	doApplySysShiftCorr=True,
-				    	jetCorrPayloadName='AK5PFchs',
-                                    	makePFMEtByMVA=True,
-					makeNoPileUpPFMEt=True,
-				    	addToPatDefaultSequence=False,
-				    	doSmearJets=False,
-				    	postfix='')
+		process.noPileUpPFMEt.srcLeptons = cms.VInputTag("tightMuons","tightElectrons")
+		if not runOnMC : process.calibratedAK5PFJetsForNoPileUpPFMEt.correctors = cms.vstring("ak5PFL1FastL2L3")
 
-	else : 
-		if runOnMC :
-                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3")
-                        runMEtUncertainties(process,
-                                        makeType1p2corrPFMEt=False,
-                                        doApplyType0corr=True,
-                                        sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
-                                        doApplySysShiftCorr=True,
-                                        jetCorrPayloadName='AK5PFchs',
-                                        makePFMEtByMVA=True,
-                                        addToPatDefaultSequence=False,
-                                        postfix='')
-                else :
-                        process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
-                        runMEtUncertainties(process,
-                                        makeType1p2corrPFMEt=False,
-                                        doApplyType0corr=True,
-                                        sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
-                                        doApplySysShiftCorr=True,
-                                        jetCorrPayloadName='AK5PFchs',
-                                        makePFMEtByMVA=True,
-                                        addToPatDefaultSequence=False,
-                                        doSmearJets=False,
-                                        postfix='')
+	##Uncertainties
+	if runOnMC :
+		runMEtUncertainties(process,
+				    makeType1p2corrPFMEt=False,
+				    doApplyType0corr=True,
+				    jetCorrLabel = "L3Absolute",
+				    sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc,
+				    doApplySysShiftCorr=True,
+				    jetCorrPayloadName='AK5PFchs',
+				    makePFMEtByMVA=True,
+				    makeNoPileUpPFMEt=makeNoPUMet,    
+				    addToPatDefaultSequence=False,
+				    postfix='')
+	else :
+		process.patPFMet.addGenMET = cms.bool(False)
+		process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
+		runMEtUncertainties(process,
+				    makeType1p2corrPFMEt=False,
+				    doApplyType0corr=True,
+				    jetCorrLabel = "L2L3Residual",
+				    sysShiftCorrParameter=process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data,
+				    doApplySysShiftCorr=True,
+				    jetCorrPayloadName='AK5PFchs',
+				    makePFMEtByMVA=True,
+				    makeNoPileUpPFMEt=makeNoPUMet,    
+				    addToPatDefaultSequence=False,
+				    doSmearJets=False,
+				    postfix='')
 
 	
-
-
-	process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone()
 	process.metUncertaintySequence.replace(process.patType1CorrectedPFMet,
-					       cms.Sequence(process.type0PFMEtCorrection*process.patPFMETtype0Corr*process.patType1CorrectedPFMet*process.patType01SCorrectedPFMet)
+					       cms.Sequence(process.type0PFMEtCorrection*process.patPFMETtype0Corr*process.patType1CorrectedPFMet)
 					       )
 
 	process.pfCandsNotInJet.topCollection = cms.InputTag("pfNoTau")
 	
 	#Add Met with different corrections
+	process.patType01SCorrectedPFMet = process.patType1CorrectedPFMet.clone()
+
 	process.patType01CorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
                 src = cms.InputTag('patPFMet'),
                 applyType1Corrections = cms.bool(True),
@@ -158,7 +129,7 @@ def setupPatMets (process, runOnMC, makeNoPUMet):
         )  
 	
 
-	process.metUncertaintySequence += cms.Sequence(process.patTypeOnly1CorrectedPFMet+process.patType0CorrectedPFMet+process.patTypeSysCorrectedPFMet+process.patType01CorrectedPFMet+process.patType1sysCorrectedPFMet+process.patType0sysCorrectedPFMet)
+	process.metUncertaintySequence += cms.Sequence(process.patType01SCorrectedPFMet+process.patTypeOnly1CorrectedPFMet+process.patType0CorrectedPFMet+process.patTypeSysCorrectedPFMet+process.patType01CorrectedPFMet+process.patType1sysCorrectedPFMet+process.patType0sysCorrectedPFMet)
  
 
 	#clean metUncertaintySequence
@@ -177,7 +148,8 @@ def setupPatMets (process, runOnMC, makeNoPUMet):
 		print ""
 		print "These modules will be removed from the metUncertaintySequence as useless for data:"
 		for name in process.metUncertaintySequence.moduleNames() :
-			if name[-2:]=="Up" or name[-4:]=="Down" :
+			#if name[-4:]=="EnUp" or name[-6:]=="EnDown" :
+			if "EnUp" in name or "EnDown" in name:
 				print "Run on data: remove uncertainty variation,", name
 				process.metUncertaintySequence.remove(getattr(process,name))
 				if name in process.metUncertaintySequence.moduleNames() :

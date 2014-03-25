@@ -45,27 +45,23 @@ def setupPatSubJets (process, runOnMC):
     process.selectedPatJetsCA8CHS.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
 
     process.pileupJetIdProducerChsCA8 = process.pileupJetIdProducerChs.clone(
-        jets = cms.InputTag("patJetsCA8CHS"),
+        jets = cms.InputTag("selectedPatJetsCA8CHS"),
         jec  = cms.string("AK7PFchs")
         )
-    #process.puJetIdChsCA8 = process.puJetIdChs.clone() #configure beta/beta* for CA8 jets
-    #process.puJetMvaChsCA8 = process.puJetMvaChs.clone()
     
-    #process.puJetIdChsCA8.jets = cms.InputTag("patJetsCA8CHS")
-    #process.puJetMvaChsCA8.jets = cms.InputTag("patJetsCA8CHS")
-    #process.puJetMvaChsCA8.jetids = cms.InputTag("puJetIdChsCA8")
-    
-    process.patJetsCA8CHSWithBeta = cms.EDProducer('JetBetaProducer',
-                                                   src = cms.InputTag("patJetsCA8CHS"),
+    process.selectedPatJetsCA8CHSWithBeta = cms.EDProducer('JetBetaProducer',
+                                                   src = cms.InputTag("selectedPatJetsCA8CHS"),
                                                    primaryVertices = cms.InputTag("goodPV"),
-                                                   #puJetIdMVA = cms.InputTag("puJetMvaChsCA8","fullDiscriminant"),
-                                                   #puJetIdFlag = cms.InputTag("puJetMvaChsCA8","fullId"),
-                                                   #puJetIdentifier = cms.InputTag("puJetIdChsCA8"),
                                                    puJetIdMVA = cms.InputTag("pileupJetIdProducerChsCA8","fullDiscriminant"),
                                                    puJetIdFlag = cms.InputTag("pileupJetIdProducerChsCA8","fullId"),
                                                    puJetIdentifier = cms.InputTag("pileupJetIdProducerChsCA8"),
                                                    )
-    process.selectedPatJetsCA8CHS.src = cms.InputTag("patJetsCA8CHSWithBeta")
+
+    process.cleanPatJetsCA8CHS.src = cms.InputTag("selectedPatJetsCA8CHSWithBeta")
+    process.cleanPatJetsCA8CHS.checkOverlaps.muons.requireNoOverlaps = cms.bool(True)
+    process.cleanPatJetsCA8CHS.checkOverlaps.muons.deltaR = cms.double(0.8)
+    process.cleanPatJetsCA8CHS.checkOverlaps.electrons.requireNoOverlaps = cms.bool(True)
+    process.cleanPatJetsCA8CHS.checkOverlaps.electrons.deltaR = cms.double(0.8)
 
                             
     addJetCollection(process, #pruned CA8 jets to PAT
@@ -84,7 +80,11 @@ def setupPatSubJets (process, runOnMC):
     process.patJetsCA8CHSpruned.embedPFCandidates = True
     process.patJetsCA8CHSpruned.addTagInfos = cms.bool(True)
     process.selectedPatJetsCA8CHSpruned.cut = 'pt > 15. & abs(eta) < 2.5' #harder cut?
-
+    process.cleanPatJetsCA8CHSpruned.checkOverlaps.muons.requireNoOverlaps = cms.bool(True)
+    process.cleanPatJetsCA8CHSpruned.checkOverlaps.muons.deltaR = cms.double(0.8)
+    process.cleanPatJetsCA8CHSpruned.checkOverlaps.electrons.requireNoOverlaps = cms.bool(True)
+    process.cleanPatJetsCA8CHSpruned.checkOverlaps.electrons.deltaR = cms.double(0.8)
+                
     #subjets
     inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
     if runOnMC : inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute'])
@@ -132,7 +132,7 @@ def setupPatSubJets (process, runOnMC):
 
     #Nsubjettiness
     process.selectedPatJetsCA8CHSwithNsub = cms.EDProducer("NjettinessAdder",
-                                                           src=cms.InputTag("selectedPatJetsCA8CHS"),
+                                                           src=cms.InputTag("selectedPatJetsCA8CHSWithBeta"),
                                                            cone=cms.double(0.8)
                                                            )
 
@@ -158,8 +158,7 @@ def setupPatSubJets (process, runOnMC):
 
     process.patDefaultSequence.replace(
         process.selectedPatJetsCA8CHS,
-        #cms.Sequence(process.puJetIdChsCA8 * process.puJetMvaChsCA8 * process.patJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHS * process.selectedPatJetsCA8CHSwithNsub)
-        cms.Sequence(process.pileupJetIdProducerChsCA8 * process.patJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHS * process.selectedPatJetsCA8CHSwithNsub)
+        cms.Sequence(process.selectedPatJetsCA8CHS * process.pileupJetIdProducerChsCA8 * process.selectedPatJetsCA8CHSWithBeta * process.selectedPatJetsCA8CHSwithNsub)
         )
      
 

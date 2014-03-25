@@ -23,6 +23,9 @@ def isInCategory(category, categoryData):
 
 # specific implementation of the "virtual methods" above
 EventSelectionImplementation = __import__(configuration.eventSelection)
+atts=configuration.eventSelection.split(".")[1:]
+for att in atts:
+  EventSelectionImplementation = getattr(EventSelectionImplementation,att)
 categoryNames  = EventSelectionImplementation.categoryNames
 eventCategory  = EventSelectionImplementation.eventCategory
 isInCategory   = EventSelectionImplementation.isInCategory
@@ -54,7 +57,13 @@ def prepareAnalysisEvent(event):
   for coll in configuration.eventCollections:
     event.addCollection(coll.label,coll.handle,coll.collection)
   for prod in configuration.eventProducers:
-    event.addProducer(prod.label,getattr(__import__(prod.module),prod.function),**prod.kwargs)
+    mod = __import__(configuration.pythonpath+prod.module)
+    atts=(configuration.pythonpath+prod.module).split(".")[1:]
+    for att in atts : mod = getattr(mod,att)
+    event.addProducer(prod.label,getattr(mod,prod.function),**prod.kwargs)
   for weight in configuration.eventWeights:
-    event.addWeight(weight.label,getattr(__import__(weight.module),weight.classname)(**weight.kwargs))
+    mod= __import__(configuration.pythonpath+weight.module)
+    atts=(configuration.pythonpath+weight.module).split(".")[1:]
+    for att in atts : mod = getattr(mod,att)
+    event.addWeight(weight.label,getattr(mod,weight.classname)(**weight.kwargs))
 
