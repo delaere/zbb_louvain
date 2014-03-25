@@ -5,22 +5,41 @@ import pickle
 
 ##______General functions______
 
-def get_eta_key(eta):
 
+def get_eta_key(eta):
    range =''
    if ( abs(eta)<=0.9):
-      range = 'ptabseta<0.9'                  
+      range = 'ptabseta<0.9'
    elif (abs(eta)> 0.9 and abs(eta)<=1.2):
       range = 'ptabseta0.9-1.2'
-   elif (abs(eta)> 1.2 and  abs(eta)<= 2.4 ):
-      range = 'ptabseta1.2-2.4'   
+   elif (abs(eta)> 1.2 and abs(eta)<= 2.1 ):
+      range = 'ptabseta1.2-2.1'   
+   elif (abs(eta)> 2.1 and abs(eta)<= 2.4 ):
+      range = 'ptabseta2.1-2.4'
    else:
       print 'ERROR: value not in range'
-        
+              
+   return range
+
+def get_eta_trigger_key(eta):
+## N.B. needed for a different syntax for the new pkl file :-(
+   range =''
+   if ( abs(eta)<=0.9):
+      range = '0.0,0.9'                  
+   elif (abs(eta)> 0.9 and abs(eta)<=1.2):
+      range = '0.9,1.2'
+   elif (abs(eta)> 1.2 and  abs(eta)<= 2.1 ):
+      range = '1.2,2.1'      
+   elif (abs(eta)> 2.1 and  abs(eta)<= 2.4 ):
+      range = '2.1,2.4'   
+   else:
+      print 'ERROR: value not in range'
+
    return range
 
 def get_etaFiner_key(eta):
-
+## N.B. obsolete, but kept
+   
    range= ''
    if (eta>=-2.4 and eta< -2.1):
       range = '-2.4_-2.1'
@@ -79,11 +98,98 @@ def get_pt_key(pt):
    elif (pt>=90 and  pt<140 ):
       range = '90_140'
    elif (pt>= 140 ):
-      range = '140_500'
+      range = '140_300'
    else:
       print 'ERROR: value not in range'
 
    return range
+
+class EleIDISO_SFReader:
+   
+  def __init__(self):
+     """Embedding Ele ID-ISO SF."""
+     f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdTight_2012rereco.txt', 'r')
+     if f:
+        self._file = f  
+     else :
+        print 'ERROR: Input file for muon SF not existing!'
+
+  def value(self,pt,eta,mode):
+     
+        for line in file:
+           vals = line.split() # find a new way for splitting
+           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+              if mode == '0'  :
+                 return double(vals[4])
+              elif mode == '+1'  :
+                 return double(vals[5])
+              elif mode == '-1'  :   
+                 return double(vals[6])
+              else:  
+                 print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+                 return 0
+           else:
+              print 'WARNING: Any electron sf range matching the specified eta/pt'
+              return 1.
+
+
+class EleTriggerHighPtLeg_SFReader:
+   
+  def __init__(self):
+     """Embedding Electron Trigger High leg SF."""
+     f = open(configuration.dataDirectory+'scalefactors_ele_IdTightTrigger17Leg_2012rereco.txt', 'r')
+     if f:
+        self._file = f  
+     else :
+        print 'ERROR: Input file for muon SF not existing!'
+
+  def value(self,pt,eta,mode):
+     
+        for line in file:
+           vals = line.split() # find a new way for splitting
+           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+              if mode == '0'  :
+                 return double(vals[4])
+              elif mode == '+1'  :
+                 return double(vals[5])
+              elif mode == '-1'  :   
+                 return double(vals[6])
+              else:  
+                 print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+                 return 0
+           else:
+              print 'WARNING: Any electron sf range matching the specified eta/pt'
+              return 1.
+
+
+class EleTriggerLowPtLeg_SFReader:
+   
+  def __init__(self):
+     """Embedding Electron Trigger Low leg SF."""
+     f = open(configuration.dataDirectory+'scalefactors_ele_IdTightTrigger8Leg_2012rereco.txt', 'r')
+     if f:
+        self._file = f  
+     else :
+        print 'ERROR: Input file for muon SF not existing!'
+
+  def value(self,pt,eta,mode):
+     
+        for line in file:
+           vals = line.split() # find a new way for splitting
+           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+              if mode == '0'  :
+                 return double(vals[4])
+              elif mode == '+1'  :
+                 return double(vals[5])
+              elif mode == '-1'  :   
+                 return double(vals[6])
+              else:  
+                 print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+                 return 0
+           else:
+              print 'WARNING: Any electron sf range matching the specified eta/pt'
+              return 1.
+       
          
 class PtEtaMap:
    """A binned map in pt and eta.
@@ -149,18 +255,20 @@ class PtEtaMap:
    def __len__(self): 
      return (len(self._etabins)+1)*(len(self._ptbins)+1)
 
-##### period_ABCD______ ID+ISO_SF
+#===  Muon ID SF
+#===  (https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs#22Jan2013_ReReco_of_2012_data_re)
 
-class MuonSFMap:
+class MuonIDSFReader:
    """A binned map in eta (for the moment) for muon SF.
       Values can be extracted are (value,error). """
 
    def __init__(self):
-     """Construct a MuonSFMap using pikle files."""
-     f = open(configuration.dataDirectory+'Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     """Construct a MuonIDSFReader using pikle files."""
+     f = open(configuration.dataDirectory+'MuonEfficiencies_Run2012ReReco_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
-        self._range = ''
+        self._eta_range = ''
+        self._pt_range = ''
      else :
         print 'ERROR: Input file for muon SF not existing!'
 
@@ -168,250 +276,216 @@ class MuonSFMap:
 
      """Return the SF or the uncertainty for a given pt and eta."""
 
-     self._range= get_etaFiner_key(eta)
+     self._eta_range= get_eta_key(eta)
+     self._pt_range= get_pt_key(pt)
 
      if mode == '0'  :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['efficiency_ratio']
+        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
      elif mode == '+1'  :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['err_hi'] 
+        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi'] 
      elif mode == '-1' :
-        return self._map['combRelIsoPF04dBeta<02_Tight']['etapt20-500_2012ABCD'][self._range]['data/mc']['err_low']
+        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
      else:  
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
-        
 
-##### period_AB______Mu17_Mu8_____Leg17
-        
-class MuonTriggerEffMap_leg17_AB:
-   """A binned map in eta only (for the moment) for Trigger efficiencies.
+#===  Muon ISO SF
+#===  (https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs#22Jan2013_ReReco_of_2012_data_re)
+
+class MuonISOSFReader:
+   """A binned map in eta (for the moment) for muon SF.
       Values can be extracted are (value,error). """
 
    def __init__(self):
-     """Construct a MuonTriggerEffMap using pikle files."""
-     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
+     """Construct a MuonISOSFReader using pikle files."""
+     f = open(configuration.dataDirectory+'MuonEfficiencies_ISO_Run_2012ReReco_53X.pkl', 'r')
      if f :
         self._map = pickle.load(f)
         self._eta_range = ''
         self._pt_range = ''
      else :
-        print 'ERROR: Input file for Trigger efficiencies not existing!'
+        print 'ERROR: Input file for muon SF not existing!'
 
    def value(self,pt,eta,mode):
+
+     """Return the SF or the uncertainty for a given pt and eta."""
+
+     self._eta_range= get_eta_key(eta)
+     self._pt_range= get_pt_key(pt)
+
+     if mode == '0'  :
+        return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
+     elif mode == '+1'  :
+        return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi'] 
+     elif mode == '-1' :
+        return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
+     else:  
+        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+        return 0    
+        
+
+#=== Muon Trigger efficiencies 
+#=== 2012ABC for Mu17Mu8 OR Mu17TkMu8
+        
+class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
+   """A binned map in eta of both muons for HLT 2012 trigger efficiencies.
+      Values can be extracted are (value,error). """
+
+   def __init__(self):
+     """Construct a MuonTriggerEffReader using pikle files."""
+     f = open(configuration.dataDirectory+'MuHLTEfficiencies_Run_2012ABCD_53X_DR03-2.pkl', 'r')
+     if f :
+        self._map = pickle.load(f)
+        self._eta_range = ''
+     else :
+        print 'ERROR: Input file for Trigger efficiencies not existing!'
+
+   def value(self,eta1,eta2,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
      
-     self._eta_range= get_eta_key(eta)+'_2012B'
-     self._pt_range= get_pt_key(pt)
+     self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
 
      if mode == '0'  :
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['efficiency'] 
+        return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['efficiency']
      elif mode == '+1'  :
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['err_hi']
+        return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
      elif mode == '-1' : 
-        return self._map['DoubleMu17Mu8_Mu17_Tight'][self._eta_range][self._pt_range]['data']['err_low']
+        return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
      else:  
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
         
 
-
-##### period_AB________Mu17_Mu8_____Leg8
-
-class MuonTriggerEffMap_leg8_AB:
-   """A binned map in eta only (for the moment) for Trigger efficiencies.
-      Values can be extracted are (value,error). """
-
-   def __init__(self):
-     """Construct a MuonTriggerEffMap using pikle files."""
-     f = open(configuration.dataDirectory+'MuonEfficiencies_Run_2012A_2012_B_53X.pkl', 'r')
-     if f :
-        self._map = pickle.load(f)
-        self._eta_range = ''
-        self._pt_range = ''
-     else :
-        print 'ERROR: Input file for Trigger efficiencies not existing!'
-   
-   def value(self,pt,eta,mode):
-
-     """Return the eff or the uncertainty for a given pt and eta."""
-
-     self._eta_range= get_eta_key(eta)+'_2012B'
-     self._pt_range= get_pt_key(pt)
-
-     if mode == '0'  :
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['efficiency'] 
-     elif mode == '+1'  :
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['err_hi']
-     elif mode == '-1' : 
-        return self._map['DoubleMu17Mu8_Mu8_Tight'][self._eta_range][self._pt_range]['data']['err_low']
-     else:  
-        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''     
-        return 0
 
 class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
 
    def __init__(self):
 
+     # ===== MUON: initializing the weights
+
+     self._muIDWeight  = MuonIDSFReader()
+     self._muISOWeight  = MuonISOSFReader()
+     self._muTRIGGERWeight  = MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8()
+
+     self._eleIDISOWeight = EleIDISO_SFReader()
+     self._ele17TrgWeight = EleTriggerHighPtLeg_SFReader()
+     self._ele8TrgWeight = EleTriggerLowPtLeg_SFReader()
+
+     # ==== ELECTRONS: tabulated values
      
-     # ===================== ELECTRONS 2012 A+B+C+D (WP medium) : https://twiki.cern.ch/twiki/bin/view/Main/EGammaScaleFactors2012#2012_8_TeV_data_53X  ==========
-     # ===================== ELECTRONS RECO SF assumed ~1 according to e-gamma POG==========
-     
-     self._eleRecoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
-                                   [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
-                                    [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
+##      self._eleRecoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+##                                    [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
+##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
+##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
+##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
       
-     self._eleIdIsoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
-                                   [[(1.004,sqrt(0.003**2+0.003**2)), (0.975,sqrt(0.013**2 +0.006**2)),  (1.034,sqrt(0.015**2+0.003**2)), (0.983, sqrt(0.006**2+0.009**2)), (1.025,sqrt(0.006**2+0.005**2))],     # 20-30 GeV
-                                    [(1.003,sqrt(0.001**2+0.002**2)), (0.984,sqrt(0.001**2 +0.001**2)),  (1.006,sqrt(0.007**2+0.002**2)), (0.990, sqrt(0.003**2+0.001**2)), (1.022,sqrt(0.003**2+0.002**2))],     # 30-40 GeV
-                                    [(1.007,sqrt(0.001**2+0.001**2)), (0.992,sqrt(0.001**2 +0.001**2)),  (0.991,sqrt(0.003**2+0.004**2)), (1.006, sqrt(0.002**2+0.002**2)), (1.013,sqrt(0.001**2+0.003**2))],     # 40-50 GeV
-                                    [(1.007,sqrt(0.001**2+0.002**2)), (0.995,sqrt(0.002**2 +0.001**2)),  (0.993,sqrt(0.005**2+0.002**2)), (1.007, sqrt(0.003**2+0.0001**2)), (1.009,sqrt(0.002**2+0.001**2))]])    # 50-200 GeV
+##      self._eleIdIsoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
+##                                    [[(1.004,sqrt(0.003**2+0.003**2)), (0.975,sqrt(0.013**2 +0.006**2)),  (1.034,sqrt(0.015**2+0.003**2)), (0.983, sqrt(0.006**2+0.009**2)), (1.025,sqrt(0.006**2+0.005**2))],     # 20-30 GeV
+##                                     [(1.003,sqrt(0.001**2+0.002**2)), (0.984,sqrt(0.001**2 +0.001**2)),  (1.006,sqrt(0.007**2+0.002**2)), (0.990, sqrt(0.003**2+0.001**2)), (1.022,sqrt(0.003**2+0.002**2))],     # 30-40 GeV
+##                                     [(1.007,sqrt(0.001**2+0.001**2)), (0.992,sqrt(0.001**2 +0.001**2)),  (0.991,sqrt(0.003**2+0.004**2)), (1.006, sqrt(0.002**2+0.002**2)), (1.013,sqrt(0.001**2+0.003**2))],     # 40-50 GeV
+##                                     [(1.007,sqrt(0.001**2+0.002**2)), (0.995,sqrt(0.002**2 +0.001**2)),  (0.993,sqrt(0.005**2+0.002**2)), (1.007, sqrt(0.003**2+0.0001**2)), (1.009,sqrt(0.002**2+0.001**2))]])   # 50-200 GeV
 
-     #===== electron trigger ( https://indico.cern.ch/getFile.py/access?contribId=60&sessionId=7&resId=0&materialId=slides&confId=219050 ) ======================
-     self._ele17TrgWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.978,0.0019),  (0.980,0.001), (1.00,0.001), (0.989,0.001), (0.984,0.001)],       # 20-30 GeV
-                                    [(0.991,0.0012),  (0.992,0.001), (1.00,0.001), (0.995,0.001), (0.993,0.001)],       # 30-40 GeV
-                                    [(0.993,0.0046),  (0.994,0.001), (1.00,0.001), (0.997,0.001), (0.997,0.001)],    # 40-50 GeV
-                                    [(0.993,0.00047), (0.995,0.001), (1.00,0.001), (0.997,0.001), (0.996,0.001)]]) # 50-200 GeV
+##      self._ele17TrgWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
+##                                    [[(0.978,0.0019),  (0.980,0.001), (1.00,0.001), (0.989,0.001), (0.984,0.001)],  # 20-30 GeV
+##                                     [(0.991,0.0012),  (0.992,0.001), (1.00,0.001), (0.995,0.001), (0.993,0.001)],  # 30-40 GeV
+##                                     [(0.993,0.0046),  (0.994,0.001), (1.00,0.001), (0.997,0.001), (0.997,0.001)],  # 40-50 GeV
+##                                     [(0.993,0.00047), (0.995,0.001), (1.00,0.001), (0.997,0.001), (0.996,0.001)]]) # 50-200 GeV
 
-     self._ele8TrgWeight  = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-                                   [[(0.980,0.001), (0.980,0.001), (1.00,0.00), (0.986,0.001), (0.985,0.001)],     # 20-30 GeV
-                                    [(0.989,0.001), (0.989,0.001), (1.00,0.00), (0.991,0.001), (0.991,0.001)],  # 30-40 GeV
-                                    [(0.991,0.001), (0.991,0.001), (1.00,0.00), (0.994,0.001), (0.993,0.001)],   # 40-50 GeV
-                                    [(0.991,0.001), (0.992,0.001), (1.00,0.00), (0.995,0.001), (0.995,0.001)]])  # 50-200 GeV
+##      self._ele8TrgWeight  = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
+##                                    [[(0.980,0.001), (0.980,0.001), (1.00,0.00), (0.986,0.001), (0.985,0.001)],  # 20-30 GeV
+##                                     [(0.989,0.001), (0.989,0.001), (1.00,0.00), (0.991,0.001), (0.991,0.001)],  # 30-40 GeV
+##                                     [(0.991,0.001), (0.991,0.001), (1.00,0.00), (0.994,0.001), (0.993,0.001)],  # 40-50 GeV
+##                                     [(0.991,0.001), (0.992,0.001), (1.00,0.00), (0.995,0.001), (0.995,0.001)]]) # 50-200 GeV
      
      ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
 
-     # ===================== Muon ID-ISO 2012A+B+C+D ==========
-     # Updated to the values provided by muon POG: https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs#2012_data
+   def weight_mm(self,m1,m2):
+     """Event weight for di-muons."""
+     lw = 1.
+     # The final per-event weight (convolving ID, ISO and Trigger)
+     lw *= self._muIDWeight.value(m1.pt(),m1.eta(),'0')
+     lw *= self._muIDWeight.value(m2.pt(),m2.eta(),'0')
+     lw *= self._muISOWeight.value(m1.pt(),m1.eta(),'0')
+     lw *= self._muISOWeight.value(m2.pt(),m2.eta(),'0')
+     lw *= self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'0')
 
-     self._muIDISOWeight  = MuonSFMap()
-
-     ## ==================== Muon Trigger ==================
-
-     self._muTRIGGERWeight_leg17_A  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_A  = MuonTriggerEffMap_leg8_AB()
-
-     self._muTRIGGERWeight_leg17_B  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_B  = MuonTriggerEffMap_leg8_AB()
-
-     ## CAVEAT: C and D have to be updated once available in the muon POG
-     
-     self._muTRIGGERWeight_leg17_C  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_C  = MuonTriggerEffMap_leg8_AB()
-
-     self._muTRIGGERWeight_leg17_D  = MuonTriggerEffMap_leg17_AB()
-     self._muTRIGGERWeight_leg8_D  = MuonTriggerEffMap_leg8_AB()
+     if abs(configuration.LeptonTnPfactor)<0.01 :
+       return lw
+     else:
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
          
     
-   def uncertainty_ee(self,e1,e2):
+
+   def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     # reco
-     unc =  (self._eleRecoWeight[(e1.pt(),e1.eta())][1]/self._eleRecoWeight[(e1.pt(),e1.eta())][0] +  \
-             self._eleRecoWeight[(e2.pt(),e2.eta())][1]/self._eleRecoWeight[(e2.pt(),e2.eta())][0])**2
-     # id-isolation
-     unc += (self._eleIdIsoWeight[(e1.pt(),e1.eta())][1]/self._eleIdIsoWeight[(e1.pt(),e1.eta())][0] +  \
-             self._eleIdIsoWeight[(e2.pt(),e2.eta())][1]/self._eleIdIsoWeight[(e2.pt(),e2.eta())][0])**2
-     # trigger (approximate)
-     unc += (abs(self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1]+  \
-                self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-   \
-                self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]-  \
-                self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1])/ \
-             (self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+     \
-              self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-     \
-              self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]))**2
-     unc += ((self._ele8TrgWeight[(e1.pt(),e1.eta())][1]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+     \
-             self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][1])/     \
-            (self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+      \
-             self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-      \
-             self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]))**2
-     #outcome
+     
+     unc =  (self._muIDWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDWeight.value(m1.pt(),m1.eta(),'0') +   \
+            self._muIDWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDWeight.value(m2.pt(),m2.eta(),'0'))**2 +   \
+            (self._muISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muISOWeight.value(m1.pt(),m1.eta(),'0') + \
+            self._muISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muISOWeight.value(m2.pt(),m2.eta(),'0'))**2 + \
+            (self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'+1')/self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'0'))**2
+         
      return sqrt(unc)
-  
+
+
    def weight_ee(self,e1,e2):
      """Event weight for di-electrons."""
-     # particle ID
-     pid_sf_run2011 = self._eleRecoWeight[(e1.pt(),e1.eta())][0]*self._eleRecoWeight[(e2.pt(),e2.eta())][0]
-     # isolation 
-     iso_sf_run2011 = self._eleIdIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIdIsoWeight[(e2.pt(),e2.eta())][0]
-     # trigger
-     hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
-                        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]- \
-                        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]
 
-     lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
+     lw = 1.
+     lw *= self._eleIDISOWeight(m1.pt(),m1.eta(),'0')
+     lw *= self._eleIDISOWeight(m2.pt(),m2.eta(),'0')
+     lw *= self._ele17TrgWeight(m1.pt(),m1.eta(),'0')* self._ele8TrgWeight(m2.pt(),m2.eta(),'0') + self._ele8TrgWeight(m1.pt(),m1.eta(),'0')* self._ele17TrgWeight(m2.pt(),m2.eta(),'0') - self._ele17TrgWeight(m1.pt(),m1.eta(),'0')* self._ele17TrgWeight(m2.pt(),m2.eta(),'0')  ## formula for the asymmetric trigger
 
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
        return lw + configuration.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
 
-   def uncertainty_mm(self,m1,m2):
+
+   def uncertainty_ee(self,e1,e2):
+     ## TBD (rc feb.2014) 
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     # ID and isolation uncertainty (TO BE FIXED)
-     unc =  (self._muIDISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDISOWeight.value(m1.pt(),m1.eta(),'+1')+  \
-             self._muIDISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDISOWeight.value(m2.pt(),m2.eta(),'+1'))**2
-     
-##    # trigger (approximate) ==== FIXME!! ===============
-##    hlt_sf_run2011_a_unc = (self._mu7TrgWeight [(m1.pt(),m1.eta())][1]/self._mu7TrgWeight [(m1.pt(),m1.eta())][0] + \
-##                            self._mu7TrgWeight [(m2.pt(),m2.eta())][1]/self._mu7TrgWeight [(m2.pt(),m2.eta())][0])**2
-##    hlt_sf_run2011_b_unc = (abs(self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-##                                self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-##                            (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_b_unc += ((self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-##                            (self._mu8Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-##                             self._mu13Trg_Mu13Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu13Trg_Mu13Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_c_unc = (abs(self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1]+  \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-   \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-  \
-##                                self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/ \
-##                            (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    hlt_sf_run2011_c_unc += ((self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][1]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+     \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][1])/     \
-##                            (self._mu8Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]+      \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu8Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]-      \
-##                             self._mu17Trg_Mu17Mu8_Weight[(m1.pt(),m1.eta())][0]*self._mu17Trg_Mu17Mu8_Weight[(m2.pt(),m2.eta())][0]))**2
-##    unc += 0.002*hlt_sf_run2011_a_unc + 0.643*hlt_sf_run2011_b_unc + 0.024*hlt_sf_run2011_c_unc
-    
+     # reco
+     unc =  (self._eleIDISOWeight(m1.pt(),m1.eta(),'1')/self._eleIDISOWeight(m1.pt(),m1.eta(),'0')+ \
+             self._eleIDISOWeight(m2.pt(),m2.eta(),'1')/self._eleIDISOWeight(m2.pt(),m2.eta(),'0'))**2
+     # trigger (approximate) TO BE IMPLEMENTED! FIXME
+     # unc += (abs(self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1]+  \
+     #           self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-   \
+     #           self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]-  \
+     #           self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1])/ \
+     #        (self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+     \
+     #         self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-     \
+     #         self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]))**2
+     # unc += ((self._ele8TrgWeight[(e1.pt(),e1.eta())][1]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+     \
+     #        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][1])/     \
+     #       (self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+      \
+     #        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-      \
+     #        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]))**2
+     #outcome
      return sqrt(unc)
+  
+   #def weight_ee(self,e1,e2):
+   #  """Event weight for di-electrons."""
+   #  # particle ID
+   #  pid_sf_run2011 = self._eleRecoWeight[(e1.pt(),e1.eta())][0]*self._eleRecoWeight[(e2.pt(),e2.eta())][0]
+   #  # isolation 
+   #  iso_sf_run2011 = self._eleIdIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIdIsoWeight[(e2.pt(),e2.eta())][0]
+   #  # trigger
+   #  hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
+   #                     self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]- \
+   #                     self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]
+   #
+   #  lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
+   #
+   #  if abs(configuration.LeptonTnPfactor)<0.01 :
+   #    return lw
+   #  else:
+   #    return lw + configuration.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
 
-   def weight_mm(self,m1,m2):
-     """Event weight for di-muons."""
-     lw = 1.
-
-     # particle id and isolation
-     lw *= self._muIDISOWeight.value(m1.pt(),m1.eta(),'0')
-     lw *= self._muIDISOWeight.value(m2.pt(),m2.eta(),'0')
-
-     # Trigger
-     hlt_sf_run2012_a = (self._muTRIGGERWeight_leg8_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_A.value(m2.pt(),m2.eta(),'0') +\
-                         self._muTRIGGERWeight_leg17_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg8_A.value(m2.pt(),m2.eta(),'0') -\
-                         self._muTRIGGERWeight_leg17_A.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_A.value(m2.pt(),m2.eta(),'0'))
-
-     hlt_sf_run2012_b = (self._muTRIGGERWeight_leg8_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_B.value(m2.pt(),m2.eta(),'0') +\
-                         self._muTRIGGERWeight_leg17_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg8_B.value(m2.pt(),m2.eta(),'0') -\
-                         self._muTRIGGERWeight_leg17_B.value(m1.pt(),m1.eta(),'0')*self._muTRIGGERWeight_leg17_B.value(m2.pt(),m2.eta(),'0'))
-                         
-     lw *= (0.5*hlt_sf_run2012_a + 0.5*hlt_sf_run2012_b) ##percentage according to the lumi in which they were not prescaled (apparently same efficinecy for AB)
-     #lw *= 0.966 ## temporary solution!
-
-     if abs(configuration.LeptonTnPfactor)<0.01 :
-       return lw
-     else:
-       return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
    def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
