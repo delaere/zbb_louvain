@@ -195,14 +195,6 @@ class JetmetControlPlots(BaseControlPlots):
     def beginJob(self, btagging="CSV"):
       self.btagging=btagging
       # declare histograms
-      self.add("SSVHEdisc","SSVHEdisc",200,0,10)
-      self.add("nVertHE","Number of two-tracks vertices in jets",5,-0.5,4.5)
-      self.add("SSVHPdisc","SSVHPdisc",200,0,10)
-      self.add("nVertHP","Number of three-tracks vertices in jets",5,-0.5,4.5)
-      self.add("SVmass","SVmass",20,0,5)
-      self.add("SVpT","SVpT",100,0,200)
-      self.add("CSVdisc","CSVdisc",100,0,1)
-      self.add("JPdisc","JPdisc",100,0,2.5)
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,0,10)
       self.add("SSVHPdiscDisc1","SSVHPdiscDisc1",200,0,10)
       self.add("CSVdiscDisc1","CSVdiscDisc1",100,0,1)
@@ -212,135 +204,64 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("METsignificance","MET significance",1000,0,500)
       self.add("METphiNNregression","MET #ph for NN regression",70,-3.5,3.5)
       self.add("METNNregression","MET for NN regression",250,0,500)
-      self.add("jetpt","Jet Pt",100,15,215)
-      self.add("jetpt_totunc","Jet Pt total uncertainty",100,0,1)
-      self.add("jetFlavor","Jet Flavor (MC)",29,-6.5,22.5)
-      self.add("jeteta","Jet eta",25,0, 2.5)
-      self.add("jetetapm","Jet eta",50,-2.5, 2.5)
-      self.add("jetphi","Jet phi",80,-4,4)
-      self.add("jetoverlapmu","jets overlaps with muons",2,0,2)
-      self.add("jetoverlapele","jets overlaps with electrons",2,0,2)
-      self.add("jetbeta","Jet beta function",20,-1,1)
-      self.add("jetbetaStar","Jet beta* function",20,-1,1)
-      self.add("jet1pt","leading jet Pt",1000,0,1000)
-      self.add("jet1pt_totunc","leading jet Pt total uncertainty",100,0,100)
-      self.add("jet1Flavor","leading jet Flavor (MC)",29,-6.5,22.5)
-      self.add("jet1eta","leading jet Eta",25,0,2.5)
-      self.add("jet1etapm","leading jet Eta",50,-2.5,2.5)
-      self.add("jet1phi","leading jet Phi",25,-4,4)
-      self.add("jet1energy","leading jet energy",125,0,3000)
-      self.add("jet1mass","leading jet mass",125,0,500)
-      self.add("jet1Chf","charged hadron energy fraction leading jet",100,0,1.5)
-      self.add("jet1Nhf","neutral hadron energy fraction leading jet",100,0,1.5)
-      self.add("jet1Phf","photon energy fraction leading jet",100,0,1.5)
-      self.add("jet1Elf","electron energy fraction leading jet",100,0,1.5)
-      self.add("jet1Muf","muon energy fraction leading jet",100,0,1.5)
-      self.add("jet1Vtx3dL","secondary vertex 3d flight distance leading jet",100,0,16)
-      self.add("jet1Vtx3deL","secondary vertex 3d flight distance error leading jet",200,0,3)
-      self.add("jet1VtxPt","secondary vertex PT for leading jet",100,0,270)
-      self.add("jet1PtD","constituentPt leading jet",100,0,1.5)
-      self.add("jet1SSVHEdisc","leading jet SSVHE discriminant",200,0,10)
-      self.add("jet1nVertHE","Number of two-tracks vertices in leading jet",5,-0.5,4.5)
-      self.add("jet1SSVHPdisc","leading jet SSVHP discriminant",200,0,10)
-      self.add("jet1nVertHP","Number of three-tracks vertices in leading jet",5,-0.5,4.5)
-      self.add("jet1SVmass","leading jet SV mass",20,0,5)
-      self.add("jet1SVpT","leading jet SV pT",100,0,200)
-      self.add("jet1CSVdisc","leading jet CSV discriminant",100,0,1)
-      self.add("jet1JPdisc","leading jet JP discriminant",100,0,2.5)
-      self.add("jet1beta","leading jet beta function",20,-1,1)
-      self.add("jet1betaStar","leading jet beta* function",20,-1,1)
-      self.add("jet2pt","subleading jet Pt",1000,0,1000)
-      self.add("jet2pt_totunc","subleading jet Pt total uncertainty",100,0,100)
-      self.add("jet2Flavor","subleading jet Flavor (MC)",29,-6.5,22.5)
-      self.add("jet2eta","subleading jet Eta",25,0,2.5)
-      self.add("jet2etapm","subleading jet Eta",50,-2.5,2.5)
-      self.add("jet2phi","subleading bjet Phi",25,-4,4)
-      self.add("jet2energy","subleading bjet energy",125,0,3000)
-      self.add("jet2mass","subleading bjet mass",125,0,500)
-      self.add("jet2Chf","charged hadron energy fraction leading jet",100,0,1.5)
-      self.add("jet2Nhf","neutral hadron energy fraction leading jet",100,0,1.5)
-      self.add("jet2Phf","photon energy fraction leading jet",100,0,1.5)
-      self.add("jet2Elf","electron energy fraction leading jet",100,0,1.5)
-      self.add("jet2Muf","muon energy fraction leading jet",100,0,1.5)
-      self.add("jet2Vtx3dL","secondary vertex 3d flight distance leading jet",100,0,16)
-      self.add("jet2Vtx3deL","secondary vertex 3d flight distance error leading jet",200,0,3)
-      self.add("jet2VtxPt","secondary vertex PT for leading jet",100,0,270)
-      self.add("jet2PtD","constituentPt leading jet",100,0,1.5)
-      self.add("jet2SSVHEdisc","subleading jet SSVHE discriminant",200,0,10)
-      self.add("jet2nVertHE","Number of two-tracks vertices in subleading jet",5,-0.5,4.5)
-      self.add("jet2SSVHPdisc","subleading jet SSVHP discriminant",200,0,10)
-      self.add("jet2nVertHP","Number of two-tracks vertices in subleading jet",5,-0.5,4.5)
-      self.add("jet2SVmass","subleading jet SV mass",20,0,5)
-      self.add("jet2SVpT","subleading jet SV pT",100,0,200)
-      self.add("jet2CSVdisc","subleading jet CSV discriminant",100,0,1)
-      self.add("jet2JPdisc","subleading jet JP discriminant",100,0,2.5)
-      self.add("jet2beta","subleading jet beta function",20,-1,1)
-      self.add("jet2betaStar","subleading jet beta* function",20,-1,1)
-      self.add("bjet1pt","leading bjet Pt",1000,0,1000)
-      self.add("bjet1pt_totunc","leading bjet Pt total uncertainty",100,0,100)
-      self.add("bjet1Flavor","leading bjet Flavor (MC)",29,-6.5,22.5)
-      self.add("bjet1eta","leading bjet Eta",25,0,2.5)
-      self.add("bjet1etapm","leading bjet Eta",50,-2.5,2.5)
-      self.add("bjet1phi","leading bjet Phi",25,-4,4)
-      self.add("bjet1energy","leading bjet energy",125,0,3000)
-      self.add("bjet1mass","leading bjet mass",125,0,500)
-      self.add("bjet1Chf","charged hadron energy fraction leading bjet",100,0,1.5)
-      self.add("bjet1Nhf","neutral hadron energy fraction leading bjet",100,0,1.5)
-      self.add("bjet1Phf","photon energy fraction leading bjet",100,0,1.5)
-      self.add("bjet1Elf","electron energy fraction leading bjet",100,0,1.5)
-      self.add("bjet1Muf","muon energy fraction leading bjet",100,0,1.5)
-      self.add("bjet1Vtx3dL","secondary vertex 3d flight distance leading bjet",100,0,16)
-      self.add("bjet1Vtx3deL","secondary vertex 3d flight distance error leading bjet",200,0,3)
-      self.add("bjet1VtxPt","secondary vertex PT for leading bjet",100,0,270)
-      self.add("bjet1PtD","constituentPt leading jet",100,0,1.5)
-      self.add("bjet1SSVHEdisc","leading bjet SSVHE discriminant",200,1.74,10)
-      self.add("bjet1nVertHE","Number of two-tracks vertices in leading bjet",5,-0.5,4.5)
-      self.add("bjet1SSVHPdisc","leading bjet SSVHP discriminant",200,0,10)
-      self.add("bjet1nVertHP","Number of three-tracks vertices in leading bjet",5,-0.5,4.5)
-      self.add("bjet1SVmass","leading bjet SV mass",20,0,5)
-      self.add("bjet1SVpT","leading bjet SV pT",100,0,200)
-      self.add("bjet1CSVdisc","leading bjet CSV discriminant",100,0,1)
-      self.add("bjet1JPdisc","leading bjet JP discriminant",100,0,2.5)
-      self.add("bjet1beta","leading bjet beta function",20,-1,1)
-      self.add("bjet1betaStar","leading bjet beta* function",20,-1,1)
-      self.add("bjet2pt","subleading bjet Pt",1000,0,1000)
-      self.add("bjet2pt_totunc","subleading bjet Pt total uncertainty",100,0,100)
-      self.add("bjet2Flavor","subleading bjet Flavor (MC)",29,-6.5,22.5)
-      self.add("bjet2eta","subleading bjet Eta",25,0,2.5)
-      self.add("bjet2etapm","subleading bjet Eta",50,-2.5,2.5)
-      self.add("bjet2phi","subleading bjet Phi",25,-4,4)
-      self.add("bjet2energy","subleading bjet energy",125,0,3000)
-      self.add("bjet2mass","subleading bjet mass",125,0,500)
-      self.add("bjet2Chf","charged hadron energy fraction sublieading bjet",100,0,1.5)
-      self.add("bjet2Nhf","neutral hadron energy fraction sublieading bjet",100,0,1.5)
-      self.add("bjet2Phf","photon energy fraction sublieading bjet",100,0,1.5)
-      self.add("bjet2Elf","electron energy fraction sublieading bjet",100,0,1.5)
-      self.add("bjet2Muf","muon energy fraction sublieading bjet",100,0,1.5)
-      self.add("bjet2Vtx3dL","secondary vertex 3d flight distance sublieading bjet",100,0,16)
-      self.add("bjet2Vtx3deL","secondary vertex 3d flight distance error sublieading bjet",200,0,3)
-      self.add("bjet2VtxPt","secondary vertex PT for sublieading bjet",100,0,270)
-      self.add("bjet2PtD","constituentPt sublieading bjet",100,0,1.5)
-      self.add("bjet2SSVHEdisc","subleading bjet SSVHE discriminant",200,1.74,10)
-      self.add("bjet2nVertHE","Number of two-tracks vertices in subleading bjet",5,-0.5,4.5)
-      self.add("bjet2SSVHPdisc","subleading bjet SSVHP discriminant",200,0,10)
-      self.add("bjet2nVertHP","Number of three-tracks vertices in subleading bjet",5,-0.5,4.5)
-      self.add("bjet2SVmass","subleading bjet SV mass",20,0,5)
-      self.add("bjet2SVpT","subleading bjet SV pT",100,0,200)
-      self.add("bjet2CSVdisc","subleading bjet CSV discriminant",100,0,1)
-      self.add("bjet2JPdisc","subleading bjet JP discriminant",100,0,2.5)
-      self.add("bjet2beta","subleading bjet beta function",20,-1,1)
-      self.add("bjet2betaStar","subleading bjet beta* function",20,-1,1)
+      #List of the variables related to jets in the oreder of plotting (from python 2.7 use of 'OrderedDict' can simplify this)
+      self.varOrdering = ["pt", "pt_totunc", "eta", "etapm", "phi", "energy", "mass", "jetid", "Flavor", "npf", "nch", "Chf", "Nhf", "cef", "nef", "Phf", "Elf", "Muf", "SSVHEdisc", "SSVHPdisc", "CSVdisc", "JPdisc", "nVertHE", "nVertHP", "SVmass", "SVpT", "Vtx3dL", "Vtx3deL", "VtxPt", "PtD", "beta", "betaStar", "PUIdMva", "overlapmu", "overlapele"]
+      #Definitions (title, bins, xmin, xmax) of the variables to be plotted
+      dicoVar = {
+          "pt" : ["Pt",1000,0,1000],
+          "pt_totunc" : ["Pt total uncertainty",100,0,1],
+          "eta" : ["Eta",25,0,2.5],
+          "etapm" : ["Eta",50,-2.5,2.5],
+          "phi" : ["Phi",25,-4,4],
+          "energy" : ["energy",125,0,3000],
+          "mass" : ["mass",125,0,500],
+          "jetid" : ["Jet Id level (none, loose, medium, tight)",4,0,4],
+          "Flavor" : ["Flavor (MC)",29,-6.5,22.5],
+          "npf" : ["total multiplicity",50,0,50],
+          "nch" : ["charged multiplicity",50,0,50],
+          "Chf" : ["charged hadron energy fraction",100,0,1.5],
+          "Nhf" : ["neutral hadron energy fraction",100,0,1.5],
+          "cef" : ["charged EmEnergy fraction",101,0,1.01],
+          "nef" : ["neutral EmEnergy fraction",101,0,1.01],
+          "Phf" : ["photon energy fraction",100,0,1.5],
+          "Elf" : ["electron energy fraction",100,0,1.5],
+          "Muf" : ["muon energy fraction",100,0,1.5],
+          "SSVHEdisc" : ["SSVHE discriminant",200,0,10],
+          "SSVHPdisc" : ["SSVHP discriminant",200,0,10],
+          "CSVdisc" : ["CSV discriminant",100,0,1],
+          "JPdisc" : ["JP discriminant",100,0,2.5],
+          "nVertHE" : ["Number of two-tracks vertices",5,-0.5,4.5],
+          "nVertHP" : ["Number of three-tracks vertices",5,-0.5,4.5],
+          "SVmass" : ["SV mass",20,0,5],
+          "SVpT" : ["SV pT",100,0,200],
+          "Vtx3dL" : ["secondary vertex 3d flight distance",100,0,16],
+          "Vtx3deL" : ["secondary vertex 3d flight distance error",200,0,3],
+          "VtxPt" : ["secondary vertex PT",100,0,270],
+          "PtD" : ["constituentPt",100,0,1.5],
+          "beta" : ["beta function",20,-1,1],
+          "betaStar" : ["beta* function",20,-1,1],
+          "PUIdMva" : ["PU id MVA",100,0,1],
+          "overlapmu" : ["jets overlaps with muons",2,0,2],
+          "overlapele" : ["jets overlaps with electrons",2,0,2],
+          }
+      for var in self.varOrdering:
+          if not var in dicoVar :
+              print "Warning:", var, " is not defined. This variable will not be plotted."
+              self.varOrdering.remove(var)
+              continue
+          self.add("jets"+var,"All jet "+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
+      self.njets = 2
+      for ijet in range(0,self.njets):
+          for var in self.varOrdering:
+              self.add("jet"+str(ijet+1)+var,"Jet "+str(ijet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
+      self.nbjets = 2
+      for ibjet in range(0,self.nbjets):
+          for var in self.varOrdering:
+              self.add("bjet"+str(ibjet+1)+var,"b-jet "+str(ibjet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
       self.add("dptj1b1","Pt difference between leading jet and leading bjet",1000,-500,500)
       self.add("nj","jet count",15,-0.5,14.5)
       self.add("nb","b-jet count",5,-0.5,4.5)
       self.add("nbP","pure b-jet count",5,0,5)
-      self.add("nhf","neutral hadron energy fraction",101,0,1.01)
-      self.add("nef","neutral EmEnergy fraction",101,0,1.01)
-      self.add("npf","total multiplicity",50,0,50)
-      self.add("chf","charged hadron energy fraction",101,0,1.01)
-      self.add("nch","charged multiplicity",50,0,50)
-      self.add("cef","charged EmEnergy fraction",101,0,1.01)
-      self.add("jetid","Jet Id level (none, loose, medium, tight)",4,0,4)
       self.add("rho", "Rho Variable",100,0,100)
       self.add("isrjetpt","isr jet Pt",1000,0,1000)
       self.add("isrjetetapm","isr jet Eta",50,-2.5,2.5)
@@ -366,34 +287,7 @@ class JetmetControlPlots(BaseControlPlots):
         configuration.JERfactor = 0
         configuration.JESfactor = 0
       # process event and fill histograms
-      result["SSVHEdisc"] = [ ]
-      result["SSVHPdisc"] = [ ]
-      result["nVertHE"] = [ ]
-      result["nVertHP"] = [ ]
-      result["SVmass"] = [ ]
-      result["SVpT"] = [ ]
-      result["SSVHEmass"] = [ ]
-      result["SSVHPmass"] = [ ]
-      result["CSVdisc"] = [ ]
-      result["JPdisc"] = [ ]
-      result["jetpt"] = [ ]
-      result["jetpt_totunc"] = [ ]
-      result["jetFlavor"] = [ ]
-      result["jeteta"] = [ ]
-      result["jetetapm"] = [ ]
-      result["jetphi"] = [ ]
-      result["jetoverlapmu"] = [ ]
-      result["jetoverlapele"] = [ ]
-      result["jetbeta"] = [ ]
-      result["jetbetaStar"] = [ ]
-      result["nhf"] = [ ]
-      result["nef"] = [ ]
-      result["npf"] = [ ]
-      result["chf"] = [ ]
-      result["nch"] = [ ]
-      result["cef"] = [ ]
-      result["jetid"] = [ ]
-      # jets 
+      for var in self.varOrdering : result["jets"+var] = []
       nj  = 0
       nb  = 0
       nbP = 0
@@ -409,29 +303,33 @@ class JetmetControlPlots(BaseControlPlots):
         jetPt = self._JECuncertainty.jetPt(jet)
         if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
-          result["jetpt"].append(jetPt)
-	  result["jetpt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
-	  result["jetFlavor"].append(jet.partonFlavour())
-          result["jeteta"].append(abs(jet.eta()))
-          result["jetetapm"].append(jet.eta())
-          result["jetphi"].append(jet.phi())
-          result["jetoverlapmu"].append(jet.hasOverlaps("muons"))
-          result["jetoverlapele"].append(jet.hasOverlaps("electrons"))
-          result["jetbeta"].append(jet.userFloat("beta"))
-          result["jetbetaStar"].append(jet.userFloat("betaStar"))
-          result["nhf"].append(( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy())
-          result["nef"].append(rawjet.neutralEmEnergyFraction())
-          result["npf"].append(rawjet.numberOfDaughters())
-          result["chf"].append(rawjet.chargedHadronEnergyFraction())
-          result["nch"].append(rawjet.chargedMultiplicity())
-          result["cef"].append(rawjet.chargedEmEnergyFraction())
-          if jetId(jet,"tight"): result["jetid"].append(3)
-          elif jetId(jet,"medium"): result["jetid"].append(2)
-          elif jetId(jet,"loose"): result["jetid"].append(1)
-          else: result["jetid"].append(0)
-          # B-tagging
-          result["SSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
-          result["SSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
+          result["jetspt"].append(jetPt)
+	  result["jetspt_totunc"].append(self._JECuncertainty.unc_tot_jet(jet))
+          result["jetseta"].append(abs(jet.eta()))
+          result["jetsetapm"].append(jet.eta())
+          result["jetsphi"].append(jet.phi())
+	  result["jetsenergy"].append(jet.energy())
+          result["jetsmass"].append(jet.mass())
+          if jetId(jet,"tight"): result["jetsjetid"].append(3)
+          elif jetId(jet,"medium"): result["jetsjetid"].append(2)
+          elif jetId(jet,"loose"): result["jetsjetid"].append(1)
+          else: result["jetsjetid"].append(0)
+          result["jetsFlavor"].append(jet.partonFlavour())
+          result["jetsnpf"].append(rawjet.numberOfDaughters())
+          result["jetsnch"].append(rawjet.chargedMultiplicity())
+          result["jetsChf"].append(jet.chargedHadronEnergyFraction())
+          result["jetsNhf"].append(jet.neutralHadronEnergyFraction())
+          result["jetsnef"].append(rawjet.neutralEmEnergyFraction())
+          result["jetscef"].append(rawjet.chargedEmEnergyFraction())
+          result["jetsPhf"].append(jet.photonEnergyFraction())
+          result["jetsElf"].append(jet.electronEnergyFraction())
+          result["jetsMuf"].append(jet.muonEnergyFraction())
+          result["jetsVtx3dL"].append(jetVtx3dL(jet))
+          result["jetsVtx3deL"].append(jetVtx3deL(jet))
+          result["jetsVtxPt"].append(jetVtxPt(jet))
+          result["jetsPtD"].append(jetPtD(jet))
+          result["jetsSSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+          result["jetsSSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
 	  tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
           nHEvert = 0
           nHPvert = 0
@@ -439,151 +337,115 @@ class JetmetControlPlots(BaseControlPlots):
             nHEvert = tISV.nVertices()
             nHPvert = sum( tISV.nVertexTracks(v) >=3 for v in range(nHEvert))
 	    if tISV.secondaryVertex(0) :
-	      result["SVmass"].append(tISV.secondaryVertex(0).p4().mass())
-	      result["SVpT"].append(tISV.secondaryVertex(0).p4().pt())
-          result["nVertHE"].append(nHEvert)
-          result["nVertHP"].append(nHPvert)
-          result["CSVdisc"].append(jet.bDiscriminator("combinedSecondaryVertexBJetTags"))
-          result["JPdisc"].append(jet.bDiscriminator("jetProbabilityBJetTags"))
-	  maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
+	      result["jetsSVmass"].append(tISV.secondaryVertex(0).p4().mass())
+	      result["jetsSVpT"].append(tISV.secondaryVertex(0).p4().pt())
+          result["jetsnVertHE"].append(nHEvert)
+          result["jetsnVertHP"].append(nHPvert)
+          result["jetsCSVdisc"].append(jet.bDiscriminator("combinedSecondaryVertexBJetTags"))
+          result["jetsJPdisc"].append(jet.bDiscriminator("jetProbabilityBJetTags"))
+          result["jetsbeta"].append(jet.userFloat("beta"))
+          result["jetsbetaStar"].append(jet.userFloat("betaStar"))
+          result["jetsPUIdMva"].append(jet.userFloat("puJetMva"))
+          result["jetsoverlapmu"].append(jet.hasOverlaps("muons"))
+          result["jetsoverlapele"].append(jet.hasOverlaps("electrons"))	
+
+          maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
 	  maxbdiscSSVHP = max(maxbdiscSSVHP,jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
 	  maxbdiscCSV = max(maxbdiscSSVHE,jet.bDiscriminator("combinedSecondaryVertexBJetTags"))
 	  maxbdiscJP = max(maxbdiscSSVHP,jet.bDiscriminator("jetProbabilityBJetTags"))
           nj += 1
+          if nj<self.njets+1 :
+              result["jet"+str(nj)+"pt"] = jetPt
+              result["jet"+str(nj)+"pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+              result["jet"+str(nj)+"eta"] = abs(jet.eta())
+              result["jet"+str(nj)+"etapm"] = jet.eta()
+              result["jet"+str(nj)+"phi"] = jet.phi()
+              result["jet"+str(nj)+"energy"] = jet.energy()
+              result["jet"+str(nj)+"mass"] = jet.mass()	    
+              if jetId(jet,"tight"): result["jet"+str(nj)+"jetid"] = 3
+              elif jetId(jet,"medium"): result["jet"+str(nj)+"jetid"] = 2
+              elif jetId(jet,"loose"): result["jet"+str(nj)+"jetid"] = 1
+              else: result["jet"+str(nj)+"jetid"] = 0
+              result["jet"+str(nj)+"Flavor"] = jet.partonFlavour()
+              result["jet"+str(nj)+"npf"] = jet.numberOfDaughters()
+              result["jet"+str(nj)+"nch"] = jet.chargedMultiplicity()
+              result["jet"+str(nj)+"Chf"] = jet.chargedHadronEnergyFraction()
+              result["jet"+str(nj)+"Nhf"] = jet.neutralHadronEnergyFraction()
+              result["jet"+str(nj)+"nef"] = jet.neutralEmEnergyFraction()
+              result["jet"+str(nj)+"cef"] = jet.chargedEmEnergyFraction()
+              result["jet"+str(nj)+"Phf"] = jet.photonEnergyFraction()
+              result["jet"+str(nj)+"Elf"] = jet.electronEnergyFraction()
+              result["jet"+str(nj)+"Muf"] = jet.muonEnergyFraction()
+              result["jet"+str(nj)+"Vtx3dL"] = jetVtx3dL(jet)
+              result["jet"+str(nj)+"Vtx3deL"] = jetVtx3deL(jet)
+              result["jet"+str(nj)+"VtxPt"] = jetVtxPt(jet)
+              result["jet"+str(nj)+"PtD"] = jetPtD(jet)
+              result["jet"+str(nj)+"SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+              result["jet"+str(nj)+"SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+              result["jet"+str(nj)+"nVertHE"] = nHEvert
+              result["jet"+str(nj)+"nVertHP"] = nHPvert
+              if tISV :
+                  if tISV.secondaryVertex(0) :
+                      result["jet"+str(nj)+"SVmass"] = tISV.secondaryVertex(0).p4().mass()
+                      result["jet"+str(nj)+"SVpT"] = tISV.secondaryVertex(0).p4().pt()
+              result["jet"+str(nj)+"CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+              result["jet"+str(nj)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
+              result["jet"+str(nj)+"beta"] = jet.userFloat("beta")
+              result["jet"+str(nj)+"PUIdMva"] = jet.userFloat("puJetMva")
+              result["jet"+str(nj)+"overlapmu"] = jet.hasOverlaps("muons")
+              result["jet"+str(nj)+"overlapele"] = jet.hasOverlaps("electrons")
           if nj==1: 
 	    j1pt=jetPt
-            result["jet1pt"] = jetPt
-	    result["jet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
-	    result["jet1Flavor"] = jet.partonFlavour()
-            result["jet1eta"] = abs(jet.eta())
-            result["jet1etapm"] = jet.eta()
-            result["jet1phi"] = jet.phi()
-            result["jet1energy"] = jet.energy()
-            result["jet1mass"] = jet.mass()	    
-            result["jet1Chf"] = jet.chargedHadronEnergyFraction()
-            result["jet1Nhf"] = jet.neutralHadronEnergyFraction()
-            result["jet1Phf"] = jet.photonEnergyFraction()
-            result["jet1Elf"] = jet.electronEnergyFraction()
-            result["jet1Muf"] = jet.muonEnergyFraction()
-            result["jet1Vtx3dL"] = jetVtx3dL(jet)
-            result["jet1Vtx3deL"] = jetVtx3deL(jet)
-            result["jet1VtxPt"] = jetVtxPt(jet)
-            result["jet1PtD"] = jetPtD(jet)
-            result["jet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-            result["jet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-            result["jet1nVertHE"] = nHEvert
-            result["jet1nVertHP"] = nHPvert
-	    if tISV :
-	      if tISV.secondaryVertex(0) :
-	        result["jet1SVmass"] = tISV.secondaryVertex(0).p4().mass()
-	        result["jet1SVpT"] = tISV.secondaryVertex(0).p4().pt()
-            result["jet1CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
-            result["jet1JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
-            result["jet1beta"] = jet.userFloat("beta")
-            result["jet1betaStar"] = jet.userFloat("betaStar")
-          elif nj==2:
-            result["jet2pt"] = jetPt
-	    result["jet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
-	    result["jet2Flavor"] = jet.partonFlavour()
-            result["jet2eta"] = abs(jet.eta())
-            result["jet2etapm"] = jet.eta()
-            result["jet2phi"] = jet.phi()
-            result["jet2energy"] = jet.energy()
-            result["jet2mass"] = jet.mass()
-            result["jet2Chf"] = jet.chargedHadronEnergyFraction()
-            result["jet2Nhf"] = jet.neutralHadronEnergyFraction()
-            result["jet2Phf"] = jet.photonEnergyFraction()
-            result["jet2Elf"] = jet.electronEnergyFraction()
-            result["jet2Muf"] = jet.muonEnergyFraction()
-            result["jet2Vtx3dL"] = jetVtx3dL(jet)
-            result["jet2Vtx3deL"] = jetVtx3deL(jet)
-            result["jet2VtxPt"] = jetVtxPt(jet)
-            result["jet2PtD"] = jetPtD(jet)
-            result["jet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-            result["jet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-            result["jet2nVertHE"] = nHEvert
-            result["jet2nVertHP"] = nHPvert
-	    if tISV :
-	      if tISV.secondaryVertex(0) :
-	        result["jet2SVmass"] = tISV.secondaryVertex(0).p4().mass()
-	        result["jet2SVpT"] = tISV.secondaryVertex(0).p4().pt()
-            result["jet2CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
-            result["jet2JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
-            result["jet2beta"] = jet.userFloat("beta")
-            result["jet2betaStar"] = jet.userFloat("betaStar")             
           if isBJet(jet,"HE",self.btagging): 
             nb += 1
-            if indexDijet==0 and jet in dijet:
+            if jet in dijet:
               indexDijet+=1
-              result["bjet1pt"] = jetPt
-	      result["bjet1pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
-	      result["bjet1Flavor"] = jet.partonFlavour()
-              result["bjet1eta"] = abs(jet.eta())
-              result["bjet1etapm"] = jet.eta()
-              result["bjet1phi"] = jet.phi()
-              result["bjet1energy"] = jet.energy()
-              result["bjet1mass"] = jet.mass()
-              result["bjet1Chf"] = jet.chargedHadronEnergyFraction()
-              result["bjet1Nhf"] = jet.neutralHadronEnergyFraction()
-              result["bjet1Phf"] = jet.photonEnergyFraction()
-              result["bjet1Elf"] = jet.electronEnergyFraction()
-              result["bjet1Muf"] = jet.muonEnergyFraction()
-              result["bjet1Vtx3dL"] = jetVtx3dL(jet)
-              result["bjet1Vtx3deL"] = jetVtx3deL(jet)
-              result["bjet1VtxPt"] = jetVtxPt(jet)
-              result["bjet1PtD"] = jetPtD(jet)
-              result["bjet1SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-              result["bjet1SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-              result["bjet1nVertHE"] = nHEvert
-              result["bjet1nVertHP"] = nHPvert
-	      bjet1svmass=-1
-	      bjet1svpt=-1
+              if indexDijet > self.nbjets : print "Error: more than 2 jets in dijet pair!!"
+              result["bjet"+str(indexDijet)+"pt"] = jetPt
+	      result["bjet"+str(indexDijet)+"pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	      result["bjet"+str(indexDijet)+"eta"] = abs(jet.eta())
+              result["bjet"+str(indexDijet)+"etapm"] = jet.eta()
+              result["bjet"+str(indexDijet)+"phi"] = jet.phi()
+              result["bjet"+str(indexDijet)+"energy"] = jet.energy()
+              result["bjet"+str(indexDijet)+"mass"] = jet.mass()
+              result["bjet"+str(indexDijet)+"Flavor"] = jet.partonFlavour()
+              if jetId(jet,"tight"): result["bjet"+str(indexDijet)+"jetid"] = 3
+              elif jetId(jet,"medium"): result["bjet"+str(indexDijet)+"jetid"] = 2
+              elif jetId(jet,"loose"): result["bjet"+str(indexDijet)+"jetid"] = 1
+              else: result["bjet"+str(indexDijet)+"jetid"] = 0
+              result["bjet"+str(indexDijet)+"npf"] = jet.numberOfDaughters()
+              result["bjet"+str(indexDijet)+"nch"] = jet.chargedMultiplicity()
+              result["bjet"+str(indexDijet)+"Chf"] = jet.chargedHadronEnergyFraction()
+              result["bjet"+str(indexDijet)+"Nhf"] = jet.neutralHadronEnergyFraction()
+              result["bjet"+str(indexDijet)+"nef"] = jet.neutralEmEnergyFraction()
+              result["bjet"+str(indexDijet)+"cef"] = jet.chargedEmEnergyFraction()
+              result["bjet"+str(indexDijet)+"Phf"] = jet.photonEnergyFraction()
+              result["bjet"+str(indexDijet)+"Elf"] = jet.electronEnergyFraction()
+              result["bjet"+str(indexDijet)+"Muf"] = jet.muonEnergyFraction()
+              result["bjet"+str(indexDijet)+"Vtx3dL"] = jetVtx3dL(jet)
+              result["bjet"+str(indexDijet)+"Vtx3deL"] = jetVtx3deL(jet)
+              result["bjet"+str(indexDijet)+"VtxPt"] = jetVtxPt(jet)
+              result["bjet"+str(indexDijet)+"PtD"] = jetPtD(jet)
+              result["bjet"+str(indexDijet)+"SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+              result["bjet"+str(indexDijet)+"SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+              result["bjet"+str(indexDijet)+"nVertHE"] = nHEvert
+              result["bjet"+str(indexDijet)+"nVertHP"] = nHPvert
+	      bjetsvmass=-1
+	      bjetsvpt=-1
 	      if tISV :
 	        if tISV.secondaryVertex(0) :
-	          bjet1svmass = tISV.secondaryVertex(0).p4().mass()
-                  bjet1svpt = tISV.secondaryVertex(0).p4().pt()
-              result["bjet1SVmass"] = bjet1svmass
-	      result["bjet1SVpT"] = bjet1svpt
-	      result["bjet1CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
-              result["bjet1JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
-	      result["dptj1b1"] = jetPt-j1pt
-              result["bjet1beta"] = jet.userFloat("beta")
-              result["bjet1betaStar"] = jet.userFloat("betaStar")
-            elif indexDijet==1 and jet in dijet:
-              indexDijet+=1
-              result["bjet2pt"] = jetPt
-	      result["bjet2pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
-	      result["bjet2Flavor"] = jet.partonFlavour()
-              result["bjet2eta"] = abs(jet.eta())
-              result["bjet2etapm"] = jet.eta()
-              result["bjet2phi"] = jet.phi()
-              result["bjet2energy"] = jet.energy()
-              result["bjet2mass"] = jet.mass()
-              result["bjet2Chf"] = jet.chargedHadronEnergyFraction()
-              result["bjet2Nhf"] = jet.neutralHadronEnergyFraction()
-              result["bjet2Phf"] = jet.photonEnergyFraction()
-              result["bjet2Elf"] = jet.electronEnergyFraction()
-              result["bjet2Muf"] = jet.muonEnergyFraction()
-              result["bjet2Vtx3dL"] = jetVtx3dL(jet)
-              result["bjet2Vtx3deL"] = jetVtx3deL(jet)
-              result["bjet2VtxPt"] = jetVtxPt(jet)
-              result["bjet2PtD"] = jetPtD(jet)
-              result["bjet2SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
-              result["bjet2SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
-	      bjet2svmass=-1
-	      bjet2svpt=-1
-	      if tISV :
-	        if tISV.secondaryVertex(0) :
-	          bjet2svmass = tISV.secondaryVertex(0).p4().mass()
-                  bjet2svpt = tISV.secondaryVertex(0).p4().pt()
-              result["bjet2SVmass"] = bjet2svmass
-	      result["bjet2SVpT"] = bjet2svpt
-              result["bjet2CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
-              result["bjet2JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
-              result["bjet2nVertHE"] = nHEvert
-              result["bjet2nVertHP"] = nHPvert
-              result["bjet2beta"] = jet.userFloat("beta")
-              result["bjet2betaStar"] = jet.userFloat("betaStar")	      
+	          bjetsvmass = tISV.secondaryVertex(0).p4().mass()
+                  bjetsvpt = tISV.secondaryVertex(0).p4().pt()
+              result["bjet"+str(indexDijet)+"SVmass"] = bjetsvmass
+	      result["bjet"+str(indexDijet)+"SVpT"] = bjetsvpt
+	      result["bjet"+str(indexDijet)+"CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+              result["bjet"+str(indexDijet)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
+	      result["bjet"+str(indexDijet)+"beta"] = jet.userFloat("beta")
+              result["bjet"+str(indexDijet)+"betaStar"] = jet.userFloat("betaStar")
+              result["bjet"+str(indexDijet)+"overlapmu"] = jet.hasOverlaps("muons")
+              result["bjet"+str(indexDijet)+"overlapele"] = jet.hasOverlaps("electrons")
+
+              result["dptj1b1"] = jetPt-j1pt
           if isBJet(jet,"HP",self.btagging): nbP += 1
 
       #second loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
@@ -631,45 +493,45 @@ class JetmetControlPlots(BaseControlPlots):
                           trijetM[self.masspoints[imass]] = threejet4vec.M()
               ijet+=1
               
-              if not isrjet is None:
-                  result["isrjetpt"] = self._JECuncertainty.jetPt(isrjet)
-                  result["isrjetetapm"] = isrjet.eta()
-                  result["isrjetphi"] = isrjet.phi()
-                  result["isrjetmass"] = isrjet.mass()
-              else:
-                  result["isrjetpt"] = 0
-                  result["isrjetetapm"] = 0
-                  result["isrjetphi"] = 0
-                  result["isrjetmass"] = 0
+          if not isrjet is None:
+              result["isrjetpt"] = self._JECuncertainty.jetPt(isrjet)
+              result["isrjetetapm"] = isrjet.eta()
+              result["isrjetphi"] = isrjet.phi()
+              result["isrjetmass"] = isrjet.mass()
+          else:
+              result["isrjetpt"] = 0
+              result["isrjetetapm"] = 0
+              result["isrjetphi"] = 0
+              result["isrjetmass"] = 0
+              
+          if not fsrjetDR is None:
+              result["fsrjetDRpt"] = self._JECuncertainty.jetPt(fsrjetDR)
+              result["fsrjetDRetapm"] = fsrjetDR.eta()
+              result["fsrjetDRphi"] = fsrjetDR.phi()
+              result["fsrjetDRmass"] = fsrjetDR.mass()
+              result["fsrDR"] = fsrDR
+              result["trijetMdr"] = (b1 + b2 + fsrjet4vec).M()
+          else:
+              result["fsrjetDRpt"] = 0
+              result["fsrjetDRetapm"] = 0
+              result["fsrjetDRphi"] = 0
+              result["fsrjetDRmass"] = 0
+              result["fsrDR"] = 0
+              result["trijetMdr"] = 0
                   
-              if not fsrjetDR is None:
-                  result["fsrjetDRpt"] = self._JECuncertainty.jetPt(fsrjetDR)
-                  result["fsrjetDRetapm"] = fsrjetDR.eta()
-                  result["fsrjetDRphi"] = fsrjetDR.phi()
-                  result["fsrjetDRmass"] = fsrjetDR.mass()
-                  result["fsrDR"] = fsrDR
-                  result["trijetMdr"] = (b1 + b2 + fsrjet4vec).M()
+          for imass in range(len(self.masspoints)):
+              if not fsrjet[self.masspoints[imass]] is None:
+                  result["fsrjetpt_"+str(self.masspoints[imass])] = self._JECuncertainty.jetPt(fsrjet[self.masspoints[imass]])
+                  result["fsrjetetapm_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].eta()
+                  result["fsrjetphi_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].phi()
+                  result["fsrjetmass_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].mass()
+                  result["trijetM_"+str(self.masspoints[imass])] = trijetM[self.masspoints[imass]]
               else:
-                  result["fsrjetDRpt"] = 0
-                  result["fsrjetDRetapm"] = 0
-                  result["fsrjetDRphi"] = 0
-                  result["fsrjetDRmass"] = 0
-                  result["fsrDR"] = 0
-                  result["trijetMdr"] = 0
-                  
-              for imass in range(len(self.masspoints)):
-                  if not fsrjet[self.masspoints[imass]] is None:
-                      result["fsrjetpt_"+str(self.masspoints[imass])] = self._JECuncertainty.jetPt(fsrjet[self.masspoints[imass]])
-                      result["fsrjetetapm_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].eta()
-                      result["fsrjetphi_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].phi()
-                      result["fsrjetmass_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].mass()
-                      result["trijetM_"+str(self.masspoints[imass])] = trijetM[self.masspoints[imass]]
-                  else:
-                      result["fsrjetpt_"+str(self.masspoints[imass])] = 0
-                      result["fsrjetetapm_"+str(self.masspoints[imass])] = 0
-                      result["fsrjetphi_"+str(self.masspoints[imass])] = 0
-                      result["fsrjetmass_"+str(self.masspoints[imass])] = 0
-                      result["trijetM_"+str(self.masspoints[imass])] = 0
+                  result["fsrjetpt_"+str(self.masspoints[imass])] = 0
+                  result["fsrjetetapm_"+str(self.masspoints[imass])] = 0
+                  result["fsrjetphi_"+str(self.masspoints[imass])] = 0
+                  result["fsrjetmass_"+str(self.masspoints[imass])] = 0
+                  result["trijetM_"+str(self.masspoints[imass])] = 0
                       
       result["SSVHEdiscDisc1"] = maxbdiscSSVHE
       result["SSVHPdiscDisc1"] = maxbdiscSSVHP

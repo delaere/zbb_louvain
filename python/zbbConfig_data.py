@@ -74,8 +74,8 @@ class configuration:
                        eventCollection("allelectrons","vector<pat::Electron>","allElectrons"),
                        eventCollection("allmuons","vector<pat::Muon>","allMuons"),
                        eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
-                       eventCollection("rho","double",("kt6PFJets","rho"))
-                     ] 
+                       eventCollection("rho","double",("kt6PFJets","rho")),
+                       ] 
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
                        eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False } ),

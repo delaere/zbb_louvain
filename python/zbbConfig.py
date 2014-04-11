@@ -66,7 +66,7 @@ class configuration:
                        eventCollection("genJets","vector<reco::GenJet>","ak5GenJets"),
                        eventCollection("genInfo","GenEventInfoProduct","generator"),
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
-                       eventCollection("jets","vector<pat::Jet>","selectedPatJets"),
+                       eventCollection("jets","vector<pat::Jet>","selectedPatJetsWithBeta"),
                        #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
@@ -78,7 +78,7 @@ class configuration:
                        eventCollection("allelectrons","vector<pat::Electron>","allElectrons"),
                        eventCollection("allmuons","vector<pat::Muon>","allMuons"),
                        eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
-                       eventCollection("rho","double",("kt6PFJets","rho"))
+                       eventCollection("rho","double",("kt6PFJets","rho")),
                      ] 
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
