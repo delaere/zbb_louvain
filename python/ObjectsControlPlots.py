@@ -15,7 +15,7 @@ class MuonsControlPlots(BaseControlPlots):
     
     def beginJob(self, muonList="muons", muonType="tight"):
       # declare histograms
-      self.add("muonType","Muon type", 4,0,4)
+      self.add("muonType","Muon type (0:no type, 1:global, 2:tracker, 3:glob+track)", 4,0,4)
       self.add("muonTckLayers","Muon Tck Layers",50,0,50)
       self.add("muonIso","Muon isolation",20,0,0.2)
       self.add("muonPt","Muon Pt",500,0,500)
@@ -98,18 +98,23 @@ class ElectronsControlPlots(BaseControlPlots):
     def beginJob(self, electronList="electrons", electronType="tight"):
       # declare histograms
       self.add("eleid","electron id",10,0,10)
+      self.add("eleMVAnontrig","electron MVA non trig",100,-1,1)
+      self.add("eleMVAtrig","electron MVA trig",100,-1,1)
+      self.add("eleMVAtrigNoIP","electron MVA trig no IP",100,-1,1)
       self.add("elemisshits","Electron missing hits",5,0,5)
       self.add("elept","electron pt",500,0,500)
       self.add("eleeta","electron eta",30,0,3)
       self.add("eleetapm","electron eta",60,-3,3)
       self.add("eledb","electron dB",100,0,0.05)
       self.add("eleoverlapmu","electrons overlaps with muon",2,0,2)
-      self.add("elechargedIso","Electron charged Hadron isolation ",100,0,0.2)
-      self.add("elephotonIso","Electron photon isolation",100,0,0.2)
-      self.add("eleneutralIso","Electron neutral Hadron isolation ",100,0,0.2)
       self.add("elepfIsoPUc","Electron pfIsoPUCorrected",100,0,0.2)
       self.add("elepfIsoPUcMC","Electron pfIsoPUCorrectedMC",100,0,0.2)
-      #self.add("eleHoE","Electron H over E",100,0,0.1)
+      self.add("eleHcalDepth1Iso","Electron HcalDepth1Iso",1000,0,20)
+      self.add("eleHcalDepth2Iso","Electron HcalDepth2Iso",1000,0,20)
+      self.add("eleHcalDepth1BcIso","Electron HcalDepth1BcIso",1000,0,20)
+      self.add("eleHcalDepth2BcIso","Electron HcalDepth2BcIso",1000,0,20)
+      self.add("eleEcalIso","Electron EcalIso",1000,0,20)
+      self.add("eleTkIso","Electron TkIso",1000,0,20)
       self.add("eledphi","Electron dphi at calo",100,0,0.1)
       self.add("eledeta","Electron deta at calo",100,0,0.01)
       self.add("eleinin","Electron sigma ieta ieta",100,0,0.1)
@@ -122,38 +127,44 @@ class ElectronsControlPlots(BaseControlPlots):
       result = { }
       # lepton selection
       result["eleid"] = [ ]
+      result["eleMVAnontrig"] = [ ]
+      result["eleMVAtrig"] = [ ]
+      result["eleMVAtrigNoIP"] = [ ]
       result["elemisshits"] = [ ]
       result["elept"] = [ ]
       result["eleeta"] = [ ]
       result["eleetapm"] = [ ]
       result["eledb"] = [ ]
       result["eleoverlapmu"] = [ ]
-      #result["elechargedIso"] = [ ]
-      #result["elephotonIso"] = [ ]
-      #result["eleneutralIso"] = [ ]
       result["elepfIsoPUc"] = [ ]
       result["elepfIsoPUcMC"] = [ ]
-      #result["eleHoE"] = [ ]
       result["eledphi"] = [ ]
       result["eledeta"] = [ ]
       result["eleinin"] = [ ]
+      result["eleHcalDepth1Iso"] = [ ]
+      result["eleHcalDepth2Iso"] = [ ]
+      result["eleHcalDepth1BcIso"] = [ ]
+      result["eleHcalDepth2BcIso"] = [ ]
+      result["eleEcalIso"] = [ ]
+      result["eleTkIso"] = [ ]
       nel = 0
       for electron in getattr(event, self.electronList):
         # for electrons
         if electron.pt()<20. : continue
-        
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
         result["eleid"].append(electron.userInt("MediumWP"))
+        result["eleMVAnontrig"].append(electron.electronID("mvaNonTrigV0"))
+        result["eleMVAtrig"].append(electron.electronID("mvaTrigV0"))
+        result["eleMVAtrigNoIP"].append(electron.electronID("mvaTrigNoIPV0"))
         result["elemisshits"].append(electron.gsfTrack().numberOfLostHits())
-        #result["elechargedIso"].append()
-        #result["elephotonIso"].append()
-        #result["eleneutralIso"].append()
         result["elepfIsoPUc"].append(electron.userFloat("PFIsoPUCorrected"))
         result["elepfIsoPUcMC"].append(electron.userFloat("PFIsoPUCorrectedMC"))
-        #result["eleHcalIso"].append(electron.dr03HcalTowerSumEt()/scEt)
-        #result["eleEcalIso"].append(electron.dr03EcalRecHitSumEt()/scEt)
-        #result["eleTkIso"].append(electron.dr03TkSumPt()/scEt)
-        #result["eleHoE"].append(electron.hadronicOverEm())
+        result["eleHcalDepth1Iso"].append(electron.dr03IsolationVariables().hcalDepth1TowerSumEt/scEt)
+        result["eleHcalDepth2Iso"].append(electron.dr03IsolationVariables().hcalDepth2TowerSumEt/scEt)
+        result["eleHcalDepth1BcIso"].append(electron.dr03IsolationVariables().hcalDepth1TowerSumEtBc/scEt)
+        result["eleHcalDepth2BcIso"].append(electron.dr03IsolationVariables().hcalDepth2TowerSumEtBc/scEt)
+        result["eleEcalIso"].append(electron.dr03IsolationVariables().ecalRecHitSumEt/scEt)
+        result["eleTkIso"].append(electron.dr03IsolationVariables().tkSumPt/scEt)
         result["eledphi"].append(electron.deltaPhiEleClusterTrackAtCalo())
         result["eledeta"].append(electron.deltaEtaEleClusterTrackAtCalo())
         result["eleinin"].append(electron.scSigmaIEtaIEta())
@@ -205,7 +216,7 @@ class JetmetControlPlots(BaseControlPlots):
       self.add("METphiNNregression","MET #ph for NN regression",70,-3.5,3.5)
       self.add("METNNregression","MET for NN regression",250,0,500)
       #List of the variables related to jets in the oreder of plotting (from python 2.7 use of 'OrderedDict' can simplify this)
-      self.varOrdering = ["pt", "pt_totunc", "eta", "etapm", "phi", "energy", "mass", "jetid", "Flavor", "npf", "nch", "Chf", "Nhf", "cef", "nef", "Phf", "Elf", "Muf", "SSVHEdisc", "SSVHPdisc", "CSVdisc", "JPdisc", "nVertHE", "nVertHP", "SVmass", "SVpT", "Vtx3dL", "Vtx3deL", "VtxPt", "PtD", "beta", "betaStar", "PUIdMva", "overlapmu", "overlapele"]
+      self.varOrdering = ["pt", "pt_totunc", "eta", "etapm", "phi", "energy", "mass", "jetid", "Flavor", "npf", "nch", "Chf", "Nhf", "cef", "nef", "Phf", "Elf", "Muf", "SSVHEdisc", "SSVHPdisc", "CSVdisc", "JPdisc", "nVertHE", "nVertHP", "SVmass", "SVpT", "Vtx3dL", "Vtx3deL", "VtxPt", "PtD", "beta", "betaStar", "PUIdMva", "PUIdWP", "overlapmu", "overlapele"]
       #Definitions (title, bins, xmin, xmax) of the variables to be plotted
       dicoVar = {
           "pt" : ["Pt",1000,0,1000],
@@ -241,6 +252,7 @@ class JetmetControlPlots(BaseControlPlots):
           "beta" : ["beta function",20,-1,1],
           "betaStar" : ["beta* function",20,-1,1],
           "PUIdMva" : ["PU id MVA",100,0,1],
+          "PUIdWP" : ["PU id WP (0:no, 4:loose, 6:medium, 7:tight)",8,-0.5,7.5],
           "overlapmu" : ["jets overlaps with muons",2,0,2],
           "overlapele" : ["jets overlaps with electrons",2,0,2],
           }
@@ -346,6 +358,7 @@ class JetmetControlPlots(BaseControlPlots):
           result["jetsbeta"].append(jet.userFloat("beta"))
           result["jetsbetaStar"].append(jet.userFloat("betaStar"))
           result["jetsPUIdMva"].append(jet.userFloat("puJetMva"))
+          result["jetsPUIdWP"].append(jet.userInt("puJetId"))
           result["jetsoverlapmu"].append(jet.hasOverlaps("muons"))
           result["jetsoverlapele"].append(jet.hasOverlaps("electrons"))	
 
@@ -392,6 +405,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["jet"+str(nj)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
               result["jet"+str(nj)+"beta"] = jet.userFloat("beta")
               result["jet"+str(nj)+"PUIdMva"] = jet.userFloat("puJetMva")
+              result["jet"+str(nj)+"PUIdWP"] = jet.userInt("puJetId")
               result["jet"+str(nj)+"overlapmu"] = jet.hasOverlaps("muons")
               result["jet"+str(nj)+"overlapele"] = jet.hasOverlaps("electrons")
           if nj==1: 
@@ -442,6 +456,8 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet"+str(indexDijet)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
 	      result["bjet"+str(indexDijet)+"beta"] = jet.userFloat("beta")
               result["bjet"+str(indexDijet)+"betaStar"] = jet.userFloat("betaStar")
+              result["bjet"+str(indexDijet)+"PUIdMva"] = jet.userFloat("puJetMva")
+              result["bjet"+str(indexDijet)+"PUIdWP"] = jet.userInt("puJetId")
               result["bjet"+str(indexDijet)+"overlapmu"] = jet.hasOverlaps("muons")
               result["bjet"+str(indexDijet)+"overlapele"] = jet.hasOverlaps("electrons")
 
