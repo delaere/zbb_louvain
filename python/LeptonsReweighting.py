@@ -37,6 +37,34 @@ def get_eta_trigger_key(eta):
 
    return range
 
+def get_eta_trigger_key(eta1,eta2):
+## N.B. needed for a different syntax for the new pkl file :-(
+   range =''
+   if (( abs(eta1)<=0.9 and abs(eta2)<=0.9 )):
+      range = '(0.0,0.9)(0.0,0.9)'                  
+   elif ((abs(eta1)> 0.9 and abs(eta1)<=1.2 and abs(eta2)<=0.9) or (abs(eta2)> 0.9 and abs(eta2)<=1.2 and abs(eta1)<=0.9)):
+      range = '(0.9,1.2)(0.0,0.9)'
+   elif ((abs(eta1)> 0.9 and abs(eta1)<=1.2 and abs(eta2)> 0.9 and abs(eta2)<=1.2 ) or (abs(eta2)> 0.9 and abs(eta2)<=1.2 and abs(eta1)> 0.9 and abs(eta1)<=1.2 )):
+      range = '(0.9,1.2)(0.9,1.2)'
+   elif ((abs(eta1)> 1.2 and abs(eta1)<=2.1 and abs(eta2)> 0.9 and abs(eta2)<=1.2 ) or (abs(eta2)> 1.2 and abs(eta2)<=2.1 and abs(eta1)> 0.9 and abs(eta1)<=1.2 )):
+      range = '(1.2,2.1)(0.9,1.2)'
+   elif ((abs(eta1)> 1.2 and abs(eta1)<=2.1 and abs(eta2)> 1.2 and abs(eta2)<=2.1 )):
+      range = '(1.2,2.1)(1.2,2.1)'
+   elif ((abs(eta1)> 1.2 and abs(eta1)<=2.1 and abs(eta2)<=0.9 ) or (abs(eta2)> 1.2 and abs(eta2)<=2.1 and abs(eta1)<=0.9 ) ):
+      range = '(1.2,2.1)(0.0,0.9)'
+   elif ((abs(eta1)> 2.1 and abs(eta1)<= 2.4 and abs(eta2)<=0.9 ) or (abs(eta2)> 2.1 and abs(eta2)<= 2.4 and abs(eta1)<=0.9 ) ):
+      range = '(2.1,2.4)(0.0,0.9)'
+   elif ((abs(eta1)> 2.1 and abs(eta1)<= 2.4 and abs(eta2)> 1.2 and abs(eta2)<=2.1 ) or ( abs(eta2)> 2.1 and abs(eta2)<= 2.4 and  abs(eta1)> 1.2 and abs(eta1)<=2.1 )):
+      range = '(2.1,2.4)(1.2,2.1)'
+   elif ((abs(eta1)> 2.1 and abs(eta1)<= 2.4 and abs(eta2)> 0.9 and abs(eta2)<=1.2 ) or ( abs(eta2)> 2.1 and  abs(eta2)<= 2.4 and abs(eta1)> 0.9 and abs(eta1)<=1.2 ) ):
+      range = '(2.1,2.4)(0.9,1.2)'
+   elif ((abs(eta1)> 2.1 and  abs(eta1)<= 2.4 and abs(eta2)> 2.1 and  abs(eta2)<= 2.4 ) ):
+      range = '(2.1,2.4)(2.1,2.4)' 
+   else:
+      print 'ERROR: value not in range'
+
+   return range
+
 def get_etaFiner_key(eta):
 ## N.B. obsolete, but kept
    
@@ -110,27 +138,33 @@ class EleIDISO_SFReader:
      """Embedding Ele ID-ISO SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdTight_2012rereco.txt', 'r')
      if f:
-        self._file = f  
+        self._file = f 
      else :
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
-     
-        for line in file:
-           vals = line.split() # find a new way for splitting
-           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+
+       self._file.seek(0,0) 
+       for line in self._file:
+           vals = line.split() # find a new way for splitting           
+           # === DEBUG ===
+           #print line
+           #print 'pt/eta', pt , eta
+           #print 'abs(eta)', abs(eta)
+
+           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
               if mode == '0'  :
-                 return double(vals[4])
+                 return float(vals[4])
               elif mode == '+1'  :
-                 return double(vals[5])
+                 return float(vals[5])
               elif mode == '-1'  :   
-                 return double(vals[6])
+                 return float(vals[6])
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-           else:
-              print 'WARNING: Any electron sf range matching the specified eta/pt'
-              return 1.
+
+       print 'WARNING: Any electron sf range matching the specified eta/pt'
+       return 1.
 
 
 class EleTriggerHighPtLeg_SFReader:
@@ -144,22 +178,22 @@ class EleTriggerHighPtLeg_SFReader:
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
-     
-        for line in file:
+        self._file.seek(0,0) 
+        for line in self._file:
            vals = line.split() # find a new way for splitting
-           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
               if mode == '0'  :
-                 return double(vals[4])
+                 return float(vals[4])
               elif mode == '+1'  :
-                 return double(vals[5])
+                 return float(vals[5])
               elif mode == '-1'  :   
-                 return double(vals[6])
+                 return float(vals[6])
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-           else:
-              print 'WARNING: Any electron sf range matching the specified eta/pt'
-              return 1.
+           
+        print 'WARNING: Any electron sf range matching the specified eta/pt '
+        return 1.
 
 
 class EleTriggerLowPtLeg_SFReader:
@@ -173,22 +207,22 @@ class EleTriggerLowPtLeg_SFReader:
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
-     
-        for line in file:
+        self._file.seek(0,0) 
+        for line in self._file:
            vals = line.split() # find a new way for splitting
-           if( pt> double(vals[0]) and pt<=double(vals[1]) and eta> double(vals[2]) and eta<= double(vals[3])):
+           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
               if mode == '0'  :
-                 return double(vals[4])
+                 return float(vals[4])
               elif mode == '+1'  :
-                 return double(vals[5])
+                 return float(vals[5])
               elif mode == '-1'  :   
-                 return double(vals[6])
+                 return float(vals[6])
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-           else:
-              print 'WARNING: Any electron sf range matching the specified eta/pt'
-              return 1.
+           
+        print 'WARNING: Any electron sf range matching the specified eta/pt'
+        return 1.
        
          
 class PtEtaMap:
@@ -344,7 +378,8 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
 
      """Return the eff or the uncertainty for a given pt and eta."""
      
-     self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
+     #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
+     self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
 
      if mode == '0'  :
         return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['efficiency']
@@ -355,7 +390,6 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
      else:  
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
-        
 
 
 class LeptonsReWeighting:
@@ -435,9 +469,9 @@ class LeptonsReWeighting:
      """Event weight for di-electrons."""
 
      lw = 1.
-     lw *= self._eleIDISOWeight(m1.pt(),m1.eta(),'0')
-     lw *= self._eleIDISOWeight(m2.pt(),m2.eta(),'0')
-     lw *= self._ele17TrgWeight(m1.pt(),m1.eta(),'0')* self._ele8TrgWeight(m2.pt(),m2.eta(),'0') + self._ele8TrgWeight(m1.pt(),m1.eta(),'0')* self._ele17TrgWeight(m2.pt(),m2.eta(),'0') - self._ele17TrgWeight(m1.pt(),m1.eta(),'0')* self._ele17TrgWeight(m2.pt(),m2.eta(),'0')  ## formula for the asymmetric trigger
+     lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
+     lw *= self._eleIDISOWeight.value(e2.pt(),e2.eta(),'0')
+     lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele8TrgWeight.value(e2.pt(),e2.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0')  ## formula for the asymmetric trigger
 
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
@@ -450,8 +484,8 @@ class LeptonsReWeighting:
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
      # reco
-     unc =  (self._eleIDISOWeight(m1.pt(),m1.eta(),'1')/self._eleIDISOWeight(m1.pt(),m1.eta(),'0')+ \
-             self._eleIDISOWeight(m2.pt(),m2.eta(),'1')/self._eleIDISOWeight(m2.pt(),m2.eta(),'0'))**2
+     unc =  (self._eleIDISOWeight.value(e1.pt(),e1.eta(),'1')/self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')+ \
+             self._eleIDISOWeight.value(e2.pt(),e2.eta(),'1')/self._eleIDISOWeight.value(e2.pt(),e2.eta(),'0'))**2
      # trigger (approximate) TO BE IMPLEMENTED! FIXME
      # unc += (abs(self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][1]+  \
      #           self._ele17TrgWeight[(e1.pt(),e1.eta())][1]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]-   \
@@ -468,25 +502,6 @@ class LeptonsReWeighting:
      #outcome
      return sqrt(unc)
   
-   #def weight_ee(self,e1,e2):
-   #  """Event weight for di-electrons."""
-   #  # particle ID
-   #  pid_sf_run2011 = self._eleRecoWeight[(e1.pt(),e1.eta())][0]*self._eleRecoWeight[(e2.pt(),e2.eta())][0]
-   #  # isolation 
-   #  iso_sf_run2011 = self._eleIdIsoWeight[(e1.pt(),e1.eta())][0]*self._eleIdIsoWeight[(e2.pt(),e2.eta())][0]
-   #  # trigger
-   #  hlt_sf_run2011AB = self._ele8TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]+ \
-   #                     self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele8TrgWeight[(e2.pt(),e2.eta())][0]- \
-   #                     self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]
-   #
-   #  lw = (pid_sf_run2011*iso_sf_run2011*hlt_sf_run2011AB)
-   #
-   #  if abs(configuration.LeptonTnPfactor)<0.01 :
-   #    return lw
-   #  else:
-   #    return lw + configuration.LeptonTnPfactor*self.uncertainty_ee(e1,e2)
-
-
    def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
      # if fwevent is defined, get electrons and muons from there
