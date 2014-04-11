@@ -62,7 +62,8 @@ class configuration:
                        eventCollection("genJets","vector<reco::GenJet>","ak5GenJets"),
                        eventCollection("genInfo","GenEventInfoProduct","generator"),
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
-                       eventCollection("jets","vector<pat::Jet>","cleanPatJets"),
+                       eventCollection("jets","vector<pat::Jet>","selectedPatJets"),
+                       #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
@@ -73,8 +74,8 @@ class configuration:
                        eventCollection("allelectrons","vector<pat::Electron>","allElectrons"),
                        eventCollection("allmuons","vector<pat::Muon>","allMuons"),
                        eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
-                       eventCollection("rho","double",("kt6PFJets","rho"))
-                     ] 
+                       eventCollection("rho","double",("kt6PFJets","rho")),
+                       ] 
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
                        eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False } ),

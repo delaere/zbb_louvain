@@ -414,6 +414,8 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
           TDirectory* dir;
           (*it)->GetObject(key->GetName(),dir);
           dataitems.push_back(dir);
+	  std::string keyname = key->GetName();
+	  if(keyname=="Muon" || keyname=="Electron" || keyname=="Combined") std::cout<<keyname<<std::endl;
         }
         std::vector<TDirectory*> mcitems;
         for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it) {
