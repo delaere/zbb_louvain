@@ -22,7 +22,8 @@ class configuration:
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
-  btagging = "CSV" 
+  btagging = "CSV"
+  WP = ["M","L"]
   muChannel = True
   eleChannel = True
   SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
@@ -40,11 +41,11 @@ class configuration:
 
   # control plot classes
   controlPlots = [ 
-                   controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging }),
-                   controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
-                   controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
-                   controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
-                 ]
+    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
+    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
+    controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
+    controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
+    ]
 
   if runningMode == "plots" :
     plotCP = [
@@ -85,21 +86,16 @@ class configuration:
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
-                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "ZjetFilter":"bcl" } ),
+                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":"bcl" } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
-                       eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":True,"eleChannel":False } ),
-                       eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":False,"eleChannel":True } ),
-                       eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"muChannel":True,"eleChannel":True } ),
+                       eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
+                       eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
+                       eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } )
                      ]
 
-#  eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":ssvperfData,"btagging":btagging}),
-#                       eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
-#                       eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
-#                       eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":pileupMC, "DataFileName":pileupData, "systematicShift":0})
-#                     ]
   eventWeights     = []
 
 class eventDumpConfig:

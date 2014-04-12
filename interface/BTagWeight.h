@@ -42,7 +42,7 @@ class JetSet {
   public:
     JetSet(std::string themode, const char* infile = "");
     ~JetSet();
-    void addJet(std::string uncert, int flavor, double et, double eta);
+    void addJet(std::string uncert, int flavor, double et, double eta, int algo1, int algo2);
     void addJet(const JetInfo& jet);
     const std::vector<JetInfo>& getJets() const { return jets_; }
     void reset() { jets_.clear(); }

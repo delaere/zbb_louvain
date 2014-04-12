@@ -107,14 +107,14 @@ def isInCategoryChannel(category, categoryTuple):
   else:
     return False
 
-def eventCategory(event,btagging="CSV", ZjetFilter="bcl"):
+def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
   if event.object().event().eventAuxiliary().isRealData():
     configuration.JERfactor = 0
     configuration.JESfactor = 0
-  return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, ZjetFilter=ZjetFilter) + \
-         eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, ZjetFilter=ZjetFilter)
+  return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter) + \
+         eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
   
-def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", ZjetFilter="bcl"):
+def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
   if not ZjetFilter=="bcl":
@@ -149,8 +149,8 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
   for index,jet in enumerate(event.jets):
     if goodJets[index]:
       nJets += 1
-      HE = isBJet(jet,"HE",btagging)
-      HP = isBJet(jet,"HP",btagging)
+      HE = isBJet(jet,WP[1],btagging)
+      HP = isBJet(jet,WP[0],btagging)
       if HE: nBjetsHE += 1
       if HP: nBjetsHP += 1
       if HE and HP: nBjetsHEHP +=1

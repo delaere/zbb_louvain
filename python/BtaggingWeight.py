@@ -9,23 +9,31 @@ from zbbConfig import configuration
 class BtaggingWeight:
   """compute the event weight based on btagging SF"""
 
-  def __init__(self, jmin1, jmax1, jmin2, jmax2, file, btagging="CSV"):
+  def __init__(self, jmin1, jmax1, jmin2, jmax2, file, btagging="CSV", WP=["M","L"]):
     self.engine=ROOT.BTagWeight(jmin1,jmax1,jmin2,jmax2)
     self.myJetSet = ROOT.JetSet(configuration.SF_running_mode,file)
     self.btagging=btagging
+    self.WP=WP
+    if "L" in WP or "HE" in WP : self.algo1 = 1
+    else :
+      self.algo1 = 2
+      self.algo2 = 3
+    if self.algo1 == 1 :
+      if "M" in WP or "HP" in WP : self.algo2 = 2
+      else : self.algo2 = 3
 
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
 
   def setMode(self,mode):
     #reminder: in the engine, the HP includes always HE.
-    if   mode=="HE": self.engine.setLimits(1,999,0,999)
-    elif mode=="HP": self.engine.setLimits(1,999,1,999)
-    elif mode=="HEexcl": self.engine.setLimits(1,1,0,1)
-    elif mode=="HPexcl": self.engine.setLimits(1,1,1,1)
-    elif mode=="HEHE": self.engine.setLimits(2,999,0,999)
-    elif mode=="HEHP": self.engine.setLimits(2,999,1,999)
-    elif mode=="HPHP": self.engine.setLimits(2,999,2,999)
+    if   mode==self.WP[1]: self.engine.setLimits(1,999,0,999)
+    elif mode==self.WP[0]: self.engine.setLimits(1,999,1,999)
+    elif mode==self.WP[1]+"excl": self.engine.setLimits(1,1,0,1)
+    elif mode==self.WP[0]+"excl": self.engine.setLimits(1,1,1,1)
+    elif mode==self.WP[1]+self.WP[1]: self.engine.setLimits(2,999,0,999)
+    elif mode==self.WP[1]+self.WP[0]: self.engine.setLimits(2,999,1,999)
+    elif mode==self.WP[0]+self.WP[0]: self.engine.setLimits(2,999,2,999)
     else: 
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)
@@ -57,20 +65,20 @@ class BtaggingWeight:
       # check flavor
       flavor = jet.partonFlavour()
       # check btagging
-      if isBJet(jet,"HP",self.btagging):
+      if isBJet(jet,self.WP[0],self.btagging):
         ntagsHP += 1
         if flavor == 0:
-          #if jet.et() > 100. : print "WARNING : "+btagging+"HP tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          #if jet.et() > 100. : print "WARNING : "+btagging+self.WP[0]+" tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHP += 1
-      if isBJet(jet,"HE",self.btagging):
+      if isBJet(jet,self.WP[1],self.btagging):
         ntagsHE += 1
         if flavor == 0:
-          #if jet.et() > 100. : print "WARNING : "+btagging+"HE tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          #if jet.et() > 100. : print "WARNING : "+btagging+self.WP[1]+" tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
-      self.myJetSet.addJet(configuration.SF_uncert, flavor,jet.et(),jet.eta())
-    #if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+btagging+"HP tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
-    #if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+btagging+"HE tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
+      self.myJetSet.addJet(configuration.SF_uncert, flavor,jet.et(),jet.eta(), self.algo1, self.algo2)
+    #if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+btagging+self.WP[0]+" tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
+    #if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+btagging+self.WP[1]+" tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
     return max(self.getWeight(self.myJetSet,ntagsHE,ntagsHP),0.)
 
   def getWeight(self,jetset, ntags1, ntags2):
@@ -79,20 +87,20 @@ class BtaggingWeight:
 
   def btaggingWeightMode(self,catName):
     if catName.find("(HEHE") != -1:
-      return "HEHE"
+      return self.WP[1]+self.WP[1]
     elif catName.find("(HEHP") != -1:
-      return "HEHP"
+      return self.WP[1]+self.WP[0]
     elif catName.find("(HPHP") != -1:
-      return "HPHP"
+      return self.WP[0]+self.WP[0]
     elif catName.find("(HE") != -1:
       if catName.find("exclusive") != -1:
-        return "HEexcl"
+        return self.WP[1]+"excl"
       else:
-        return "HE"
+        return self.WP[1]
     elif catName.find("(HP") != -1:
       if catName.find("exclusive") != -1:
-        return "HPexcl"
+        return self.WP[0]+"excl"
       else:
-        return "HP"
+        return self.WP[0]
     return "None"
 
