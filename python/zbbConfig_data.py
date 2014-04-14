@@ -63,7 +63,7 @@ class configuration:
                        eventCollection("genJets","vector<reco::GenJet>","ak5GenJets"),
                        eventCollection("genInfo","GenEventInfoProduct","generator"),
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
-                       eventCollection("jets","vector<pat::Jet>","selectedPatJets"),
+                       eventCollection("jets","vector<pat::Jet>","selectedPatJetsWithBeta"),
                        #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
