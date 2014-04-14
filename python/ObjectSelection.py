@@ -315,16 +315,18 @@ def isBJet(jet,workingPoint,algo="CSV"):
     elif workingPoint=="HP":
       return jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")>2.0 and jet.eta()<2.1
     else:
-      print "Error: unforeseen working point for b-tagging. Use HE or HP"
+      print "Error: unforeseen working point for SSV. Use HE or HP"
       return False
   elif algo=="CSV":
-    #HE is Loose WP and HP is Medium WP valid both for 2011 and 2012
-    if workingPoint=="HE":
+    #WP valid both for 2011 and 2012
+    if workingPoint=="L":
       return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.244
-    elif workingPoint=="HP":
+    elif workingPoint=="M":
       return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.679
+    elif workingPoint=="T":
+      return jet.bDiscriminator("combinedSecondaryVertexBJetTags")>0.898
     else:
-      print "Error: unforeseen working point for b-tagging. Use HE or HP"
+      print "Error: unforeseen working point for CSV. Use L, M or T"
       return False
   else:
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
@@ -508,7 +510,7 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
 
-def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
+def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
   if muChannel and eleChannel:
@@ -531,7 +533,7 @@ def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
   jetList = []
   # start with HP b-jets
   for index in indices[:]:
-    if isBJet(event.jets[index],"HP",btagging):
+    if isBJet(event.jets[index],WP[0],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)
@@ -542,7 +544,7 @@ def findDijetPair(event, btagging="CSV", muChannel=True, eleChannel=False):
       return (event.jets[jetList[1]],event.jets[jetList[0]])
   # continue with HE b-jets
   for index in indices[:]:
-    if isBJet(event.jets[index],"HE",btagging):
+    if isBJet(event.jets[index],WP[1],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)

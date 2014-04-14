@@ -203,8 +203,9 @@ class JetmetControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, btagging="CSV"):
+    def beginJob(self, btagging="CSV", WP=["M","L"]):
       self.btagging=btagging
+      self.WP=WP
       # declare histograms
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,0,10)
       self.add("SSVHPdiscDisc1","SSVHPdiscDisc1",200,0,10)
@@ -410,7 +411,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["jet"+str(nj)+"overlapele"] = jet.hasOverlaps("electrons")
           if nj==1: 
 	    j1pt=jetPt
-          if isBJet(jet,"HE",self.btagging): 
+          if isBJet(jet,self.WP[1],self.btagging): 
             nb += 1
             if jet in dijet:
               indexDijet+=1
@@ -462,7 +463,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet"+str(indexDijet)+"overlapele"] = jet.hasOverlaps("electrons")
 
               result["dptj1b1"] = jetPt-j1pt
-          if isBJet(jet,"HP",self.btagging): nbP += 1
+          if isBJet(jet,self.WP[0],self.btagging): nbP += 1
 
       #second loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
       fsrjet={}

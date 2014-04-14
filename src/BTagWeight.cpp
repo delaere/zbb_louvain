@@ -36,7 +36,7 @@ JetSet::~JetSet() { }
 // add a jet to the set. 
 // Efficiencies and scale factors are automatically extracted from the db,
 // and the jet is added to the set only if meaningful data can be obtained.
-void JetSet::addJet(std::string uncert, int flavor, double et, double eta) { 
+void JetSet::addJet(std::string uncert, int flavor, double et, double eta, int algo1, int algo2) { 
   btagPerfBase::SystematicVariation mode = btagPerfBase::MEAN;
   if(uncert=="min") mode = btagPerfBase::MIN;
   if(uncert=="max") mode = btagPerfBase::MAX;
@@ -44,10 +44,10 @@ void JetSet::addJet(std::string uncert, int flavor, double et, double eta) {
   if(uncert=="max_bc") mode = btagPerfBase::MAX_BC;
   if(uncert=="min_l") mode = btagPerfBase::MIN_L;
   if(uncert=="max_l") mode = btagPerfBase::MAX_L;
-  addJet(JetInfo(interface_->getbEfficiency(mode,flavor,1,et,eta),
-                 interface_->getbEffScaleFactor(mode,flavor,1,et,eta),
-                 interface_->getbEfficiency(mode,flavor,2,et,eta),
-                 interface_->getbEffScaleFactor(mode,flavor,2,et,eta),
+  addJet(JetInfo(interface_->getbEfficiency(mode,flavor,algo1,et,eta),
+                 interface_->getbEffScaleFactor(mode,flavor,algo1,et,eta),
+                 interface_->getbEfficiency(mode,flavor,algo2,et,eta),
+                 interface_->getbEffScaleFactor(mode,flavor,algo2,et,eta),
                  flavor)
         );
 }
