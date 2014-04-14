@@ -136,7 +136,7 @@ class EleIDISO_SFReader:
    
   def __init__(self):
      """Embedding Ele ID-ISO SF."""
-     f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdTight_2012rereco.txt', 'r')
+     f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdMedium_2012rereco.txt', 'r')
      if f:
         self._file = f 
      else :
@@ -163,7 +163,7 @@ class EleIDISO_SFReader:
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
 
-       print 'WARNING: Any electron sf range matching the specified eta/pt'
+       if pt<200. : print 'WARNING: Any electron sf range matching the specified eta/pt'
        return 1.
 
 
