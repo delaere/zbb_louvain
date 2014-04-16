@@ -37,7 +37,7 @@ class configuration:
   ssvperfData=dataDirectory+"performance_csv_witheff.root"
   pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
   pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
-  jecUncertainty=dataDirectory+"JEC11_V12_AK5PF_UncertaintySources.txt"
+  jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
 
   # control plot classes
   controlPlots = [ 
