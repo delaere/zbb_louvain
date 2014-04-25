@@ -60,8 +60,8 @@ void JetSet::addJet(const JetInfo& jet) {
     std::cerr << "Error: attempt to use a ill-defined jet for btagging." << std::endl;
     jet.print(true);
   }
-  if(jet.flavor==0 && (jet.eff_SSVHEM>0.3 || jet.eff_SSVHPT>0.1)) { //true if jets not matched with a parton are not considered like a light jet 
-    std::cerr << "ERROR : attempt to use a ill-defined jet for btagging. with high eficiency" << std::endl;
+  if(jet.flavor==0 && (jet.eff_SSVHEM>0.5 || jet.eff_SSVHPT>0.5)) { //true if jets not matched with a parton are not considered like a light jet 
+    std::cerr << "Warning : attempt to use a ill-defined jet for btagging. with high eficiency" << std::endl;
     jet.print(true);
   }
 }
