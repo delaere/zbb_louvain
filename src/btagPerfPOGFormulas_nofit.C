@@ -71,7 +71,6 @@ float btagPerfPOGFormulas_nofit::SFb_error_CSVT[] = {
 
 btagPerfPOGFormulas_nofit::btagPerfPOGFormulas_nofit(const char* inputfile) {
   // just a sigmoid. Used to parametrize the efficiencies
-  eff_ = new TF1("sigmoidTimesL","[0]+([3]+[4]*x)/(1+exp([1]-x*[2]))",20,1000);
   std::cout<<"I'm using the hardcoded CSV b-tag SFs"<<std::endl;
   esdata_ = TFile::Open(inputfile);
   h_eff_csvl_b_brl_ = (TH1F*)esdata_->Get( "CSVL/h_eff_bTagOverGoodJet_ptb_Barrel"  );
@@ -92,10 +91,53 @@ btagPerfPOGFormulas_nofit::btagPerfPOGFormulas_nofit(const char* inputfile) {
   h_eff_csvt_c_fwd_ = (TH1F*)esdata_->Get( "CSVT/h_eff_bTagOverGoodJet_ptc_Endcaps" );
   h_eff_csvt_l_brl_ = (TH1F*)esdata_->Get( "CSVT/h_eff_bTagOverGoodJet_ptl_Barrel"  );
   h_eff_csvt_l_fwd_ = (TH1F*)esdata_->Get( "CSVT/h_eff_bTagOverGoodJet_ptl_Endcaps" );
+
+  GetSFlmeanCSVL00 = GetSFlmean("CSV", "L", 0.0, 0.5, "ABCD");  
+  GetSFlminCSVL00  = GetSFlmin("CSV", "L", 0.0, 0.5, "ABCD");
+  GetSFlmaxCSVL00 = GetSFlmax("CSV", "L", 0.0, 0.5, "ABCD");
+
+  GetSFlmeanCSVL05 = GetSFlmean("CSV", "L", 0.5, 1.0, "ABCD");
+  GetSFlminCSVL05 = GetSFlmin("CSV", "L", 0.5, 1.0, "ABCD");
+  GetSFlmaxCSVL05 = GetSFlmax("CSV", "L", 0.5, 1.0, "ABCD");
+
+  GetSFlmeanCSVL10 = GetSFlmean("CSV", "L", 1.0, 1.5, "ABCD");
+  GetSFlminCSVL10 = GetSFlmin("CSV", "L", 1.0, 1.5, "ABCD");
+  GetSFlmaxCSVL10 = GetSFlmax("CSV", "L", 1.0, 1.5, "ABCD");
+
+  GetSFlmeanCSVL15 = GetSFlmean("CSV", "L", 1.5, 2.4, "ABCD");
+  GetSFlminCSVL15 = GetSFlmin("CSV", "L", 1.5, 2.4, "ABCD");
+  GetSFlmaxCSVL15 = GetSFlmax("CSV", "L", 1.5, 2.4, "ABCD");
+
+  GetSFlmeanCSVM00 = GetSFlmean("CSV", "M", 0.0, 0.8, "ABCD");
+  GetSFlminCSVM00 = GetSFlmin("CSV", "M", 0.0, 0.8, "ABCD");
+  GetSFlmaxCSVM00 = GetSFlmax("CSV", "M", 0.0, 0.8, "ABCD");
+
+  GetSFlmeanCSVM08 = GetSFlmean("CSV", "M", 0.8, 1.6, "ABCD");
+  GetSFlminCSVM08 = GetSFlmin("CSV", "M", 0.8, 1.6, "ABCD");
+  GetSFlmaxCSVM08 = GetSFlmax("CSV", "M", 0.8, 1.6, "ABCD");
+
+  GetSFlmeanCSVM16 = GetSFlmean("CSV", "M", 1.6, 2.4, "ABCD");
+  GetSFlminCSVM16 = GetSFlmin("CSV", "M", 1.6, 2.4, "ABCD");
+  GetSFlmaxCSVM16 = GetSFlmax("CSV", "M", 1.6, 2.4, "ABCD");
+
+  GetSFlmeanCSVT00 = GetSFlmean("CSV", "T", 0.0, 2.4, "ABCD");
+  GetSFlminCSVT00 = GetSFlmin("CSV", "T", 0.0, 2.4, "ABCD");
+  GetSFlmaxCSVT00 = GetSFlmax("CSV", "T", 0.0, 2.4, "ABCD");
 }
 
 btagPerfPOGFormulas_nofit::~btagPerfPOGFormulas_nofit() {
-  delete eff_;
+
+  delete GetSFlmeanCSVL00; delete GetSFlminCSVL00; delete GetSFlmaxCSVL00;
+  delete GetSFlmeanCSVL05; delete GetSFlminCSVL05; delete GetSFlmaxCSVL05;
+  delete GetSFlmeanCSVL10; delete GetSFlminCSVL10; delete GetSFlmaxCSVL10;
+  delete GetSFlmeanCSVL15; delete GetSFlminCSVL15; delete GetSFlmaxCSVL15;
+
+  delete GetSFlmeanCSVM00; delete GetSFlminCSVM00; delete GetSFlmaxCSVM00;
+  delete GetSFlmeanCSVM08; delete GetSFlminCSVM08; delete GetSFlmaxCSVM08;
+  delete GetSFlmeanCSVM16; delete GetSFlminCSVM16; delete GetSFlmaxCSVM16;
+
+  delete GetSFlmeanCSVT00; delete GetSFlminCSVT00; delete GetSFlmaxCSVT00;
+
 }
 
 btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
@@ -169,36 +211,36 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
 
      if( algo == 1 && fabs(eta)>0.0 &&  fabs(eta)<= 0.5) {
        //   Tagger: CSVL within 20 < pt GeV, abs(eta) < 0.5, x = pt
-       SFb = GetSFlmean("CSV", "L", 0.0, 0.5, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "L", 0.0, 0.5, "ABCD")->Eval(pt)-GetSFlmin("CSV", "L", 0.0, 0.5, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVL00->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVL00->Eval(pt)-GetSFlminCSVL00->Eval(pt))/2;
      } else if ( algo == 1 && fabs(eta)>0.5 &&  fabs(eta)<= 1.0) {
        //   Tagger: CSVL within 20 < pt GeV, 0.5 < abs(eta) < 1.0, x = pt
-       SFb = GetSFlmean("CSV", "L", 0.5, 1.0, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "L", 0.5, 1.0, "ABCD")->Eval(pt)-GetSFlmin("CSV", "L", 0.5, 1.0, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVL05->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVL05->Eval(pt)-GetSFlminCSVL05->Eval(pt))/2;
      } else if ( algo == 1 && fabs(eta)>1.0 &&  fabs(eta)<= 1.5) {
        //   Tagger: CSVL within 20 < pt GeV, 1.0 < abs(eta) < 1.5, x = pt
-       SFb = GetSFlmean("CSV", "L", 1.0, 1.5, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "L", 1.0, 1.5, "ABCD")->Eval(pt)-GetSFlmin("CSV", "L", 1.0, 1.5, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVL10->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVL10->Eval(pt)-GetSFlminCSVL10->Eval(pt))/2;
      } else if ( algo == 1 && fabs(eta)>1.5) {
        //   Tagger: CSVL within 20 < pt GeV, 1.5 < abs(eta) < 2.4, x = pt
-       SFb = GetSFlmean("CSV", "L", 1.5, 2.4, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "L", 1.5, 2.4, "ABCD")->Eval(pt)-GetSFlmin("CSV", "L", 1.5, 2.4, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVL15->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVL15->Eval(pt)-GetSFlminCSVL15->Eval(pt))/2;
      } else if ( algo == 2 && fabs(eta)>0.0 &&  fabs(eta)<= 0.8) {
        //   Tagger: CSVM within 20 < pt GeV, 0.0 < abs(eta) < 0.8, x = pt
-       SFb = GetSFlmean("CSV", "M", 0.0, 0.8, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "M", 0.0, 0.8, "ABCD")->Eval(pt)-GetSFlmin("CSV", "M", 0.0, 0.8, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVM00->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVM00->Eval(pt)-GetSFlminCSVM00->Eval(pt))/2;
      } else if ( algo == 2 && fabs(eta)>0.8 &&  fabs(eta)<= 1.6) {
        //   Tagger: CSVM within 20 < pt GeV, 0.8 < abs(eta) < 1.6, x = pt
-       SFb = GetSFlmean("CSV", "M", 0.8, 1.6, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "M", 0.8, 1.6, "ABCD")->Eval(pt)-GetSFlmin("CSV", "M", 0.8, 1.6, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVM08->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVM08->Eval(pt)-GetSFlminCSVM08->Eval(pt))/2;
      } else if ( algo == 2 && fabs(eta)>1.6) {
        //   Tagger: CSVM within 20 < pt GeV, 1.6 < abs(eta) < 2.4, x = pt
-       SFb = GetSFlmean("CSV", "M", 1.6, 2.4, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "M", 1.6, 2.4, "ABCD")->Eval(pt)-GetSFlmin("CSV", "M", 1.6, 2.4, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVM16->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVM16->Eval(pt)-GetSFlminCSVM16->Eval(pt))/2;
      } else if ( algo == 3 ) {
        //   Tagger: CSVT within 20 < pt GeV, 0.0 < abs(eta) < 2.4, x = pt
-       SFb = GetSFlmean("CSV", "T", 0.0, 2.4, "ABCD")->Eval(pt);
-       SFb_unc = ERR*(GetSFlmax("CSV", "T", 0.0, 2.4, "ABCD")->Eval(pt)-GetSFlmin("CSV", "T", 0.0, 2.4, "ABCD")->Eval(pt))/2;
+       SFb = GetSFlmeanCSVT00->Eval(pt);
+       SFb_unc = ERR*(GetSFlmaxCSVT00->Eval(pt)-GetSFlminCSVT00->Eval(pt))/2;
      }
    }
   }
