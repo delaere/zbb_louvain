@@ -21,10 +21,14 @@ void beffAnalysis(const char* input, const char* output) {
 
   // produce the ratio plot for the 12 combinations of (CSVL,CSVM,CSVT),(Barrel,Endcap),(b,c,l)
   TClonesArray algorithms("TCut",3);
-  new(algorithms[0]) TCut("CSVL","csv>0.244");
-  new(algorithms[1]) TCut("CSVM","csv>0.679");
-  new(algorithms[2]) TCut("CSVT","csv>0.898");
+//   new(algorithms[0]) TCut("CSVL","csv>0.244");
+//   new(algorithms[1]) TCut("CSVM","csv>0.679");
+//   new(algorithms[2]) TCut("CSVT","csv>0.898");
 
+  new(algorithms[0]) TCut("JPL","jp>0.275");
+  new(algorithms[1]) TCut("JPM","jp>0.545");
+  new(algorithms[2]) TCut("JPT","jp>0.790");
+  
   TClonesArray etaRegions("TCut",2);
   new(etaRegions[0]) TCut("Barrel","abs(eta)<=1.2");
   new(etaRegions[1]) TCut("Endcaps","abs(eta)>1.2");
