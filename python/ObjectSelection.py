@@ -4,8 +4,10 @@ import intervalmap
 from VertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
+from zbbConfig import configuration
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
+btagging=configuration.btagging
 
 # here we declare our triggers
 class ourTriggers: pass
@@ -328,6 +330,17 @@ def isBJet(jet,workingPoint,algo="CSV"):
     else:
       print "Error: unforeseen working point for CSV. Use L, M or T"
       return False
+  elif algo=="JP":
+    #WP valid both for 2011 and 2012
+    if workingPoint=="L":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.275
+    elif workingPoint=="M":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.545
+    elif workingPoint=="T":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.790
+    else:
+      print "Error: unforeseen working point for CSV. Use L, M or T"
+      return False
   else:
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
@@ -368,7 +381,7 @@ def jetVtx3dL(jet):
 
 def jetVtx3deL(jet):
   #input of VBF NN regression
-  #returns the 3D error of the SV jet if it exists
+  #returns the 3D error of the http://31.media.tumblr.com/b31acfdd73732a25d45104495be8b617/tumblr_mig7og0YbH1r5xpw1o1_250.gifSV jet if it exists
   output = 0
   tisv = jet.tagInfoSecondaryVertex()
   if tisv.nVertices()>0:
@@ -419,6 +432,7 @@ def isZcandidate(zCandidate,vertex=None):
     result = result and zVertex(zCandidate,0.05,vertex)
   # if everything ok, return the result of the lepton check
   return result
+  
 
 def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
@@ -534,6 +548,7 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestM = z.mass()
         bestZ = z
   return bestZ
+  
 
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
@@ -548,7 +563,11 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
     goodJets = event.goodJets_none
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
-  csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+  if btagging == "CSV":
+    csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+  elif btagging == "JP":
+    csvList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    
   csvList.sort(reverse=True)
   indices = []
   for icsv in csvList:

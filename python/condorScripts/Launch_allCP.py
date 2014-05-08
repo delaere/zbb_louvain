@@ -8,25 +8,30 @@ import LaunchOnCondor
 import glob
 import os
 
+from UserCode.zbb_louvain.zbbConfig import configuration
+ 
+mode = configuration.runningMode
+
+
 samples = [
     #"DATA",
-    #"DY",
-    "TT",
-    #"ZZ",
-    #"ZH",
+#"DY",
+"TT",
+#"ZZ",
+#"ZH",
     ]
 
 DYsamples = [
-    "DYjets",
-    #"DY1jets",
-    #"DY2jets",
-    #"DY3jets",
-    #"DY4jets",
-    #"DYjets_Pt50to70",
-    #"DYjets_Pt70to100",
-    #"DYjets_Pt100",
-    #"DYjets_Pt180",
-    #"Zbb",
+#    "DYjets",
+#"DY1jets",
+#"DY2jets",
+#"DY3jets",
+#"DY4jets",
+"DYjets_Pt50to70",
+"DYjets_Pt70to100",
+"DYjets_Pt100",
+"DYjets_Pt180",
+"Zbb",
     ]
 
 DYbcl = [
@@ -39,9 +44,9 @@ DYbcl = [
     ]
 
 TTsamples = [
-    #"TTjets",
-    "TTFullLept",
-    #"TTSemiLept",
+    "TTjets",
+   # "TTFullLept",
+   # "TTSemiLept",
     #"TTHadronic"
     ]
 
@@ -49,14 +54,14 @@ mass = [125] #[110,115,120,125,130,135]
 
 MC = "Summer12"
 DATA = "2012"
-cpVersion = "V5"
+cpVersion = "JP_fix"
 README = "first 2012 ReReco CP for TTfullLept \n"
 
 listdata=[
         "A",
-        #"B",
-        #"C",
-        #"D",
+        "B",
+        "C",
+        "D",
         ]
 
 DataChannel = [
@@ -87,44 +92,50 @@ jobs = {
     "DY4jets" : 100,
     "DYjets_Pt50to70" : 250,
     "DYjets_Pt70to100" : 250,
+    "DYjets_Pt100" : 50,
     "DYjets_Pt180" : 50,
     "Zbb" : 400,
     }
 
-dir = "/nfs/user/acaudron/ControlPlots/cp5314p1/"
+if mode == "plots":
+  dir = "/nfs/user/cbeluffi/ControlPlots/cp_test/"
+  string_mode='ControlPlots_'
+elif mode == "dataset":
+  dir = "/nfs/user/cbeluffi/RDS/rds5314p1/"
+  string_mode='RDS_'
 
-os.system('mkdir '+dir+'ControlPlots_'+cpVersion)
-f = open(dir+'ControlPlots_'+cpVersion+'/README.txt', 'w')
+os.system('mkdir '+dir+string_mode+cpVersion)
+f = open(dir+string_mode+cpVersion+'/README.txt', 'w')
 f.write(README)
 f.close()
 for sample in samples :
     if sample=="ZH":
         for m in mass:
-            os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+sample+str(m))
-            LaunchOnCondor.Jobs_FinalCmds.append('mv ZH'+str(m)+'_'+MC+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+sample+str(m)+'/ \n')
+            os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+sample+str(m))
+            LaunchOnCondor.Jobs_FinalCmds.append('mv ZH'+str(m)+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+sample+str(m)+'/ \n')
     elif sample=="DY":
         for dy in DYsamples :
             #for fl in DYbcl :
-                #os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+dy+'_'+fl)
-                #LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+fl+'_'+MC+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+dy+'_'+fl+'/ \n')
-            os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+dy)
-            LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+MC+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+dy+'/ \n')
+                #os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+dy+'_'+fl)
+                #LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+fl+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+'_'+fl+'/ \n')
+            os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+dy)
+            LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+'/ \n')
     elif sample=="TT":
         for tt in TTsamples :
-            os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+tt)
-            LaunchOnCondor.Jobs_FinalCmds.append('mv '+tt+'_'+MC+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+tt+'/ \n')
+            os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+tt)
+            LaunchOnCondor.Jobs_FinalCmds.append('mv '+tt+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+tt+'/ \n')
     elif sample=="DATA":
         for ch in DataChannel :
             for samp in DataSample :
                 for period in listdata :
-                    os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+samp+ch+DATA+period)
-                    LaunchOnCondor.Jobs_FinalCmds.append('mv '+samp+ch+DATA+period+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+samp+ch+DATA+period+'/ \n')
+                    os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+samp+ch+DATA+period)
+                    LaunchOnCondor.Jobs_FinalCmds.append('mv '+samp+ch+DATA+period+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+samp+ch+DATA+period+'/ \n')
     else :
-        os.system('mkdir '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+sample)
-        LaunchOnCondor.Jobs_FinalCmds.append('mv '+sample+'_*.root '+dir+'ControlPlots_'+cpVersion+'/ControlPlots_'+sample+'/ \n')
+        os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+sample)
+        LaunchOnCondor.Jobs_FinalCmds.append('mv '+sample+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+sample+'/ \n')
         
-FarmDirectory = dir+"FARM_CP_"+cpVersion
-JobName = "CoPl_list_"+cpVersion
+FarmDirectory = dir+"FARM_"+string_mode+cpVersion
+JobName = "RDS_list_"+cpVersion
 
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 

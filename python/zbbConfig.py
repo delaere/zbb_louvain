@@ -15,26 +15,33 @@ class configuration:
   WSname = "workspace_ras"
 
   # mode: plots or dataset
-  runningMode = "plots"
-  #runningMode = "dataset"
+  #runningMode = "plots"
+  runningMode = "dataset"
 
   # event selection class
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
-  btagging = "CSV" 
+  btagging = "JP" #CSV or JP 
   WP = ["M","L"] #2 WP, the tightest one first
   muChannel = True
   eleChannel = True
   SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
-  SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
+  if btagging == "CSV":
+    SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
+  elif btagging == "JP":
+    SF_running_mode= "database" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
+    
   JERfactor = 1. # 1 = recommended smearing for MC, use 0 for MadWeight
   JESfactor = 0. # 1 = +1sigma
   LeptonTnPfactor = 0 # Lepton reweighting uncertainty
   doMEcontrolPlots = True
   doNNJetRegression = False
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
-  ssvperfData=dataDirectory+"performance_csv_witheff.root"
+  if btagging == "CSV":
+    ssvperfData=dataDirectory+"performance_csv_witheff.root"
+  elif btagging == "JP":
+    ssvperfData=dataDirectory+"performance_jp_witheff.root"
   pileupData=dataDirectory+"Cert_190456-208686_8TeV_22Jan2013ReReco_pileupTruth.root"
   pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
   jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
@@ -93,8 +100,9 @@ class configuration:
                        eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":"bcl" } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
-                       eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
-                       eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
+                       #eventProducer("bestDiLeptCandidate", "ObjectSelection", "findBestDiLeptCandidate", { "muChannel":True,"eleChannel":True } ),
+		       eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
+		       eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair",{ "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),

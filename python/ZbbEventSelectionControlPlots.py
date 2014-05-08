@@ -14,6 +14,9 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
     
     def beginJob(self):
       # declare histograms
+      self.add("run","Run number",50000,160000,210000)
+      self.add("event","Event number",1000,0,5e9)
+      self.add("ls","Lumi section",2000,0,2000)      
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("triggerDouble","Double trigger",2,0,2)
@@ -96,6 +99,9 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       result["triggerBits"] = triggerList
       result["triggerSingle"] = SingleTrig
       result["triggerDouble"] = DoubleTrig
+      result["run"] = event.run()
+      result["event"] = event.event()
+      result["ls"] = event.lumi()
       
       ## Z boson
       result["zmassMu"] = [ ]
