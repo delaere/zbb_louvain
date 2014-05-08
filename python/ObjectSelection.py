@@ -450,7 +450,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
   if l1.isMuon() :
-    return True
+    #return True
     if runNumber>=160410 and runNumber<163269 :
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
         return True

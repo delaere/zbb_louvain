@@ -56,7 +56,7 @@
     <Variable VarIndex="4" Expression="zz3weight" Label="zz3weight" Title="zz3weight" Unit="" Internal="zz3weight" Type="D" Min="8.83782101e+00" Max="5.00000000e+01"/>
     <Variable VarIndex="5" Expression="hiweight" Label="hiweight" Title="hiweight" Unit="" Internal="hiweight" Type="D" Min="2.15564861e+01" Max="5.00000000e+01"/>
     <Variable VarIndex="6" Expression="hi3weight" Label="hi3weight" Title="hi3weight" Unit="" Internal="hi3weight" Type="D" Min="1.12755232e+01" Max="5.00000000e+01"/>
-    <Variable VarIndex="7" Expression="prodCSV" Label="prodCSV" Title="prodCSV" Unit="" Internal="prodCSV" Type="D" Min="1.73260003e-01" Max="9.99992073e-01"/>
+    <Variable VarIndex="7" Expression="prodJP" Label="prodJP" Title="prodJP" Unit="" Internal="prodJP" Type="D" Min="1.73260003e-01" Max="9.99992073e-01"/>
   </Variables>
   <Spectators NSpec="0"/>
   <Classes NClass="2">

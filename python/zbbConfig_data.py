@@ -37,10 +37,14 @@ class configuration:
   doMEcontrolPlots = True
   doNNJetRegression = False
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
+<<<<<<< HEAD
   if btagging == "CSV":
     ssvperfData=dataDirectory+"performance_csv_witheff.root"
   elif btagging == "JP":
     ssvperfData=dataDirectory+"performance_jp_witheff.root"
+=======
+  ssvperfData=dataDirectory+"btag_allalgos_witheff.root"
+>>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
   pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
   pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
   jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"

@@ -14,9 +14,9 @@ mode = configuration.runningMode
 
 
 samples = [
-    #"DATA",
+    "DATA",
 #"DY",
-"TT",
+#"TT",
 #"ZZ",
 #"ZH",
     ]
@@ -59,13 +59,13 @@ README = "first 2012 ReReco CP for TTfullLept \n"
 
 listdata=[
         "A",
-        "B",
-        "C",
-        "D",
+#        "B",
+#        "C",
+#        "D",
         ]
 
 DataChannel = [
-    "Ele",
+    #"Ele",
     "Mu",
     ]
 

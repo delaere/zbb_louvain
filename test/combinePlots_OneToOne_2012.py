@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 
 from UserCode.zbb_louvain.zbbCommons import zbbnorm
 #lumi=zbbnorm.lumi_tot2012*1000 #in pb-1
-lumi=(19.7)*1000
+lumi=(19.79-7.11)*1000
 
 class EColor:
  """ROOT colors taken from RTypes.h"""
@@ -28,75 +28,22 @@ print "ok"
 process = cms.Process("merge")
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('mergedPlots_2012ABCD_V1_higgs_allMC.root'),
+  outputFile = cms.string('mergedPlots_2012ABCD_V1_higgs_DataMatchvsNoMatch_Muon.root'),
     
   data = cms.VPSet (
         cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012A/DoubleEle2012A_Summer12_final.root')
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V19/ControlPlots_DoubleEle2012A/DoubleEle2012A_Summer12_final.root')
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-            ), 
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012A06aug/DoubleEle2012A06aug_Summer12_final.root')
-#            ), 
-        cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012B/DoubleEle2012B_Summer12_final.root')
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V19/ControlPlots_DoubleEle2012B/DoubleEle2012B_Summer12_final.root')
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-            ), 
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012C-v1/DoubleEle2012C-v1_Summer12_final.root')
-#            ), 
-        cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012C/DoubleEle2012C_Summer12_final.root')
-            ),
-        cms.PSet(
-           fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleEle2012D/DoubleEle2012D_Summer12_final.root')
-           ),
-
-        cms.PSet(
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root') 
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V19/ControlPlots_DoubleEle2012C/DoubleEle2012C_Summer12_final.root')
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V24/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root')
             ), 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V19/ControlPlots_DoubleEle2012D/DoubleEle2012D_Summer12_final.root')
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V24/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V24/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root')
+            ), 
+        cms.PSet(
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V24/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root')
             ), 
 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root') 
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-            ),
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012A06aug/DoubleMu2012A06aug_Summer12_final.root')    
-#            ),   
-        cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root')    
-            ),   
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012C-v1/DoubleMu2012C-v1_Summer12_final.root')    
-#            ),   
-        cms.PSet(
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root')    
-            ),   
-        cms.PSet(
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root')    
-=======
-           fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root') 
-            ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root') 
-            ),
-        cms.PSet(
-           fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root') 
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-            ),
         
   ),
     
@@ -104,114 +51,36 @@ process.CombinePlots = cms.PSet(
   mc   = cms.VPSet (
         
         cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_ZZ/ZZ_Summer12_final.root'),
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V20/ControlPlots_ZZ/ZZ_Summer12_final.root'),
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root'),
             color = cms.uint32(EColor.kMagenta+palette),
-            scale = cms.double(zbbnorm.xsec_ZZ_8TeV*lumi/zbbnorm.nev_ZZ_summer12),#6.206*5051./(4191045.)), #Xs 
-            role = cms.string('ZZ')
+            scale = cms.double(1.),#6.206*5051./(4191045.)), #Xs 
+            role = cms.string('A')
             ),
 
         cms.PSet(
-<<<<<<< HEAD
-            #fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_TTjets/TTjets_Summer12_final.root'),
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_TTFullLept/TTFullLept_Summer12_final.root'),
+            #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V21/ControlPlots_TTjets/TTjets_Summer12_final.root'),
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root'),
             color = cms.uint32(EColor.kYellow+palette),
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V23/ControlPlots_WZ/WZ_Summer12_final.root'),
-            color = cms.uint32(EColor.kCyan+palette),
-            scale = cms.double(zbbnorm.xsec_WZ_8TeV*lumi/zbbnorm.nev_WZ_summer12),#6.206*5051./(4191045.)), #Xs 
-            role = cms.string('WZ')
-            ),
-
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V23/ControlPlots_WW/WW_Summer12_final.root'),
-            color = cms.uint32(EColor.kOrange+palette),
-            scale = cms.double(zbbnorm.xsec_WW_8TeV*lumi/zbbnorm.nev_WW_summer12),#6.206*5051./(4191045.)), #Xs 
-            role = cms.string('WW')
-            ),
-
-        cms.PSet(
-            #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V12/ControlPlots_TTjets/TTjets_Summer12_final.root'),
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V20/ControlPlots_TTFullLept/TTFullLept_Summer12_final.root'),
-            color = cms.uint32(EColor.kTeal+palette),
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
             #scale = cms.double(zbbnorm.xsec_TTjets_8TeV*lumi/zbbnorm.nev_TTjets_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            scale = cms.double(zbbnorm.xsec_TTFullLept_8TeV*lumi/zbbnorm.nev_TTFullLept_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            role = cms.string('t#bar{t} dilep')
+            scale = cms.double(1.),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
+            role = cms.string('B')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V20/ControlPlots_TTSemiLept/TTSemiLept_Summer12_final.root'),
-            color = cms.uint32(EColor.kTeal+palette),
-            scale = cms.double(zbbnorm.xsec_TTSemiLept_8TeV*lumi/zbbnorm.nev_TTSemiLept_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            role = cms.string('t#bar{t} lept')
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root'),
+            color = cms.uint32(EColor.kYellow+palette),
+            scale = cms.double(1.),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
+            role = cms.string('C')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V22/ControlPlots_Wt/Wt_Summer12_final.root'),
-            color = cms.uint32(EColor.kSpring+palette),
-            scale = cms.double(zbbnorm.xsec_tW_8TeV*lumi/zbbnorm.nev_tW_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            role = cms.string('tW')
-            ),
-
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V22/ControlPlots_Wtbar/Wtbar_Summer12_final.root'),
-            color = cms.uint32(EColor.kSpring+palette),
-            scale = cms.double(zbbnorm.xsec_tbarW_8TeV*lumi/zbbnorm.nev_tbarW_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            role = cms.string('#bar{t}W')
-            ),
-
-        cms.PSet(
-<<<<<<< HEAD
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DYjets/DYjets_Summer12_final.root'),
+            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V21/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root'),
             #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V10/ControlPlots_Zbb_Zb/Zbb_Zb_Summer12_final.root'),
-=======
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V20/ControlPlots_DYjets/DYjets_Summer12_final.root'),
-            #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V20/ControlPlots_Zbb_Zb/Zbb_Zb_Summer12_final.root'),
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
             color = cms.uint32(EColor.kRed+palette),
-            scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
+            scale = cms.double(1.),#3048.*5051./35907791.), #NLO MCFM
             #scale = cms.double(zbbnorm.xsec_Zbb_8TeV*lumi/zbbnorm.nev_Zbb_summer12),
-            role = cms.string('Z+j')
+            role = cms.string('D')
             ), 
-<<<<<<< HEAD
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DYjets/DYjets_Summer12_final.root'),     
-#            color = cms.uint32(EColor.kGreen+palette),
-#            scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
-#            role = cms.string('Z+bx')
-#            ), 
-#        cms.PSet(
-#            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_DYjets/DYjets_Summer12_final.root'),
-#            color = cms.uint32(EColor.kBlue+palette),
-#            scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
-#            role = cms.string('Z+xx')
-#            ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/cbeluffi/ControlPlots/cp5314p1/ControlPlots_JP/ControlPlots_ZH125/ZH125_Summer12_final.root'),
-=======
-        #cms.PSet(
-        #    fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V13/ControlPlots_DYjets_Zbx/DYjets_Zbx_Summer12_final.root'),     
-        #    color = cms.uint32(EColor.kGreen+palette),
-        #    scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
-        #    role = cms.string('Z+bx')
-        #    ), 
-        #cms.PSet(
-        #    fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V13/ControlPlots_DYjets_Zxx/DYjets_Zxx_Summer12_final.root'),
-        #    color = cms.uint32(EColor.kBlue+palette),
-        #    scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
-        #    role = cms.string('Z+xx')
-        #    ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V20/ControlPlots_ZH125/ZH125_Summer12_final.root'),
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-            color = cms.uint32(EColor.kWhite),#EColor.kAzure+palette),
-            scale = cms.double(zbbnorm.xsec_ZH125_8TeV*lumi/zbbnorm.nev_ZH125_summer12), #Xs 
-            role = cms.string('ZH_125')
-            ),
   ),
 
   options = cms.PSet (
