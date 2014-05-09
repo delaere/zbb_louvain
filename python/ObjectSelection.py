@@ -4,10 +4,8 @@ import intervalmap
 from VertexAssociation import zVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
-from zbbConfig import configuration
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
-btagging=configuration.btagging
 
 # here we declare our triggers
 class ourTriggers: pass
@@ -339,10 +337,10 @@ def isBJet(jet,workingPoint,algo="CSV"):
     elif workingPoint=="T":
       return jet.bDiscriminator("jetProbabilityBJetTags")>0.790
     else:
-      print "Error: unforeseen working point for CSV. Use L, M or T"
+      print "Error: unforeseen working point for JP. Use L, M or T"
       return False
   else:
-    print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
+    print "Error: unforeseen algo for b-tagging. Use SSV, CSV or JP"
     return False
 
 def jetPtD(jet):
@@ -381,7 +379,7 @@ def jetVtx3dL(jet):
 
 def jetVtx3deL(jet):
   #input of VBF NN regression
-  #returns the 3D error of the http://31.media.tumblr.com/b31acfdd73732a25d45104495be8b617/tumblr_mig7og0YbH1r5xpw1o1_250.gifSV jet if it exists
+  #returns the 3D error of SV jet if it exists
   output = 0
   tisv = jet.tagInfoSecondaryVertex()
   if tisv.nVertices()>0:
@@ -564,14 +562,14 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   if btagging == "CSV":
-    csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
   elif btagging == "JP":
-    csvList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
     
-  csvList.sort(reverse=True)
+  btagList.sort(reverse=True)
   indices = []
-  for icsv in csvList:
-    indices.append(icsv[1])
+  for ibtag in btagList:
+    indices.append(ibtag[1])
   if len(indices)<1: return (None, None)
   if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []

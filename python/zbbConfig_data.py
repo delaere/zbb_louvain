@@ -22,7 +22,7 @@ class configuration:
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
-  btagging = "JP"
+  btagging = "CSV"
   WP = ["M","L"]
   muChannel = True
   eleChannel = True
@@ -38,7 +38,7 @@ class configuration:
   doNNJetRegression = False
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
   if btagging == "CSV":
-    ssvperfData=dataDirectory+"performance_csv_witheff.root"
+    ssvperfData=dataDirectory+"btag_allalgos_witheff.root"
   elif btagging == "JP":
     ssvperfData=dataDirectory+"performance_jp_witheff.root"
   pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"

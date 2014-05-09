@@ -15,14 +15,14 @@ class configuration:
   WSname = "workspace_ras"
 
   # mode: plots or dataset
-  #runningMode = "plots"
-  runningMode = "dataset"
+  runningMode = "plots"
+  #runningMode = "dataset"
 
   # event selection class
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
-  btagging = "JP" #CSV or JP 
+  btagging = "CSV" #CSV or JP 
   WP = ["M","L"] #2 WP, the tightest one first
   muChannel = True
   eleChannel = True
@@ -39,7 +39,7 @@ class configuration:
   doNNJetRegression = False
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
   if btagging == "CSV":
-    ssvperfData=dataDirectory+"performance_csv_witheff.root"
+    ssvperfData=dataDirectory+"btag_allalgos_witheff.root"
   elif btagging == "JP":
     ssvperfData=dataDirectory+"performance_jp_witheff.root"
   pileupData=dataDirectory+"Cert_190456-208686_8TeV_22Jan2013ReReco_pileupTruth.root"

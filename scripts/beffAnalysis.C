@@ -20,12 +20,6 @@ void beffAnalysis(const char* input, const char* output) {
   ptSpectrum->Sumw2();
 
   // produce the ratio plot for the 12 combinations of (CSVL,CSVM,CSVT),(Barrel,Endcap),(b,c,l)
-<<<<<<< HEAD
-  TClonesArray algorithms("TCut",3);
-//   new(algorithms[0]) TCut("CSVL","csv>0.244");
-//   new(algorithms[1]) TCut("CSVM","csv>0.679");
-//   new(algorithms[2]) TCut("CSVT","csv>0.898");
-=======
   TClonesArray algorithms("TCut",9);
   new(algorithms[0]) TCut("CSVL","csv>0.244");
   new(algorithms[1]) TCut("CSVM","csv>0.679");
@@ -36,11 +30,6 @@ void beffAnalysis(const char* input, const char* output) {
   new(algorithms[6]) TCut("JPL","jp>0.275");
   new(algorithms[7]) TCut("JPM","jp>0.545");
   new(algorithms[8]) TCut("JPT","jp>0.790");
->>>>>>> 0e985ca69eeb89ab39df5c42a6759da32c5dffa0
-
-  new(algorithms[0]) TCut("JPL","jp>0.275");
-  new(algorithms[1]) TCut("JPM","jp>0.545");
-  new(algorithms[2]) TCut("JPT","jp>0.790");
   
   TClonesArray etaRegions("TCut",2);
   new(etaRegions[0]) TCut("Barrel","abs(eta)<=1.2");
