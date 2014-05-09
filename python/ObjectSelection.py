@@ -497,10 +497,6 @@ def isZcandidate(zCandidate,vertex=None):
   # if everything ok, return the result of the lepton check
   return result
   
-<<<<<<< HEAD
-  
-=======
->>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
 
 def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
@@ -634,7 +630,6 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
   
-<<<<<<< HEAD
 def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
   """Finds the best not Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates.
@@ -756,19 +751,11 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   if btagging == "CSV":
-<<<<<<< HEAD
-    csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
-  elif btagging == "JP":
-    csvList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
-    
-  csvList.sort(reverse=True)
-=======
     btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
   elif btagging == "JP":
     btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
     
   btagList.sort(reverse=True)
->>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
   indices = []
   for ibtag in btagList:
     indices.append(ibtag[1])
