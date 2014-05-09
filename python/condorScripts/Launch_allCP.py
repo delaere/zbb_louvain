@@ -65,7 +65,7 @@ listdata=[
         ]
 
 DataChannel = [
-    "Ele",
+    #"Ele",
     "Mu",
     ]
 

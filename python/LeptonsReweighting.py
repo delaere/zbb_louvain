@@ -151,10 +151,10 @@ class EleIDISO_SFReader:
            #print line
            #print 'pt/eta', pt , eta
            #print 'abs(eta)', abs(eta)
-
-           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
+           
+           if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)<float(vals[3])):
               if mode == '0'  :
-                 return float(vals[4])
+                 return float(vals[4])                
               elif mode == '+1'  :
                  return float(vals[5])
               elif mode == '-1'  :   
@@ -162,8 +162,8 @@ class EleIDISO_SFReader:
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-
-       if pt<200. : print 'WARNING: Any electron sf range matching the specified eta/pt'
+       if (pt<=200):       
+          print 'WARNING: Any electron sf range matching the specified eta/pt'
        return 1.
 
 
@@ -171,7 +171,7 @@ class EleTriggerHighPtLeg_SFReader:
    
   def __init__(self):
      """Embedding Electron Trigger High leg SF."""
-     f = open(configuration.dataDirectory+'scalefactors_ele_IdTightTrigger17Leg_2012rereco.txt', 'r')
+     f = open(configuration.dataDirectory+'scalefactors_ele_IdMediumTrigger17Leg_2012rereco.txt', 'r')
      if f:
         self._file = f  
      else :
@@ -181,7 +181,8 @@ class EleTriggerHighPtLeg_SFReader:
         self._file.seek(0,0) 
         for line in self._file:
            vals = line.split() # find a new way for splitting
-           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
+        
+           if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)< float(vals[3])):
               if mode == '0'  :
                  return float(vals[4])
               elif mode == '+1'  :
@@ -191,8 +192,8 @@ class EleTriggerHighPtLeg_SFReader:
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-           
-        print 'WARNING: Any electron sf range matching the specified eta/pt '
+        if (pt<=200):   
+           print 'WARNING: Any electron sf range matching the specified eta/pt '
         return 1.
 
 
@@ -200,7 +201,7 @@ class EleTriggerLowPtLeg_SFReader:
    
   def __init__(self):
      """Embedding Electron Trigger Low leg SF."""
-     f = open(configuration.dataDirectory+'scalefactors_ele_IdTightTrigger8Leg_2012rereco.txt', 'r')
+     f = open(configuration.dataDirectory+'scalefactors_ele_IdMediumTrigger8Leg_2012rereco.txt', 'r')
      if f:
         self._file = f  
      else :
@@ -210,7 +211,7 @@ class EleTriggerLowPtLeg_SFReader:
         self._file.seek(0,0) 
         for line in self._file:
            vals = line.split() # find a new way for splitting
-           if( pt> float(vals[0]) and pt<=float(vals[1]) and abs(eta)> float(vals[2]) and abs(eta)<= float(vals[3])):
+           if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)< float(vals[3])):
               if mode == '0'  :
                  return float(vals[4])
               elif mode == '+1'  :
@@ -220,8 +221,8 @@ class EleTriggerLowPtLeg_SFReader:
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-           
-        print 'WARNING: Any electron sf range matching the specified eta/pt'
+        if (pt<=200):   
+           print 'WARNING: Any electron sf range matching the specified eta/pt'
         return 1.
        
          
@@ -472,7 +473,8 @@ class LeptonsReWeighting:
      lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
      lw *= self._eleIDISOWeight.value(e2.pt(),e2.eta(),'0')
      lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele8TrgWeight.value(e2.pt(),e2.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0')  ## formula for the asymmetric trigger
-
+     
+     
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:

@@ -37,7 +37,10 @@ btagPerfFWLiteInterface::btagPerfFWLiteInterface(const char* inputfile) {
     heWP ="CSVL";
     hpWP ="CSVM";
   }
-
+  else if(sinputfile.find("jp")!=std::string::npos){
+    heWP ="JPL";
+    hpWP ="JPM";
+  }
   es_->get(testRecID).get(plHandleBTAGSSVHEM_, ("MUJETSWPBTAG"+heWP).c_str());
   es_->get(testRecID).get(wpHandleBTAGSSVHEM_, ("MUJETSWPBTAG"+heWP).c_str() );
   if ( plHandleBTAGSSVHEM_.isValid() && wpHandleBTAGSSVHEM_.isValid() ) 

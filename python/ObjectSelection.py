@@ -346,7 +346,7 @@ def isGoodJet(jet, Z = None):
     if not hasNoOverlap(jet,Z) :
       return False 
   # pt, eta, and jetid
-  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>20. and jetId(jet,"loose")
+  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>30. and jetId(jet,"loose")
 
 def goodJets(event, muChannel=True, eleChannel=True):
   # best Z candidate
@@ -405,7 +405,7 @@ def isBJet(jet,workingPoint,algo="CSV"):
       print "Error: unforeseen working point for CSV. Use L, M or T"
       return False
   else:
-    print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
+    print "Error: unforeseen algo for b-tagging. Use SSV, CSV or JP"
     return False
 
 def jetPtD(jet):
@@ -444,7 +444,11 @@ def jetVtx3dL(jet):
 
 def jetVtx3deL(jet):
   #input of VBF NN regression
+<<<<<<< HEAD
   #returns the 3D error of the http://31.media.tumblr.com/b31acfdd73732a25d45104495be8b617/tumblr_mig7og0YbH1r5xpw1o1_250.gifSV jet if it exists
+=======
+  #returns the 3D error of SV jet if it exists
+>>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
   output = 0
   tisv = jet.tagInfoSecondaryVertex()
   if tisv.nVertices()>0:
@@ -496,7 +500,10 @@ def isZcandidate(zCandidate,vertex=None):
   # if everything ok, return the result of the lepton check
   return result
   
+<<<<<<< HEAD
   
+=======
+>>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
 
 def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
@@ -514,7 +521,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
   if l1.isMuon() :
-    return True
+    #return True
     if runNumber>=160410 and runNumber<163269 :
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
         return True
@@ -630,6 +637,7 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
   
+<<<<<<< HEAD
 def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
   """Finds the best not Z candidate. Might be none.
      As input, the function takes an arbitrary number of collections of Z candidates.
@@ -734,6 +742,9 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
     
     
     
+=======
+
+>>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
@@ -748,14 +759,22 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   if btagging == "CSV":
+<<<<<<< HEAD
     csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
   elif btagging == "JP":
     csvList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
     
   csvList.sort(reverse=True)
+=======
+    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+  elif btagging == "JP":
+    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    
+  btagList.sort(reverse=True)
+>>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
   indices = []
-  for icsv in csvList:
-    indices.append(icsv[1])
+  for ibtag in btagList:
+    indices.append(ibtag[1])
   if len(indices)<1: return (None, None)
   if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []

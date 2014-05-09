@@ -2,10 +2,7 @@
 from ROOT import *
 from optparse import OptionParser
 import os, sys
-lib_path = os.path.abspath('../')
-sys.path.append(lib_path)
-lib_path2 = os.path.abspath('../analysisScripts/')
-sys.path.append(lib_path2)
+
 #parser options
 parser = OptionParser()
 parser.add_parser = OptionParser()
@@ -40,7 +37,7 @@ jetcategoryList = ["2jet", "P2jet"]
 dataLabel = "DATA"
 
 syst = ""
-useDYptBins = True
+useDYptBins = False
 useDYjetBins = False
 useMCTruth = True
 from listForRDS import MCsampleList, totsampleList, DYrew
@@ -129,7 +126,7 @@ category={"HE"         : "rc_eventSelection_5",
 
 #mlpZbbvsTT_mu_MM_N
 #mlpDYvsTT_2012
-varNamesList = { "btag"  : "jetmetbjetProdCSVdisc"   ,
+varNamesList = { "btag"  : "jetmetbjetProdJPdisc"   ,
 		 "mwnn"  : "mlpDYvsTT_2012",
                  "w_b_HE"    : "BtaggingReweightingHE"  ,
                  "w_b_HP"    : "BtaggingReweightingHP"  ,
@@ -229,8 +226,8 @@ for sample in sampleList:
       #  fileNameList["DY"+c] = fileNameList[sample+c]
   else :
     for c in ["Mu","Ele"]:
-      fileNameList[sample+c.replace("Ele","El")] = path["Double"+c+"_DataA"].replace("DataA","Data")
-#print file name
+      fileNameList[sample+c.replace("Ele","El")] = path["Double"+c+"_DataA"].replace("Data","Data")
+      print  "bla"
 for name in fileNameList:
 	print name, fileNameList[name]
 
