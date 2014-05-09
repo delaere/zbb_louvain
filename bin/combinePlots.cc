@@ -416,6 +416,7 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
           dataitems.push_back(dir);
 	  std::string keyname = key->GetName();
 	  if(keyname=="Muon" || keyname=="Electron" || keyname=="Combined") std::cout<<keyname<<std::endl;
+	  //else std::cout<<keyname<<std::endl;
         }
         std::vector<TDirectory*> mcitems;
         for(std::vector<TDirectory*>::const_iterator it = mcdirs.begin();it<mcdirs.end();++it) {
@@ -425,7 +426,9 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
         }
         CombineDir(dataitems, mcitems, output->mkdir(key->GetName(),key->GetTitle()));
      } else if (key->ReadObj()->InheritsFrom("TH1")) {
-        CombineHistos(key->GetName(),datadirs,mcdirs,output);
+       std::string keyname = key->GetName();
+       //std::cout<<keyname<<std::endl;
+       CombineHistos(key->GetName(),datadirs,mcdirs,output);
      }
    }
 }

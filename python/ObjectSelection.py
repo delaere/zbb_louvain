@@ -283,7 +283,7 @@ def isGoodJet(jet, Z = None):
     if not hasNoOverlap(jet,Z) :
       return False 
   # pt, eta, and jetid
-  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>20. and jetId(jet,"loose")
+  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>30. and jetId(jet,"loose")
 
 def goodJets(event, muChannel=True, eleChannel=True):
   # best Z candidate

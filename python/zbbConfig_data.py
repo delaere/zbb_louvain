@@ -71,6 +71,7 @@ class configuration:
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
                        eventCollection("jets","vector<pat::Jet>","selectedPatJetsWithBeta"),
                        #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
+                       #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
