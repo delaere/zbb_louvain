@@ -732,11 +732,8 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
   else:
     return None
     
-    
-    
-=======
+        
 
->>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
