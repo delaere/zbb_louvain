@@ -52,6 +52,18 @@ def zVertex(zcandidate, cut, vertex=None):
       print "Warning : argument vertex is not of type reco::Vertex "
       return abs(lepton1.vz()-lepton2.vz())<cut
     return (abs(lepton1.vz()-vertex.z())<cut and abs(lepton2.vz()-vertex.z())<cut)
+    
+def isfromVertex(lepton1, lepton2, cut, vertex=None):
+  if vertex is None:
+    #loose criteria: both leptons close one of each other
+    return abs(lepton1.vz()-lepton2.vz())<cut
+  else:
+    #strict criteria: both leptons are close to the (same) vertex
+    if not type(vertex).__name__ == 'reco::Vertex' :
+      print "Warning : argument vertex is not of type reco::Vertex "
+      return abs(lepton1.vz()-lepton2.vz())<cut
+    return (abs(lepton1.vz()-vertex.z())<cut and abs(lepton2.vz()-vertex.z())<cut)    
+    
 
 def jetVertex(vertex, jet, algo, sigmaCut, fraction):
   if algo==1 : return jetVertex_1(vertex, jet, sigmaCut, fraction)

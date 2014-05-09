@@ -14,10 +14,14 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
     
     def beginJob(self):
       # declare histograms
+      self.add("run","Run number",50000,160000,210000)
+      self.add("event","Event number",1000,0,5e9)
+      self.add("ls","Lumi section",2000,0,2000)      
       self.add("triggerSelection","triggerSelection ",2,0,2)
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("triggerDouble","Double trigger",2,0,2)
       self.add("triggerSingle","Single trigger",2,0,2)
+      self.add("triggerEMU","E-MU trigger",2,0,2)
       self.add("zmassMu","zmassMu",10000,0,1000)
       self.add("bestzmassMu","bestzmassMu",10000,0,1000)
       self.add("zmassEle","zmassEle",10000,0,1000)
@@ -74,6 +78,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       triggers = []
       SingleTrig = 0
       DoubleTrig = 0
+      EMUTrig    = 0
       for i in range(paths.size()) :
           name = paths[i].name()
           #print name
@@ -93,9 +98,15 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       if len(triggers)==0 : triggerList.append(6)
       if len(triggerList)==1 or len(triggerList)>4 : print "error", len(triggerList)
       
+      if "HLT_Mu8_Ele17" in triggers or "HLT_Mu17_Ele8" in triggers or "HLT_Mu30_Ele30" in triggers or "HLT_DoubleMu5_Ele8" in triggers or "HLT_DoubleMu8_Ele8" in triggers or "HLT_Mu8_DoubleEle8" in triggers or "HLT_Mu8_Ele8" in triggers or "HLT_Mu7_Ele7" in triggers : 
+        EMUTrig=1
       result["triggerBits"] = triggerList
       result["triggerSingle"] = SingleTrig
       result["triggerDouble"] = DoubleTrig
+      result["triggerEMU"] = EMUTrig
+      result["run"] = event.run()
+      result["event"] = event.event()
+      result["ls"] = event.lumi()
       
       ## Z boson
       result["zmassMu"] = [ ]

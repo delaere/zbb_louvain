@@ -1,11 +1,13 @@
 import ROOT
 import string
 import intervalmap
-from VertexAssociation import zVertex
+from VertexAssociation import zVertex, isfromVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
+from zbbConfig import configuration
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
+btagging=configuration.btagging
 
 # here we declare our triggers
 class ourTriggers: pass
@@ -80,10 +82,63 @@ ourtriggers.elrunMap[190455:] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_E
                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18",
                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v19",
                                  )
+				 
+#e-mu triggers
+#Main ones
+ourtriggers.emurunMap = intervalmap.intervalmap()
+ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",) 
+ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",) 
+ourtriggers.emurunMap[191691:193621] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",) 
+ourtriggers.emurunMap[193834:196531] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",) 
+ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",) 
+ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)  
+
+ourtriggers.emurunMap[190456:190738] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",)
+ourtriggers.emurunMap[190782:191411] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",)
+ourtriggers.emurunMap[191691:193621] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",)
+ourtriggers.emurunMap[193834:196531] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",)
+ourtriggers.emurunMap[198022:199608] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",)
+ourtriggers.emurunMap[199698:209151] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)
+
+#higher thresholds	
+ourtriggers.emurunMap[190456:190738] = ("HLT_Mu30_Ele30_CaloIdL_v3",)	
+ourtriggers.emurunMap[190782:191411] = ("HLT_Mu30_Ele30_CaloIdL_v4",)	
+ourtriggers.emurunMap[191691:193621] = ("HLT_Mu30_Ele30_CaloIdL_v5",)	
+ourtriggers.emurunMap[193834:196531] = ("HLT_Mu30_Ele30_CaloIdL_v6",)	
+ourtriggers.emurunMap[198022:199608] = ("HLT_Mu30_Ele30_CaloIdL_v7",)	
+ourtriggers.emurunMap[199698:209151] = ("HLT_Mu30_Ele30_CaloIdL_v8",)
+	
+#3leptons
+ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v12",)
+ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v13",)
+ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v14",)
+ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v15",)
+ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v16",)
+
+ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1",) 
+ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2",) 
+ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3",) 
+ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v4",) 
+ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v5",)
+	
+ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v3",)
+ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v4",)
+ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5",)
+ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6",) 
+ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7",)
+	
+ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3",) 
+ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v4",)
+ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5",)
+ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6",)
+ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7",)
+
+				 
 # merged lists of triggers
-ourtriggers.mutriggers = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
-ourtriggers.eltriggers = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
-ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers))
+ourtriggers.mutriggers  = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
+ourtriggers.eltriggers  = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
+ourtriggers.emutriggers = list(set([item for sublist in [i for i in ourtriggers.emurunMap.values()] for item in sublist]))
+ourtriggers.triggers   = list(set(ourtriggers.mutriggers) | set(ourtriggers.eltriggers) | set(ourtriggers.emutriggers))
 ourtriggers.SingleMutriggers = list(set([item for sublist in [i for i in ourtriggers.muSinglerunMap.values()] for item in sublist]))
 
 def electron_iswrongPS(electron, runNumber, lumi_section):
@@ -141,23 +196,33 @@ def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
   #for i in range(paths.size()) : print paths[i].name()
   pathnames = map(lambda i: paths[i].name(),range(paths.size()))
   if not perRun:
-    if muChannel:
+    if muChannel and not eleChannel:
       intersect = set(pathnames) & set(ourtriggers.mutriggers)
-    else:
+    elif not muChannel and eleChannel:
       intersect = set(pathnames) & set(ourtriggers.eltriggers)
+    elif muChannel and eleChannel:
+      intersect = set(pathnames) & set(ourtriggers.emutriggers)      
   else:
-    if muChannel:
+    if muChannel and not eleChannel:
       if ourtriggers.murunMap[runNumber] is None:
         print "muon unexpected runNumber : " , runNumber
         intersect = set()
       else:  
         intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
-    else:
+    elif not muChannel and eleChannel:
       if ourtriggers.elrunMap[runNumber] is None:
         print "electron unexpected runNumber : " , runNumber
         intersect = set()
       else:  
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
+    elif muChannel and eleChannel:
+      if ourtriggers.emurunMap[runNumber] is None:
+        print "e-mu unexpected runNumber : " , runNumber
+        intersect = set()
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])	
+	
+	
   outcome = len(intersect)>0
   return (outcome and isTriggerMatchZcandidate(bestZcandidate,runNumber,event.lumi()))
 
@@ -328,6 +393,17 @@ def isBJet(jet,workingPoint,algo="CSV"):
     else:
       print "Error: unforeseen working point for CSV. Use L, M or T"
       return False
+  elif algo=="JP":
+    #WP valid both for 2011 and 2012
+    if workingPoint=="L":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.275
+    elif workingPoint=="M":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.545
+    elif workingPoint=="T":
+      return jet.bDiscriminator("jetProbabilityBJetTags")>0.790
+    else:
+      print "Error: unforeseen working point for CSV. Use L, M or T"
+      return False
   else:
     print "Error: unforeseen algo for b-tagging. Use SSV or CSV"
     return False
@@ -368,7 +444,7 @@ def jetVtx3dL(jet):
 
 def jetVtx3deL(jet):
   #input of VBF NN regression
-  #returns the 3D error of the SV jet if it exists
+  #returns the 3D error of the http://31.media.tumblr.com/b31acfdd73732a25d45104495be8b617/tumblr_mig7og0YbH1r5xpw1o1_250.gifSV jet if it exists
   output = 0
   tisv = jet.tagInfoSecondaryVertex()
   if tisv.nVertices()>0:
@@ -419,6 +495,8 @@ def isZcandidate(zCandidate,vertex=None):
     result = result and zVertex(zCandidate,0.05,vertex)
   # if everything ok, return the result of the lepton check
   return result
+  
+  
 
 def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
@@ -512,6 +590,23 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
 
              #print runNumber
              return True
+	     
+  if (l1.isElectron() and l2.isMuon() ) or (l2.isElectron() and l1.isMuon() ):	     
+    if runNumber>=190782 and runNumber<= 209151:
+      if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) :
+        return True
+    if runNumber>= 190456 and runNumber<= 209151:
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) :
+        return True
+      if (l1.triggerObjectMatchesByPath("HLT_Mu30_Ele30_CaloIdL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu30_Ele30_CaloIdL_v*",0,0).size()>0) :
+        return True
+      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) :
+        return True	
+      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) :
+        return True
+      if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v*",0,0).size()>0) :
+        return True	
+
   return False
 
 def findBestCandidate(event, muChannel=True, eleChannel=False):
@@ -534,7 +629,111 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestM = z.mass()
         bestZ = z
   return bestZ
+  
+def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
+  """Finds the best not Z candidate. Might be none.
+     As input, the function takes an arbitrary number of collections of Z candidates.
+     muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
+  runNumber = event.run()
+  lumi_section = event.lumi()   
+  
+  first_mu=None
+  second_mu=None
+  first_el=None
+  second_el=None
+   
+  first_mu_pt=0
+  second_mu_pt=0
+  first_el_pt=0
+  second_el_pt=0
+    
+  first_lept=None
+  second_lept=None
+  
+  vertex_cond=False
+  result = False
+  
+  leptList = []
+  #select the two hardest muons 
+  if muChannel:
+    for mu in event.muons:
+      if isGoodMuon(mu, "tight"):
+        if (mu.pt()> first_mu_pt):
+          first_mu_pt=mu.pt()
+	  first_mu = mu
+	  
+        elif (mu.pt()< first_mu_pt and mu.pt()> second_mu_pt):
+          second_mu_pt=mu.pt()
+	  second_mu = mu
+        elif (mu.pt()< second_mu_pt): continue
+  
+  #select the two hardest electrons 
+  if eleChannel:
+    for el in event.electrons:
+      if isGoodElectron(el, "tight"):
+        if (el.pt()> first_el_pt):
+          first_el_pt=el.pt()
+	  first_el=el
+        elif (el.pt()< first_el_pt and el.pt()> second_el_pt):
+          second_el_pt=el.pt()
+	  second_el=el
+        elif (el.pt()< second_el_pt): continue
+        
+  #select the two hardest leptons  
+  if (first_mu):
+    first_lept =first_mu
+    if (first_el and first_el_pt > first_mu_pt):
+      first_lept =first_el
+  else:
+    if (first_el):
+      first_lept =first_el
+      
+      
+     
+  if (first_lept == first_mu):
+      if (second_mu  and second_el == None):
+        second_lept = second_mu
+      elif (second_mu == None and first_el ):
+        second_lept = first_el 
+      elif (second_mu  and first_el ):
+        if (second_mu_pt > first_el_pt):
+	  second_lept = second_mu
+	else:
+	  second_lept = first_el	     
+  else:
+      if (second_el and second_mu == None):
+        second_lept = second_el
+      elif (second_el == None and first_mu ):
+        second_lept = first_mu 
+      elif (second_el  and first_mu ):
+        if (second_el_pt > first_mu_pt):
+	  second_lept = second_el
+	else:
+	  second_lept = first_mu
+	  
+  leptList.append(first_lept)
+  leptList.append(second_lept)
+	  
+  if (first_lept  and second_lept ):	  
+     vertex_cond = isfromVertex(first_lept, second_lept, 0.05)
+    #check leptons match the trigger
+     if (vertex_cond):
+#       Daugh1 = first_lept.masterClone()
+#       ROOT.SetOwnership( Daugh1, False )
+#       Daugh2 = second_lept.masterClone()
+#       ROOT.SetOwnership( Daugh2, False )
+       case1 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section) 
+       case2 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section)
+       if (case1 or case2):
+         result = True 
 
+  if (result == True):
+    return (leptList[0],leptList[1])
+  else:
+    return None
+    
+    
+    
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
@@ -548,7 +747,11 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
     goodJets = event.goodJets_none
   # check number of good jets
   indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
-  csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+  if btagging == "CSV":
+    csvList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+  elif btagging == "JP":
+    csvList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    
   csvList.sort(reverse=True)
   indices = []
   for icsv in csvList:
