@@ -4,10 +4,8 @@ import intervalmap
 from VertexAssociation import zVertex, isfromVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
-from zbbConfig import configuration
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
-btagging=configuration.btagging
 
 # here we declare our triggers
 class ourTriggers: pass
