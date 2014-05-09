@@ -444,11 +444,8 @@ def jetVtx3dL(jet):
 
 def jetVtx3deL(jet):
   #input of VBF NN regression
-<<<<<<< HEAD
-  #returns the 3D error of the http://31.media.tumblr.com/b31acfdd73732a25d45104495be8b617/tumblr_mig7og0YbH1r5xpw1o1_250.gifSV jet if it exists
-=======
-  #returns the 3D error of SV jet if it exists
->>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
+  #returns the 3D error of the SV jet if it exists
+
   output = 0
   tisv = jet.tagInfoSecondaryVertex()
   if tisv.nVertices()>0:
