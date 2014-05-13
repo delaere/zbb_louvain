@@ -81,55 +81,55 @@ ourtriggers.elrunMap[190455:] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_E
                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v19",
                                  )
 				 
-#e-mu triggers
+#e-mu triggers (only 2012. 2011 e-mu triggers to be implemented)
 #Main ones
 ourtriggers.emurunMap = intervalmap.intervalmap()
-ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",) 
-ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",) 
-ourtriggers.emurunMap[191691:193621] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",) 
-ourtriggers.emurunMap[193834:196531] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",) 
-ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",) 
-ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)  
+ourtriggers.emurunMap[190455:] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5", 
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",
+                                  "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",
+				  )
 
-ourtriggers.emurunMap[190456:190738] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",)
-ourtriggers.emurunMap[190782:191411] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",)
-ourtriggers.emurunMap[191691:193621] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",)
-ourtriggers.emurunMap[193834:196531] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",)
-ourtriggers.emurunMap[198022:199608] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",)
-ourtriggers.emurunMap[199698:209151] = ("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9",)
-
-#higher thresholds	
-ourtriggers.emurunMap[190456:190738] = ("HLT_Mu30_Ele30_CaloIdL_v3",)	
-ourtriggers.emurunMap[190782:191411] = ("HLT_Mu30_Ele30_CaloIdL_v4",)	
-ourtriggers.emurunMap[191691:193621] = ("HLT_Mu30_Ele30_CaloIdL_v5",)	
-ourtriggers.emurunMap[193834:196531] = ("HLT_Mu30_Ele30_CaloIdL_v6",)	
-ourtriggers.emurunMap[198022:199608] = ("HLT_Mu30_Ele30_CaloIdL_v7",)	
-ourtriggers.emurunMap[199698:209151] = ("HLT_Mu30_Ele30_CaloIdL_v8",)
+#higher thresholds (probably not add much efficiency, maybe for the future)
+#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu30_Ele30_CaloIdL_v3",)	
+#ourtriggers.emurunMap[190782:191411] = ("HLT_Mu30_Ele30_CaloIdL_v4",)	
+#ourtriggers.emurunMap[191691:193621] = ("HLT_Mu30_Ele30_CaloIdL_v5",)	
+#ourtriggers.emurunMap[193834:196531] = ("HLT_Mu30_Ele30_CaloIdL_v6",)	
+#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu30_Ele30_CaloIdL_v7",)	
+#ourtriggers.emurunMap[199698:209151] = ("HLT_Mu30_Ele30_CaloIdL_v8",)
 	
-#3leptons
-ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v12",)
-ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v13",)
-ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v14",)
-ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v15",)
-ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v16",)
-
-ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1",) 
-ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2",) 
-ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3",) 
-ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v4",) 
-ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v5",)
-	
-ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v3",)
-ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v4",)
-ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5",)
-ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6",) 
-ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7",)
-	
-ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3",) 
-ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v4",)
-ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5",)
-ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6",)
-ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7",)
+#3leptons (maybe for the future)
+#ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v12",)
+#ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v13",)
+#ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v14",)
+#ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v15",)
+#ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v16",)
+#
+#ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1",) 
+#ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2",) 
+#ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3",) 
+#ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v4",) 
+#ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v5",)
+#	
+#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v3",)
+#ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v4",)
+#ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5",)
+#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6",) 
+#ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7",)
+#	
+#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3",) 
+#ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v4",)
+#ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5",)
+#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6",)
+#ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7",)
 
 				 
 # merged lists of triggers
@@ -534,7 +534,7 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
     return False
 
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
-  if l1.isMuon() :
+  if l1.isMuon() and l2.isMuon():
     #return True
     if runNumber>=160410 and runNumber<163269 :
       if (l1.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu6_v*",0,0).size()>0) :
@@ -567,7 +567,7 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
           #print runNumber
           return True
         
-  if l1.isElectron() :
+  if l1.isElectron() and l2.isElectron():
     if electron_iswrongPS(l1, runNumber, lumi_section):
       return False
     else :
@@ -613,20 +613,9 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
              return True
 	     
   if (l1.isElectron() and l2.isMuon() ) or (l2.isElectron() and l1.isMuon() ):	     
-    if runNumber>=190782 and runNumber<= 209151:
-      if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) :
+    if runNumber >= 190455:
+      if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) or (l1.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0):
         return True
-    if runNumber>= 190456 and runNumber<= 209151:
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,0).size()>0) :
-        return True
-      if (l1.triggerObjectMatchesByPath("HLT_Mu30_Ele30_CaloIdL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu30_Ele30_CaloIdL_v*",0,0).size()>0) :
-        return True
-      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) :
-        return True	
-      if (l1.triggerObjectMatchesByPath("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v*",0,0).size()>0) :
-        return True
-      if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v*",0,0).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v*",0,0).size()>0) :
-        return True	
 
   return False
 
