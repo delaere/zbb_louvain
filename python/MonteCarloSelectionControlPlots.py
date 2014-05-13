@@ -229,7 +229,7 @@ class genMetsControlPlots(BaseControlPlots):
       result["MEMET_Px"]=neutrinos_4v.Px()
       result["MEMET_Py"]=neutrinos_4v.Py()
       result["MEMET_NumberOfNeutrinos"]=event.NumberOfNeutrinos
-
+      return result
 
 
 if __name__=="__main__":

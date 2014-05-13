@@ -48,6 +48,7 @@ class configuration:
   # control plot classes
   controlPlots = [ 
     controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
+    controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
     controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
     controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
@@ -74,6 +75,14 @@ class configuration:
                        #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
+		       eventCollection("PFMETNoCorr","vector<pat::MET>","patPFMet"),
+                       eventCollection("PFMET01Phi","vector<pat::MET>","patType1CorrectedPFMet"),
+                       eventCollection("PFMET01","vector<pat::MET>","patType01CorrectedPFMet"),
+                       eventCollection("PFMET1","vector<pat::MET>","patTypeOnly1CorrectedPFMet"),
+                       eventCollection("PFMETPhi","vector<pat::MET>","patTypeSysCorrectedPFMet"),
+                       eventCollection("PFMET1Phi","vector<pat::MET>","patType1sysCorrectedPFMet"),
+                       eventCollection("MVAMET","vector<pat::MET>","patPFMetMVA"),
+                       eventCollection("NoPUMET","vector<pat::MET>","patPFMetNoPileUp"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
                        eventCollection("Zelel","vector<reco::CompositeCandidate>","zelTightelTight"),
                        eventCollection("triggerInfo","pat::TriggerEvent","patTriggerEvent"),
