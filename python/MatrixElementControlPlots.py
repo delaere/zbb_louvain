@@ -3,8 +3,10 @@ import array
 from math import sqrt, pi
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from PatAnalysis.EventSelection import *
-from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
-from zbbConfig import configuration
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 class MatrixElementControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -29,7 +31,6 @@ class MatrixElementControlPlots(BaseControlPlots):
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
-      self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self):
       # declare histograms
@@ -149,10 +150,6 @@ class MatrixElementControlPlots(BaseControlPlots):
     def process(self, event):
       """matrixElementControlPlots"""
       result = { }
-      # disable JES/JER corrections for data (should already be done elsewhere)
-      if event.object().event().eventAuxiliary().isRealData():
-        configuration.JERfactor = 0
-        configuration.JESfactor = 0
       # in all cases, we need a reco Z
       bestZcandidate = event.bestZcandidate
       if bestZcandidate is None:
@@ -326,7 +323,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       if not bestZcandidate is None:
         dijet = event.dijet_all
         if not dijet[0] is None:
-          b1 = self._JECuncertainty.jet(dijet[0])
+          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass()) #self._JECuncertainty.jet(dijet[0])
 	  jetPt = b1.Pt()
           bNNCorr1 = ROOT.TLorentzVector(0,0,0,0)#4-vec first NNcorr bjet
 
@@ -373,7 +370,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet1massNNCorr"] = dijet[0].mass()*corrDijet0
 
         if not dijet[1] is None:
-          b2 = self._JECuncertainty.jet(dijet[1])
+          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass()) #self._JECuncertainty.jet(dijet[1])
 	  jetPt = b2.Pt()
           bNNCorr2 = ROOT.TLorentzVector(0,0,0,0)#4-vec second NNcorr bjet
 

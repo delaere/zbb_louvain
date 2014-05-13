@@ -2,6 +2,10 @@ from PatAnalysis.EventSelection import categoryName
 from zbbConfig import configuration
 from math import sqrt
 import pickle
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 ##______General functions______
 

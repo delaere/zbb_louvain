@@ -1,8 +1,10 @@
 import ROOT
 from PatAnalysis.BaseControlPlots import BaseControlPlots
-from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from ObjectSelection import selectedTriggers
-from zbbConfig import configuration
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
@@ -10,7 +12,6 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
     def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
-      self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self):
       # declare histograms
@@ -65,8 +66,6 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
       result = { }
       if event.object().event().eventAuxiliary().isRealData():
         checkTrigger = True
-        configuration.JERfactor = 0
-        configuration.JESfactor = 0
       else:
         checkTrigger = False
       ## trigger
@@ -163,7 +162,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
         dijet = event.dijet_all
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
-          b1 = self._JECuncertainty.jet(dijet[0])
+          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
           Zb = z+b1
           result["ZbM"] = Zb.M()
           result["ZbPt"] = Zb.Pt()
@@ -171,7 +170,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
           result["dphiZbj1"] = abs(z.DeltaPhi(b1))
           result["drZbj1"] = z.DeltaR(b1)
         if not dijet[1] is None:
-          b2 = self._JECuncertainty.jet(dijet[1])
+          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
             b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())

@@ -4,7 +4,10 @@ from math import sin, fabs
 from PatAnalysis.BaseControlPlots import BaseControlPlots
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from ObjectSelection import *
-from zbbConfig import configuration
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
@@ -296,9 +299,6 @@ class JetmetControlPlots(BaseControlPlots):
     def process(self, event):
       """JetmetControlPlots"""
       result = { }
-      if event.object().event().eventAuxiliary().isRealData():
-        configuration.JERfactor = 0
-        configuration.JESfactor = 0
       # process event and fill histograms
       for var in self.varOrdering : result["jets"+var] = []
       nj  = 0
@@ -312,8 +312,7 @@ class JetmetControlPlots(BaseControlPlots):
       dijet = event.dijet_all
       goodJets = event.goodJets_all
       for index,jet in enumerate(event.jets):
-        #jetPt = jet.pt()
-        jetPt = self._JECuncertainty.jetPt(jet)
+        jetPt = jet.pt()
         if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
           result["jetspt"].append(jetPt)
@@ -481,8 +480,8 @@ class JetmetControlPlots(BaseControlPlots):
       fsrDR = 999.9
       fsrjet4vec = ROOT.TLorentzVector(0,0,0,0)
       if nj > 2 : #if there are 3 good jets and we select 2 b-jets
-          b1 = ROOT.TLorentzVector(self._JECuncertainty.jetPt(dijet[0]),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
-          b2 = ROOT.TLorentzVector(self._JECuncertainty.jetPt(dijet[1]),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
+          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
+          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
           for index,jet in enumerate(event.jets):
               if goodJets[index] and not jet in dijet:
                   #print "there is isrjet"
@@ -491,7 +490,7 @@ class JetmetControlPlots(BaseControlPlots):
                       firstJet = False
                       #print "assigning isr jet to jet with pt=", jet.pt()
                   extrajet4vec = ROOT.TLorentzVector(0,0,0,0)
-                  extrajet4vec.SetPtEtaPhiM(self._JECuncertainty.jetPt(jet), jet.eta(), jet.phi(), jet.mass())
+                  extrajet4vec.SetPtEtaPhiM(jet.pt(), jet.eta(), jet.phi(), jet.mass())
                   
                   #setting fsr jet based on DR criteria
                   tmpdr = min(extrajet4vec.DeltaR(b1), extrajet4vec.DeltaR(b2))
@@ -511,7 +510,7 @@ class JetmetControlPlots(BaseControlPlots):
               ijet+=1
               
           if not isrjet is None:
-              result["isrjetpt"] = self._JECuncertainty.jetPt(isrjet)
+              result["isrjetpt"] = isrjet.pt()
               result["isrjetetapm"] = isrjet.eta()
               result["isrjetphi"] = isrjet.phi()
               result["isrjetmass"] = isrjet.mass()
@@ -522,7 +521,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["isrjetmass"] = 0
               
           if not fsrjetDR is None:
-              result["fsrjetDRpt"] = self._JECuncertainty.jetPt(fsrjetDR)
+              result["fsrjetDRpt"] = fsrjetDR.pt()
               result["fsrjetDRetapm"] = fsrjetDR.eta()
               result["fsrjetDRphi"] = fsrjetDR.phi()
               result["fsrjetDRmass"] = fsrjetDR.mass()
@@ -538,7 +537,7 @@ class JetmetControlPlots(BaseControlPlots):
                   
           for imass in range(len(self.masspoints)):
               if not fsrjet[self.masspoints[imass]] is None:
-                  result["fsrjetpt_"+str(self.masspoints[imass])] = self._JECuncertainty.jetPt(fsrjet[self.masspoints[imass]])
+                  result["fsrjetpt_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].pt()
                   result["fsrjetetapm_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].eta()
                   result["fsrjetphi_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].phi()
                   result["fsrjetmass_"+str(self.masspoints[imass])] = fsrjet[self.masspoints[imass]].mass()

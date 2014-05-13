@@ -15,8 +15,8 @@ class configuration:
   WSname = "workspace_ras"
 
   # mode: plots or dataset
-  #runningMode = "plots"
-  runningMode = "dataset"
+  runningMode = "plots"
+  #runningMode = "dataset"
 
   # event selection class
   eventSelection = pythonpath+"ZbbEventSelection"
@@ -69,9 +69,9 @@ class configuration:
                        eventCollection("genJets","vector<reco::GenJet>","ak5GenJets"),
                        eventCollection("genInfo","GenEventInfoProduct","generator"),
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
-                       eventCollection("jets","vector<pat::Jet>","selectedPatJetsWithBeta"),
-                       #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
-                       #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
+                       eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsWithBeta"),
+                       #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
+                       #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
@@ -90,6 +90,7 @@ class configuration:
                        eventProducer("goodJets_ele", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("goodJets_all", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":True } ),
                        eventProducer("goodJets_none", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":False } ),
+                       eventProducer("jets", "ObjectSelection", "allJets", { } ),
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
