@@ -49,7 +49,7 @@ class configuration:
   # control plot classes
   controlPlots = [ 
     controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging ,"WP":WP }),
-    #controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
+    controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("genMets","MonteCarloSelectionControlPlots","genMetsControlPlots",{}),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
     controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
