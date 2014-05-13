@@ -569,6 +569,108 @@ class JetmetControlPlots(BaseControlPlots):
 
       return result
 
+class MetControlPlots(BaseControlPlots):
+    """A class to create control plots for MET"""
+
+    def __init__(self, dir=None, dataset=None, mode="plots"):
+      # create output file if needed. If no file is given, it means it is delegated
+      BaseControlPlots.__init__(self, dir=dir, purpose="mets", dataset=dataset, mode=mode)
+
+    def beginJob(self):
+      # declare histograms
+      self.add("PFMETNoCorr_Pt","PF MET Pt",600,0,600)
+      self.add("PFMETNoCorr_Phi","PF MET Phi",320,-3.2,3.2)
+      self.add("PFMETNoCorr_Px","PF MET Px",1000,-500,500)
+      self.add("PFMETNoCorr_Py","PF MET Py",1000,-500,500)
+      self.add("PFMETNoCorr_Significance","PF MET Significance",500,0,250)
+
+      self.add("PFMET01Phi_Pt","PF MET Pt",600,0,600)
+      self.add("PFMET01Phi_Phi","PF MET Phi",320,-3.2,3.2)
+      self.add("PFMET01Phi_Px","PF MET Px",1000,-500,500)
+      self.add("PFMET01Phi_Py","PF MET Py",1000,-500,500)
+      self.add("PFMET01Phi_Significance","PF MET Significance",500,0,250)
+
+      self.add("PFMET01_Pt","PF MET Pt",600,0,600)
+      self.add("PFMET01_Phi","PF MET Phi",320,-3.2,3.2)
+      self.add("PFMET01_Px","PF MET Px",1000,-500,500)
+      self.add("PFMET01_Py","PF MET Py",1000,-500,500)
+      self.add("PFMET01_Significance","PF MET Significance",500,0,250)
+
+      self.add("PFMET1_Pt","PF MET Pt",600,0,600)
+      self.add("PFMET1_Phi","PF MET Phi",320,-3.2,3.2)
+      self.add("PFMET1_Px","PF MET Px",1000,-500,500)
+      self.add("PFMET1_Py","PF MET Py",1000,-500,500)
+      self.add("PFMET1_Significance","PF MET Significance",500,0,250)
+
+      self.add("PFMETPhi_Pt","PF MET Pt",600,0,600)
+      self.add("PFMETPhi_Phi","PF MET Phi",320,-3.2,3.2)
+      self.add("PFMETPhi_Px","PF MET Px",1000,-500,500)
+      self.add("PFMETPhi_Py","PF MET Py",1000,-500,500)
+      self.add("PFMETPhi_Significance","PF MET Significance",500,0,250)
+
+      self.add("MVAMET_Pt","MVA MET Pt",600,0,600)
+      self.add("MVAMET_Phi","MVA MET Phi",320,-3.2,3.2)
+      self.add("MVAMET_Px","MVA MET Px",1000,-500,500)
+      self.add("MVAMET_Py","MVA MET Py",1000,-500,500)
+      self.add("MVAMET_Significance","MVA MET Significance",800,0,400)
+
+      self.add("NoPUMET_Pt","NoPileUp MET Pt",600,0,600)
+      self.add("NoPUMET_Phi","NoPileUp MET Phi",320,-3.2,3.2)
+      self.add("NoPUMET_Px","NoPileUp MET Px",1000,-500,500)
+      self.add("NoPUMET_Py","NoPileUp MET Py",1000,-500,500)
+      self.add("NoPUMET_Significance","NoPileUp MET Significance",600,0,600)
+
+    def process(self, event):
+      """MetControlPlots"""
+      result = { }
+		
+      result["PFMETNoCorr_Pt"] = event.PFMETNoCorr[0].pt()
+      result["PFMETNoCorr_Phi"] = event.PFMETNoCorr[0].phi()
+      result["PFMETNoCorr_Px"] = event.PFMETNoCorr[0].px()
+      result["PFMETNoCorr_Py"] = event.PFMETNoCorr[0].py()
+      result["PFMETNoCorr_Significance"] = event.PFMETNoCorr[0].significance()
+
+      result["PFMET01Phi_Pt"] = event.PFMET01Phi[0].pt()
+      result["PFMET01Phi_Phi"] = event.PFMET01Phi[0].phi()
+      result["PFMET01Phi_Px"] = event.PFMET01Phi[0].px()
+      result["PFMET01Phi_Py"] = event.PFMET01Phi[0].py()
+      result["PFMET01Phi_Significance"] = event.PFMET01Phi[0].significance()
+
+      result["PFMET01_Pt"] = event.PFMET01[0].pt()
+      result["PFMET01_Phi"] = event.PFMET01[0].phi()
+      result["PFMET01_Px"] = event.PFMET01[0].px()
+      result["PFMET01_Py"] = event.PFMET01[0].py()
+      result["PFMET01_Significance"] = event.PFMET01[0].significance()
+
+      result["PFMET1_Pt"] = event.PFMET1[0].pt()
+      result["PFMET1_Phi"] = event.PFMET1[0].phi()
+      result["PFMET1_Px"] = event.PFMET1[0].px()
+      result["PFMET1_Py"] = event.PFMET1[0].py()
+      result["PFMET1_Significance"] = event.PFMET1[0].significance()
+
+      result["PFMETPhi_Pt"] = event.PFMETPhi[0].pt()
+      result["PFMETPhi_Phi"] = event.PFMETPhi[0].phi()
+      result["PFMETPhi_Px"] = event.PFMETPhi[0].px()
+      result["PFMETPhi_Py"] = event.PFMETPhi[0].py()
+      result["PFMETPhi_Significance"] = event.PFMETPhi[0].significance()
+      
+      result["MVAMET_Pt"] = event.MVAMET[0].pt()
+      result["MVAMET_Phi"] = event.MVAMET[0].phi()
+      result["MVAMET_Px"] = event.MVAMET[0].px()
+      result["MVAMET_Py"] = event.MVAMET[0].py()
+      result["MVAMET_Significance"] = event.MVAMET[0].significance()
+      
+      result["NoPUMET_Pt"] = event.NoPUMET[0].pt()
+      result["NoPUMET_Phi"] = event.NoPUMET[0].phi()
+      result["NoPUMET_Px"] = event.NoPUMET[0].px()
+      result["NoPUMET_Py"] = event.NoPUMET[0].py()
+      result["NoPUMET_Significance"] = event.NoPUMET[0].significance()
+	
+      return result
+
+
+
+
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest

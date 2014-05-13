@@ -359,6 +359,29 @@ def goodJets(event, muChannel=True, eleChannel=True):
   # compute the good jets
   return map(lambda jet:isGoodJet(jet,bestZcandidate),event.jets)
 
+def isMetHigherThan(met,cut=20):
+  """Apply a lower MET threshold"""
+  return met.pt()>cut
+
+def isMetLowerThan(met,cut=20):
+  """Apply an upper MET threshold"""
+  return met.pt()<cut
+
+def hasMet_SigHigherThan(met,cut=10):
+  """Apply a lower MET threshold"""
+  if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
+    return met.significance()>cut
+  else :
+    return False
+
+def hasMet_SigLowerThan(met,cut=10):
+  """Apply an upper MET threshold"""
+  if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
+    return met.significance()<cut
+  else :
+    return False
+
+
 def isGoodMet(met,cut=50):
   """Apply the MET cut"""
   return met.pt()<cut
