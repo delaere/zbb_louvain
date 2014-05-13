@@ -26,24 +26,15 @@ class configuration:
   WP = ["M","L"]
   muChannel = True
   eleChannel = True
-  SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
-  if btagging == "CSV":
-    SF_running_mode= "hardcoded_nofit" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
-  elif btagging == "JP":
-    SF_running_mode= "database" #btagging reweighting: choose between hardcoded_nofit/hardcoded/database
-  JERfactor = 0. # 1 = recommended smearing for MC, use 0 for MadWeight
-  JESfactor = 0. # 1 = +1sigma
-  LeptonTnPfactor = 0 # Lepton reweighting uncertainty
   doMEcontrolPlots = True
   doNNJetRegression = False
+  JERfactor = 0. # don't change it, should be 0 on data
+  JESfactor = 0. # don't change it, should be 0 on data
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
-  if btagging == "CSV":
-    ssvperfData=dataDirectory+"btag_allalgos_witheff.root"
-  elif btagging == "JP":
-    ssvperfData=dataDirectory+"performance_jp_witheff.root"
-  pileupData=dataDirectory+"Cert_190456-208686_8TeV_PromptPlusReReco_pileupTruth.root"
-  pileupMC=dataDirectory+"MCpileup_Summer12_S10.root"
   jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
+
+  #parameter you want to print
+  toprint = ['runningMode', 'eventSelection', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
 
   # control plot classes
   controlPlots = [ 
@@ -112,3 +103,17 @@ class eventDumpConfig:
   productsToPrint   = [ ] # list of product to display (use the producer label)
   collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label) 
 
+def printConfig(configration=configuration):
+  print "#########################################################################"
+  print "#                        print configuration                            #"
+  print "#########################################################################"
+  print ""
+  for attr in configuration.toprint : print "                "+attr+" =", getattr(configuration,attr)
+  print ""
+  print "#########################################################################"
+  print "#                         end configuration                             #"
+  print "#########################################################################"
+  print ""
+           
+printConfig(configuration)
+                  
