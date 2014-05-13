@@ -5,6 +5,10 @@ import PatAnalysis.CMSSW
 from PatAnalysis.EventSelection import categoryName
 from ObjectSelection import isBJet
 from zbbConfig import configuration
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 class BtaggingWeight:
   """compute the event weight based on btagging SF"""
@@ -68,15 +72,15 @@ class BtaggingWeight:
       if isBJet(jet,self.WP[0],self.btagging):
         ntagsHP += 1
         if flavor == 0:
-          #if jet.et() > 100. : print "WARNING : "+btagging+self.WP[0]+" tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          #if jet.pt() > 100. : print "WARNING : "+btagging+self.WP[0]+" tagged jet with no flavor and high transverse energy : ", jet.pt(), ", eta : ", jet.eta()
           ntagsNoFlvavorHP += 1
       if isBJet(jet,self.WP[1],self.btagging):
         ntagsHE += 1
         if flavor == 0:
-          #if jet.et() > 100. : print "WARNING : "+btagging+self.WP[1]+" tagged jet with no flavor and high transverse energy : ", jet.et(), ", eta : ", jet.eta()
+          #if jet.pt() > 100. : print "WARNING : "+btagging+self.WP[1]+" tagged jet with no flavor and high transverse energy : ", jet.pt(), ", eta : ", jet.eta()
           ntagsNoFlvavorHE += 1
       # add to the jetset class
-      self.myJetSet.addJet(configuration.SF_uncert, flavor,jet.et(),jet.eta(), self.algo1, self.algo2)
+      self.myJetSet.addJet(configuration.SF_uncert, flavor,jet.pt(),jet.eta(), self.algo1, self.algo2)
     #if ntagsNoFlvavorHP>=2 and ntagsNoFlvavorHE<2: print "IMPORTANT WARNING : 2 "+btagging+self.WP[0]+" tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
     #if ntagsNoFlvavorHE>=2 : print "IMPORTANT WARNING : 2 "+btagging+self.WP[1]+" tagged jets with no flavour !! Event should be checked !! Event number : ", event.event()
     return max(self.getWeight(self.myJetSet,ntagsHE,ntagsHP),0.)

@@ -337,6 +337,11 @@ def jetId(jet,level="loose"):
     print "Error: unknown jetid level:",level
     return False
 
+def allJets(event):
+  if event.object().event().eventAuxiliary().isRealData() : return event.rawjets
+  for jet in event.rawjets : JECuncertaintyProxy.Scale(jet)
+  return event.rawjets
+
 def isGoodJet(jet, Z = None):
   """Perform additional checks that define a good jet"""
   # overlap checking
@@ -344,7 +349,7 @@ def isGoodJet(jet, Z = None):
     if not hasNoOverlap(jet,Z) :
       return False 
   # pt, eta, and jetid
-  return abs(jet.eta())<2.4 and JECuncertaintyProxy.jetPt(jet)>30. and jetId(jet,"loose")
+  return abs(jet.eta())<2.4 and jet.pt()>30. and jetId(jet,"loose")
 
 def goodJets(event, muChannel=True, eleChannel=True):
   # best Z candidate
@@ -730,11 +735,6 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
   else:
     return None
     
-    
-    
-=======
-
->>>>>>> 7fa96118cb8d6d6ab5d0a04d5cbaaabba10d435c
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list

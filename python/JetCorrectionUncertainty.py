@@ -3,7 +3,9 @@ import ROOT
 import PatAnalysis.CMSSW
 from math import sqrt
 from random import gauss
-from zbbConfig import configuration
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 class JetCorrectionUncertaintyProxy:
   """A class to access JEC uncertainties"""
@@ -86,3 +88,25 @@ class JetCorrectionUncertaintyProxy:
       b = 0.466763
       d = 0.193137
     return sqrt(((cmp(a,0)*(a/jetpt)**2)+(b**2*(pow(jetpt,(d-1))))))
+
+  def Scale(self,jet):
+    """Jet Pt, optionally varied for JES and JER"""
+    jetpt = jet.pt()
+    # smear to reproduce resolution measured in data
+    # apply JetMet recommendation:  pT->max[0.,pTgen+c*(pT-pTgen)] 
+    if abs(configuration.JERfactor)>0.01: # non-zero
+      #print "JER"
+      try:
+        ptgen = jet.genJet().pt()
+      except:
+        ptgen = gauss(jetpt,self.jetEnergyResolution(jet))
+      jersf = (self.jerCorrectionFactor(jet)-1.) * configuration.JERfactor
+      jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
+    # take into account JEC uncertainty
+    if abs(configuration.JESfactor)>0.01: # non-zero
+      #print "JEC"
+      jesunc = self.unc_tot_jet(jet) * configuration.JESfactor * jetpt
+      jetpt = max(0., jetpt + jesunc)
+    # return the jet pt, including all of the above
+    if abs(configuration.JERfactor)>0.01 or abs(configuration.JESfactor)>0.01 : jet.scaleEnergy(jetpt/jet.pt())
+    return 
