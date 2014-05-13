@@ -196,6 +196,42 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
       if self._ran:
         print "summary: out of",self.i,"events:",self.cjet,"cZ events",self.bjet,"bZ events and",self.ljet," light jets events."
 
+class genMetsControlPlots(BaseControlPlots):
+    """A class to create control plots for generator Mets"""
+    
+    def __init__(self, dir=None, dataset=None, mode="plots"):
+      # create output file if needed. If no file is given, it means it is delegated
+      BaseControlPlots.__init__(self, dir=dir, purpose="genMets", dataset=dataset, mode=mode)
+
+    def beginJob(self):
+      # declare histograms
+      self.add("genMET_Pt","GEN MET Pt",600,0,600)
+      self.add("genMET_Phi","GEN MET Phi",320,-3.2,3.2)
+      self.add("genMET_Px","GEN MET Px",1000,-500,500)
+      self.add("genMET_Py","GEN MET Py",1000,-500,500)
+      self.add("MEMET_Pt","Matrix Element MET Pt",600,0,600)
+      self.add("MEMET_Phi","Matrix Element MET Phi",320,-3.2,3.2)
+      self.add("MEMET_Px","Matrix Element MET Px",1000,-500,500)
+      self.add("MEMET_Py","Matrix Element MET Py",1000,-500,500)
+      self.add("MEMET_NumberOfNeutrinos","NumberOfNeutrinos",4,0,4)
+      
+    def process(self,event):
+      """Generator Level Mets"""
+      result = { }
+      result["genMET_Pt"] = event.genMET[0].pt()
+      result["genMET_Phi"] = event.genMET[0].phi()
+      result["genMET_Px"] = event.genMET[0].px()
+      result["genMET_Py"] = event.genMET[0].py()
+      
+      neutrinos_4v = event.MEMET_4v
+      result["MEMET_Pt"]=neutrinos_4v.Pt()
+      result["MEMET_Phi"]=neutrinos_4v.Phi()
+      result["MEMET_Px"]=neutrinos_4v.Px()
+      result["MEMET_Py"]=neutrinos_4v.Py()
+      result["MEMET_NumberOfNeutrinos"]=event.NumberOfNeutrinos
+
+
+
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest

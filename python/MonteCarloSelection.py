@@ -240,3 +240,27 @@ def getGenZleptonPair(event, muons=True, electrons=True, leptonPtCut=20, leptonE
   else:
     return None
 
+def getMEMET_4v(event):
+      neutrinos_4v = TLorentzVector()
+      for particle in event.genParticles:
+                if (particle.status()==3 and (abs(particle.pdgId())==12 or abs(particle.pdgId())==14 or abs(particle.pdgId())==16)):
+                        neutrinos_4v += TLorentzVector(particle.px(),particle.py(),particle.pz(),particle.energy())
+      return neutrinos_4v
+
+def getNumberOfStatus3Neutrinos(event):
+      NumberOfNeutrinos=0
+      for particle in event.genParticles:
+                if (particle.status()==3 and (abs(particle.pdgId())==12 or abs(particle.pdgId())==14 or abs(particle.pdgId())==16)):
+			NumberOfNeutrinos+=1
+      return NumberOfNeutrinos
+
+
+
+
+
+
+
+
+
+
+

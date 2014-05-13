@@ -49,6 +49,8 @@ class configuration:
   # control plot classes
   controlPlots = [ 
     controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging ,"WP":WP }),
+    #controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
+    controlPlot("genMets","MonteCarloSelectionControlPlots","genMetsControlPlots",{}),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
     controlPlot("selection", "ZbbEventSelectionControlPlots", "ZbbEventSelectionControlPlots", { }),
     controlPlot("MCselection", "MonteCarloSelectionControlPlots", "MonteCarloSelectionControlPlots", { }),
@@ -79,6 +81,15 @@ class configuration:
                        #eventCollection("jets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
                        eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
+	               eventCollection("genMET","vector<reco::GenMET>","genMetTrue"),
+                       eventCollection("PFMETNoCorr","vector<pat::MET>","patPFMet"),
+                       eventCollection("PFMET01Phi","vector<pat::MET>","patType1CorrectedPFMet"),
+                       eventCollection("PFMET01","vector<pat::MET>","patType01CorrectedPFMet"),
+                       eventCollection("PFMET1","vector<pat::MET>","patTypeOnly1CorrectedPFMet"),
+                       eventCollection("PFMETPhi","vector<pat::MET>","patTypeSysCorrectedPFMet"),
+                       eventCollection("PFMET1Phi","vector<pat::MET>","patType1sysCorrectedPFMet"),
+                       eventCollection("MVAMET","vector<pat::MET>","patPFMetMVA"),
+                       eventCollection("NoPUMET","vector<pat::MET>","patPFMetNoPileUp"),
                        eventCollection("Zmumu","vector<reco::CompositeCandidate>","zmuTightmuTight"),
                        eventCollection("Zelel","vector<reco::CompositeCandidate>","zelTightelTight"),
                        eventCollection("triggerInfo","pat::TriggerEvent","patTriggerEvent"),
@@ -108,7 +119,9 @@ class configuration:
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
 #                       eventProducer("genZparticle", "MonteCarloSelection", "getGenZparticle", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
-                       eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
+                       eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } ),
+                       eventProducer("MEMET_4v", "MonteCarloSelection", "getMEMET_4v", {} ),
+                       eventProducer("NumberOfNeutrinos", "MonteCarloSelection", "getNumberOfStatus3Neutrinos", {} )
                      ]
 
   eventWeights     = [ eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":ssvperfData,"btagging":btagging}),
