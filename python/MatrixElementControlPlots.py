@@ -323,7 +323,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       if not bestZcandidate is None:
         dijet = event.dijet_all
         if not dijet[0] is None:
-          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass()) #self._JECuncertainty.jet(dijet[0])
+          b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy()) #self._JECuncertainty.jet(dijet[0])
 	  jetPt = b1.Pt()
           bNNCorr1 = ROOT.TLorentzVector(0,0,0,0)#4-vec first NNcorr bjet
 
@@ -370,7 +370,7 @@ class MatrixElementControlPlots(BaseControlPlots):
           result["bjet1massNNCorr"] = dijet[0].mass()*corrDijet0
 
         if not dijet[1] is None:
-          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass()) #self._JECuncertainty.jet(dijet[1])
+          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy()) #self._JECuncertainty.jet(dijet[1])
 	  jetPt = b2.Pt()
           bNNCorr2 = ROOT.TLorentzVector(0,0,0,0)#4-vec second NNcorr bjet
 

@@ -162,7 +162,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
         dijet = event.dijet_all
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
-          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
+          b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
           Zb = z+b1
           result["ZbM"] = Zb.M()
           result["ZbPt"] = Zb.Pt()
@@ -170,7 +170,7 @@ class ZbbEventSelectionControlPlots(BaseControlPlots):
           result["dphiZbj1"] = abs(z.DeltaPhi(b1))
           result["drZbj1"] = z.DeltaR(b1)
         if not dijet[1] is None:
-          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
+          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
             b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
