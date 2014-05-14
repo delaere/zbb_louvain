@@ -31,13 +31,13 @@ for cp in updateControlPlots : configuration.controlPlots.append(cp)
 updateEventCollections = [
     eventCollection("genMET","vector<reco::GenMET>","genMetTrue"),
     ]
-for ec in updateEventCollections : eventCollections.append(ec)
+for ec in updateEventCollections : configuration.eventCollections.append(ec)
 
 updateEventProducers = [
     #eventProducer("genZparticle", "MonteCarloSelection", "getGenZparticle", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
-    eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
+    eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } ),
     eventProducer("MEMET_4v", "MonteCarloSelection", "getMEMET_4v", {} ),
-    eventProducer("NumberOfNeutrinos", "MonteCarloSelection", "getNumberOfStatus3Neutrinos", {} )
+    eventProducer("NumberOfNeutrinos", "MonteCarloSelection", "getNumberOfStatus3Neutrinos", {} ),
     ]
 for ep in updateEventProducers : configuration.eventProducers.append(ep)
 
