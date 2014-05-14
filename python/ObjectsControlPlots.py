@@ -480,8 +480,8 @@ class JetmetControlPlots(BaseControlPlots):
       fsrDR = 999.9
       fsrjet4vec = ROOT.TLorentzVector(0,0,0,0)
       if nj > 2 : #if there are 3 good jets and we select 2 b-jets
-          b1 = ROOT.TLorentzVector(dijet[0].pt(),dijet[0].eta(),dijet[0].phi(),dijet[0].mass())
-          b2 = ROOT.TLorentzVector(dijet[1].pt(),dijet[1].eta(),dijet[1].phi(),dijet[1].mass())
+          b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
           for index,jet in enumerate(event.jets):
               if goodJets[index] and not jet in dijet:
                   #print "there is isrjet"
