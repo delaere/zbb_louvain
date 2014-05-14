@@ -35,7 +35,7 @@ for ec in updateEventCollections : eventCollections.append(ec)
 
 updateEventProducers = [
     #eventProducer("genZparticle", "MonteCarloSelection", "getGenZparticle", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
-    eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } )
+    eventProducer("genZparticle", "MonteCarloSelection", "getGenZleptonPair", { "muons":True, "electrons":True, "leptonPtCut":20, "leptonEtaCut":2.4 } ),
     eventProducer("MEMET_4v", "MonteCarloSelection", "getMEMET_4v", {} ),
     eventProducer("NumberOfNeutrinos", "MonteCarloSelection", "getNumberOfStatus3Neutrinos", {} )
     ]
