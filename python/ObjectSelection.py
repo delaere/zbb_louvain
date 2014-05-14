@@ -617,13 +617,11 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
   
-def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
-  """Finds the best not Z candidate. Might be none.
-     As input, the function takes an arbitrary number of collections of Z candidates.
-     muChannel specify if we have to consider only muons (true), electrons (false) or both (none)."""
+def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
+
   runNumber = event.run()
-  lumi_section = event.lumi()   
-  
+  lumi_section = event.lumi() 
+
   first_mu=None
   second_mu=None
   first_el=None
@@ -645,72 +643,80 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=False):
   if muChannel:
     for mu in event.muons:
       if isGoodMuon(mu, "tight"):
-        if (mu.pt()> first_mu_pt):
-          first_mu_pt=mu.pt()
+        mu_pt = mu.pt()
+        if (mu_pt> first_mu_pt):
+          first_mu_pt=mu_pt
 	  first_mu = mu
 	  
-        elif (mu.pt()< first_mu_pt and mu.pt()> second_mu_pt):
-          second_mu_pt=mu.pt()
-	  second_mu = mu
-        elif (mu.pt()< second_mu_pt): continue
+    for mu in event.muons :
+      if isGoodMuon(mu, "tight") and mu is not first_mu:
+        mu_pt = mu.pt()
+        if (mu_pt> second_mu_pt):
+          second_mu_pt=mu_pt
+	  second_mu = mu 
+
   
   #select the two hardest electrons 
   if eleChannel:
     for el in event.electrons:
       if isGoodElectron(el, "tight"):
-        if (el.pt()> first_el_pt):
-          first_el_pt=el.pt()
-	  first_el=el
-        elif (el.pt()< first_el_pt and el.pt()> second_el_pt):
-          second_el_pt=el.pt()
-	  second_el=el
-        elif (el.pt()< second_el_pt): continue
-        
-  #select the two hardest leptons  
-  if (first_mu):
+        el_pt = el.pt()
+        if (el_pt> first_el_pt):
+          first_el_pt=el_pt
+	  first_el = el
+	  
+    for el in event.electrons :
+      if isGoodElectron(el, "tight") and el is not first_el:
+        el_pt = el.pt()
+        if (el_pt> second_el_pt):
+          second_el_pt=el_pt
+	  second_el = el 
+  
+  #select the two hardest leptons
+  if first_mu is not None:
     first_lept =first_mu
-    if (first_el and first_el_pt > first_mu_pt):
+    if (first_el is not None and first_el_pt > first_mu_pt):
       first_lept =first_el
   else:
-    if (first_el):
+    if (first_el is not None):
       first_lept =first_el
-      
-      
      
   if (first_lept == first_mu):
-      if (second_mu  and second_el == None):
+      if (second_mu is not None and first_el is None):
         second_lept = second_mu
-      elif (second_mu == None and first_el ):
+      elif (second_mu is None and first_el is not None):
         second_lept = first_el 
-      elif (second_mu  and first_el ):
+      elif (second_mu is not None and first_el is not None):
         if (second_mu_pt > first_el_pt):
 	  second_lept = second_mu
 	else:
 	  second_lept = first_el	     
   else:
-      if (second_el and second_mu == None):
+      if (second_el is not None and first_mu is None):
         second_lept = second_el
-      elif (second_el == None and first_mu ):
+      elif (second_el is None and first_mu is not None):
         second_lept = first_mu 
-      elif (second_el  and first_mu ):
+      elif (second_el is not None and first_mu is not None):
         if (second_el_pt > first_mu_pt):
 	  second_lept = second_el
 	else:
 	  second_lept = first_mu
-	  
+ 	  
   leptList.append(first_lept)
   leptList.append(second_lept)
+
 	  
-  if (first_lept  and second_lept ):	  
+  if (first_lept is not None  and second_lept is not None ):	  
      vertex_cond = isfromVertex(first_lept, second_lept, 0.05)
     #check leptons match the trigger
-     if (vertex_cond):
+     if (vertex_cond is True):
 #       Daugh1 = first_lept.masterClone()
 #       ROOT.SetOwnership( Daugh1, False )
 #       Daugh2 = second_lept.masterClone()
 #       ROOT.SetOwnership( Daugh2, False )
        case1 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section) 
        case2 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section)
+       
        if (case1 or case2):
          result = True 
 
