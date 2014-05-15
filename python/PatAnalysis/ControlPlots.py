@@ -27,6 +27,8 @@ parser.add_option("--Njobs", type="int", dest='Njobs', default="1",
                   help="Number of jobs when splitting the processing.")
 parser.add_option("--jobNumber", type="int", dest='jobNumber', default="0",
                   help="Number of the job is a splitted set of jobs.")
+parser.add_option("--nEvents", type="int", dest='nEvents', default="0",
+                  help="Run only nEvents for the given job. Useful for testing")
 
 (options, args) = parser.parse_args()
 
@@ -78,6 +80,10 @@ def main(options):
     return
   if options.jobNumber>=options.Njobs:
     print "Error: jobNumber must be strictly smaller than Njobs."
+    parser.print_help()
+    return
+  if options.nEvents<0:
+    print "Error: nEvents should be >= 0 (=0 means run all events)"
     parser.print_help()
     return
   # if all ok, run the procedure
@@ -150,6 +156,8 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
     if i%100==0 : 
       print "Processing... event %d. Last batch in %f s." % (i,(time.time()-t0))
       t0 = time.time()
+    if i >= options.nEvents and options.nEvents != 0:
+      break
     if configuration.runningMode=="plots":
       # loop on channels
       plots = filter(lambda x: EventSelection.isInCategory(x,event.category) ,levels)
