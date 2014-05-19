@@ -166,7 +166,7 @@ class EleIDISO_SFReader:
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-       if (pt<=200):       
+       if (pt<=500):       
           print 'WARNING: Any electron sf range matching the specified eta/pt'
        return 1.
 
@@ -196,7 +196,7 @@ class EleTriggerHighPtLeg_SFReader:
               else:  
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-        if (pt<=200):   
+        if (pt<=500):   
            print 'WARNING: Any electron sf range matching the specified eta/pt '
         return 1.
 
