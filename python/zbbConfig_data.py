@@ -19,7 +19,7 @@ class configuration:
   #runningMode = "dataset"
 
   # event selection class
-  eventSelection = pythonpath+"ZbbEventSelection"
+  eventSelection = pythonpath+"myEventSelection"
 
   # my variables: files, systematics and other options
   btagging = "CSV"
@@ -64,10 +64,10 @@ class configuration:
                        eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsWithBeta"),
                        #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
                        #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
-                       eventCollection("MET","vector<pat::MET>","patType01SCorrectedPFMet"),
+                       eventCollection("MET","vector<pat::MET>","patType1CorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
 		       eventCollection("PFMETNoCorr","vector<pat::MET>","patPFMet"),
-                       eventCollection("PFMET01Phi","vector<pat::MET>","patType1CorrectedPFMet"),
+                       eventCollection("PFMET01Phi","vector<pat::MET>","patType01SCorrectedPFMet"),
                        eventCollection("PFMET01","vector<pat::MET>","patType01CorrectedPFMet"),
                        eventCollection("PFMET1","vector<pat::MET>","patTypeOnly1CorrectedPFMet"),
                        eventCollection("PFMETPhi","vector<pat::MET>","patTypeSysCorrectedPFMet"),
