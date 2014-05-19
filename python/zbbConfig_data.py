@@ -19,7 +19,7 @@ class configuration:
   #runningMode = "dataset"
 
   # event selection class
-  eventSelection = pythonpath+"myEventSelection"
+  eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
   btagging = "CSV"
