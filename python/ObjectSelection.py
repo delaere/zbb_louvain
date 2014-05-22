@@ -224,6 +224,55 @@ def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
   outcome = len(intersect)>0
   return (outcome and isTriggerMatchZcandidate(bestZcandidate,runNumber,event.lumi()))
 
+def isTriggerIncOK(event,perRun=True):
+  """Checks if the proper trigger is passed"""
+  # simple case: mu trigger for mu channel (1), ele trigger for ele channel (0)
+  # more complex case: different trigger for various run ranges (lowest unprescaled)
+  # trigger info
+  triggerInfo = event.triggerInfo
+  runNumber = event.run()
+  l1= None
+  l2= None
+  bestDileptcandidate = event.bestDiLeptCandidate
+  if bestDileptcandidate is not None:
+    l1=bestDileptcandidate[0]
+    l2=bestDileptcandidate[1]
+
+  
+  if triggerInfo is None:
+    return True
+  paths = triggerInfo.acceptedPaths()
+  #for i in range(paths.size()) : print paths[i].name()
+  pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+  intersect = set()
+  if not perRun and l1 is not None and l2 is not None:
+    if l1.isMuon() and l2.isMuon():
+      intersect = set(pathnames) & set(ourtriggers.mutriggers)
+    elif l1.isElectron() and l2.isElectron():
+      intersect = set(pathnames) & set(ourtriggers.eltriggers)
+    elif (l1.isElectron() and l2.isMuon()) or(l2.isElectron() and l1.isMuon()):
+        intersect = set(pathnames) & set(ourtriggers.emutriggers)      
+  elif perRun and l1 is not None and l2 is not None:
+    if l1.isMuon() and l2.isMuon():
+      if ourtriggers.murunMap[runNumber] is None:
+        print "muon unexpected runNumber : " , runNumber
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
+    elif l1.isElectron() and l2.isElectron():
+      if ourtriggers.elrunMap[runNumber] is None:
+        print "electron unexpected runNumber : " , runNumber
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
+    elif (l1.isElectron() and l2.isMuon()) or(l2.isElectron() and l1.isMuon()):
+      if ourtriggers.emurunMap[runNumber] is None:
+        print "e-mu unexpected runNumber : " , runNumber
+      else:  
+        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])	
+	
+  outcome = len(intersect)>0
+  return (outcome and isTriggerMatchDileptcandidate(bestDileptcandidate,runNumber,event.lumi()))
+
+
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
@@ -538,6 +587,17 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   else:
     return False
 
+#trigger matching for inclusive selection    
+def isTriggerMatchDileptcandidate(bestDileptCandidate,runNumber, lumi_section):
+  if not bestDileptCandidate is None:
+    daughter1 = bestDileptCandidate[0]
+    daughter2 = bestDileptCandidate[1]
+    case1 = isTriggerMatchPair(daughter1,daughter2,runNumber,lumi_section) 
+    case2 = isTriggerMatchPair(daughter1,daughter2,runNumber,lumi_section)
+    return (case1 or case2)
+  else:
+    return False
+
 def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
   if l1.isMuon() and l2.isMuon():
     #return True
@@ -668,46 +728,49 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   
   leptList = []
   #select the two hardest muons 
-  if muChannel:
-    for mu in event.muons:
+  #if muChannel:
+  for mu in event.muons:
       if isGoodMuon(mu, "tight"):
         mu_pt = mu.pt()
         if (mu_pt> first_mu_pt):
           first_mu_pt=mu_pt
 	  first_mu = mu
 	  
-    for mu in event.muons :
-      if isGoodMuon(mu, "tight") and mu is not first_mu:
-        mu_pt = mu.pt()
-        if (mu_pt> second_mu_pt):
-          second_mu_pt=mu_pt
-	  second_mu = mu 
+  for mu in event.muons :
+        if isGoodMuon(mu, "tight") :
+          mu_pt = mu.pt()
+	  if mu_pt != first_mu_pt:
+            if (mu_pt> second_mu_pt):
+              second_mu_pt=mu_pt
+	      second_mu = mu 
 
   
   #select the two hardest electrons 
-  if eleChannel:
-    for el in event.electrons:
+  #if eleChannel:
+  for el in event.electrons:
       if isGoodElectron(el, "tight"):
         el_pt = el.pt()
         if (el_pt> first_el_pt):
           first_el_pt=el_pt
 	  first_el = el
 	  
-    for el in event.electrons :
-      if isGoodElectron(el, "tight") and el is not first_el:
-        el_pt = el.pt()
-        if (el_pt> second_el_pt):
-          second_el_pt=el_pt
-	  second_el = el 
-  
-  #select the two hardest leptons
-  if first_mu is not None:
+  for el in event.electrons :
+      if isGoodElectron(el, "tight") :
+          el_pt = el.pt()
+	  if el_pt != first_el_pt:
+            if (el_pt> second_el_pt):
+              second_el_pt=el_pt
+	      second_el = el 
+  #select the two hardest leptons  
+  if first_mu is not None and first_el is None:
     first_lept =first_mu
-    if (first_el is not None and first_el_pt > first_mu_pt):
+  elif first_el is not None and first_mu is None:
+    first_lept =first_el
+  elif first_el is not None and first_mu is not None:
+    if (first_el_pt > first_mu_pt):
       first_lept =first_el
-  else:
-    if (first_el is not None):
-      first_lept =first_el
+    else:
+      first_lept =first_mu
      
   if (first_lept == first_mu):
       if (second_mu is not None and first_el is None):
@@ -719,7 +782,7 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
 	  second_lept = second_mu
 	else:
 	  second_lept = first_el	     
-  else:
+  elif (first_lept == first_el):
       if (second_el is not None and first_mu is None):
         second_lept = second_el
       elif (second_el is None and first_mu is not None):
@@ -729,30 +792,21 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
 	  second_lept = second_el
 	else:
 	  second_lept = first_mu
- 	  
+	  
   leptList.append(first_lept)
   leptList.append(second_lept)
-
 	  
   if (first_lept is not None  and second_lept is not None ):	  
      vertex_cond = isfromVertex(first_lept, second_lept, 0.05)
     #check leptons match the trigger
      if (vertex_cond is True):
-#       Daugh1 = first_lept.masterClone()
-#       ROOT.SetOwnership( Daugh1, False )
-#       Daugh2 = second_lept.masterClone()
-#       ROOT.SetOwnership( Daugh2, False )
-       case1 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section) 
-       case2 = isTriggerMatchPair(first_lept,second_lept,runNumber,lumi_section)
+       result = True
        
-       if (case1 or case2):
-         result = True 
-
   if (result == True):
     return (leptList[0],leptList[1])
   else:
     return None
-    
+  
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
