@@ -1,8 +1,10 @@
 import ROOT
 import MonteCarloSelection
 from ObjectSelection import *
-from zbbConfig import configuration
-from PatAnalysis.CPconfig import configuration
+import os
+confCfg = os.environ["PatAnalysisCfg"]
+if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
+else : from zbbConfig import configuration
 
 #########################################################################
 #  Standard methods  ####################################################
