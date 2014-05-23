@@ -23,7 +23,7 @@ class configuration:
 
   # my variables: files, systematics and other options
   btagging = "CSV"
-  WP = ["M","L"]
+  WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   muChannel = True
   eleChannel = True
   doMEcontrolPlots = True
