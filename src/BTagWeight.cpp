@@ -94,6 +94,7 @@ float BTagWeight::weight(vector<JetInfo> jets, int algo, int ntags) const {
             mc*=(1.-jets[j].eff_SSVHEM);
 	    data*=(1.-jets[j].eff_SSVHEM*jets[j].sf_SSVHEM);
           }
+	  break;
 	}
  	case 2: {
           if(tagged) {
@@ -104,6 +105,7 @@ float BTagWeight::weight(vector<JetInfo> jets, int algo, int ntags) const {
             mc*=(1.-jets[j].eff_SSVHPT);
             data*=(1.-jets[j].eff_SSVHPT*jets[j].sf_SSVHPT);
           }
+	  break;
  	}
       }
     }       
@@ -154,7 +156,7 @@ float BTagWeight::weight2(vector<JetInfo> jets, int ntags1, int ntags2) const {
           ntagged2++;
           mc*=jets[j].eff_SSVHPT;
           data*=jets[j].eff_SSVHPT*jets[j].sf_SSVHPT;
-          break;
+	  break;
         }
       }
     }       
