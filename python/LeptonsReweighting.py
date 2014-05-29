@@ -396,49 +396,89 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
 
+#=== 2012ABC for Mu17 SingleLeg
+
+class MuonTriggerEffReader_Mu17Leg:
+   """A binned map in eta of both muons for HLT 2012 trigger efficiencies.
+      Values can be extracted are (value,error). """
+
+   def __init__(self):
+     """Construct a MuonTriggerEffReader using pikle files."""
+     f = open(configuration.dataDirectory+'HLT_DoubleMu_Efficiencies_Run_2012ABCD_53X_SingleLegs.pkl', 'r')
+     if f :
+        self._map = pickle.load(f)
+        self._eta_range = ''
+     else :
+        print 'ERROR: Input file for Trigger efficiencies not existing!'
+
+   def value(self,eta1,eta2,mode):
+
+     """Return the eff or the uncertainty for a given pt and eta."""
+     
+     #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
+     self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
+
+     if mode == '0'  :
+        return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
+     elif mode == '+1'  :
+        return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     elif mode == '-1' : 
+        return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     else:  
+        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+        return 0
+
+#=== 2012ABC for Mu8 SingleLeg
+
+class MuonTriggerEffReader_Mu8Leg:
+   """A binned map in eta of both muons for HLT 2012 trigger efficiencies.
+      Values can be extracted are (value,error). """
+
+   def __init__(self):
+     """Construct a MuonTriggerEffReader using pikle files."""
+     f = open(configuration.dataDirectory+'HLT_DoubleMu_Efficiencies_Run_2012ABCD_53X_SingleLegs.pkl', 'r')
+     if f :
+        self._map = pickle.load(f)
+        self._eta_range = ''
+     else :
+        print 'ERROR: Input file for Trigger efficiencies not existing!'
+
+   def value(self,eta1,eta2,mode):
+
+     """Return the eff or the uncertainty for a given pt and eta."""
+     
+     #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
+     self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
+
+     if mode == '0'  :
+        return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
+     elif mode == '+1'  :
+        return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     elif mode == '-1' : 
+        return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+
+     else:  
+        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+        return 0
+
 
 class LeptonsReWeighting:
    """A class to reweight MC to fix lepton efficiency."""
 
    def __init__(self):
 
-     # ===== MUON: initializing the weights
+     # ===== initializing the weights
 
      self._muIDWeight  = MuonIDSFReader()
      self._muISOWeight  = MuonISOSFReader()
      self._muTRIGGERWeight  = MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8()
+     self._mu17TrgWeight  = MuonTriggerEffReader_Mu17Leg()
+     self._mu8TrgWeight  = MuonTriggerEffReader_Mu8Leg() 
 
      self._eleIDISOWeight = EleIDISO_SFReader()
      self._ele17TrgWeight = EleTriggerHighPtLeg_SFReader()
      self._ele8TrgWeight = EleTriggerLowPtLeg_SFReader()
 
-     # ==== ELECTRONS: tabulated values
-     
-##      self._eleRecoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
-##                                    [[(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 20-30 GeV
-##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 30-40 GeV
-##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)],   # 40-50 GeV
-##                                     [(1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01), (1.00,0.01)]])  # 50-200 GeV
-      
-##      self._eleIdIsoWeight = PtEtaMap([30,40,50],[0.8, 1.442, 1.556, 2.0],
-##                                    [[(1.004,sqrt(0.003**2+0.003**2)), (0.975,sqrt(0.013**2 +0.006**2)),  (1.034,sqrt(0.015**2+0.003**2)), (0.983, sqrt(0.006**2+0.009**2)), (1.025,sqrt(0.006**2+0.005**2))],     # 20-30 GeV
-##                                     [(1.003,sqrt(0.001**2+0.002**2)), (0.984,sqrt(0.001**2 +0.001**2)),  (1.006,sqrt(0.007**2+0.002**2)), (0.990, sqrt(0.003**2+0.001**2)), (1.022,sqrt(0.003**2+0.002**2))],     # 30-40 GeV
-##                                     [(1.007,sqrt(0.001**2+0.001**2)), (0.992,sqrt(0.001**2 +0.001**2)),  (0.991,sqrt(0.003**2+0.004**2)), (1.006, sqrt(0.002**2+0.002**2)), (1.013,sqrt(0.001**2+0.003**2))],     # 40-50 GeV
-##                                     [(1.007,sqrt(0.001**2+0.002**2)), (0.995,sqrt(0.002**2 +0.001**2)),  (0.993,sqrt(0.005**2+0.002**2)), (1.007, sqrt(0.003**2+0.0001**2)), (1.009,sqrt(0.002**2+0.001**2))]])   # 50-200 GeV
-
-##      self._ele17TrgWeight = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-##                                    [[(0.978,0.0019),  (0.980,0.001), (1.00,0.001), (0.989,0.001), (0.984,0.001)],  # 20-30 GeV
-##                                     [(0.991,0.0012),  (0.992,0.001), (1.00,0.001), (0.995,0.001), (0.993,0.001)],  # 30-40 GeV
-##                                     [(0.993,0.0046),  (0.994,0.001), (1.00,0.001), (0.997,0.001), (0.997,0.001)],  # 40-50 GeV
-##                                     [(0.993,0.00047), (0.995,0.001), (1.00,0.001), (0.997,0.001), (0.996,0.001)]]) # 50-200 GeV
-
-##      self._ele8TrgWeight  = PtEtaMap([30,40,50],[0.8, 1.444, 1.55, 2.0],
-##                                    [[(0.980,0.001), (0.980,0.001), (1.00,0.00), (0.986,0.001), (0.985,0.001)],  # 20-30 GeV
-##                                     [(0.989,0.001), (0.989,0.001), (1.00,0.00), (0.991,0.001), (0.991,0.001)],  # 30-40 GeV
-##                                     [(0.991,0.001), (0.991,0.001), (1.00,0.00), (0.994,0.001), (0.993,0.001)],  # 40-50 GeV
-##                                     [(0.991,0.001), (0.992,0.001), (1.00,0.00), (0.995,0.001), (0.995,0.001)]]) # 50-200 GeV
-     
-     ## Note1: Trigger efficiency in the crack is assumed to be 1.00. The reason? not enough electrons in that bin at this stage to compute the efficiencies.
 
    def weight_mm(self,m1,m2):
      """Event weight for di-muons."""
@@ -455,7 +495,7 @@ class LeptonsReWeighting:
      else:
        return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
          
-    
+
 
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
@@ -477,8 +517,7 @@ class LeptonsReWeighting:
      lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
      lw *= self._eleIDISOWeight.value(e2.pt(),e2.eta(),'0')
      lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele8TrgWeight.value(e2.pt(),e2.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0')  ## formula for the asymmetric trigger
-     
-     
+          
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
@@ -507,6 +546,30 @@ class LeptonsReWeighting:
      #        self._ele17TrgWeight[(e1.pt(),e1.eta())][0]*self._ele17TrgWeight[(e2.pt(),e2.eta())][0]))**2
      #outcome
      return sqrt(unc)
+
+   
+   def weight_em(self,e1,m1):
+     """Event weight for e-mu events."""
+     lw = 1.
+     # The final per-event weight (convolving ID, ISO and Trigger)
+     lw *= self._muIDWeight.value(m1.pt(),m1.eta(),'0')
+     lw *= self._muISOWeight.value(m1.pt(),m1.eta(),'0')     
+     lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
+     lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu8TrgWeight.value(m1.pt(),m1.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.pt(),m1.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.pt(),m1.eta(),'0')  ## formula for the OR of the unprescaled  e-mu triggers
+
+     if abs(configuration.LeptonTnPfactor)<0.01 :
+       return lw
+     else:
+       return lw + configuration.LeptonTnPfactor*self.uncertainty_em(e1,m1)
+         
+   def uncertainty_em(self,e1,m1):
+     ## TBD (rc may.2014) 
+     """Relative uncertainty on the total weight.
+        We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
+     # reco
+     unc =  1.0 # --> TO BE IMPLEMENTED! FIXME
+     return sqrt(unc)
+
   
    def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
@@ -535,7 +598,8 @@ class LeptonsReWeighting:
              electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
      # sanity check
      if not(electrons is None) and not(muons is None):
-       print "Warning: LeptonsReWeighting: electrons and muon collections are both defined."
+       print "Warning: LeptonsReWeighting: electrons and muon collections are both defined. This is an e-mu event case? Please implement the proper option (r.c.)"
+       return self.weight_em(electrons[0],muons[0])
      # now compute the weight with electrons and muons that we have
      if not(electrons is None):
        return self.weight_ee(electrons[0],electrons[1])
