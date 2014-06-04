@@ -184,9 +184,9 @@ class IncEventSelectionControlPlots(BaseControlPlots):
 
         dijet = event.dijet_all
         if not dijet[0] is None:
-           b1 = self._JECuncertainty.jet(dijet[0])
+           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
         if not dijet[1] is None:
-          b2 = self._JECuncertainty.jet(dijet[1])
+          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
             b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
