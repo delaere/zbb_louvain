@@ -706,104 +706,106 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
   return bestZ
   
 def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
-
-  runNumber = event.run()
-  lumi_section = event.lumi() 
-
-  first_mu=None
-  second_mu=None
-  first_el=None
-  second_el=None
-   
-  first_mu_pt=0
-  second_mu_pt=0
-  first_el_pt=0
-  second_el_pt=0
-    
-  first_lept=None
-  second_lept=None
+  muList = []
+  elList = []
+  leptList = []
+  first_lept = None
+  second_lept = None
+  third_lept = None
+  fourth_lept = None
   
+  for mu in event.muons:
+    if isGoodMuon(mu, "tight"):
+        muList.append(mu)
+
+  for el in event.electrons:
+    if isGoodElectron(el, "tight"):
+        elList.append(el)
+
+  if len(muList) > 0  :
+    if len(elList) > 0 :
+      if elList[0].pt() > muList[0].pt():
+        first_lept = elList[0]
+        elList.remove(elList[0])
+      elif elList[0].pt() < muList[0].pt():
+        first_lept = muList[0]
+        muList.remove(muList[0]) 
+    else :
+      first_lept = muList[0]
+      muList.remove(muList[0])       	 
+  else:
+    if len(elList) > 0:
+      first_lept = elList[0]
+      elList.remove(elList[0])	
+
+  if len(muList) > 0  :
+    if len(elList) > 0 :
+      if elList[0].pt() > muList[0].pt():
+        second_lept = elList[0]
+        elList.remove(elList[0])
+      elif elList[0].pt() < muList[0].pt():
+        second_lept = muList[0]
+        muList.remove(muList[0]) 
+    else :
+      second_lept = muList[0]
+      muList.remove(muList[0])       	 
+  else:
+    if len(elList) > 0:
+      second_lept = elList[0]
+      elList.remove(elList[0])
+
+  if len(muList) > 0  :
+    if len(elList) > 0 :
+      if elList[0].pt() > muList[0].pt():
+        third_lept = elList[0]
+        elList.remove(elList[0])
+      elif elList[0].pt() < muList[0].pt():
+        third_lept = muList[0]
+        muList.remove(muList[0]) 
+    else :
+      third_lept = muList[0]
+      muList.remove(muList[0])       	 
+  else:
+    if len(elList) > 0:
+      third_lept = elList[0]
+      elList.remove(elList[0])
+
+  if len(muList) > 0  :
+    if len(elList) > 0 :
+      if elList[0].pt() > muList[0].pt():
+        fourth_lept = elList[0]
+        elList.remove(elList[0])
+      elif elList[0].pt() < muList[0].pt():
+        fourth_lept = muList[0]
+        muList.remove(muList[0]) 
+    else :
+      fourth_lept = muList[0]
+      muList.remove(muList[0])       	 
+  else:
+    if len(elList) > 0:
+      fourth_lept = elList[0]
+      elList.remove(elList[0])      
+           
   vertex_cond=False
   result = False
-  
-  leptList = []
-  #select the two hardest muons 
-  #if muChannel:
-  for mu in event.muons:
-      if isGoodMuon(mu, "tight"):
-        mu_pt = mu.pt()
-        if (mu_pt> first_mu_pt):
-          first_mu_pt=mu_pt
-	  first_mu = mu
-	  
-  for mu in event.muons :
-        if isGoodMuon(mu, "tight") :
-          mu_pt = mu.pt()
-	  if mu_pt != first_mu_pt:
-            if (mu_pt> second_mu_pt):
-              second_mu_pt=mu_pt
-	      second_mu = mu 
-
-  
-  #select the two hardest electrons 
-  #if eleChannel:
-  for el in event.electrons:
-      if isGoodElectron(el, "tight"):
-        el_pt = el.pt()
-        if (el_pt> first_el_pt):
-          first_el_pt=el_pt
-	  first_el = el
-	  
-  for el in event.electrons :
-      if isGoodElectron(el, "tight") :
-          el_pt = el.pt()
-	  if el_pt != first_el_pt:
-            if (el_pt> second_el_pt):
-              second_el_pt=el_pt
-	      second_el = el 
-  #select the two hardest leptons  
-  if first_mu is not None and first_el is None:
-    first_lept =first_mu
-  elif first_el is not None and first_mu is None:
-    first_lept =first_el
-  elif first_el is not None and first_mu is not None:
-    if (first_el_pt > first_mu_pt):
-      first_lept =first_el
-    else:
-      first_lept =first_mu
-     
-  if (first_lept == first_mu):
-      if (second_mu is not None and first_el is None):
-        second_lept = second_mu
-      elif (second_mu is None and first_el is not None):
-        second_lept = first_el 
-      elif (second_mu is not None and first_el is not None):
-        if (second_mu_pt > first_el_pt):
-	  second_lept = second_mu
-	else:
-	  second_lept = first_el	     
-  elif (first_lept == first_el):
-      if (second_el is not None and first_mu is None):
-        second_lept = second_el
-      elif (second_el is None and first_mu is not None):
-        second_lept = first_mu 
-      elif (second_el is not None and first_mu is not None):
-        if (second_el_pt > first_mu_pt):
-	  second_lept = second_el
-	else:
-	  second_lept = first_mu
-	  
   leptList.append(first_lept)
   leptList.append(second_lept)
-	  
+  leptList.append(third_lept)
+  leptList.append(fourth_lept) 
+  
+
   if (first_lept is not None  and second_lept is not None ):	  
      vertex_cond = isfromVertex(first_lept, second_lept, 0.05)
-    #check leptons match the trigger
-     if (vertex_cond is True):
-       result = True
+     if third_lept is not None:
+       vertex_cond = isfromVertex(third_lept, second_lept, 0.05)
+       if fourth_lept is not None:
+         vertex_cond = isfromVertex(third_lept, fourth_lept, 0.05)
+	 
+  if (vertex_cond is True):
+    result = True
        
   if (result == True):
-    return (leptList[0],leptList[1])
+    return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
     return None
   

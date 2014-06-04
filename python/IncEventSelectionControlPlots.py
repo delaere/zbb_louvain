@@ -75,19 +75,18 @@ class IncEventSelectionControlPlots(BaseControlPlots):
       self.add("el1etapm_inc","leading electron Eta",50,-2.5,2.5)
       self.add("el2etapm_inc","subleading electron Eta",50,-2.5,2.5)      
       self.add("invMass_inc","invariant mass of the two leptons",50,0,200)
-      self.add("drll_inc","drll_inc",100,0,5)
-      self.add("dijetM_inc","b bbar invariant mass",3000,0,3000)
-      self.add("dijetPt_inc","b bbar Pt",1000,0,1000)
-      self.add("dijetdR_inc","#Delta R (b bbar)",100,0,5)
+      self.add("drll_inc","drll_inc",50,0,5)
+      self.add("dijetM_inc","b bbar invariant mass",500,0,1000)
+      self.add("dijetPt_inc","b bbar Pt",250,0,500)
+      self.add("dijetdR_inc","#Delta R (b bbar)",50,0,5)
       self.add("dijetSVdR_inc","#Delta R (b bbar SV)",100,0,5)
       self.add("dphidijetMET_inc","#Delta #phi (b bbar MET)",40,0,3.15)      
       self.add("MET_inc","Missing transverse energy",100,0,200)
       self.add("METsignificance_inc","missing transverse energy significance",1000,0,500)
-      self.add("bjet1pt_inc","leading jet Pt",500,0,500)     
-      self.add("bjet2pt_inc","subleading pt Pt",500,0,500)
-      self.add("bjet1CSV_inc","CSVdiscDisc1",100,0,1)
-      self.add("bjet2CSV_inc","CSVdiscDisc2",100,0,1)     
-
+      self.add("llbbM_inc","llbb invariant mass",1000,0,500)
+      self.add("llbbPt_inc","llbb Pt",250,0,500)
+      self.add("drllbb_inc","drbbll_inc",50,0,5)           
+      self.add("nlept_inc","number of leptons",5,0,5)
 
     def process(self, event):
       """eventSelectionControlPlots"""
@@ -151,17 +150,21 @@ class IncEventSelectionControlPlots(BaseControlPlots):
       bestZcandidate = event.bestZcandidate
       bestDileptcandidate = event.bestDiLeptCandidate
       #if we have 2 lept. passing sanity cut, trigger matching and vertex association (so not coming from Z necessairly)
-      if not bestDileptcandidate is None :
+      if not bestDileptcandidate is None : 
+        nlept = 0
+        for i in range(0,3) :
+          if bestDileptcandidate[i] is not None:
+            nlept += 1 
         lept1=bestDileptcandidate[0]
         lept2=bestDileptcandidate[1]
-	 
-	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
-        l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())  
+	lept3=bestDileptcandidate[2]
+ 	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
+        l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
 	mass=(l1+l2).M()
-	#if (mass < 76 and mass > 106):
+
+        result["nlept_inc"] =nlept	
         result["invMass_inc"] =mass	
 	result["drll_inc"] = l1.DeltaR(l2)  
-	 
 	if lept1.isMuon():
           result["mu1pt_inc"] = lept1.pt()
           result["mu1etapm_inc"] = lept1.eta()
@@ -179,7 +182,39 @@ class IncEventSelectionControlPlots(BaseControlPlots):
           result["el2etapm_inc"] = lept2.eta()
           result["el2eta_inc"] = abs(lept2.eta())            
 
-      if not bestZcandidate is None:
+        dijet = event.dijet_all
+        if not dijet[0] is None:
+           b1 = self._JECuncertainty.jet(dijet[0])
+        if not dijet[1] is None:
+          b2 = self._JECuncertainty.jet(dijet[1])
+          if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
+            b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+            b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
+            b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
+            b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
+            svdr = b1SV.DeltaR(b2SV)
+          else:
+            svdr = -1
+          bb = b1 + b2
+	  ll=l1+l2
+	  result["drllbb_inc"] = ll.DeltaR(bb)
+	  met = event.MET     
+          met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
+	  llbb = l1+l2+bb
+	  result["llbbM_inc"] = llbb.M()
+	  result["llbbPt_inc"] = llbb.Pt()
+          result["dijetM_inc"] = bb.M()
+          result["dijetPt_inc"] = bb.Pt()
+          result["dijetdR_inc"] = b1.DeltaR(b2)
+          result["dijetSVdR_inc"] = svdr
+	  result["dphidijetMET_inc"] = bb.DeltaPhi(met4v)
+	  result["MET_inc"]= event.MET[0].pt()
+	  result["METsignificance_inc"] = 0.
+	  if event.MET[0].getSignificanceMatrix()(0,0)<1e10 and event.MET[0].getSignificanceMatrix()(1,1)<1e10: 
+            result["METsignificance_inc"] = event.MET[0].significance()
+
+
+      if bestZcandidate is not None:
         if bestZcandidate.daughter(0).isMuon():
           mu1 = bestZcandidate.daughter(0)
           mu2 = bestZcandidate.daughter(1)
@@ -214,45 +249,7 @@ class IncEventSelectionControlPlots(BaseControlPlots):
           result["el2eta"] = abs(ele2.eta())
           result["el1etapm"] = ele1.eta()
           result["el2etapm"] = ele2.eta()
-      ## plots looking for resonnances / kinematics
-      # that method returns the best jet pair. When only one is btagged, it is the first one.
-      # when two bjets are present, these are the two.
-      # later on, variables are refering to b-jets, even if some are light jets
-      
-      
-      if bestDileptcandidate is not None:
-        dijet = event.dijet_all
-        if not dijet[0] is None:
-           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-	   result["bjet1CSV_inc"] =dijet[0].bDiscriminator("combinedSecondaryVertexBJetTags")
-	   result["bjet1pt_inc"]  =dijet[0].pt()
-        if not dijet[1] is None:
-          b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-	  result["bjet2CSV_inc"] =dijet[1].bDiscriminator("combinedSecondaryVertexBJetTags")
-	  result["bjet2pt_inc"]  =dijet[1].pt()
-          if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
-            b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-            b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
-            b2SVvec = dijet[1].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
-            b2SV = ROOT.TVector3(b2SVvec.x(),b2SVvec.y(),b2SVvec.z())
-            svdr = b1SV.DeltaR(b2SV)
-          else:
-            svdr = -1
-          bb = b1 + b2
-	  met = event.MET     
-          met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
 	  
-          result["dijetM_inc"] = bb.M()
-          result["dijetPt_inc"] = bb.Pt()
-          result["dijetdR_inc"] = b1.DeltaR(b2)
-          result["dijetSVdR_inc"] = svdr
-	  result["dphidijetMET_inc"] = bb.DeltaPhi(met4v)
-	  result["MET_inc"]= event.MET[0].pt()
-	  result["METsignificance_inc"] = 0.
-	  if event.MET[0].getSignificanceMatrix()(0,0)<1e10 and event.MET[0].getSignificanceMatrix()(1,1)<1e10: 
-            result["METsignificance_inc"] = event.MET[0].significance()
-	    
-      if bestZcandidate is not None:
         dijet = event.dijet_all
         if not dijet[0] is None:
           z  = ROOT.TLorentzVector(bestZcandidate.px(),bestZcandidate.py(),bestZcandidate.pz(),bestZcandidate.energy())
