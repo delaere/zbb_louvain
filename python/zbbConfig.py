@@ -42,7 +42,7 @@ updateEventProducers = [
 for ep in updateEventProducers : configuration.eventProducers.append(ep)
 
 configuration.eventWeights = [
-    eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":configuration.btagperfData,"btagging":configuration.btagging}),
+    eventWeight("Btagging","BtaggingWeight","BtaggingWeight",{"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":configuration.btagperfData,"btagging":configuration.btagging,"WP":configuration.WP}),
     eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
     eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
     eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":configuration.pileupMC, "DataFileName":configuration.pileupData, "systematicShift":0})
