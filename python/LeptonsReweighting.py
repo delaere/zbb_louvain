@@ -586,24 +586,25 @@ class LeptonsReWeighting:
        # extract the electrons and muons collections from the event.
        else :
          if forceMode == "Muon":
-           bestZcandidate = fwevent.bestZmumuCandidate
+           muons = fwevent.muonsPair
+           if muons is None : return 1.
+           return self.weight_mm(muons[0],muons[1])
          elif forceMode == "Electron":
-           bestZcandidate = fwevent.bestZelelCandidate
-         else:
-           bestZcandidate = fwevent.bestZcandidate
-         if not bestZcandidate is None:
-           if bestZcandidate.daughter(0).isMuon():
-             muons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
-           else:
-             electrons = [ bestZcandidate.daughter(0), bestZcandidate.daughter(1) ]
-     # sanity check
-     if not(electrons is None) and not(muons is None):
-       print "Warning: LeptonsReWeighting: electrons and muon collections are both defined. This is an e-mu event case? Please implement the proper option (r.c.)"
-       return self.weight_em(electrons[0],muons[0])
-     # now compute the weight with electrons and muons that we have
-     if not(electrons is None):
-       return self.weight_ee(electrons[0],electrons[1])
-     if not(muons is None):
-       return self.weight_mm(muons[0],muons[1])
-     return 1.
+           electrons = fwevent.electronsPair
+           if electrons is None : return 1.
+           return self.weight_ee(electrons[0],electrons[1])
+         elif forceMode == "MuEl":
+           muel = fwevent.muelPair
+           if muel is None : return 1.
+           if muel[0].isElectron() : return self.weight_em(muel[0],muel[1])
+           else : return self.weight_em(muel[1],muel[0])
+         else :
+           leptons = fwevent.leptonsPair
+           if leptons is None : return 1
+           if leptons[0].isMuon() and leptons[0].isMuon() : return self.weight_mm(leptons[0],leptons[1])
+           elif leptons[0].isElectron() and leptons[0].isElectron() : return self.weight_ee(leptons[0],leptons[1])
+           elif leptons[0].isElectron() and leptons[0].isMuon() : return self.weight_em(leptons[0],leptons[1])
+           elif leptons[0].isMuon() and leptons[0].isElectron() : return self.weight_em(leptons[1],leptons[0])
+           else : print "None of the case was found: MuMu, ElEl, MuEl, ElMu..."
+       return 1.
 
