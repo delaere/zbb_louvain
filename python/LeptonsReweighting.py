@@ -601,10 +601,10 @@ class LeptonsReWeighting:
          else :
            leptons = fwevent.leptonsPair
            if leptons is None : return 1
-           if leptons[0].isMuon() and leptons[0].isMuon() : return self.weight_mm(leptons[0],leptons[1])
-           elif leptons[0].isElectron() and leptons[0].isElectron() : return self.weight_ee(leptons[0],leptons[1])
-           elif leptons[0].isElectron() and leptons[0].isMuon() : return self.weight_em(leptons[0],leptons[1])
-           elif leptons[0].isMuon() and leptons[0].isElectron() : return self.weight_em(leptons[1],leptons[0])
+           if leptons[0].isMuon() and leptons[1].isMuon() : return self.weight_mm(leptons[0],leptons[1])
+           elif leptons[0].isElectron() and leptons[1].isElectron() : return self.weight_ee(leptons[0],leptons[1])
+           elif leptons[0].isElectron() and leptons[1].isMuon() : return self.weight_em(leptons[0],leptons[1])
+           elif leptons[0].isMuon() and leptons[1].isElectron() : return self.weight_em(leptons[1],leptons[0])
            else : print "None of the case was found: MuMu, ElEl, MuEl, ElMu..."
        return 1.
 
