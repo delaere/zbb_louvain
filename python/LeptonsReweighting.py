@@ -25,7 +25,7 @@ def get_eta_key(eta):
               
    return range
 
-def get_eta_trigger_key(eta):
+def get_eta_singleLeg_trigger_key(eta):
 ## N.B. needed for a different syntax for the new pkl file :-(
    range =''
    if ( abs(eta)<=0.9):
@@ -411,12 +411,12 @@ class MuonTriggerEffReader_Mu17Leg:
      else :
         print 'ERROR: Input file for Trigger efficiencies not existing!'
 
-   def value(self,eta1,eta2,mode):
+   def value(self,eta1,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
      
      #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
-     self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
+     self._eta_range= "("+get_eta_singleLeg_trigger_key(eta1)+")"
 
      if mode == '0'  :
         return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
@@ -443,12 +443,13 @@ class MuonTriggerEffReader_Mu8Leg:
      else :
         print 'ERROR: Input file for Trigger efficiencies not existing!'
 
-   def value(self,eta1,eta2,mode):
+   def value(self,eta1,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
      
      #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
-     self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
+     self._eta_range= "("+get_eta_singleLeg_trigger_key(eta1)+")"  ## new one
+     #print self._eta_range
 
      if mode == '0'  :
         return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
@@ -551,11 +552,13 @@ class LeptonsReWeighting:
    def weight_em(self,e1,m1):
      """Event weight for e-mu events."""
      lw = 1.
+     
      # The final per-event weight (convolving ID, ISO and Trigger)
+
      lw *= self._muIDWeight.value(m1.pt(),m1.eta(),'0')
      lw *= self._muISOWeight.value(m1.pt(),m1.eta(),'0')     
      lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
-     lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu8TrgWeight.value(m1.pt(),m1.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.pt(),m1.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.pt(),m1.eta(),'0')  ## formula for the OR of the unprescaled  e-mu triggers
+     lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu8TrgWeight.value(m1.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.eta(),'0')  ## formula for the OR of the unprescaled  e-mu triggers
 
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
@@ -600,11 +603,16 @@ class LeptonsReWeighting:
            else : return self.weight_em(muel[1],muel[0])
          else :
            leptons = fwevent.leptonsPair
-           if leptons is None : return 1
-           if leptons[0].isMuon() and leptons[1].isMuon() : return self.weight_mm(leptons[0],leptons[1])
-           elif leptons[0].isElectron() and leptons[1].isElectron() : return self.weight_ee(leptons[0],leptons[1])
-           elif leptons[0].isElectron() and leptons[1].isMuon() : return self.weight_em(leptons[0],leptons[1])
-           elif leptons[0].isMuon() and leptons[1].isElectron() : return self.weight_em(leptons[1],leptons[0])
+           if leptons is None :
+	     return 1
+           if leptons[0].isMuon() and leptons[1].isMuon() :
+	     return self.weight_mm(leptons[0],leptons[1])
+           elif leptons[0].isElectron() and leptons[1].isElectron() :
+	     return self.weight_ee(leptons[0],leptons[1])
+	   elif leptons[0].isElectron() and leptons[1].isMuon() :
+	     return self.weight_em(leptons[0],leptons[1])
+           elif leptons[0].isMuon() and leptons[1].isElectron() :
+	     return self.weight_em(leptons[1],leptons[0])
            else : print "None of the case was found: MuMu, ElEl, MuEl, ElMu..."
        return 1.
 
