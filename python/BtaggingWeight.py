@@ -4,7 +4,6 @@ import ROOT
 import PatAnalysis.CMSSW
 from PatAnalysis.EventSelection import categoryName
 from ObjectSelection import isBJet
-from zbbConfig import configuration
 import os
 confCfg = os.environ["PatAnalysisCfg"]
 if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration

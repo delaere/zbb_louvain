@@ -111,7 +111,7 @@ def main():
         ]
     #files
     files = {}
-    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed.root"
+    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimedLL.root"
     for sample in dataKey+fixSamples+fitSamples+checkSamples : files[sample] = path.replace("NAME",sample).replace("DATA","Double2012")
     #get number of events
     print "Get number of events"

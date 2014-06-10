@@ -36,7 +36,7 @@ parser.add_option("--nEvents", type="int", dest='nEvents', default="0",
 if options.conf is not None:
     theUserConf = __import__(os.path.splitext(options.conf)[0])
     os.environ["PatAnalysisCfg"]=options.conf
-from CPconfig import configuration
+from CPconfig import configuration, printConfig
 if options.outputname is None:
   options.outputname = configuration.defaultFilename+".root"
 
@@ -48,6 +48,9 @@ from AnalysisEvent import AnalysisEvent
 from BaseControlPlots import getArgSet
 import EventSelection
 import cProfile
+
+#Print configuration
+printConfig(configuration)
 
 def main(options):
   """simplistic program main"""

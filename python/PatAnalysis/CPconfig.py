@@ -40,3 +40,18 @@ if theConfig is not None:
   configuration = configImplementation.configuration
   eventDumpConfig = configImplementation.eventDumpConfig
 
+def printConfig(conf=None):
+  if conf is None : return
+  print "#########################################################################"
+  print "#                        print configuration                            #"
+  print "#########################################################################"
+  print ""
+  for attr in conf.toprint : print "                "+attr+" =", getattr(conf,attr)
+  print ""
+  print "#########################################################################"
+  print "#                         end configuration                             #"
+  print "#########################################################################"
+  print ""
+  return
+
+                    
