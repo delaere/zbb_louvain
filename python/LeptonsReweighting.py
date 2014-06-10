@@ -1,5 +1,4 @@
 from PatAnalysis.EventSelection import categoryName
-from zbbConfig import configuration
 from math import sqrt
 import pickle
 import os

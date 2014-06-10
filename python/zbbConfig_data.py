@@ -110,22 +110,30 @@ class configuration:
 
   eventWeights     = []
 
+  #list of objects to update if you plan to chenge the b-tag WP and/or algo (see: "changeBTAG" below)
+  toupdateForBtag = {
+    "controlPlots" : ["jetmetAK5PF"],
+    "eventProducers" : ["category", "dijet_muChannel", "dijet_eleChannel", "dijet_all"]
+    }
+
+def changeBTAG(conf = None, btagging="CSV", WP=["M","L"]):
+  if conf is None : return
+  conf.btagging = btagging
+  conf.WP = WP
+  for up in conf.toupdateForBtag:
+    for sub in conf.toupdateForBtag[up]:
+      next((x for x in getattr(conf, up) if x.label == sub), None).kwargs["btagging"] = btagging
+      next((x for x in getattr(conf, up) if x.label == sub), None).kwargs["WP"] = WP
+  return
+
+def changeDiLeptCand(conf = None, names = {"muonsPair" : "bestZmumucandidate", "electronsPair" : "bestZelelcandidate", "muelPair" : "bestZmuelcandidate", "leptonsPair" : "bestZcandidate"}):
+  if conf is None : return
+  for name in names:
+    next((x for x in conf.eventProducers if x.label == name), None).kwargs["bestLeptonCand"] = names[name]
+  return
+
 class eventDumpConfig:
   # fine-tuning of the event content for display
   productsToPrint   = [ ] # list of product to display (use the producer label)
   collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label) 
-
-def printConfig(configration=configuration):
-  print "#########################################################################"
-  print "#                        print configuration                            #"
-  print "#########################################################################"
-  print ""
-  for attr in configuration.toprint : print "                "+attr+" =", getattr(configuration,attr)
-  print ""
-  print "#########################################################################"
-  print "#                         end configuration                             #"
-  print "#########################################################################"
-  print ""
-           
-printConfig(configuration)
                   
