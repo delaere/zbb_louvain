@@ -812,10 +812,13 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
 def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
   cand = getattr(event, bestLeptonCand)
   if cand is None : return None
-  if type(cand) is list:
+  #if type(cand) is list:
+  if bestLeptonCand=="bestDiLeptCandidate":
+    print "candidate is a list"
     if not len(cand)>1 : return None
     return cand[:2]
-  else :
+  elif bestLeptonCand=="bestZcandidate" :
+    print "candidate is a Z"
     return [ cand.daughter(0), cand.daughter(1) ]
 
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
