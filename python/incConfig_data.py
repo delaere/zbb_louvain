@@ -11,6 +11,10 @@ class configuration(configuration):
   
   # mode: plots or dataset
   runningMode = "plots"
+  
+  #produce EMU or LL CP:
+  run_on_emu = False
+  
   # my variables: files, systematics and other options
   btagging = "CSV"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]

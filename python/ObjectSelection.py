@@ -1,6 +1,7 @@
 import ROOT
 import string
 import intervalmap
+import sys
 from VertexAssociation import zVertex, isfromVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
@@ -355,10 +356,25 @@ def isGoodElectron(electron,role):
   print "Warning: Unknown electron role:",role
   return True
 
-def hasNoOverlap(jet, Z):
+def hasNoOverlap(jet, Z = None, lepPair = None):
   """check overlap between jets and leptons from the Z"""
-  l1 = Z.daughter(0)
-  l2 = Z.daughter(1)
+
+  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
+  #If lepPair is given, it checks the overlap of the jet with the pair of leptons
+  #Only Z candidate or lepPair should be provided, otherwise the code exits
+
+  if (not Z is None) and (not lepPair is None):
+    print "hasNoOverlap called with both Z and lepPair candidate, aborting!"
+    sys.exit(1)
+
+  if (not Z is None) :
+    l1 = Z.daughter(0)
+    l2 = Z.daughter(1)
+
+  if (not lepPair is None) :
+    l1 = lepPair[0]
+    l2 = lepPair[1]
+
   l1v = ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
   l2v = ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy())
   jv =  ROOT.TLorentzVector(jet.px(),jet.py(),jet.pz(),jet.energy())
@@ -391,27 +407,35 @@ def allJets(event):
   for jet in event.rawjets : JECuncertaintyProxy.Scale(jet)
   return event.rawjets
 
-def isGoodJet(jet, Z = None):
+def isGoodJet(jet, Z = None, lepPair = None):
   """Perform additional checks that define a good jet"""
+  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
+  #If lepPair is given, it checks the overlap of the jet with the pair of leptons
+
   # overlap checking
   if not Z is None :
-    if not hasNoOverlap(jet,Z) :
+    if not hasNoOverlap(jet,Z=Z) :
       return False 
+
+  if not lepPair is None :
+    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
+      return False
+
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>30. and jetId(jet,"loose")
 
 def goodJets(event, muChannel=True, eleChannel=True):
-  # best Z candidate
+  # leptons pair
   if muChannel and eleChannel:
-    bestZcandidate = event.bestZcandidate
+    pair = event.leptonsPair
   elif muChannel:
-    bestZcandidate = event.bestZmumuCandidate
+    pair = event.muonsPair
   elif eleChannel:
-    bestZcandidate = event.bestZelelCandidate
+    pair = event.electronsPair
   else:
-    bestZcandidate = None
+    pair = None
   # compute the good jets
-  return map(lambda jet:isGoodJet(jet,bestZcandidate),event.jets)
+  return map(lambda jet:isGoodJet(jet,lepPair=pair),event.jets)
 
 def isMetHigherThan(met,cut=20):
   """Apply a lower MET threshold"""
@@ -785,6 +809,15 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
     if len(elList) > 0:
       fourth_lept = elList[0]
       elList.remove(elList[0])      
+
+  #Force the DR of the first 2 leptons to be > 0.3 for the moment
+  if first_lept is None or second_lept is None: return None
+  else:
+    #l1v = ROOT.TLorentzVector(leptList[0].px(),leptList[0].py(),leptList[0].pz(),leptList[0].energy())
+    #l2v = ROOT.TLorentzVector(leptList[1].px(),leptList[1].py(),leptList[1].pz(),leptList[1].energy())
+    l1v = ROOT.TLorentzVector(first_lept.px(),first_lept.py(),first_lept.pz(),first_lept.energy())
+    l2v = ROOT.TLorentzVector(second_lept.px(),second_lept.py(),second_lept.pz(),second_lept.energy())
+    if l1v.DeltaR(l2v) < 0.3: return None
            
   vertex_cond=False
   result = False
@@ -804,6 +837,9 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   if (vertex_cond is True):
     result = True
        
+
+        
+
   if (result == True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
