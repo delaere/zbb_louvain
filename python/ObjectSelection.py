@@ -357,7 +357,7 @@ def isGoodElectron(electron,role):
   return True
 
 def hasNoOverlap(jet, Z = None, lepPair = None):
-  """check overlap between jets and leptons from the Z"""
+  """check overlap between jets and leptons"""
 
   #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
@@ -437,6 +437,15 @@ def goodJets(event, muChannel=True, eleChannel=True):
   # compute the good jets
   return map(lambda jet:isGoodJet(jet,lepPair=pair),event.jets)
 
+def getMet(event,type="PF"):
+  """Return the MET value you are interested in (type can be PF, MVA or NoPU)"""
+  return{
+	'PF':event.MET[0],
+	'MVA':event.MVAMET[0],
+	'NoPU':event.NoPUMET[0],
+	}[type]
+
+
 def isMetHigherThan(met,cut=20):
   """Apply a lower MET threshold"""
   return met.pt()>cut
@@ -445,20 +454,19 @@ def isMetLowerThan(met,cut=20):
   """Apply an upper MET threshold"""
   return met.pt()<cut
 
-def hasMet_SigHigherThan(met,cut=10):
+def isMetSigHigherThan(met,cut=10):
   """Apply a lower MET threshold"""
   if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
     return met.significance()>cut
   else :
     return False
 
-def hasMet_SigLowerThan(met,cut=10):
+def isMetSigLowerThan(met,cut=10):
   """Apply an upper MET threshold"""
   if met.getSignificanceMatrix()(0,0)<1e10 and met.getSignificanceMatrix()(1,1)<1e10 :
     return met.significance()<cut
   else :
     return False
-
 
 def isGoodMet(met,cut=50):
   """Apply the MET cut"""

@@ -191,7 +191,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
       if muChannel:
         output.append(1)
       else: output.append(0)
-    #ee channel only filled for eleChannel=True
+      #ee channel only filled for eleChannel=True
     if lept1.isElectron() and lept2.isElectron() and nlept==2:
       #elel channel only filled for elChannel=True
       if eleChannel:
@@ -232,16 +232,17 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
   output.append(nBjetsHE)
   output.append(nBjetsHP)
   output.append(nBjetsHEHP)
-  # output[7] : MET
-  if isGoodMet(event.MET[0]):
-    output.append(1)
+  # output[7] and [8] : MET and MET Significance
+  MetToCutOn=getMet(event = event,type = configuration.MetType)
+  if configuration.MetThreshold=="Upper": 
+      output.append(isMetLowerThan(met = MetToCutOn,cut = configuration.MetCut))
+      output.append(isMetSigLowerThan(met = MetToCutOn,cut = configuration.MetSigCut))
+  elif configuration.MetThreshold=="Lower": 
+      output.append(isMetHigherThan(met = MetToCutOn,cut = configuration.MetCut))
+      output.append(isMetSigHigherThan(met = MetToCutOn,cut = configuration.MetSigCut))
   else: 
-    output.append(0)
-  # output[8] : MET Significance
-  if isGoodMet_Sig(event.MET[0]):
-    output.append(1)
-  else: 
-    output.append(0)
+      print "Warning : unforeseen MetThreshold, must be \"Upper\" or \"Lower\", the MET cut may be meaningless"
+  
   # output[9] : bb DR
   dijet = event.dijet_all
   if dijet[0] is None or dijet[1] is None: 
