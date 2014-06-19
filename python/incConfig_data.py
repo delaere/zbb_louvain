@@ -14,10 +14,11 @@ class configuration(configuration):
   #produce EMU or LL CP:
   run_on_emu = False
   
-  #information about the MET (cut)
-  MetThreshold = "Upper"  #Can be Upper or Lower (applies an upper/lower threshold on MET or MET_significance in the eventSelection)
+  #information about the MET cut
+  #NB : the choice to cut on MET or on MET significance is done in eventSelection
   MetCut = 50   # Define the value of the met threshold
   MetSigCut = 10   # Define the value of the met significance threshold
+  MetRegion = "High"  #Can be Low or High (the cut applied in the eventSelection will then be MetSig<MetSigCut if you chose the Low MetRegion)
   MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
 
   # my variables: files, systematics and other options

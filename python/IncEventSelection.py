@@ -234,14 +234,14 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
   output.append(nBjetsHEHP)
   # output[7] and [8] : MET and MET Significance
   MetToCutOn=getMet(event = event,type = configuration.MetType)
-  if configuration.MetThreshold=="Upper": 
+  if configuration.MetRegion=="Low": 
       output.append(isMetLowerThan(met = MetToCutOn,cut = configuration.MetCut))
       output.append(isMetSigLowerThan(met = MetToCutOn,cut = configuration.MetSigCut))
-  elif configuration.MetThreshold=="Lower": 
+  elif configuration.MetRegion=="High": 
       output.append(isMetHigherThan(met = MetToCutOn,cut = configuration.MetCut))
       output.append(isMetSigHigherThan(met = MetToCutOn,cut = configuration.MetSigCut))
   else: 
-      print "Warning : unforeseen MetThreshold, must be \"Upper\" or \"Lower\", the MET cut may be meaningless"
+      print "Warning : unforeseen MetRegion, must be \"Low\" or \"High\", the MET cut may be meaningless"
   
   # output[9] : bb DR
   dijet = event.dijet_all
