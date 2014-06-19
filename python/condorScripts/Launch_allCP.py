@@ -30,7 +30,7 @@ dir_plot = {
 dir_rds = {
   "abdollah": "/home/fynu/acaudron/scratch/",
   "acaudron": "/home/fynu/acaudron/scratch/",
-  "bfrancois": "/home/fynu/bfrancois/storage/",
+  "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
   "cbeluffi": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testJune2014/",
 }
@@ -128,7 +128,7 @@ if mode == "plots":
   dir = dir_plot[os.environ["USER"]]
   string_mode='ControlPlots_'
 elif mode == "dataset":
-  dir_RDS = dir_plot[os.environ["USER"]]
+  dir = dir_rds[os.environ["USER"]]
   string_mode='RDS_'
 
 os.system('mkdir '+dir+string_mode+cpVersion)
