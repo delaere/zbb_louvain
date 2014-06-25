@@ -100,6 +100,8 @@ class configuration:
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
                        eventProducer("bestDiLeptCandidate", "ObjectSelection", "findBestDiLeptCandidate", { "muChannel":True,"eleChannel":True } ),
+                       eventProducer("ptSortedLeptonList", "ObjectSelection","ptSortedLeptonList",{}),
+                       eventProducer("bestDiLeptCandidate_new", "ObjectSelection", "findBestDiLeptCandidate_new", {} ),
 		       eventProducer("muonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmumucandidate" } ),
                        eventProducer("electronsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZelelcandidate" } ),
                        #eventProducer("muelPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmuelcandidate" } ),

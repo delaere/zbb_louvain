@@ -5,6 +5,7 @@ import sys
 from VertexAssociation import zVertex, isfromVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
+from operator import attrgetter
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 
@@ -736,7 +737,23 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestM = z.mass()
         bestZ = z
   return bestZ
-  
+ 
+def ptSortedLeptonList(event):
+	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight")]
+ 	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight")]
+	lepList=muList+elList
+	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
+	return ptSortedLepList if len(ptSortedLepList)>1 else None
+
+def findBestDiLeptCandidate_new(event):
+	if event.ptSortedLeptonList is not None:
+		l1=event.ptSortedLeptonList[0]
+		l2=event.ptSortedLeptonList[1]
+		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
+		return event.ptSortedLeptonList[:2] if DRll>0.3 and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05) else None
+	else : 
+		return None 
+	
 def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   muList = []
   elList = []
