@@ -100,8 +100,6 @@ class configuration:
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
                        eventProducer("bestDiLeptCandidate", "ObjectSelection", "findBestDiLeptCandidate", { "muChannel":True,"eleChannel":True } ),
-                       eventProducer("ptSortedLeptonList", "ObjectSelection","ptSortedLeptonList",{}),
-                       eventProducer("bestDiLeptCandidate_new", "ObjectSelection", "findBestDiLeptCandidate_new", {} ),
 		       eventProducer("muonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmumucandidate" } ),
                        eventProducer("electronsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZelelcandidate" } ),
                        #eventProducer("muelPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmuelcandidate" } ),
@@ -109,7 +107,9 @@ class configuration:
                        eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
-                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } )
+                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
+                       eventProducer("ptSortedLeptonList", "ObjectSelection","ptSortedLeptonList",{}),
+                       eventProducer("highestPtLeptonPair", "ObjectSelection", "highestPtLeptonPair", {} )
                      ]
 
   eventWeights     = []

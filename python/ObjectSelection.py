@@ -743,14 +743,14 @@ def ptSortedLeptonList(event):
  	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight")]
 	lepList=muList+elList
 	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
-	return ptSortedLepList if len(ptSortedLepList)>1 else None
+	return ptSortedLepList #if len(ptSortedLepList)>1 else None
 
-def findBestDiLeptCandidate_new(event):
-	if event.ptSortedLeptonList is not None:
+def highestPtLeptonPair(event):
+	if len(event.ptSortedLeptonList)>1:
 		l1=event.ptSortedLeptonList[0]
 		l2=event.ptSortedLeptonList[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
-		return event.ptSortedLeptonList[:2] if DRll>0.3 and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05) else None
+		return event.ptSortedLeptonList[:2] if DRll>0.3 and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05,event.vertex) else None
 	else : 
 		return None 
 	

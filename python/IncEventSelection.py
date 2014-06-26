@@ -146,8 +146,6 @@ def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
 def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
-  list = event.ptSortedLeptonList
-  dilepton_new= event.bestDiLeptCandidate_new
   if not ZjetFilter=="bcl":
     if MonteCarloSelection.isZbEvent(event) and not ('b' in ZjetFilter): return [-1]
     if (MonteCarloSelection.isZcEvent(event) and not MonteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
