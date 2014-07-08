@@ -53,7 +53,7 @@ ourtriggers.muSinglerunMap[190455:] = ("HLT_IsoMu24_v15",
                                        "HLT_IsoMu24_v16",
                                        "HLT_IsoMu24_v17",
                                        )
- 
+
 # electron triggers per runrange
 ourtriggers.elrunMap = intervalmap.intervalmap()
 ourtriggers.elrunMap[132440:137029] = ("HLT_Photon10_L1R",)
@@ -82,12 +82,12 @@ ourtriggers.elrunMap[190455:] = ("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_E
                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18",
                                  "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v19",
                                  )
-				 
+
 #e-mu triggers (only 2012. 2011 e-mu triggers to be implemented)
 #Main ones
 ourtriggers.emurunMap = intervalmap.intervalmap()
 ourtriggers.emurunMap[190455:] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",
-                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5", 
+                                  "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",
                                   "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6",
                                   "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7",
                                   "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8",
@@ -101,13 +101,13 @@ ourtriggers.emurunMap[190455:] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIs
 				  )
 
 #higher thresholds (probably not add much efficiency, maybe for the future)
-#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu30_Ele30_CaloIdL_v3",)	
-#ourtriggers.emurunMap[190782:191411] = ("HLT_Mu30_Ele30_CaloIdL_v4",)	
-#ourtriggers.emurunMap[191691:193621] = ("HLT_Mu30_Ele30_CaloIdL_v5",)	
-#ourtriggers.emurunMap[193834:196531] = ("HLT_Mu30_Ele30_CaloIdL_v6",)	
-#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu30_Ele30_CaloIdL_v7",)	
+#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu30_Ele30_CaloIdL_v3",)
+#ourtriggers.emurunMap[190782:191411] = ("HLT_Mu30_Ele30_CaloIdL_v4",)
+#ourtriggers.emurunMap[191691:193621] = ("HLT_Mu30_Ele30_CaloIdL_v5",)
+#ourtriggers.emurunMap[193834:196531] = ("HLT_Mu30_Ele30_CaloIdL_v6",)
+#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu30_Ele30_CaloIdL_v7",)
 #ourtriggers.emurunMap[199698:209151] = ("HLT_Mu30_Ele30_CaloIdL_v8",)
-	
+
 #3leptons (maybe for the future)
 #ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v12",)
 #ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v13",)
@@ -115,25 +115,25 @@ ourtriggers.emurunMap[190455:] = ("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIs
 #ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v15",)
 #ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v16",)
 #
-#ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1",) 
-#ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2",) 
-#ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3",) 
-#ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v4",) 
+#ourtriggers.emurunMap[190456:190738] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1",)
+#ourtriggers.emurunMap[190782:191411] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2",)
+#ourtriggers.emurunMap[191691:196531] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3",)
+#ourtriggers.emurunMap[198022:199608] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v4",)
 #ourtriggers.emurunMap[199698:209151] = ("HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v5",)
-#	
+#
 #ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v3",)
 #ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v4",)
 #ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5",)
-#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6",) 
+#ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6",)
 #ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7",)
-#	
-#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3",) 
+#
+#ourtriggers.emurunMap[190456:190738] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3",)
 #ourtriggers.emurunMap[190782:191411] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v4",)
 #ourtriggers.emurunMap[191691:196531] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5",)
 #ourtriggers.emurunMap[198022:199608] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6",)
 #ourtriggers.emurunMap[199698:209151] = ("HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7",)
 
-				 
+
 # merged lists of triggers
 ourtriggers.mutriggers  = list(set([item for sublist in [i for i in ourtriggers.murunMap.values()] for item in sublist]))
 ourtriggers.eltriggers  = list(set([item for sublist in [i for i in ourtriggers.elrunMap.values()] for item in sublist]))
@@ -157,7 +157,7 @@ def electron_iswrongPS(electron, runNumber, lumi_section):
   if runNumber==171369 and (lumi_section==42 or lumi_section==162):
     return True
   if runNumber==171446 and (lumi_section==58 or lumi_section==374):
-    return True  
+    return True
   if runNumber==171484 and (lumi_section==61 or lumi_section==358):
     return True
   if runNumber==171578 and (lumi_section==47 or lumi_section==347):
@@ -170,9 +170,9 @@ def selectedTriggers(triggerInfo):
     return []
   paths = map(lambda trigger: triggerInfo.path(trigger),ourtriggers.triggers)
   def isFired(path):
-    if not not path : 
+    if not not path :
       return path.wasAccept()
-    else: 
+    else:
       return False
   return map(lambda path:isFired(path),paths)
 
@@ -201,28 +201,28 @@ def isTriggerOK(event,muChannel=True,eleChannel=True,perRun=True):
     elif not muChannel and eleChannel:
       intersect = set(pathnames) & set(ourtriggers.eltriggers)
     elif muChannel and eleChannel:
-      intersect = set(pathnames) & set(ourtriggers.emutriggers)      
+      intersect = set(pathnames) & set(ourtriggers.emutriggers)
   else:
     if muChannel and not eleChannel:
       if ourtriggers.murunMap[runNumber] is None:
         print "muon unexpected runNumber : " , runNumber
         intersect = set()
-      else:  
+      else:
         intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
     elif not muChannel and eleChannel:
       if ourtriggers.elrunMap[runNumber] is None:
         print "electron unexpected runNumber : " , runNumber
         intersect = set()
-      else:  
+      else:
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
     elif muChannel and eleChannel:
       if ourtriggers.emurunMap[runNumber] is None:
         print "e-mu unexpected runNumber : " , runNumber
         intersect = set()
-      else:  
-        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])	
-	
-	
+      else:
+        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])
+
+
   outcome = len(intersect)>0
   return (outcome and isTriggerMatchZcandidate(bestZcandidate,runNumber,event.lumi()))
 
@@ -240,7 +240,7 @@ def isTriggerIncOK(event,perRun=True):
     l1=bestDileptcandidate[0]
     l2=bestDileptcandidate[1]
 
-  
+
   if triggerInfo is None:
     return True
   paths = triggerInfo.acceptedPaths()
@@ -253,24 +253,24 @@ def isTriggerIncOK(event,perRun=True):
     elif l1.isElectron() and l2.isElectron():
       intersect = set(pathnames) & set(ourtriggers.eltriggers)
     elif (l1.isElectron() and l2.isMuon()) or(l2.isElectron() and l1.isMuon()):
-        intersect = set(pathnames) & set(ourtriggers.emutriggers)      
+        intersect = set(pathnames) & set(ourtriggers.emutriggers)
   elif perRun and l1 is not None and l2 is not None:
     if l1.isMuon() and l2.isMuon():
       if ourtriggers.murunMap[runNumber] is None:
         print "muon unexpected runNumber : " , runNumber
-      else:  
+      else:
         intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
     elif l1.isElectron() and l2.isElectron():
       if ourtriggers.elrunMap[runNumber] is None:
         print "electron unexpected runNumber : " , runNumber
-      else:  
+      else:
         intersect = set(pathnames) & set(ourtriggers.elrunMap[runNumber])
     elif (l1.isElectron() and l2.isMuon()) or(l2.isElectron() and l1.isMuon()):
       if ourtriggers.emurunMap[runNumber] is None:
         print "e-mu unexpected runNumber : " , runNumber
-      else:  
-        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])	
-	
+      else:
+        intersect = set(pathnames) & set(ourtriggers.emurunMap[runNumber])
+
   outcome = len(intersect)>0
   return (outcome and isTriggerMatchDileptcandidate(bestDileptcandidate,runNumber,event.lumi()))
 
@@ -293,7 +293,7 @@ def isTightMuon(muon):
   # cleaning ?
   #if muon.hasMasterClone():
   #  mu = muon.masterClone()
-  #  ROOT.SetOwnership( mu, False ) 
+  #  ROOT.SetOwnership( mu, False )
   #else:
   #  mu = muon
   return (isLooseMuon(muon))
@@ -309,7 +309,7 @@ def isGoodMuon(muon,role):
   """Perform additional checks that define a good muon"""
   if string.find(role,"all")!=-1     : return isLooseMuon(muon)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
-  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)      
+  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
@@ -332,7 +332,7 @@ def isTightElectron(electron):
   #to correct the PAT error (temporary)
   #if electron.hasMasterClone():
   #  el = electron.masterClone()
-  #  ROOT.SetOwnership( el, False ) 
+  #  ROOT.SetOwnership( el, False )
   #else:
   #  el = electron
   ##everything should be in the pat now
@@ -383,7 +383,7 @@ def hasNoOverlap(jet, Z = None, lepPair = None):
   dr2 = jv.DeltaR(l2v)
   if (dr1>0.5 and dr2>0.5): return True
   else : return False
-    
+
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
   rawjet = jet.correctedJet("Uncorrected")
@@ -399,7 +399,7 @@ def jetId(jet,level="loose"):
     return nhf<0.95 and nef<0.95 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99
   elif level=="tight":
     return nhf<0.90 and nef<0.90 and  nconstituents>1 and chf>0 and nch>0 and cef<0.99
-  else: 
+  else:
     print "Error: unknown jetid level:",level
     return False
 
@@ -416,7 +416,7 @@ def isGoodJet(jet, Z = None, lepPair = None):
   # overlap checking
   if not Z is None :
     if not hasNoOverlap(jet,Z=Z) :
-      return False 
+      return False
 
   if not lepPair is None :
     if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
@@ -533,14 +533,14 @@ def jetPtD(jet):
     ptconst2 = ptconst * ptconst
     sum_ptconst += ptconst
     sum_ptconst2 += ptconst2
-         
+
   if sum_ptconst != 0:
     ptD = sqrt(sum_ptconst2)/sum_ptconst
   else:
     ptD = 0
 
   return ptD
-  
+
 def jetVtx3dL(jet):
   #input of VBF NN regression
   #returns the 3D of the SV jet if it exists
@@ -576,7 +576,7 @@ def jetVtxPt(jet):
     TLvertexSum = ROOT.TLorentzVector(vertexSum.px(),vertexSum.py(),vertexSum.pz(),vertexSum.energy())
     VtxPt = TLvertexSum.Pt()
   return VtxPt
-  
+
 def isZcandidate(zCandidate,vertex=None):
   """Checks that this is a suitable candidate from lepton quality"""
   result = True
@@ -588,7 +588,7 @@ def isZcandidate(zCandidate,vertex=None):
     charge *= daughter.charge()
     if daughter.isMuon():
       flavor *= -1
-      result = result and isGoodMuon(zCandidate.daughter(r),r)  
+      result = result and isGoodMuon(zCandidate.daughter(r),r)
     elif zCandidate.daughter(r).isElectron():
       result = result and isGoodElectron(zCandidate.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
@@ -604,7 +604,7 @@ def isZcandidate(zCandidate,vertex=None):
     result = result and zVertex(zCandidate,0.05,vertex)
   # if everything ok, return the result of the lepton check
   return result
-  
+
 
 def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
   if not zCandidate is None:
@@ -614,18 +614,18 @@ def isTriggerMatchZcandidate(zCandidate, runNumber, lumi_section):
     ROOT.SetOwnership( Daugh1, False )
     Daugh2 = daughter2.masterClone()
     ROOT.SetOwnership( Daugh2, False )
-    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber,lumi_section) 
+    case1 =  isTriggerMatchPair(Daugh1,Daugh2,runNumber,lumi_section)
     case2 = isTriggerMatchPair(Daugh2,Daugh1,runNumber,lumi_section)
     return (case1 or case2)
   else:
     return False
 
-#trigger matching for inclusive selection    
+#trigger matching for inclusive selection
 def isTriggerMatchDileptcandidate(bestDileptCandidate,runNumber, lumi_section):
   if not bestDileptCandidate is None:
     daughter1 = bestDileptCandidate[0]
     daughter2 = bestDileptCandidate[1]
-    case1 = isTriggerMatchPair(daughter1,daughter2,runNumber,lumi_section) 
+    case1 = isTriggerMatchPair(daughter1,daughter2,runNumber,lumi_section)
     case2 = isTriggerMatchPair(daughter1,daughter2,runNumber,lumi_section)
     return (case1 or case2)
   else:
@@ -644,7 +644,7 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
       if (l1.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and (l2.triggerObjectMatchesByPath("HLT_Mu13_Mu8_v*",0,1).size()>0) and ((l1.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and ((l2.triggerObjectMatchesByFilter("hltDiMuonL3PreFiltered8").size()>0) or (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0)) and (l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered13").size()>0):
         return True
     if runNumber >= 178420 and runNumber< 180253:
-      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0): 
+      if (l1.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Mu8_v*",0,1).size()>0 and (l1.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0) and (l2.triggerObjectMatchesByFilter("hltDiMuonL3p5PreFiltered8").size()>0 ) and l1.triggerObjectMatchesByFilter("hltSingleMu13L3Filtered17").size()>0):
         return True
 ### data 2012
     if runNumber >= 180253 :
@@ -664,7 +664,7 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
           #print ''
           #print runNumber
           return True
-        
+
   if l1.isElectron() and l2.isElectron():
     if electron_iswrongPS(l1, runNumber, lumi_section):
       return False
@@ -677,11 +677,11 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
              return True
        if runNumber >= 190455 :
            #print "rn", runNumber
-           #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size() 
-       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size() 
+           #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",1,0).size()
+       #print "l1.triggerObjectMatchesByPath(HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIso...) 0,1 " ,l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*",0,1).size()
            #print "path * 0,1 " , (l1.triggerObjectMatchesByPath("*",0,0).size())
            #print "path * 1,0 " , (l1.triggerObjectMatchesByPath("*",1,0).size())
-           
+
            #if ((l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l1.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size()) and (l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) and (l2.triggerObjectMatchesByFilter("hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter").size())) :
            if l1.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 :
              #print runNumber
@@ -709,8 +709,8 @@ def isTriggerMatchPair(l1,l2,runNumber,lumi_section):
 
              #print runNumber
              return True
-	     
-  if (l1.isElectron() and l2.isMuon() ) or (l2.isElectron() and l1.isMuon() ):	     
+
+  if (l1.isElectron() and l2.isMuon() ) or (l2.isElectron() and l1.isMuon() ):
     if runNumber >= 190455:
       if (l1.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0) or (l1.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0 and l2.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",0,1).size()>0):
         return True
@@ -737,23 +737,23 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestM = z.mass()
         bestZ = z
   return bestZ
- 
+
 def ptSortedLeptonList(event):
 	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight")]
  	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight")]
 	lepList=muList+elList
 	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
-	return ptSortedLepList #if len(ptSortedLepList)>1 else None
+	return ptSortedLepList
 
-def highestPtLeptonPair(event):
+def highestPtLeptonPair(event, DRll_cut=0.3):
 	if len(event.ptSortedLeptonList)>1:
 		l1=event.ptSortedLeptonList[0]
 		l2=event.ptSortedLeptonList[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
-		return event.ptSortedLeptonList[:2] if DRll>0.3 and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05,event.vertex) else None
-	else : 
-		return None 
-	
+		return event.ptSortedLeptonList[] if DRll>DRll_cut and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05,event.vertex) else None
+	else :
+		return None
+
 def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   muList = []
   elList = []
@@ -762,7 +762,7 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   second_lept = None
   third_lept = None
   fourth_lept = None
-  
+
   for mu in event.muons:
     if isGoodMuon(mu, "tight"):
         muList.append(mu)
@@ -778,14 +778,14 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
         elList.remove(elList[0])
       elif elList[0].pt() < muList[0].pt():
         first_lept = muList[0]
-        muList.remove(muList[0]) 
+        muList.remove(muList[0])
     else :
       first_lept = muList[0]
-      muList.remove(muList[0])       	 
+      muList.remove(muList[0])
   else:
     if len(elList) > 0:
       first_lept = elList[0]
-      elList.remove(elList[0])	
+      elList.remove(elList[0])
 
   if len(muList) > 0  :
     if len(elList) > 0 :
@@ -794,10 +794,10 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
         elList.remove(elList[0])
       elif elList[0].pt() < muList[0].pt():
         second_lept = muList[0]
-        muList.remove(muList[0]) 
+        muList.remove(muList[0])
     else :
       second_lept = muList[0]
-      muList.remove(muList[0])       	 
+      muList.remove(muList[0])
   else:
     if len(elList) > 0:
       second_lept = elList[0]
@@ -810,10 +810,10 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
         elList.remove(elList[0])
       elif elList[0].pt() < muList[0].pt():
         third_lept = muList[0]
-        muList.remove(muList[0]) 
+        muList.remove(muList[0])
     else :
       third_lept = muList[0]
-      muList.remove(muList[0])       	 
+      muList.remove(muList[0])
   else:
     if len(elList) > 0:
       third_lept = elList[0]
@@ -826,14 +826,14 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
         elList.remove(elList[0])
       elif elList[0].pt() < muList[0].pt():
         fourth_lept = muList[0]
-        muList.remove(muList[0]) 
+        muList.remove(muList[0])
     else :
       fourth_lept = muList[0]
-      muList.remove(muList[0])       	 
+      muList.remove(muList[0])
   else:
     if len(elList) > 0:
       fourth_lept = elList[0]
-      elList.remove(elList[0])      
+      elList.remove(elList[0])
 
   #Force the DR of the first 2 leptons to be > 0.3 for the moment
   if first_lept is None or second_lept is None: return None
@@ -843,27 +843,27 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
     l1v = ROOT.TLorentzVector(first_lept.px(),first_lept.py(),first_lept.pz(),first_lept.energy())
     l2v = ROOT.TLorentzVector(second_lept.px(),second_lept.py(),second_lept.pz(),second_lept.energy())
     if l1v.DeltaR(l2v) < 0.3: return None
-           
+
   vertex_cond=False
   result = False
   leptList.append(first_lept)
   leptList.append(second_lept)
   leptList.append(third_lept)
-  leptList.append(fourth_lept) 
-  
+  leptList.append(fourth_lept)
 
-  if (first_lept is not None  and second_lept is not None ):	  
+
+  if (first_lept is not None  and second_lept is not None ):
      vertex_cond = isfromVertex(first_lept, second_lept, 0.05)
      if third_lept is not None:
        vertex_cond = isfromVertex(third_lept, second_lept, 0.05)
        if fourth_lept is not None:
          vertex_cond = isfromVertex(third_lept, fourth_lept, 0.05)
-	 
+
   if (vertex_cond is True):
     result = True
-       
 
-        
+
+
 
   if (result == True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
@@ -899,7 +899,7 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
     btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
   elif btagging == "JP":
     btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
-    
+
   btagList.sort(reverse=True)
   indices = []
   for ibtag in btagList:

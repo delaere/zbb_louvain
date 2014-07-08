@@ -38,7 +38,7 @@ class configuration:
   toprint = ['runningMode', 'eventSelection', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
 
   # control plot classes
-  controlPlots = [ 
+  controlPlots = [
     controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
@@ -53,7 +53,7 @@ class configuration:
       controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
       ]
     for cp in plotCP : controlPlots.append(cp)
-    
+
 
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
   eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>","genParticles"),
@@ -83,7 +83,7 @@ class configuration:
                        eventCollection("allmuons","vector<pat::Muon>","allMuons"),
                        eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
                        eventCollection("rho","double",("kt6PFJets","rho")),
-                       ] 
+                       ]
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
                        eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False } ),
@@ -108,8 +108,8 @@ class configuration:
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
-                       eventProducer("ptSortedLeptonList", "ObjectSelection","ptSortedLeptonList",{}),
-                       eventProducer("highestPtLeptonPair", "ObjectSelection", "highestPtLeptonPair", {} )
+                       eventProducer("ptSortedLeptonsList", "ObjectSelection","ptSortedLeptonsList",{}),
+                       eventProducer("highestPtLeptonsPair", "ObjectSelection", "highestPtLeptonsPair", {} )
                      ]
 
   eventWeights     = []
@@ -131,7 +131,7 @@ def changeBTAG(conf = None, btagging="CSV", WP=["M","L"]):
       next((x for x in getattr(conf, up) if x.label == sub), None).kwargs["WP"] = WP
   return
 
-#function to switch to different dileptons selection: names is a map between the dilepton pair names and the dilepton candidate names 
+#function to switch to different dileptons selection: names is a map between the dilepton pair names and the dilepton candidate names
 def changeDiLeptCand(conf = None, names = {"muonsPair" : "bestZmumucandidate", "electronsPair" : "bestZelelcandidate", "muelPair" : "bestZmuelcandidate", "leptonsPair" : "bestZcandidate"}):
   if conf is None : return
   for name in names:
@@ -141,8 +141,8 @@ def changeDiLeptCand(conf = None, names = {"muonsPair" : "bestZmumucandidate", "
 class eventDumpConfig:
   # fine-tuning of the event content for display
   productsToPrint   = [ ] # list of product to display (use the producer label)
-  collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label) 
-                  
+  collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label)
+
 def updateConfMC(c=configuration):
     # my variables: files, systematics and other options
     c.JERfactor = 1.
