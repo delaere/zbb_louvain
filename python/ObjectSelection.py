@@ -2,7 +2,7 @@ import ROOT
 import string
 import intervalmap
 import sys
-from VertexAssociation import zVertex, isfromVertex
+from VertexAssociation import zVertex, isfromVertex, isFromVertex_SingleLepton
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from math import sqrt
 from operator import attrgetter
@@ -738,19 +738,19 @@ def findBestCandidate(event, muChannel=True, eleChannel=False):
         bestZ = z
   return bestZ
 
-def ptSortedLeptonList(event):
-	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight")]
- 	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight")]
+def leptonsFromPV_ptSorted(event):
+	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight") and isFromVertex_SingleLepton(muon,0.05,event.vertex)]
+ 	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight") and isFromVertex_SingleLepton(electron,0.05,event.vertex)]
 	lepList=muList+elList
 	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
 	return ptSortedLepList
 
-def highestPtLeptonPair(event, DRll_cut=0.3):
-	if len(event.ptSortedLeptonList)>1:
-		l1=event.ptSortedLeptonList[0]
-		l2=event.ptSortedLeptonList[1]
+def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3):
+	if len(event.ptSortedLeptons)>1:
+		l1=event.ptSortedLeptons[0]
+		l2=event.ptSortedLeptons[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
-		return event.ptSortedLeptonList[] if DRll>DRll_cut and isfromVertex(event.ptSortedLeptonList[0],event.ptSortedLeptonList[0],0.05,event.vertex) else None
+		return event.ptSortedLeptons if DRll>DRll_cut else None
 	else :
 		return None
 

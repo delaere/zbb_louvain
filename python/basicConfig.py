@@ -108,8 +108,8 @@ class configuration:
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
-                       eventProducer("ptSortedLeptonsList", "ObjectSelection","ptSortedLeptonsList",{}),
-                       eventProducer("highestPtLeptonsPair", "ObjectSelection", "highestPtLeptonsPair", {} )
+                       eventProducer("ptSortedLeptons", "ObjectSelection","leptonsFromPV_ptSorted",{}),
+                       eventProducer("ptSortedLeptons_DRll", "ObjectSelection", "leptonsFromPV_ptSorted_DRllVetoOnFirstTwo", {"DRll_cut":0.3} )
                      ]
 
   eventWeights     = []
