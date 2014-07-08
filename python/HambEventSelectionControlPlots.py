@@ -22,6 +22,7 @@ class HambEventSelectionControlPlots(BaseControlPlots):
       self.add("triggerBits","trigger bits",20,0,20)
       self.add("triggerDouble","Double trigger",2,0,2)
       self.add("triggerSingle","Single trigger",2,0,2)
+      self.add("triggerEMU","E-MU trigger",2,0,2)
 
       # Higgs candidate plots
       self.add("dphiaa","#Delta #phi (a,a)",40,0,3.15)
@@ -68,7 +69,7 @@ class HambEventSelectionControlPlots(BaseControlPlots):
       else:
         checkTrigger = False
       ## trigger
-      result["triggerSelection"] = checkTrigger==False or event.isTriggerOK 
+      result["triggerSelection"] = checkTrigger==False or event.isHambDiMuTriggerOK 
       #result["triggerBits"] = [index for index,trigger in enumerate(selectedTriggers(event.triggerInfo)) if trigger==1]
       triggerList = []
       paths = event.triggerInfo.acceptedPaths()

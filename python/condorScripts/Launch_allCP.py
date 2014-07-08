@@ -20,6 +20,7 @@ if theConfig is not None:
 mode = configuration.runningMode
 
 dir_plot = {
+  "ajafari": "/home/fynu/ajafari/storage/CP/V3/",
   "abdollah": "/home/fynu/acaudron/scratch/",
   "acaudron": "/home/fynu/acaudron/scratch/",
   "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
@@ -28,6 +29,7 @@ dir_plot = {
 }
 
 dir_rds = {
+  "ajafari": "/home/fynu/ajafari/storage/RDS/V3/",
   "abdollah": "/home/fynu/acaudron/scratch/",
   "acaudron": "/home/fynu/acaudron/scratch/",
   "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
@@ -35,14 +37,15 @@ dir_rds = {
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testJune2014/",
 }
 
-
-
 samples = [
-#    "DATA",
-"DY",
-"TT",
-"ZZ",
-"ZH",
+#     "DATA",
+#     "DY",
+     "TT",
+#     "ZZ",
+#     "WW",
+#     "WZ",
+#     "T",
+#     "ZH",
     ]
 
 DYsamples = [
@@ -56,7 +59,7 @@ DYsamples = [
 #"DYjets_Pt100",
 #"DYjets_Pt180",
 #"Zbb",
-"DYjets_M10to50",
+    "DYjets_M10to50",
     ]
 
 DYbcl = [
@@ -70,11 +73,28 @@ DYbcl = [
 
 TTsamples = [
     #"TTjets",
-    "TTFullLept",
-    "TTSemiLept",
+    #"TTFullLept",
+    #"TTSemiLept",
+    "Wt",
+    "Wtbar",
+    "SingleTbar_s-Channel",
+    "SingleT_s-Channel",
+#    "SingleT_t-Channel",
     #"TTHadronic"
     ]
 
+ZZsamples = [
+#    "ZZ",
+    "WZ",
+    "WW",
+]
+#Tsamples = [
+ #   "SingleTbar_s-Channel",
+ #   "SingleT_s-Channel",
+ #   "SingleT_t-Channel",
+ #   "Wt",
+ #   "Wtbar",
+ #   ]
 mass = [125] #[110,115,120,125,130,135]
 
 MC = "Summer12"
@@ -90,14 +110,14 @@ listdata=[
         ]
 
 DataChannel = [
-    "Ele",
+   # "Ele",
     "Mu",
     ]
 
 DataSample = [
     #"Single",
-    #"Double",
-    "MuEG",
+    "Double",
+    #"MuEG",
     ]
 
 jobs = {
@@ -109,7 +129,14 @@ jobs = {
     "TTFullLept" : 400,
     "TTSemiLept" : 200,
     "TTHadronic" : 100,
+    "Wt" : 50,
+    "Wtbar" : 50,
+    "SingleTbar_s-Channel" : 50,
+    "SingleT_s-Channel" : 50,
+    "SingleT_t-Channel" : 100,
     "ZZ" : 50,
+    "WZ" : 50,
+    "WW" : 50,
     "ZH" : 50,
     "DYjets" : 400,
     "DY1jets" : 300,
@@ -131,7 +158,7 @@ elif mode == "dataset":
   dir = dir_rds[os.environ["USER"]]
   string_mode='RDS_'
 
-os.system('mkdir '+dir+string_mode+cpVersion)
+os.system('mkdir -p '+dir+string_mode+cpVersion)
 f = open(dir+string_mode+cpVersion+'/README.txt', 'w')
 f.write(README)
 f.close()
@@ -149,6 +176,10 @@ for sample in samples :
             LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+'/ \n')
     elif sample=="TT":
         for tt in TTsamples :
+            os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+tt)
+            LaunchOnCondor.Jobs_FinalCmds.append('mv '+tt+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+tt+'/ \n')
+    elif sample=="ZZ":
+        for tt in ZZsamples :
             os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+tt)
             LaunchOnCondor.Jobs_FinalCmds.append('mv '+tt+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+tt+'/ \n')
     elif sample=="DATA":
@@ -178,9 +209,11 @@ if "TT" in samples :
             LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c " + theConfig + " -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+tt+"/ -o "+tt+"_"+MC+"_"+str(i)+".root --all --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZZ" in samples :
-    njobs = jobs["ZZ"]
-    for i in range(0,njobs):
-        LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c " + theConfig + " -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_ZZ/ -o ZZ_"+MC+"_"+str(i)+".root --all --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+    for zz in ZZsamples :
+        njobs = jobs[zz]
+        for i in range(0,njobs):
+            LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c " + theConfig + " -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+zz+"/ -o "+zz+"_"+MC+"_"+str(i)+".root --all --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+            #LaunchOnCondor.SendCluster_Push(["PYTHON", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c " + theConfig + " -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_ZZ/ -o ZZ_"+MC+"_"+str(i)+".root --all --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "DATA" in samples :
 	if samp=="MuEG" :

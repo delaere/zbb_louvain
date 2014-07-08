@@ -125,6 +125,8 @@ class BaseControlPlots:
     def fillPlots(self, data, weight = 1.):
       """Fills histograms with the data provided as input."""
       for name,value in data.items():
+        #print name
+        #print value
         if isinstance(value,list):
           for val in value: self._h_vector[name].Fill(val,weight)
         else:

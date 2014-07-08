@@ -47,10 +47,36 @@ categories = [
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
 
 def isInCategory(category, categoryTuple):
-  if category<len(categories):
-    return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
-  else:
-    return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
+  #print "=================================="
+  #print category
+  #print len(categories)
+  #mylen = len(categoryTuple)
+  #print len(categoryTuple)
+  #print "What is category number?"
+  #print category%len(categories)
+  #print "What is first? "  
+  #myS1 = :len(categoryTuple)/2
+  #print myS1
+  #print "What is second?"
+  #print len(categoryTuple)/2:
+  #print "+++++++++++++++"
+  #for mys in range(0,mylen):
+  #  print categoryTuple[mys]
+  #print "+++++++++++++++"
+  #print categoryTuple[:len(categoryTuple)/2]
+  #print categoryTuple[:6]
+  #print categoryTuple[0:6]
+  #print "---------------"
+  
+  #print categoryTuple[len(categoryTuple)/2:]
+  #print categoryTuple[6:]
+  #print categoryTuple[6:12]
+
+  return isInCategoryChannel(category,categoryTuple)
+  #if category<len(categories):
+  #  return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
+  #else:
+  #  return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
 
 def isInCategoryChannel(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
@@ -173,8 +199,9 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   if bestDiLeptcandidate is None:
     output.append(0)
     output.append(-1) 
-  else: 
-    for i in range(0,3) :
+  else:
+    nDilep = len(bestDiLeptcandidate) 
+    for i in range(0,nDilep) :
       if bestDiLeptcandidate[i] is not None:
         nlept += 1    
     lept1=bestDiLeptcandidate[0]
@@ -238,7 +265,8 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
     output.append(abs(mbb - mass))
   else:
     output.append(-999)
-
+  print "The length of CategoryChannel is "
+  print len(output)
   # return the list of results
   return output
 
