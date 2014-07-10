@@ -45,7 +45,7 @@ class configuration:
   toprint = ['runningMode', 'eventSelection', 'ptjet', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
 
   # control plot classes
-  controlPlots = [ 
+  controlPlots = [
     controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
@@ -60,7 +60,7 @@ class configuration:
       controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
       ]
     for cp in plotCP : controlPlots.append(cp)
-    
+
 
   # event content: lists of eventCollection, eventProducer, and eventWeight objects respectively.
   eventCollections = [ eventCollection("genParticles","vector<reco::GenParticle>","genParticles"),
@@ -91,7 +91,7 @@ class configuration:
                        eventCollection("allmuons","vector<pat::Muon>","allMuons"),
                        eventCollection("PileupSummaryInfo","std::vector< PileupSummaryInfo >","addPileupInfo"),
                        eventCollection("rho","double",("kt6PFJets","rho")),
-                       ] 
+                       ]
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
                        eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False,"pt":ptjet } ),
@@ -102,19 +102,23 @@ class configuration:
                        eventProducer("subjets", "ObjectSelection", "subjets", { } ),
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
+                       eventProducer("isINCTriggerOK", "ObjectSelection", "isTriggerIncOK", {"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
                        eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":theZfilter } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
-                       eventProducer("muonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmumucandidate" } ),
+                       eventProducer("bestDiLeptCandidate", "ObjectSelection", "findBestDiLeptCandidate", { "muChannel":True,"eleChannel":True } ),
+		       eventProducer("muonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmumucandidate" } ),
                        eventProducer("electronsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZelelcandidate" } ),
                        #eventProducer("muelPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmuelcandidate" } ),
                        eventProducer("leptonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZcandidate" } ),
                        eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
-                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } )
+                       eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
+                       eventProducer("ptSortedLeptons", "ObjectSelection","leptonsFromPV_ptSorted",{}),
+                       eventProducer("ptSortedLeptons_DRll", "ObjectSelection", "leptonsFromPV_ptSorted_DRllVetoOnFirstTwo", {"DRll_cut":0.3} )
                      ]
 
   eventWeights     = []
@@ -151,7 +155,7 @@ def changeBTAG(conf = None, btagging="CSV", WP=["M","L"]):
       next((x for x in getattr(conf, up) if x.label == sub), None).kwargs["WP"] = WP
   return
 
-#function to switch to different dileptons selection: names is a map between the dilepton pair names and the dilepton candidate names 
+#function to switch to different dileptons selection: names is a map between the dilepton pair names and the dilepton candidate names
 def changeDiLeptCand(conf = None, names = {"muonsPair" : "bestZmumucandidate", "electronsPair" : "bestZelelcandidate", "muelPair" : "bestZmuelcandidate", "leptonsPair" : "bestZcandidate"}):
   if conf is None : return
   for name in names:
@@ -161,8 +165,8 @@ def changeDiLeptCand(conf = None, names = {"muonsPair" : "bestZmumucandidate", "
 class eventDumpConfig:
   # fine-tuning of the event content for display
   productsToPrint   = [ ] # list of product to display (use the producer label)
-  collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label) 
-                  
+  collectionsToHide = [ ] # collections used in the analysis but not printed (use the collection label)
+
 def updateConfMC(c=configuration):
     # my variables: files, systematics and other options
     c.JERfactor = 1.

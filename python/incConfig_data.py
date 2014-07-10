@@ -1,28 +1,31 @@
-import os
-from zbbConfig_data import *
+from basicConfig import *
 
-configuration.eventSelection = configuration.pythonpath+"IncEventSelection"
+#update dilepton selection
+changeDiLeptCand(conf = configuration, names = {"leptonsPair" : "bestDiLeptCandidate"})
 
-configuration.eventProducers.append(eventProducer("bestDiLeptCandidate", "ObjectSelection", "findBestDiLeptCandidate", { "muChannel":True,"eleChannel":True } ))
-configuration.eventProducers.append(eventProducer("isEMUTriggerOK", "ObjectSelection", "isTriggerIncOK", {"perRun":True } ))
-#configuration.controlPlots.append(controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { }))
+class configuration(configuration):
 
+  #config file used
+  eventSelection = configuration.pythonpath+"IncEventSelection"
+  
+  # mode: plots or dataset
+  runningMode = "plots"
+  
+  #produce EMU or LL CP:
+  run_on_emu = False
+  
+  #information about the MET cut
+  #NB : the choice to cut on MET or on MET significance is done in eventSelection
+  MetCut = 50   # Define the value of the met threshold
+  MetSigCut = 10   # Define the value of the met significance threshold
+  MetRegion = "High"  #Can be Low or High (the cut applied in the eventSelection will then be MetSig<MetSigCut if you chose the Low MetRegion)
+  MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
 
-#control plot classes (since we don't want ZbbEventSelectionControlPlots I replace the whole list
-# as it is not straightforward to replace ZbbEventSelectionControlPlots by IncEventSelectionControlPlots
-configuration.controlPlots = [ 
-    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":configuration.btagging, "WP":configuration.WP }),
-    controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
-    controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
-    controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { }),
-    controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
-    ]
-
-if configuration.runningMode == "plots" :
-    plotCP = [
-      controlPlot("allmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonList":"allmuons", "muonType":"none" }),
-      controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
-      controlPlot("allelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronList":"allelectrons", "electronType":"none" }),
-      controlPlot("tightelectrons", "ObjectsControlPlots", "ElectronsControlPlots", { "electronType":"tight" }),
-      ]
-    for cp in plotCP : configuration.controlPlots.append(cp)
+  # my variables: files, systematics and other options
+  btagging = "CSV"
+  WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
+  #Add inclusive selection plots
+  controlPlots = configuration.controlPlots
+  controlPlots.extend([
+    controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
+    ])

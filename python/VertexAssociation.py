@@ -52,7 +52,7 @@ def zVertex(zcandidate, cut, vertex=None):
       print "Warning : argument vertex is not of type reco::Vertex "
       return abs(lepton1.vz()-lepton2.vz())<cut
     return (abs(lepton1.vz()-vertex.z())<cut and abs(lepton2.vz()-vertex.z())<cut)
-    
+
 def isfromVertex(lepton1, lepton2, cut, vertex=None):
   if vertex is None:
     #loose criteria: both leptons close one of each other
@@ -62,8 +62,14 @@ def isfromVertex(lepton1, lepton2, cut, vertex=None):
     if not type(vertex).__name__ == 'reco::Vertex' :
       print "Warning : argument vertex is not of type reco::Vertex "
       return abs(lepton1.vz()-lepton2.vz())<cut
-    return (abs(lepton1.vz()-vertex.z())<cut and abs(lepton2.vz()-vertex.z())<cut)    
-    
+    return (abs(lepton1.vz()-vertex.z())<cut and abs(lepton2.vz()-vertex.z())<cut)
+
+def isFromVertex_SingleLepton(lepton, cut, vertex=None):
+    if vertex is None:
+        print "Warning : No vertex given, will return true"
+        return True
+    else:
+        return abs(lepton.vz()-vertex.z())<cut
 
 def jetVertex(vertex, jet, algo, sigmaCut, fraction):
   if algo==1 : return jetVertex_1(vertex, jet, sigmaCut, fraction)
@@ -75,7 +81,7 @@ def jetVertex_1(vertex, jet, sigcut, etcut):
   ptsum = 0.
   for i in range(jet.getPFConstituents().size()):
     #make sure the object is usable
-    #the last condition is a fix if we miss muons and electrons in the file, for rare occurences... 
+    #the last condition is a fix if we miss muons and electrons in the file, for rare occurences...
     #apparently something in the vz() calculation.
     if jet.getPFConstituent(i).trackRef().isNull():
       continue
@@ -87,7 +93,7 @@ def jetVertex_1(vertex, jet, sigcut, etcut):
     sig = distance/error
     if abs(sig)<sigcut :
       ptsum += jet.getPFConstituent(i).pt()
-  if ptsum/jet.et() > etcut : 
+  if ptsum/jet.et() > etcut :
     return True
   else :
     return False
