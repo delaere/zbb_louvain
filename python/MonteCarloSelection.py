@@ -96,6 +96,22 @@ def genjetCollectionsProducer(fwevent, ptcut=0, etacut=10):
   (cjets, lightjets) = match_GenToHad(nonbjets, chads, 0.5)
   return (bjets,cjets,lightjets)
 
+def isRecoZbbEvent(event):
+  """Classify events according to recojet flavour"""
+  if not event.dijet_all[0] is None and not event.dijet_all[1] is None:
+    return abs(event.dijet_all[0].partonFlavour())==5 and abs(event.dijet_all[1].partonFlavour())==5
+  else : return False
+
+def isRecoZbEvent(event):
+  """Classify events according to recojet flavour"""
+  if not event.dijet_all[0] is None and not event.dijet_all[1] is None:
+    return (abs(event.dijet_all[0].partonFlavour())!=5 and abs(event.dijet_all[1].partonFlavour())==5) or (abs(event.dijet_all[0].partonFlavour())==5 and abs(event.dijet_all[1].partonFlavour())!=5)
+  elif not event.dijet_all[0] is None:
+    return abs(event.dijet_all[0].partonFlavour())==5
+  elif not event.dijet_all[1] is None:
+    return abs(event.dijet_all[1].partonFlavour())==5
+  else : return False
+
 def isZbbEvent(event):
   """Classify events according to genjets matched with final state hadrons"""
   bjets = event.sortedGenJets[0]
@@ -150,6 +166,7 @@ def LHEinfo(event):
       "isZ"  : -1,
       "nLep" : -1,
       "llpt" : -1,
+      "HT  " : -1,
       "nj"   : -1,
       "nb"   : -1,
       "nc"   : -1,
@@ -162,13 +179,17 @@ def LHEinfo(event):
   nup = hepeup.NUP
   isZ=False
   lep=[]
+  partons = []
   nj = 0
   nb = 0
   nc = 0
+  HT = 0
   for index,p in enumerate(pup) :
     if idup[index]==23 : isZ=True
     if abs(idup[index]) in [11,13,15] : lep.append(index)
-    if istup[index]==1 and abs(idup[index]) in [1,2,3,4,5,21] : nj+=1
+    if istup[index]==1 and abs(idup[index]) in [1,2,3,4,5,21] :
+      nj+=1
+      partons.append(p)
     if istup[index]==1 and abs(idup[index])==5 : nb+=1
     if istup[index]==1 and abs(idup[index])==4 : nc+=1
     #print "status ", istup[index], "PID ", idup[index]
@@ -181,10 +202,14 @@ def LHEinfo(event):
     llpt = zcand.Pt()
   else :
     llpt=-1
+  for j in partons:
+    j_tlv = TLorentzVector(j[0], j[1], j[2], j[3])
+    HT += j_tlv.Pt()
   out = {
     "isZ"  : isZ,
     "nLep" : len(lep),
     "llpt" : llpt,
+    "HT"   : HT,
     "nj"   : nj,
     "nb"   : nb,
     "nc"   : nc,
@@ -254,13 +279,24 @@ def getNumberOfStatus3Neutrinos(event):
 			NumberOfNeutrinos+=1
       return NumberOfNeutrinos
 
-
-
-
-
-
-
-
-
-
-
+def hadronFlavour(genParticles, jets):
+  # list of hadrons in the final state
+  bhads = [part for part in genParticles if is_final_Bhad(part)]
+  chads = [part for part in genParticles if is_final_Dhad(part)]
+  # list of genjets passing the pt,eta cuts
+  genjets = [ jet.genJet() for index,jet in enumerate(jets) if jet.genJet() ]
+  # now divide it in three independant collections
+  (b, nonbjets)  = match_GenToHad(genjets,  bhads, 0.5)
+  (c, l) = match_GenToHad(nonbjets, chads, 0.5)
+  for jet in jets:
+    genjet = jet.genJet()
+    if not genjet : # probably PU, just check it was not assigned to b or c
+      if abs(jet.partonFlavour()) in [4, 5] : jet.setPartonFlavour(0)
+      continue
+    if genjet in b :
+      if not abs(jet.partonFlavour())==5 : jet.setPartonFlavour(5) # we don't look at the sign
+    elif genjet in c :
+      if not abs(jet.partonFlavour())==4 : jet.setPartonFlavour(4)
+    else: # if no b or c hadrons matched and jet flavour is 4 or 5 then assume is gluon
+      if abs(jet.partonFlavour()) in [4, 5] : jet.setPartonFlavour(21)
+  return

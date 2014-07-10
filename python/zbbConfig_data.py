@@ -1,6 +1,13 @@
 
 from basicConfig import *
 
+changeJetCollection(conf = configuration, jetcoll = "rawjets")
+#changeJetCollection(conf = configuration, jetcoll = "subjets")
+#changeJetCollection(conf = configuration, jetcoll = "rawsubjets")
+
+changeJetPt(conf = configuration, ptjet=30.)
+#changeJetPt(conf = configuration, ptjet=20.)
+
 class configuration(configuration):
   # mode: plots or dataset
   runningMode = "plots"

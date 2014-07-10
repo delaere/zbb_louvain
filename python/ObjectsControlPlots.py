@@ -364,8 +364,8 @@ class JetmetControlPlots(BaseControlPlots):
 
           maxbdiscSSVHE = max(maxbdiscSSVHE,jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
 	  maxbdiscSSVHP = max(maxbdiscSSVHP,jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
-	  maxbdiscCSV = max(maxbdiscSSVHE,jet.bDiscriminator("combinedSecondaryVertexBJetTags"))
-	  maxbdiscJP = max(maxbdiscSSVHP,jet.bDiscriminator("jetProbabilityBJetTags"))
+	  maxbdiscCSV = max(maxbdiscCSV,jet.bDiscriminator("combinedSecondaryVertexBJetTags"))
+	  maxbdiscJP = max(maxbdiscJP,jet.bDiscriminator("jetProbabilityBJetTags"))
           nj += 1
           if nj<self.njets+1 :
               result["jet"+str(nj)+"pt"] = jetPt
@@ -404,6 +404,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["jet"+str(nj)+"CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
               result["jet"+str(nj)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
               result["jet"+str(nj)+"beta"] = jet.userFloat("beta")
+              result["jet"+str(nj)+"betaStar"] = jet.userFloat("betaStar")
               result["jet"+str(nj)+"PUIdMva"] = jet.userFloat("puJetMva")
               result["jet"+str(nj)+"PUIdWP"] = jet.userInt("puJetId")
               result["jet"+str(nj)+"overlapmu"] = jet.hasOverlaps("muons")

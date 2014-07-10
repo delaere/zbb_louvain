@@ -109,17 +109,17 @@ def isInCategoryChannel(category, categoryTuple):
   else:
     return False
 
-def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
+def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter) + \
          eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
   
-def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
+def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   """Check analysis requirements for various steps."""
   # first of all: ZjetFilter. If failed, we don't even evaluate the rest of the vector and we return the special -1 value.
-  if not ZjetFilter=="bcl":
-    if MonteCarloSelection.isZbEvent(event) and not ('b' in ZjetFilter): return [-1]
-    if (MonteCarloSelection.isZcEvent(event) and not MonteCarloSelection.isZbEvent(event)) and not ('c' in ZjetFilter): return [-1]
-    if (not MonteCarloSelection.isZcEvent(event) and not MonteCarloSelection.isZbEvent(event)) and not ('l' in ZjetFilter): return [-1]
+  if not ZjetFilter=="none":
+    if MonteCarloSelection.isRecoZbbEvent(event) and not ('2b' in ZjetFilter): return [-1]
+    if (MonteCarloSelection.isRecoZbEvent(event) and not MonteCarloSelection.isRecoZbbEvent(event)) and not ('1b' in ZjetFilter): return [-1]
+    if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
   bestZcandidate = event.bestZcandidate

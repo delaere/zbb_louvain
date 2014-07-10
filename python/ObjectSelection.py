@@ -3,6 +3,7 @@ import string
 import intervalmap
 from VertexAssociation import zVertex, isfromVertex
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
+from MonteCarloSelection import hadronFlavour
 from math import sqrt
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
@@ -386,21 +387,22 @@ def jetId(jet,level="loose"):
     print "Error: unknown jetid level:",level
     return False
 
-def allJets(event):
-  if event.object().event().eventAuxiliary().isRealData() : return event.rawjets
-  for jet in event.rawjets : JECuncertaintyProxy.Scale(jet)
-  return event.rawjets
+def allJets(event, jets="rawjets"):
+  eventrawjets = getattr(event, jets)
+  if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
+  for jet in eventrawjets : JECuncertaintyProxy.Scale(jet)
+  return eventrawjets
 
-def isGoodJet(jet, Z = None):
+def isGoodJet(jet, Z = None, pt = 30.):
   """Perform additional checks that define a good jet"""
   # overlap checking
   if not Z is None :
     if not hasNoOverlap(jet,Z) :
       return False 
   # pt, eta, and jetid
-  return abs(jet.eta())<2.4 and jet.pt()>30. and jetId(jet,"loose")
+  return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
 
-def goodJets(event, muChannel=True, eleChannel=True):
+def goodJets(event, muChannel=True, eleChannel=True, pt=30.):
   # best Z candidate
   if muChannel and eleChannel:
     bestZcandidate = event.bestZcandidate
@@ -411,7 +413,7 @@ def goodJets(event, muChannel=True, eleChannel=True):
   else:
     bestZcandidate = None
   # compute the good jets
-  return map(lambda jet:isGoodJet(jet,bestZcandidate),event.jets)
+  return map(lambda jet:isGoodJet(jet,bestZcandidate,pt),event.jets)
 
 def isMetHigherThan(met,cut=20):
   """Apply a lower MET threshold"""
@@ -880,3 +882,18 @@ def vertex(event):
   else:
     return None
 
+def subjets(event):
+  subjets = []
+  j1 = None
+  j2 = None
+  prunedPt = 0
+  for pruned in event.rawprunedjets:
+    if pruned.numberOfDaughters() == 2 and pruned.pt()>30. and abs(pruned.eta())<2.4 and pruned.pt()>prunedPt:
+      prunedPt = pruned.pt()
+      j1 = pruned.daughter(0)
+      j2 = pruned.daughter(1)
+  if not (j1 is None and j2 is None):
+    subjets.append(j1)
+    subjets.append(j2)
+  if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
+  return subjets

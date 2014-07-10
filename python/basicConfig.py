@@ -1,5 +1,11 @@
 import os
 
+theZfilter = os.getenv("ZjetFilter")
+if not theZfilter : theZfilter = "none"
+
+weightmode = os.getenv("weightmode")
+if not weightmode : weightmode = "none"
+
 #configuration of the ControlPlot machinery
 from collections import namedtuple
 controlPlot     = namedtuple("controlPlot",    ["label","module","classname","kwargs"])
@@ -23,6 +29,7 @@ class configuration:
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
+  ptjet = 30.
   btagging = "CSV"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   muChannel = True
@@ -35,7 +42,7 @@ class configuration:
   jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
 
   #parameter you want to print
-  toprint = ['runningMode', 'eventSelection', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
+  toprint = ['runningMode', 'eventSelection', 'ptjet', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
 
   # control plot classes
   controlPlots = [ 
@@ -62,8 +69,9 @@ class configuration:
                        eventCollection("genInfo","GenEventInfoProduct","generator"),
                        eventCollection("vertices","vector<reco::Vertex>","goodPV"),
                        eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsWithBeta"),
-                       #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
-                       #eventCollection("rawjets","vector<pat::Jet>","selectedPatJetsCA8CHSWithBeta"),
+                       eventCollection("rawsubjets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
+                       eventCollection("rawfatjets","vector<pat::Jet>","selectedPatJetsCA8CHSwithNsub"),
+                       eventCollection("rawprunedjets","vector<pat::Jet>","selectedPatJetsCA8CHSPrunedPacked"),
                        eventCollection("MET","vector<pat::MET>","patType1CorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
 		       eventCollection("PFMETNoCorr","vector<pat::MET>","patPFMet"),
@@ -86,15 +94,16 @@ class configuration:
                        ] 
 
   eventProducers   = [ eventProducer("vertex", "ObjectSelection", "vertex", {}),
-                       eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False } ),
-                       eventProducer("goodJets_ele", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":True } ),
-                       eventProducer("goodJets_all", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":True } ),
-                       eventProducer("goodJets_none", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":False } ),
-                       eventProducer("jets", "ObjectSelection", "allJets", { } ),
+                       eventProducer("goodJets_mu", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":False,"pt":ptjet } ),
+                       eventProducer("goodJets_ele", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":True,"pt":ptjet } ),
+                       eventProducer("goodJets_all", "ObjectSelection", "goodJets", { "muChannel":True,"eleChannel":True,"pt":ptjet } ),
+                       eventProducer("goodJets_none", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":False,"pt":ptjet } ),
+                       eventProducer("jets", "ObjectSelection", "allJets", {"jets":"rawjets" } ),
+                       eventProducer("subjets", "ObjectSelection", "subjets", { } ),
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
-                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":"bcl" } ),
+                       eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":theZfilter } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
                        eventProducer("bestZcandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":True } ),
@@ -115,6 +124,21 @@ class configuration:
     "controlPlots" : ["jetmetAK5PF"],
     "eventProducers" : ["category", "dijet_muChannel", "dijet_eleChannel", "dijet_all"]
     }
+
+#function to change the jet collection
+def changeJetCollection(conf = None, jetcoll = "rawjets"):
+  next((x for x in conf.eventProducers if x.label == "jets"), None).kwargs["jets"] = jetcoll
+  return
+
+#function to change jet pt cut
+def changeJetPt(conf = None, ptjet=30.):
+  if conf is None : return
+  conf.ptjet = ptjet
+  iter = (x for x in conf.eventProducers if x.function == "goodJets")
+  while True:
+    try: next(iter).kwargs["pt"] = ptjet
+    except StopIteration : break  
+  return
 
 #function to switch b-tagging or WP
 def changeBTAG(conf = None, btagging="CSV", WP=["M","L"]):
@@ -153,6 +177,7 @@ def updateConfMC(c=configuration):
     c.SF_uncert="mean" #btagging reweighting:  choose among min/max/mean
     c.pileupData=c.dataDirectory+"Cert_190456-208686_8TeV_22Jan2013ReReco_pileupTruth.root"
     c.pileupMC=c.dataDirectory+"MCpileup_Summer12_S10.root"
+    c.DYmerging=c.dataDirectory+"DYmergingWeights.txt"
 
     #toprint = configuration.toprint
     c.toprint.extend(["JERfactor", "JESfactor", "LeptonTnPfactor", "SF_uncert", "SF_running_mode", "btagperfData", "pileupData", "pileupMC"])
@@ -188,6 +213,6 @@ def updateConfMC(c=configuration):
     c.eventWeights = [
         eventWeight("Btagging","BtaggingWeight","BtaggingWeight", {"jmin1":0,"jmax1":999,"jmin2":0,"jmax2":999,"file":c.btagperfData,"btagging":c.btagging,"WP":c.WP}),
         eventWeight("Leptons","LeptonsReweighting","LeptonsReWeighting", {}),
-        eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":"none"}),
+        eventWeight("MonteCarlo","MonteCarloReweighting","MonteCarloReWeighting", {"shift":0, "MCmode":weightmode}),
         eventWeight("PileUp","LumiReWeighting","LumiReWeighting", {"MonteCarloFileName":c.pileupMC, "DataFileName":c.pileupData, "systematicShift":0})
         ]
