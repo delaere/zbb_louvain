@@ -45,7 +45,7 @@ samples = [
     #"WW",
     #"WZ",
     #"SingleT",
-    "ZA"
+    #"ZA"
     ]
 
 ZAsamples = [
@@ -98,18 +98,18 @@ SingleTsamples = [
 
 MC = "Summer12"
 DATA = "2012"
-cpVersion = "V44"
-#cpVersion = "V1"
-README = "RDS DY and ZA \n"
+#cpVersion = "V44"
+cpVersion = "V1"
+README = "What you produced... \n"
 
 stages = "--all"
 #stages = "-l 18,37"
 
-dyweight = 'Merging' #apply weight in order to merge DY ptZ, HT and inclusive
+#dyweight = 'Merging' #apply weight in order to merge DY ptZ, HT and inclusive
 #dyweight = 'sfs_dy__Merging' 
 #dyweight = 'sfs_dy' #apply data driven normalisation for bkg
 #ttweight = 'sfs_tt'
-#dyweight = '' # no weight
+dyweight = '' # no weight
 ttweight = ''
 
 listdata=[
