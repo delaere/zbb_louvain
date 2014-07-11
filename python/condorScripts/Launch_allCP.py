@@ -45,7 +45,7 @@ samples = [
     #"WW",
     #"WZ",
     #"SingleT",
-    #"ZA"
+    "ZA"
     ]
 
 ZAsamples = [
@@ -70,11 +70,13 @@ DYsamples = [
     "DYjets_M10to50",
     ]
 
-DYbcl = [
-    "2b",
-    "1b",
-    "0b",
-    ]
+DYbcl = [""]
+if mode == "plots":
+    DYbcl = [
+        "_2b",
+        "_1b",
+        "_0b",
+        ]
 
 TTsamples = [
     #"TTjets",
@@ -96,18 +98,18 @@ SingleTsamples = [
 
 MC = "Summer12"
 DATA = "2012"
-#cpVersion = "V43"
-cpVersion = "V1"
-README = "My production... \n"
+cpVersion = "V44"
+#cpVersion = "V1"
+README = "RDS DY and ZA \n"
 
 stages = "--all"
 #stages = "-l 18,37"
 
-#dyweight = 'Merging' #apply weight in order to merge DY ptZ, HT and inclusive
+dyweight = 'Merging' #apply weight in order to merge DY ptZ, HT and inclusive
 #dyweight = 'sfs_dy__Merging' 
 #dyweight = 'sfs_dy' #apply data driven normalisation for bkg
 #ttweight = 'sfs_tt'
-dyweight = '' # no weight
+#dyweight = '' # no weight
 ttweight = ''
 
 listdata=[
@@ -120,7 +122,7 @@ listdata=[
 DataChannel = [
     "DoubleEle",
     "DoubleMu",
-    "MuEG"
+    #"MuEG"
     ]
 
 jobs = {
@@ -140,8 +142,8 @@ jobs = {
     "DY2jets" : 200,
     "DY3jets" : 150,
     "DY4jets" : 100,
-    "DYjets_Pt50to70" : 250,
-    "DYjets_Pt70to100" : 250,
+    "DYjets_Pt50to70" : 200,
+    "DYjets_Pt70to100" : 100,
     "DYjets_Pt100" : 80,
     "DYjets_Pt180" : 50,
     "DYjets_HT200to400" : 80,
@@ -181,10 +183,8 @@ for sample in samples :
     elif sample=="DY":
         for dy in DYsamples :
             for fl in DYbcl :
-                os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+dy+'_'+fl)
-                LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+fl+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+'_'+fl+'/ \n')
-            #os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+dy)
-            #LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+'/ \n')
+                os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+dy+fl)
+                LaunchOnCondor.Jobs_FinalCmds.append('mv '+dy+fl+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+dy+fl+'/ \n')
     elif sample=="TT":
         for tt in TTsamples :
             os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+tt)
@@ -246,9 +246,7 @@ if "DY" in samples :
         njobs = jobs[dy]        
         for fl in DYbcl :
             for i in range(0,njobs):
-                LaunchOnCondor.SendCluster_Push(["BASH", "export ZjetFilter='"+fl+"'; export weightmode='"+dyweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+dy+"/ -o "+dy+"_"+fl+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
-        #for i in range(0,njobs):
-            #LaunchOnCondor.SendCluster_Push(["BASH", "export weightmode='sfs_dy'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+dy+"/ -o "+dy+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+                LaunchOnCondor.SendCluster_Push(["BASH", "export ZjetFilter='"+fl.replace("_","")+"'; export weightmode='"+dyweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+dy+"/ -o "+dy+fl+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZH" in samples :
     mass = [125]#[115,120,125,130,135]
