@@ -90,7 +90,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 2:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==2:
-    return isInCategoryChannel(1, categoryTuple) and categoryTuple[9]>15 
+    return isInCategoryChannel(1, categoryTuple) and categoryTuple[10]>15 
 
  # category 3:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15 + METSIG 
   elif category==3:
@@ -98,7 +98,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 4:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + DMaa < 30
   elif category==4:
-    return isInCategoryChannel(1, categoryTuple) and abs(categoryTuple[10])<30 
+    return isInCategoryChannel(1, categoryTuple) and abs(categoryTuple[11])<30 
 
  # category 5:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + DMaa < 30 + METSIG 
   elif category==5:
@@ -106,7 +106,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 6:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30
   elif category==6:
-    return isInCategoryChannel(2, categoryTuple) and abs(categoryTuple[10])<30
+    return isInCategoryChannel(2, categoryTuple) and abs(categoryTuple[11])<30
 
  # category 7:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30 + METSIG
   elif category==7:
@@ -118,7 +118,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 9:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==9:
-    return isInCategoryChannel(8, categoryTuple) and categoryTuple[9]>15
+    return isInCategoryChannel(8, categoryTuple) and categoryTuple[10]>15
 
  # category 10:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15 + METSIG 
   elif category==10:
@@ -126,7 +126,7 @@ def isInCategoryChannel(category, categoryTuple):
   
  # category 11:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + DMaa < 30
   elif category==11:
-    return isInCategoryChannel(8, categoryTuple) and abs(categoryTuple[10])<30
+    return isInCategoryChannel(8, categoryTuple) and abs(categoryTuple[11])<30
 
  # category 12:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + DMaa < 30 + METSIG 
   elif category==12:
@@ -134,7 +134,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 13:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30
   elif category==13:
-    return isInCategoryChannel(9, categoryTuple) and abs(categoryTuple[10])<30
+    return isInCategoryChannel(9, categoryTuple) and abs(categoryTuple[11])<30
 
  # category 14:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30 + METSIG
   elif category==14:
@@ -146,7 +146,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 16:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==16:
-    return isInCategoryChannel(15, categoryTuple) and categoryTuple[9]>15
+    return isInCategoryChannel(15, categoryTuple) and categoryTuple[10]>15
 
  # category 17:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + Mbb > 15 + METSIG 
   elif category==17:
@@ -154,7 +154,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 18:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + DMaa < 30
   elif category==18:
-    return isInCategoryChannel(15, categoryTuple) and abs(categoryTuple[10])<30
+    return isInCategoryChannel(15, categoryTuple) and abs(categoryTuple[11])<30
 
  # category 19:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + DMaa < 30 + METSIG 
   elif category==19:
@@ -162,7 +162,7 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 20:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30
   elif category==20:
-    return isInCategoryChannel(16, categoryTuple) and abs(categoryTuple[10])<30
+    return isInCategoryChannel(16, categoryTuple) and abs(categoryTuple[11])<30
 
  # category 21:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15 + DMaa < 30 + METSIG
   elif category==21:
@@ -237,7 +237,8 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   output.append(isMetSigLowerThan(met = MetToCutOn,cut = configuration.MetSigCut))
   
   # output[8] : bb DR
-  # output[9]: bb invariant mass, default value: -1
+  # output[9] : bb SVDR
+  # output[10]: bb invariant mass, default value: -1
   mbb = -1
   dijet = event.dijet_muChannel
   if dijet[0] is None or dijet[1] is None: 
@@ -260,7 +261,7 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
     output.append(mbb)
 
 
-  # output[10]: "mbb - mll", default value: -999
+  # output[11]: "mbb - mll", default value: -999
   if (mbb != -1) and (mass != -1):
     output.append(abs(mbb - mass))
   else:

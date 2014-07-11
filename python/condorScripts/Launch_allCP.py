@@ -40,8 +40,8 @@ dir_rds = {
 samples = [
 #     "DATA",
 #     "DY",
-     "TT",
-#     "ZZ",
+#     "TT",
+     "ZZ",
 #     "WW",
 #     "WZ",
 #     "T",
@@ -73,18 +73,18 @@ DYbcl = [
 
 TTsamples = [
     #"TTjets",
-    #"TTFullLept",
-    #"TTSemiLept",
+    "TTFullLept",
+    "TTSemiLept",
     "Wt",
     "Wtbar",
     "SingleTbar_s-Channel",
     "SingleT_s-Channel",
-#    "SingleT_t-Channel",
+    "SingleT_t-Channel",
     #"TTHadronic"
     ]
 
 ZZsamples = [
-#    "ZZ",
+    "ZZ",
     "WZ",
     "WW",
 ]
