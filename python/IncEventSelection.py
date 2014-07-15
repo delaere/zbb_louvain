@@ -153,7 +153,8 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
-  bestDiLeptcandidate = event.bestDiLeptCandidate
+  bestDiLeptcandidate = event.ptSortedLeptons_DRll
+  nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all
   nlept = 0
   # output[0]: Trigger
@@ -170,12 +171,13 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     output.append(0)
     output.append(0)
   else:
-    for i in range(0,3) :
-      if bestDiLeptcandidate[i] is not None:
-        nlept += 1
+
     lept1=bestDiLeptcandidate[0]
     lept2=bestDiLeptcandidate[1]
-    lept3= bestDiLeptcandidate[2]
+    if nlept >2:
+      lept3= bestDiLeptcandidate[2]
+    else:
+      lept3=None
     l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
     l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
     mass=(l1+l2).M()

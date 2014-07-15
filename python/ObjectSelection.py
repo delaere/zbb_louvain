@@ -870,7 +870,8 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
     return None
-
+    
+    
 def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
   cand = getattr(event, bestLeptonCand)
   if cand is None : return None
@@ -882,6 +883,7 @@ def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
       return [cand.daughter(0), cand.daughter(1)]
     except:
       return [None, None]
+
 
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
