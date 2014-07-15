@@ -1,19 +1,19 @@
 from basicConfig import *
 
 #update dilepton selection
-changeDiLeptCand(conf = configuration, names = {"leptonsPair" : "bestDiLeptCandidate"})
+changeDiLeptCand(conf = configuration, names = {"leptonsPair" : "ptSortedLeptons_DRll"})
 
 class configuration(configuration):
 
   #config file used
   eventSelection = configuration.pythonpath+"IncEventSelection"
-  
+
   # mode: plots or dataset
   runningMode = "plots"
-  
+
   #produce EMU or LL CP:
   run_on_emu = False
-  
+
   #information about the MET cut
   #NB : the choice to cut on MET or on MET significance is done in eventSelection
   MetCut = 50   # Define the value of the met threshold

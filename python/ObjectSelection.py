@@ -744,10 +744,10 @@ def leptonsFromPV_ptSorted(event):
  	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight") and isFromVertex_SingleLepton(electron,0.05,event.vertex)]
 	lepList=muList+elList
 	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
-	return ptSortedLepList
+	return ptSortedLepList if len(ptSortedLepList)>1 else None
 
 def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3):
-	if len(event.ptSortedLeptons)>1:
+	if event.ptSortedLeptons is not None :
 		l1=event.ptSortedLeptons[0]
 		l2=event.ptSortedLeptons[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
@@ -876,7 +876,7 @@ def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
   if cand is None : return None
   if type(cand) is list or type(cand) is tuple:
     if not len(cand)>1 : return None
-    return cand[:2]
+    return cand
   else:
     try:
       return [cand.daughter(0), cand.daughter(1)]
