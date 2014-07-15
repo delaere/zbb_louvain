@@ -19,20 +19,22 @@ if theConfig is not None:
 mode = configuration.runningMode
 
 dir_plot = {
-    "abdollah": "",
-    "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-    "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
-    "cbeluffi": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
-    "vizangarciaj": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
-    }
+
+  "abdollah": "/home/fynu/acaudron/scratch/",
+  "acaudron": "/home/fynu/acaudron/scratch/",
+  "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
+  "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
+  "vizangarciaj": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
+}
 
 dir_rds = {
-    "abdollah": "",
-    "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-    "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
-    "cbeluffi": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
-    "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testJune2014/",
-    }
+  "abdollah": "/home/fynu/acaudron/scratch/",
+  "acaudron": "/home/fynu/acaudron/scratch/",
+  "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
+  "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
+  "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testJune2014/",
+}
+
 
 
         
