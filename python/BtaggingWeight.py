@@ -32,11 +32,24 @@ class BtaggingWeight:
     #reminder: in the engine, the HP includes always HE.
     if   mode==self.WP[1]: self.engine.setLimits(1,999,0,999)
     elif mode==self.WP[0]: self.engine.setLimits(1,999,1,999)
-    elif mode==self.WP[1]+"excl": self.engine.setLimits(1,1,0,1)
+    elif mode==self.WP[1]+"excl": self.engine.setLimits(1,1,0,1)# M exclu
     elif mode==self.WP[0]+"excl": self.engine.setLimits(1,1,1,1)
     elif mode==self.WP[1]+self.WP[1]: self.engine.setLimits(2,999,0,999)
     elif mode==self.WP[1]+self.WP[0]: self.engine.setLimits(2,999,1,999)
     elif mode==self.WP[0]+self.WP[0]: self.engine.setLimits(2,999,2,999)
+    
+    elif mode==self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(2,2,0,1)#LL exclu
+    elif mode==self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(2,2,2,2)#MM exclu
+    elif mode==self.WP[1]+self.WP[0]+"excl": self.engine.setLimits(2,2,1,1)#ML exclu
+    
+    elif mode==self.WP[1]+self.WP[1]+self.WP[1]: self.engine.setLimits(3,999,0,999)#LLL exclu
+    elif mode==self.WP[0]+self.WP[0]+self.WP[0]: self.engine.setLimits(3,999,3,999)#MMM exclu    
+    
+    elif mode==self.WP[1]+self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(3,3,0,1)#LLL exclu
+    elif mode==self.WP[0]+self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(3,3,3,3)#MMM exclu
+   
+    
+    
     else: 
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)
@@ -89,12 +102,32 @@ class BtaggingWeight:
     return result
 
   def btaggingWeightMode(self,catName):
-    if catName.find("(HEHE") != -1:
-      return self.WP[1]+self.WP[1]
+  
+    if catName.find("(HEHEHE") != -1:
+      if catName.find("exclusive") != -1:
+        return self.WP[1]+self.WP[1]+self.WP[1]+"excl"
+      else:
+        return self.WP[1]+self.WP[1]+self.WP[1]
+    elif catName.find("(HPHPHP") != -1:
+      if catName.find("exclusive") != -1:
+        return self.WP[0]+self.WP[0]+self.WP[0]+"excl"
+      else:
+        return self.WP[0]+self.WP[0]+self.WP[0]	
+    elif catName.find("(HEHE") != -1:
+      if catName.find("exclusive") != -1:
+        return self.WP[1]+self.WP[1]+"excl"
+      else:
+        return self.WP[1]+self.WP[1]
     elif catName.find("(HEHP") != -1:
-      return self.WP[1]+self.WP[0]
+      if catName.find("exclusive") != -1:
+        return self.WP[1]+self.WP[0]+"excl"
+      else:
+        return self.WP[1]+self.WP[0]
     elif catName.find("(HPHP") != -1:
-      return self.WP[0]+self.WP[0]
+      if catName.find("exclusive") != -1:
+        return self.WP[0]+self.WP[0]+"excl"
+      else:
+        return self.WP[0]+self.WP[0]
     elif catName.find("(HE") != -1:
       if catName.find("exclusive") != -1:
         return self.WP[1]+"excl"

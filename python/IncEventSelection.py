@@ -39,8 +39,8 @@ if configuration.run_on_emu == True:
 else:
   categories = [ 
   "Trigger", 
-  "ll + 2b (HPHP) + Mll < 20 GeV ",
-  "ll + 2b (HPHP) + Mll < 20 GeV + METSIG",      
+  "ll + 2b (HPHP) + Mll > 20 GeV ",
+  "ll + 2b (HPHP) + Mll > 20 GeV + METSIG",      
   "ll + 2b (HPHP) + 20 <  Mll < 60 GeV ",
   "ll + 2b (HPHP) + 20 <  Mll < 60 GeV + METSIG",
   "ll + 2b (HPHP) + 60 <  Mll < 120 GeV ",
@@ -111,10 +111,10 @@ def isInCategoryChannel(category, categoryTuple):
     # category 0: Trigger
     if category==0:
       return categoryTuple[0]==1
-   # category 1:e-e + 2b (HPHP) + Mll <20  GeV
+   # category 1:e-e + 2b (HPHP) + Mll >20  GeV
     elif category==1:
-      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1 and categoryTuple[2] > 10 and categoryTuple[2] < 20
-   # category 2:e-e + 2b (HEHE) + Mll < 20 GeV + MET_sig
+      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1 and categoryTuple[2] > 10 and categoryTuple[2] > 20
+   # category 2:e-e + 2b (HEHE) + Mll > 20 GeV + MET_sig
     elif category==2:
       return isInCategoryChannel(1, categoryTuple) and categoryTuple[8]>0 
    # category 3:e-e + 2b (HEHE) + 20 < Mll < 60 GeV 
@@ -186,18 +186,18 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
       mass3 =  (l3+l1).M()
 
     
-    if lept1.isMuon() and lept2.isMuon() and nlept==2:
+    if lept1.isMuon() and lept2.isMuon() :
       #mumu channel only filled for muChannel=True
       if muChannel:
         output.append(1)
       else: output.append(0)
       #ee channel only filled for eleChannel=True
-    if lept1.isElectron() and lept2.isElectron() and nlept==2:
+    if lept1.isElectron() and lept2.isElectron() :
       #elel channel only filled for elChannel=True
       if eleChannel:
         output.append(2)
       else: output.append(0)
-    if (lept1.isElectron() and lept2.isMuon()) or (lept2.isElectron() and lept1.isMuon()) and nlept == 2:
+    if (lept1.isElectron() and lept2.isMuon()) or (lept2.isElectron() and lept1.isMuon()) :
       output.append(3) 
     if nlept > 2:
       output.append(4)
