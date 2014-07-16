@@ -94,7 +94,8 @@ def CreateTheShellFile(argv):
 	if   argv[0]=='BASH':
 		if Jobs_RunHere==0:
                 	shell_file.write('cd -\n')
-                shell_file.write(argv[1] + " %s\n" % function_argument)
+                #shell_file.write(argv[1] + " %s\n" % function_argument)
+                shell_file.write(argv[1] + '\n\n\n')
         elif argv[0]=='ROOT':
 		if Jobs_RunHere==0:
                 	shell_file.write('cd -\n')
