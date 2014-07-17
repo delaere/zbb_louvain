@@ -154,9 +154,9 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
   bestDiLeptcandidate = event.ptSortedLeptons_DRll
-  nlept= len(bestDiLeptcandidate)
+  if bestDiLeptcandidate is None : nlept=0
+  else : nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all
-  nlept = 0
   # output[0]: Trigger
   checkTrigger = event.object().event().eventAuxiliary().isRealData()
 #  if checkTrigger==False or (event.isMuTriggerOK and muChannel and not eleChannel) or (event.isEleTriggerOK and eleChannel and not muChannel) or (event.isINCTriggerOK and eleChannel and muChannel):
