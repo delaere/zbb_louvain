@@ -15,6 +15,8 @@ class LeptonsReweightingControlPlots(BaseControlPlots):
       self._muChannel = muChannel
       # declare histograms
       self.add("weight","weight",200,0,2)
+      self.add("weight_OneExtraLep","weight_OneExtraLep",200,0,2)
+      self.add("weight_TwoExtraLep","weight_TwoExtraLep",200,0,2)
 
     def process(self, event):
       """LeptonsReweightingControlPlots"""
@@ -25,6 +27,8 @@ class LeptonsReweightingControlPlots(BaseControlPlots):
         result["weight"] = event.weight(weightList=["Leptons"], forceMode="Electron")
       elif self._muChannel == True:
         result["weight"] = event.weight(weightList=["Leptons"], forceMode="Muon")
+      result["weight_OneExtraLep"] = event.weight(weightList=["Leptons"], forceMode="3lep")
+      result["weight_TwoExtraLep"] = event.weight(weightList=["Leptons"], forceMode="4lep")
       return result
 
 if __name__=="__main__":
