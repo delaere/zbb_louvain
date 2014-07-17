@@ -9,7 +9,7 @@ class configuration(configuration):
   eventSelection = configuration.pythonpath+"IncEventSelection"
 
   # mode: plots or dataset
-  runningMode = "plots"
+  runningMode = "dataset"
 
   #produce EMU or LL CP:
   run_on_emu = False
@@ -18,7 +18,7 @@ class configuration(configuration):
   #NB : the choice to cut on MET or on MET significance is done in eventSelection
   MetCut = 50   # Define the value of the met threshold
   MetSigCut = 10   # Define the value of the met significance threshold
-  MetRegion = "High"  #Can be Low or High (the cut applied in the eventSelection will then be MetSig<MetSigCut if you chose the Low MetRegion)
+  MetRegion = "Low"  #Can be Low or High (the cut applied in the eventSelection will then be MetSig<MetSigCut if you chose the Low MetRegion)
   MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
 
   # my variables: files, systematics and other options
