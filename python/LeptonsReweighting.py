@@ -16,25 +16,25 @@ def get_eta_key(eta):
    elif (abs(eta)> 0.9 and abs(eta)<=1.2):
       range = 'ptabseta0.9-1.2'
    elif (abs(eta)> 1.2 and abs(eta)<= 2.1 ):
-      range = 'ptabseta1.2-2.1'   
+      range = 'ptabseta1.2-2.1'
    elif (abs(eta)> 2.1 and abs(eta)<= 2.4 ):
       range = 'ptabseta2.1-2.4'
    else:
       print 'ERROR: value not in range'
-              
+
    return range
 
 def get_eta_singleLeg_trigger_key(eta):
 ## N.B. needed for a different syntax for the new pkl file :-(
    range =''
    if ( abs(eta)<=0.9):
-      range = '0.0,0.9'                  
+      range = '0.0,0.9'
    elif (abs(eta)> 0.9 and abs(eta)<=1.2):
       range = '0.9,1.2'
    elif (abs(eta)> 1.2 and  abs(eta)<= 2.1 ):
-      range = '1.2,2.1'      
+      range = '1.2,2.1'
    elif (abs(eta)> 2.1 and  abs(eta)<= 2.4 ):
-      range = '2.1,2.4'   
+      range = '2.1,2.4'
    else:
       print 'ERROR: value not in range'
 
@@ -44,7 +44,7 @@ def get_eta_trigger_key(eta1,eta2):
 ## N.B. needed for a different syntax for the new pkl file :-(
    range =''
    if (( abs(eta1)<=0.9 and abs(eta2)<=0.9 )):
-      range = '(0.0,0.9)(0.0,0.9)'                  
+      range = '(0.0,0.9)(0.0,0.9)'
    elif ((abs(eta1)> 0.9 and abs(eta1)<=1.2 and abs(eta2)<=0.9) or (abs(eta2)> 0.9 and abs(eta2)<=1.2 and abs(eta1)<=0.9)):
       range = '(0.9,1.2)(0.0,0.9)'
    elif ((abs(eta1)> 0.9 and abs(eta1)<=1.2 and abs(eta2)> 0.9 and abs(eta2)<=1.2 ) or (abs(eta2)> 0.9 and abs(eta2)<=1.2 and abs(eta1)> 0.9 and abs(eta1)<=1.2 )):
@@ -62,7 +62,7 @@ def get_eta_trigger_key(eta1,eta2):
    elif ((abs(eta1)> 2.1 and abs(eta1)<= 2.4 and abs(eta2)> 0.9 and abs(eta2)<=1.2 ) or ( abs(eta2)> 2.1 and  abs(eta2)<= 2.4 and abs(eta1)> 0.9 and abs(eta1)<=1.2 ) ):
       range = '(2.1,2.4)(0.9,1.2)'
    elif ((abs(eta1)> 2.1 and  abs(eta1)<= 2.4 and abs(eta2)> 2.1 and  abs(eta2)<= 2.4 ) ):
-      range = '(2.1,2.4)(2.1,2.4)' 
+      range = '(2.1,2.4)(2.1,2.4)'
    else:
       print 'ERROR: value not in range'
 
@@ -70,7 +70,7 @@ def get_eta_trigger_key(eta1,eta2):
 
 def get_etaFiner_key(eta):
 ## N.B. obsolete, but kept
-   
+
    range= ''
    if (eta>=-2.4 and eta< -2.1):
       range = '-2.4_-2.1'
@@ -106,12 +106,12 @@ def get_etaFiner_key(eta):
       print 'ERROR: value not in eta range'
 
    return range
-  
+
 def get_pt_key(pt):
-   
+
    range = ''
    if (pt>=10 and  pt< 20 ):
-      range = '10_20'   
+      range = '10_20'
    elif (pt>=20 and  pt< 25 ):
       range = '20_25'
    elif (pt>=25 and  pt< 30 ):
@@ -136,82 +136,82 @@ def get_pt_key(pt):
    return range
 
 class EleIDISO_SFReader:
-   
+
   def __init__(self):
      """Embedding Ele ID-ISO SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdMedium_2012rereco.txt', 'r')
      if f:
-        self._file = f 
+        self._file = f
      else :
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
 
-       self._file.seek(0,0) 
+       self._file.seek(0,0)
        for line in self._file:
-           vals = line.split() # find a new way for splitting           
+           vals = line.split() # find a new way for splitting
            # === DEBUG ===
            #print line
            #print 'pt/eta', pt , eta
            #print 'abs(eta)', abs(eta)
-           
+
            if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)<float(vals[3])):
               if mode == '0'  :
-                 return float(vals[4])                
+                 return float(vals[4])
               elif mode == '+1'  :
                  return float(vals[5])
-              elif mode == '-1'  :   
+              elif mode == '-1'  :
                  return float(vals[6])
-              else:  
+              else:
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-       if (pt<=500):       
+       if (pt<=500):
           print 'WARNING: Any electron sf range matching the specified eta/pt'
        return 1.
 
 
 class EleTriggerHighPtLeg_SFReader:
-   
+
   def __init__(self):
      """Embedding Electron Trigger High leg SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_IdMediumTrigger17Leg_2012rereco.txt', 'r')
      if f:
-        self._file = f  
+        self._file = f
      else :
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
-        self._file.seek(0,0) 
+        self._file.seek(0,0)
         for line in self._file:
            vals = line.split() # find a new way for splitting
-        
+
            if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)< float(vals[3])):
               if mode == '0'  :
                  return float(vals[4])
               elif mode == '+1'  :
                  return float(vals[5])
-              elif mode == '-1'  :   
+              elif mode == '-1'  :
                  return float(vals[6])
-              else:  
+              else:
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-        if (pt<=500):   
+        if (pt<=500):
            print 'WARNING: Any electron sf range matching the specified eta/pt '
         return 1.
 
 
 class EleTriggerLowPtLeg_SFReader:
-   
+
   def __init__(self):
      """Embedding Electron Trigger Low leg SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_IdMediumTrigger8Leg_2012rereco.txt', 'r')
      if f:
-        self._file = f  
+        self._file = f
      else :
         print 'ERROR: Input file for muon SF not existing!'
 
   def value(self,pt,eta,mode):
-        self._file.seek(0,0) 
+        self._file.seek(0,0)
         for line in self._file:
            vals = line.split() # find a new way for splitting
            if( pt>= float(vals[0]) and pt<float(vals[1]) and abs(eta)>= float(vals[2]) and abs(eta)< float(vals[3])):
@@ -219,16 +219,16 @@ class EleTriggerLowPtLeg_SFReader:
                  return float(vals[4])
               elif mode == '+1'  :
                  return float(vals[5])
-              elif mode == '-1'  :   
+              elif mode == '-1'  :
                  return float(vals[6])
-              else:  
+              else:
                  print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
                  return 0
-        if (pt<=200):   
+        if (pt<=200):
            print 'WARNING: Any electron sf range matching the specified eta/pt'
         return 1.
-       
-         
+
+
 class PtEtaMap:
    """A binned map in pt and eta.
       Bins are defined at construction time by defining the bin edges.
@@ -264,7 +264,7 @@ class PtEtaMap:
 
    def __check(self):
      """Do some basic sanity checks"""
-     if len(self._data)!=len(self._ptbins)+1: 
+     if len(self._data)!=len(self._ptbins)+1:
        raise IndexError('Pt bins mismatch')
      for ptbin in self._data:
        if len(ptbin)!=len(self._etabins)+1:
@@ -290,7 +290,7 @@ class PtEtaMap:
      representation += "Data:" + "\n" + repr(self._data)
      return representation
 
-   def __len__(self): 
+   def __len__(self):
      return (len(self._etabins)+1)*(len(self._ptbins)+1)
 
 #===  Muon ID SF
@@ -320,10 +320,10 @@ class MuonIDSFReader:
      if mode == '0'  :
         return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
      elif mode == '+1'  :
-        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi'] 
+        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
      elif mode == '-1' :
         return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
-     else:  
+     else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
 
@@ -354,17 +354,17 @@ class MuonISOSFReader:
      if mode == '0'  :
         return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
      elif mode == '+1'  :
-        return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi'] 
+        return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
      elif mode == '-1' :
         return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
-     else:  
+     else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
-        return 0    
-        
+        return 0
 
-#=== Muon Trigger efficiencies 
+
+#=== Muon Trigger efficiencies
 #=== 2012ABC for Mu17Mu8 OR Mu17TkMu8
-        
+
 class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
    """A binned map in eta of both muons for HLT 2012 trigger efficiencies.
       Values can be extracted are (value,error). """
@@ -381,7 +381,7 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
    def value(self,eta1,eta2,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
-     
+
      #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
      self._eta_range= get_eta_trigger_key(eta1,eta2)  ## new one
 
@@ -389,9 +389,9 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
         return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['efficiency']
      elif mode == '+1'  :
         return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' : 
+     elif mode == '-1' :
         return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     else:  
+     else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
 
@@ -413,7 +413,7 @@ class MuonTriggerEffReader_Mu17Leg:
    def value(self,eta1,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
-     
+
      #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
      self._eta_range= "("+get_eta_singleLeg_trigger_key(eta1)+")"
 
@@ -421,9 +421,9 @@ class MuonTriggerEffReader_Mu17Leg:
         return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
      elif mode == '+1'  :
         return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' : 
+     elif mode == '-1' :
         return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     else:  
+     else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
 
@@ -445,7 +445,7 @@ class MuonTriggerEffReader_Mu8Leg:
    def value(self,eta1,mode):
 
      """Return the eff or the uncertainty for a given pt and eta."""
-     
+
      #self._eta_range= "("+get_eta_trigger_key(eta1)+")("+get_eta_trigger_key(eta2)+")"
      self._eta_range= "("+get_eta_singleLeg_trigger_key(eta1)+")"  ## new one
      #print self._eta_range
@@ -454,10 +454,10 @@ class MuonTriggerEffReader_Mu8Leg:
         return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
      elif mode == '+1'  :
         return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' : 
+     elif mode == '-1' :
         return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
 
-     else:  
+     else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
 
@@ -473,7 +473,7 @@ class LeptonsReWeighting:
      self._muISOWeight  = MuonISOSFReader()
      self._muTRIGGERWeight  = MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8()
      self._mu17TrgWeight  = MuonTriggerEffReader_Mu17Leg()
-     self._mu8TrgWeight  = MuonTriggerEffReader_Mu8Leg() 
+     self._mu8TrgWeight  = MuonTriggerEffReader_Mu8Leg()
 
      self._eleIDISOWeight = EleIDISO_SFReader()
      self._ele17TrgWeight = EleTriggerHighPtLeg_SFReader()
@@ -494,19 +494,19 @@ class LeptonsReWeighting:
        return lw
      else:
        return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
-         
+
 
 
    def uncertainty_mm(self,m1,m2):
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
-     
+
      unc =  (self._muIDWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDWeight.value(m1.pt(),m1.eta(),'0') +   \
             self._muIDWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDWeight.value(m2.pt(),m2.eta(),'0'))**2 +   \
             (self._muISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muISOWeight.value(m1.pt(),m1.eta(),'0') + \
             self._muISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muISOWeight.value(m2.pt(),m2.eta(),'0'))**2 + \
             (self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'+1')/self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'0'))**2
-         
+
      return sqrt(unc)
 
 
@@ -517,7 +517,7 @@ class LeptonsReWeighting:
      lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
      lw *= self._eleIDISOWeight.value(e2.pt(),e2.eta(),'0')
      lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele8TrgWeight.value(e2.pt(),e2.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._ele17TrgWeight.value(e2.pt(),e2.eta(),'0')  ## formula for the asymmetric trigger
-          
+
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
@@ -525,7 +525,7 @@ class LeptonsReWeighting:
 
 
    def uncertainty_ee(self,e1,e2):
-     ## TBD (rc feb.2014) 
+     ## TBD (rc feb.2014)
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
      # reco
@@ -547,15 +547,15 @@ class LeptonsReWeighting:
      #outcome
      return sqrt(unc)
 
-   
+
    def weight_em(self,e1,m1):
      """Event weight for e-mu events."""
      lw = 1.
-     
+
      # The final per-event weight (convolving ID, ISO and Trigger)
 
      lw *= self._muIDWeight.value(m1.pt(),m1.eta(),'0')
-     lw *= self._muISOWeight.value(m1.pt(),m1.eta(),'0')     
+     lw *= self._muISOWeight.value(m1.pt(),m1.eta(),'0')
      lw *= self._eleIDISOWeight.value(e1.pt(),e1.eta(),'0')
      lw *= self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu8TrgWeight.value(m1.eta(),'0') + self._ele8TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.eta(),'0') - self._ele17TrgWeight.value(e1.pt(),e1.eta(),'0')* self._mu17TrgWeight.value(m1.eta(),'0')  ## formula for the OR of the unprescaled  e-mu triggers
 
@@ -563,16 +563,41 @@ class LeptonsReWeighting:
        return lw
      else:
        return lw + configuration.LeptonTnPfactor*self.uncertainty_em(e1,m1)
-         
+
    def uncertainty_em(self,e1,m1):
-     ## TBD (rc may.2014) 
+     ## TBD (rc may.2014)
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
      # reco
      unc =  1.0 # --> TO BE IMPLEMENTED! FIXME
      return sqrt(unc)
 
-  
+   def weight_extraLeptons(self, leptons, nTotSelectedLep=2):
+	"""Extra weight for requiring additionnal (wrt 2) leptons."""
+	if leptons is None :
+		return 0
+	if len(leptons)<nTotSelectedLep :
+		return 0
+	lw=1.0
+	for lepton in leptons[2:nTotSelectedLep] :
+            if lepton.isMuon() :
+                lw *= self._muIDWeight.value(lepton.pt(),lepton.eta(),'0')
+                lw *= self._muISOWeight.value(lepton.pt(),lepton.eta(),'0')
+            elif lepton.isElectron() :
+                lw *= self._eleIDISOWeight.value(lepton.pt(),lepton.eta(),'0')
+        if abs(configuration.LeptonTnPfactor)<0.01 :
+                return lw
+        else:
+                return lw + configuration.LeptonTnPfactor*self.uncertainty_extraLeptons(leptons,nTotSelectedLep)
+	
+   def uncertainty_extraLeptons(self, leptons, nTotSelectedLep):
+     """Relative uncertainty on the total weight.
+        We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
+     unc =  1.0  # --> TO BE IMPLEMENTED!
+     return sqrt(unc)
+
+
+
    def weight( self, fwevent=None, electrons=None, muons=None, category=None, forceMode = None):
      """Lepton eff weight"""
      # if fwevent is defined, get electrons and muons from there
@@ -600,18 +625,45 @@ class LeptonsReWeighting:
            if muel is None : return 1.
            if muel[0].isElectron() : return self.weight_em(muel[0],muel[1])
            else : return self.weight_em(muel[1],muel[0])
+	 elif forceMode == "3lep":
+	   leptons = fwevent.leptonsPair
+	   return self.weight_extraLeptons(leptons,nTotSelectedLep=3)
+	 elif forceMode == "4lep":
+	   leptons = fwevent.leptonsPair
+	   return self.weight_extraLeptons(leptons,nTotSelectedLep=4)
          else :
+           catName = categoryName(category)
            leptons = fwevent.leptonsPair
            if leptons is None :
 	     return 1
            if leptons[0].isMuon() and leptons[1].isMuon() :
-	     return self.weight_mm(leptons[0],leptons[1])
+		if catName.find("3lep")!=-1 :
+			return self.weight_mm(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=3)
+	        elif catName.find("4lep")!=-1 :
+			return self.weight_mm(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=4)
+		else :
+			return self.weight_mm(leptons[0],leptons[1])
            elif leptons[0].isElectron() and leptons[1].isElectron() :
-	     return self.weight_ee(leptons[0],leptons[1])
+		if catName.find("3lep")!=-1 :
+                        return self.weight_ee(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=3)
+                elif catName.find("4lep")!=-1 :
+                        return self.weight_ee(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=4)
+                else :
+                        return self.weight_ee(leptons[0],leptons[1])
 	   elif leptons[0].isElectron() and leptons[1].isMuon() :
-	     return self.weight_em(leptons[0],leptons[1])
+		if catName.find("3lep")!=-1 :
+                        return self.weight_em(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=3)
+                elif catName.find("4lep")!=-1 :
+                        return self.weight_em(leptons[0],leptons[1])*self.weight_extraLeptons(leptons,nTotSelectedLep=4)
+                else :
+                        return self.weight_em(leptons[0],leptons[1])
            elif leptons[0].isMuon() and leptons[1].isElectron() :
-	     return self.weight_em(leptons[1],leptons[0])
+		if catName.find("3lep")!=-1 :
+                        return self.weight_em(leptons[1],leptons[0])*self.weight_extraLeptons(leptons,nTotSelectedLep=3)
+                elif catName.find("4lep")!=-1 :
+                        return self.weight_em(leptons[1],leptons[0])*self.weight_extraLeptons(leptons,nTotSelectedLep=4)
+                else :
+                        return self.weight_em(leptons[1],leptons[0])
            else : print "None of the case was found: MuMu, ElEl, MuEl, ElMu..."
        return 1.
 
