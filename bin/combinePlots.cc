@@ -29,6 +29,7 @@ class plotCombiner {
        _lat = new TLatex(0.2,0.87,options.getUntrackedParameter("label",std::string("")).c_str());
        _leg = new TLegend(0.6,0.7,0.9,0.9);
        _legendCompleted = false;
+       _ratioPlot = options.getUntrackedParameter("ratioPlot",false);
      }
      ~plotCombiner() { 
        delete _lat;
@@ -71,7 +72,7 @@ class plotCombiner {
      std::vector<TDirectory*> _filesData;
      std::vector<TDirectory*> _filesMC;
      std::map<std::string, edm::ParameterSet> _styleTweaks;
-     bool _nostack, _autoLumiScaling, _legendCompleted;
+     bool _nostack, _autoLumiScaling, _legendCompleted, _ratioPlot;
      double _lumi;
      TLegend* _leg;
      TLatex* _lat;
@@ -227,10 +228,21 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    // create everything, using also first data histo
    gROOT->SetStyle("tdrStyle");
    TH1* data;
+   TH1D * myStk = 0;
    (*datadirs.begin())->cd();
    (*datadirs.begin())->GetObject(name,data);
    data = (TH1*) data->Clone();
    TCanvas* c = new TCanvas(data->GetName(),data->GetTitle(),500,500);
+   //for the main histogram
+   TPad *pad1 = 0;
+   //for the ratio
+   TPad *pad2 = 0;	
+   if(_ratioPlot){
+   	pad1 = new TPad("pad1","pad1",0,0.15,1,1);
+   	pad2 = new TPad("pad2","pad1",0,0,1,0.15);
+	pad2->SetGridy();
+   }
+    
    THStack* stack = new THStack(data->GetName(),"MC stack");
    THStack* nostack = new THStack(data->GetName(),"MC stack - not stacked");
    // DATA
@@ -288,10 +300,34 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      _legendCompleted = true;
    }
    if(drawData) {
-     data->Draw("e");         // first draw data... that fixes the scale
-     stack->Draw("hist, same");   // then the stack on top
-     nostack->Draw("nostack, hist, same");     // then the unstacked histograms on top
-     data->Draw("e, same");   // and again data to see all points
+     if(!_ratioPlot){	
+     	data->Draw("e");         // first draw data... that fixes the scale
+     	stack->Draw("hist, same");   // then the stack on top
+     	nostack->Draw("nostack, hist, same");     // then the unstacked histograms on top
+     	data->Draw("e, same");   // and again data to see all points
+     } else {
+	c->cd();
+	pad1->Draw();
+	pad1->cd();
+	data->Draw("e");
+        stack->Draw("hist, same");   // then the stack on top
+        nostack->Draw("nostack, hist, same");     // then the unstacked histograms on top
+        data->Draw("e, same"); 
+	c->cd();
+	pad2->Draw();
+	pad2->cd();
+	myStk = (TH1D*)stack->GetStack()->Last()->Clone("ratio");
+	//myStk->Sumw2();
+	myStk->GetYaxis()->SetTitle("MC/Data");
+	myStk->GetYaxis()->SetTitleOffset(0.35);
+	myStk->GetYaxis()->SetTitleSize(0.24);
+	myStk->GetYaxis()->SetLabelSize(0.17);
+	myStk->SetStats(0);
+	myStk->SetMarkerStyle(20);
+	myStk->Divide(data);
+	myStk->Draw("ep");   
+	c->cd();	
+     }
    } else {
      stack->Draw();         // draw the mc alone
      nostack->Draw("nostack, same");// draw the mc alone
@@ -322,8 +358,15 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
    _leg->SetX2NDC(_leg->GetX1NDC()+0.3);
    _leg->SetY1NDC(0.65 - fontsize);
    _leg->SetY2NDC(0.85 - fontsize);
-   _leg->Draw();               // draw the legend
-   c->UseCurrentStyle();
+   if(!_ratioPlot){
+	c->cd();
+   	_leg->Draw();               // draw the legend
+   	c->UseCurrentStyle();
+   }else{
+	pad1->cd();
+	_leg->Draw();
+	pad1->UseCurrentStyle();
+   }
    if(style!=_styleTweaks.end()) {
      // we might add in the config file a set of entries to set labels, axis, etc.
      // everything is done using untracked parameters, so it is easy and quick to add things.
@@ -331,8 +374,15 @@ void plotCombiner::CombineHistos(const char* name, std::vector<TDirectory*> data
      data->SetYTitle(style->second.getUntrackedParameter("labely",std::string("")).c_str());
      if(style->second.getUntrackedParameter("logx",false)) c->SetLogx();
      if(style->second.getUntrackedParameter("logy",false)) c->SetLogy();
+     if(_ratioPlot){
+	if(style->second.getUntrackedParameter("logx",false)) pad1->SetLogx();
+	if(style->second.getUntrackedParameter("logy",false)) pad1->SetLogy();
+     }
      std::vector<double> xrange = style->second.getUntrackedParameter("rangex",std::vector<double>());
      if(xrange.size()==2) data->GetXaxis()->SetRangeUser(xrange[0],xrange[1]);
+     if(_ratioPlot && xrange.size()==2)	
+	if(myStk != NULL)
+	   myStk->GetXaxis()->SetRangeUser(xrange[0],xrange[1]);
    }
    output->WriteObject(c,c->GetName());
    // cleanup
@@ -432,4 +482,5 @@ void plotCombiner::CombineDir(std::vector<TDirectory*> datadirs, std::vector<TDi
      }
    }
 }
+
 
