@@ -276,6 +276,38 @@ def isTriggerIncOK(event,perRun=True):
   return (outcome and isTriggerMatchDileptcandidate(bestDileptcandidate,runNumber,event.lumi()))
 
 
+def isTriggerHambOK(event,perRun=True):
+  """Checks if the proper trigger is passed"""
+  # Only simple case: mu trigger for mu channel (1)
+  triggerInfo = event.triggerInfo
+  runNumber = event.run()
+  l1= None
+  l2= None
+  bestDileptcandidate = event.bestHambDiMuCandidate
+  if bestDileptcandidate is not None:
+    l1=bestDileptcandidate[0]
+    l2=bestDileptcandidate[1]
+  if triggerInfo is None:
+    return True
+  paths = triggerInfo.acceptedPaths()
+  #for i in range(paths.size()) : print paths[i].name()
+  pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+  intersect = set()
+  if l1 is not None and l2 is not None:
+    if l1.isMuon() and l2.isMuon():
+      if not perRun:
+        intersect = set(pathnames) & set(ourtriggers.mutriggers)
+      else:
+        if ourtriggers.murunMap[runNumber] is None:
+          print "muon unexpected runNumber : " , runNumber
+        else:
+          intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
+  outcome = len(intersect)>0
+  return (outcome and isTriggerMatchDileptcandidate(bestDileptcandidate,runNumber,event.lumi()))
+
+
+
+
 def isLooseMuon(muon):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
@@ -870,7 +902,19 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
     return None
-    
+
+
+
+def findBestHambDiMuCandidate(event, muChannel=True):
+  muList = []
+  for mu in event.muons:
+    if isGoodMuon(mu, "tight"):
+        muList.append(mu)
+  if len(muList) < 2: return None
+  if muList[0] is None or muList[1] is None: return None
+  if not (isfromVertex(muList[0], muList[1], 0.05)):
+    return None
+  return (muList[0],muList[1])    
     
 def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
   cand = getattr(event, bestLeptonCand)
