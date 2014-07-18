@@ -47,47 +47,19 @@ categories = [
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
 
 def isInCategory(category, categoryTuple):
-  #print "=================================="
-  #print category
-  #print len(categories)
-  #mylen = len(categoryTuple)
-  #print len(categoryTuple)
-  #print "What is category number?"
-  #print category%len(categories)
-  #print "What is first? "  
-  #myS1 = :len(categoryTuple)/2
-  #print myS1
-  #print "What is second?"
-  #print len(categoryTuple)/2:
-  #print "+++++++++++++++"
-  #for mys in range(0,mylen):
-  #  print categoryTuple[mys]
-  #print "+++++++++++++++"
-  #print categoryTuple[:len(categoryTuple)/2]
-  #print categoryTuple[:6]
-  #print categoryTuple[0:6]
-  #print "---------------"
-  
-  #print categoryTuple[len(categoryTuple)/2:]
-  #print categoryTuple[6:]
-  #print categoryTuple[6:12]
-
   return isInCategoryChannel(category,categoryTuple)
-  #if category<len(categories):
-  #  return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
-  #else:
-  #  return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
 
 def isInCategoryChannel(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
   # category 0: Trigger
   if category==0:
     return categoryTuple[0]==1
-
  # category 1:mu-mu + 2b (HPHP) + 20 < Mll <70  GeV
   elif category==1:
-    return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
-
+    if (not configuration.mHblind):
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
+    else:
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > 20 and categoryTuple[2] < 70  and not (abs(categoryTuple[12]) < configuration.mHwindow)
  # category 2:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==2:
     return isInCategoryChannel(1, categoryTuple) and categoryTuple[10]>15 
@@ -114,7 +86,10 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 8:mu-mu + 2b (HPHE) + 20 < Mll <70  GeV
   elif category==8:
-    return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
+    if (not configuration.mHblind):
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
+    else:
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > 20 and categoryTuple[2] < 70 and not (abs(categoryTuple[12]) < configuration.mHwindow)
 
  # category 9:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==9:
@@ -142,7 +117,10 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 15:mu-mu + 2b (HEHE) + 20 < Mll <70  GeV
   elif category==15:
-    return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > 20 and categoryTuple[2]<70
+    if (not configuration.mHblind):
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > 20 and categoryTuple[2]<70
+    else:
+      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > 20 and categoryTuple[2]<70 and not (abs(categoryTuple[12]) < configuration.mHwindow)
 
  # category 16:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==16:
@@ -172,6 +150,8 @@ def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
   if event.object().event().eventAuxiliary().isRealData():
     configuration.JERfactor = 0
     configuration.JESfactor = 0
+  else: # do blinding only for data 
+    configuration.mHblind = False   
   return eventCategoryChannel(event, muChannel=configuration.muChannel, btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
   
 def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="bcl"):
@@ -186,6 +166,9 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   bestDiLeptcandidate = event.bestHambDiMuCandidate
   goodJets = event.goodJets_all
   nlept = 0
+  higgs = ROOT.TLorentzVector(0,0,0,0)
+  mass = -1  
+  mbb = -1
   # output[0]: Trigger
   checkTrigger = event.object().event().eventAuxiliary().isRealData()
 #  if checkTrigger==False or (event.isMuTriggerOK and muChannel and not eleChannel) or (event.isEleTriggerOK and eleChannel and not muChannel) or (event.isINCTriggerOK and eleChannel and muChannel):
@@ -195,7 +178,6 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
     output.append(0)      
   # output[1], 1: mumu, 2:ee, 3:emu, 4:more than 2 leptons
   # output[2]: di-lepton system mass, default value: -1
-  mass = -1  
   if bestDiLeptcandidate is None:
     output.append(0)
     output.append(-1) 
@@ -209,6 +191,7 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
     l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
     l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
     mass=(l1+l2).M()	
+    higgs = l1+l2
    
     if lept1.isMuon() and lept2.isMuon() and nlept==2:
       #mumu channel only filled for muChannel=True
@@ -239,7 +222,6 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   # output[8] : bb DR
   # output[9] : bb SVDR
   # output[10]: bb invariant mass, default value: -1
-  mbb = -1
   dijet = event.dijet_muChannel
   if dijet[0] is None or dijet[1] is None: 
     output.append(-1)
@@ -248,6 +230,7 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   else:
     b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
     b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+    higgs = higgs + b1 + b2  
     output.append(b1.DeltaR(b2))
     if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0:
       b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
@@ -262,12 +245,18 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
 
 
   # output[11]: "mbb - mll", default value: -999
+  # output[12]: "Higgs candidate mass - mH: 0"
   if (mbb != -1) and (mass != -1):
     output.append(abs(mbb - mass))
+    output.append(abs(higgs.M()-configuration.mH))
   else:
     output.append(-999)
-  print "The length of CategoryChannel is "
-  print len(output)
+    output.append(0)
+  #print "The length of CategoryChannel is "
+  #print len(output)
   # return the list of results
+  
+
+  
   return output
 

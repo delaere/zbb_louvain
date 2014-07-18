@@ -20,7 +20,7 @@ if theConfig is not None:
 mode = configuration.runningMode
 
 dir_plot = {
-  "ajafari": "/home/fynu/ajafari/storage/CP/V3/",
+  "ajafari": "/home/fynu/ajafari/storage/CP/V5/",
   "abdollah": "/home/fynu/acaudron/scratch/",
   "acaudron": "/home/fynu/acaudron/scratch/",
   "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
@@ -29,7 +29,7 @@ dir_plot = {
 }
 
 dir_rds = {
-  "ajafari": "/home/fynu/ajafari/storage/RDS/V3/",
+  "ajafari": "/home/fynu/ajafari/storage/RDS/V5/",
   "abdollah": "/home/fynu/acaudron/scratch/",
   "acaudron": "/home/fynu/acaudron/scratch/",
   "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
@@ -38,13 +38,10 @@ dir_rds = {
 }
 
 samples = [
-#     "DATA",
+     "DATA",
 #     "DY",
 #     "TT",
-     "ZZ",
-#     "WW",
-#     "WZ",
-#     "T",
+#     "ZZ",
 #     "ZH",
     ]
 
@@ -88,13 +85,6 @@ ZZsamples = [
     "WZ",
     "WW",
 ]
-#Tsamples = [
- #   "SingleTbar_s-Channel",
- #   "SingleT_s-Channel",
- #   "SingleT_t-Channel",
- #   "Wt",
- #   "Wtbar",
- #   ]
 mass = [125] #[110,115,120,125,130,135]
 
 MC = "Summer12"
