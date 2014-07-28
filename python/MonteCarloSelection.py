@@ -166,7 +166,7 @@ def LHEinfo(event):
       "isZ"  : -1,
       "nLep" : -1,
       "llpt" : -1,
-      "HT  " : -1,
+      "HT"   : -1,
       "nj"   : -1,
       "nb"   : -1,
       "nc"   : -1,

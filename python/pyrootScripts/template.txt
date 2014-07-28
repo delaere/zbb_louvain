@@ -1,0 +1,21 @@
+# number of channels
+imax 1
+# number of backgrounds
+jmax NCHANNELS
+# number of nuisance parameters (sources of systematic uncertainties)
+kmax *
+---------------
+# number of channels
+bin 1
+# number of observed events
+observation OBSERVED
+------------------------------
+# number of expected events, per source 
+bin             1       BINS
+process         ModInd  PROCESSES   
+process         0       ORDER    
+rate            1.0     YIELDS     
+--------------------------------
+
+
+

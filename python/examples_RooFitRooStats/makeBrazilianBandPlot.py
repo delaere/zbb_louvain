@@ -1,6 +1,6 @@
 from ROOT import *
 
-f=TFile("higgsCombineTest.Asymptotic.root")
+f=TFile("/home/fynu/acaudron/scratch/CMSSW_6_1_1/src/final_results_ZH/higgsCombineTest.Asymptotic.root")
 
 tree = f.Get("limit")
 entries = tree.GetEntriesFast()
@@ -28,8 +28,8 @@ mhBin = {115:1,
 for expects in expectList:
     myTH1_cls[str(expects)] = TH1F("TH1_"+str(expects),"TH1_"+str(expects),
                                    len(mhHypoList),
-                                   min(mhHypoList)-3.,
-                                   max(mhHypoList)+3.)
+                                   min(mhHypoList)-2.5,
+                                   max(mhHypoList)+2.5)
     
 for jentry in xrange(entries) :
     # get the next tree in the chain and verify
@@ -61,9 +61,14 @@ for expects in expectList:
     
 C = TCanvas("C","C",1200,500)
 
-g_cls[-1].Draw("AC")
+line = TF1("line","1.",115,135)
+line.GetYaxis().SetRangeUser(0,13)
+line.Draw("")
 
-for expects in expectList: myTH1_cls[str(expects)].Draw("AC,same")
+for expects in expectList: myTH1_cls[str(expects)].Draw("C,same")
+
+#g_cls[-1].Draw("AC,same")
+
 
 myTH1_cls["0.975"].SetFillColor(kYellow)
 myTH1_cls["0.84"].SetFillColor(kGreen)
@@ -71,7 +76,11 @@ myTH1_cls["0.16"].SetFillColor(kYellow)
 myTH1_cls["0.025"].SetFillColor(1001)
 
 myTH1_cls["-1"].SetLineWidth(3)
-myTH1_cls["-1"].Draw("AC*,same")
+myTH1_cls["-1"].Draw("C*,same")
+
+g_cls[-1].Draw("C,same")
+
+line.Draw("same")
 
 ##################
 ### THE END :( ###

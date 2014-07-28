@@ -94,7 +94,8 @@ def CreateTheShellFile(argv):
 	if   argv[0]=='BASH':
 		if Jobs_RunHere==0:
                 	shell_file.write('cd -\n')
-                shell_file.write(argv[1] + " %s\n" % function_argument)
+                #shell_file.write(argv[1] + " %s\n" % function_argument)
+                shell_file.write(argv[1] + '\n\n\n')
         elif argv[0]=='ROOT':
 		if Jobs_RunHere==0:
                 	shell_file.write('cd -\n')
@@ -161,7 +162,7 @@ def AddJobToCmdFile():
         cmd_file.write('Executable              = %s\n'     % Path_Shell)
         cmd_file.write('output                  = %s.out\n' % Path_Log)
         cmd_file.write('error                   = %s.err\n' % Path_Log)
-        cmd_file.write('log                     = %s.log\n' % Path_Log)
+        cmd_file.write('log                     = /dev/null\n')
         cmd_file.write('Queue 1\n')
         cmd_file.close()
 

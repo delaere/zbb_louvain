@@ -953,7 +953,10 @@ def subjets(event):
       j1 = pruned.daughter(0)
       j2 = pruned.daughter(1)
   if not (j1 is None and j2 is None):
-    subjets.append(j1)
-    subjets.append(j2)
+    j1v = ROOT.TLorentzVector(j1.px(),j1.py(),j1.pz(),j1.energy())
+    j2v = ROOT.TLorentzVector(j2.px(),j2.py(),j2.pz(),j2.energy())
+    if j1v.DeltaR(j2v) >= 0.4:
+      subjets.append(j1)
+      subjets.append(j2)
   if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
   return subjets
