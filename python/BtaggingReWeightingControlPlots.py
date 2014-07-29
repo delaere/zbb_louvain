@@ -16,16 +16,20 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       self.add(WP[0],WP[0],200,0,2)
       self.add(WP[1]+"excl",WP[1]+"excl",200,0,2)
       self.add(WP[0]+"excl",WP[0]+"excl",200,0,2)
+      
       self.add(WP[1]+WP[1],WP[1]+WP[1],200,0,2)
       self.add(WP[1]+WP[0],WP[1]+WP[0],200,0,2)
       self.add(WP[0]+WP[0],WP[0]+WP[0],200,0,2)
+
+      self.add(self.WP[1]+self.WP[1]+"excl", self.WP[1]+self.WP[1]+"excl",200,0,2)
+      self.add(self.WP[0]+self.WP[0]+"excl", self.WP[0]+self.WP[0]+"excl",200,0,2)
+      self.add(self.WP[1]+self.WP[1]+self.WP[1], self.WP[1]+self.WP[1]+self.WP[1],200,0,2)
+      self.add(self.WP[0]+self.WP[0]+self.WP[0], self.WP[0]+self.WP[0]+self.WP[0],200,0,2)
+      self.add(self.WP[1]+self.WP[1]+self.WP[1]+"excl", self.WP[1]+self.WP[1]+self.WP[1]+"excl",200,0,2)
+      self.add(self.WP[0]+self.WP[0]+self.WP[0]+"excl", self.WP[0]+self.WP[0]+self.WP[0]+"excl",200,0,2)
+      self.add("0"+self.WP[1]+"excl", "0"+self.WP[1]+"excl",200,0,2)
+      self.add("0"+self.WP[0]+"excl", "0"+self.WP[0]+"excl",200,0,2)
       
-      self.add(WP[0]+WP[0]+"excl",WP[0]+WP[0]+"excl",200,0,2)      
-      self.add(WP[1]+WP[0]+"excl",WP[1]+WP[0]+"excl",200,0,2)      
-      self.add(WP[1]+WP[1]+"excl",WP[1]+WP[1]+"excl",200,0,2) 
-      
-      self.add(WP[0]+WP[0]+WP[0]+"excl",WP[0]+WP[0]+WP[0]+"excl",200,0,2) 
-      self.add(WP[1]+WP[1]+WP[1]+"excl",WP[1]+WP[1]+WP[1]+"excl",200,0,2)       
          
     def process(self,event):
       """BtaggingReWeightingControlPlots"""
@@ -39,11 +43,13 @@ class BtaggingReWeightingControlPlots(BaseControlPlots):
       result[self.WP[0]+self.WP[0]]   = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0],   btagging=self._btagging)
       
       result[self.WP[1]+self.WP[1]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[1]+self.WP[1]+"excl", btagging=self._btagging)
-      result[self.WP[1]+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[1]+self.WP[0]+"excl", btagging=self._btagging)   
-      result[self.WP[0]+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0]+"excl", btagging=self._btagging)   
-      
-      result[self.WP[0]+self.WP[0]+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0]+self.WP[0]+"excl", btagging=self._btagging) 
-      result[self.WP[1]+self.WP[1]+self.WP[1]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[1]+self.WP[1]+self.WP[1]+"excl", btagging=self._btagging) 
+      result[self.WP[0]+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0]+"excl", btagging=self._btagging)
+      result[self.WP[1]+self.WP[1]+self.WP[1]] = event.weight(weightList=["Btagging"], forceMode=self.WP[1]+self.WP[1]+self.WP[1], btagging=self._btagging)
+      result[self.WP[0]+self.WP[0]+self.WP[0]] = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0]+self.WP[0], btagging=self._btagging)
+      result[self.WP[1]+self.WP[1]+self.WP[1]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[1]+self.WP[1]+self.WP[1]+"excl", btagging=self._btagging)
+      result[self.WP[0]+self.WP[0]+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode=self.WP[0]+self.WP[0]+self.WP[0]+"excl", btagging=self._btagging)
+      result["0"+self.WP[1]+"excl"] = event.weight(weightList=["Btagging"], forceMode="0"+self.WP[1]+"excl", btagging=self._btagging)
+      result["0"+self.WP[0]+"excl"] = event.weight(weightList=["Btagging"], forceMode="0"+self.WP[0]+"excl", btagging=self._btagging)
      
               
       return result
