@@ -3,7 +3,7 @@ from basicConfig import *
 #update dilepton selection
 changeDiLeptCand(conf = configuration, names = {"leptonsPair" : "bestHambDiMuCandidate"})
 changeDiLeptCand(conf = configuration, names = {"muonsPair" : "bestHambDiMuCandidate"})
-changeJetPt(conf = configuration, ptjet=20.)
+#changeJetPt(conf = configuration, ptjet=20.)
 class configuration(configuration):
 
   #config file used
@@ -17,7 +17,17 @@ class configuration(configuration):
   MetCut = 50   # Define the value of the met threshold
   MetSigCut = 10   # Define the value of the met significance threshold
   MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
-  mHblind = True
+
+  #blinding options:
+  #0: no blinding
+  #1: data blind
+  #2: data & MC blind
+  
+  blindingOpt = 0 
+  isRealData = False
+  lowmassMu = 10 #default 20
+  highmassMu = 150 #default 70
+  
   mH = 125
   mHwindow = 20
   # my variables: files, systematics and other options

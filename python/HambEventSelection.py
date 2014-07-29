@@ -56,10 +56,17 @@ def isInCategoryChannel(category, categoryTuple):
     return categoryTuple[0]==1
  # category 1:mu-mu + 2b (HPHP) + 20 < Mll <70  GeV
   elif category==1:
-    if (not configuration.mHblind):
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
-    else:
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > 20 and categoryTuple[2] < 70  and not (abs(categoryTuple[12]) < configuration.mHwindow)
+    cat1 = isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>1 and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu
+    if (configuration.blindingOpt == 0):
+      return cat1 
+    elif (configuration.blindingOpt == 1):
+      if(configuration.isRealData):
+        return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
+      else:
+        return cat1
+    elif(configuration.blindingOpt == 2):
+      return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
+
  # category 2:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==2:
     return isInCategoryChannel(1, categoryTuple) and categoryTuple[10]>15 
@@ -86,11 +93,16 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 8:mu-mu + 2b (HPHE) + 20 < Mll <70  GeV
   elif category==8:
-    if (not configuration.mHblind):
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > 20 and categoryTuple[2] < 70
-    else:
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > 20 and categoryTuple[2] < 70 and not (abs(categoryTuple[12]) < configuration.mHwindow)
-
+    cat1 = isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5] == 1 and categoryTuple[4] == 1 and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu
+    if (configuration.blindingOpt == 0):
+      return cat1 
+    elif (configuration.blindingOpt == 1):
+      if(configuration.isRealData):
+        return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
+      else:
+        return cat1
+    elif(configuration.blindingOpt == 2):
+      return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
  # category 9:mu-mu + 2b (HPHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==9:
     return isInCategoryChannel(8, categoryTuple) and categoryTuple[10]>15
@@ -117,10 +129,16 @@ def isInCategoryChannel(category, categoryTuple):
 
  # category 15:mu-mu + 2b (HEHE) + 20 < Mll <70  GeV
   elif category==15:
-    if (not configuration.mHblind):
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > 20 and categoryTuple[2]<70
-    else:
-      return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > 20 and categoryTuple[2]<70 and not (abs(categoryTuple[12]) < configuration.mHwindow)
+    cat1 = isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[4]>1 and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu
+    if (configuration.blindingOpt == 0):
+      return cat1 
+    elif (configuration.blindingOpt == 1):
+      if(configuration.isRealData):
+        return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
+      else:
+        return cat1
+    elif(configuration.blindingOpt == 2):
+      return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
 
  # category 16:mu-mu + 2b (HEHE) + 20 < Mll < 70 GeV + Mbb > 15
   elif category==16:
@@ -150,8 +168,8 @@ def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   if event.object().event().eventAuxiliary().isRealData():
     configuration.JERfactor = 0
     configuration.JESfactor = 0
-  else: # do blinding only for data 
-    configuration.mHblind = False   
+  else: # Is it data? useful for blinding
+    configuration.isRealData = True   
   return eventCategoryChannel(event, muChannel=configuration.muChannel, btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
   
 def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="none"):
