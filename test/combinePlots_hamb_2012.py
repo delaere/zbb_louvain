@@ -32,16 +32,16 @@ process.CombinePlots = cms.PSet(
     
   data = cms.VPSet (
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root') 
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root') 
             ),
         cms.PSet(
-           fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root') 
+           fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root') 
             ),
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root') 
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root') 
             ),
         cms.PSet(
-           fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root') 
+           fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root') 
             ),
         
   ),
@@ -50,68 +50,68 @@ process.CombinePlots = cms.PSet(
   mc   = cms.VPSet (
         
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_ZZ/ZZ_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_ZZ/ZZ_Summer12_final.root'),
             color = cms.uint32(EColor.kMagenta+palette),
             scale = cms.double(zbbnorm.xsec_ZZ_8TeV*lumi/zbbnorm.nev_ZZ_summer12),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('ZZ')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_WZ/WZ_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_WZ/WZ_Summer12_final.root'),
             color = cms.uint32(EColor.kCyan+palette),
             scale = cms.double(zbbnorm.xsec_WZ_8TeV*lumi/zbbnorm.nev_WZ_summer12),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('WZ')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_WW/WW_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_WW/WW_Summer12_final.root'),
             color = cms.uint32(EColor.kOrange+palette),
             scale = cms.double(zbbnorm.xsec_WW_8TeV*lumi/zbbnorm.nev_WW_summer12),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('WW')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_TTFullLept/TTFullLept_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_TTFullLept/TTFullLept_Summer12_final.root'),
             color = cms.uint32(EColor.kYellow+palette),
             scale = cms.double(zbbnorm.xsec_TTFullLept_8TeV*lumi/zbbnorm.nev_TTFullLept_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('t#bar{t} dilep')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_TTSemiLept/TTSemiLept_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_TTSemiLept/TTSemiLept_Summer12_final.root'),
             color = cms.uint32(EColor.kTeal+palette),
             scale = cms.double(zbbnorm.xsec_TTSemiLept_8TeV*lumi/zbbnorm.nev_TTSemiLept_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('t#bar{t} lept')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_Wt/Wt_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_Wt/Wt_Summer12_final.root'),
             color = cms.uint32(EColor.kSpring+palette),
             scale = cms.double(zbbnorm.xsec_tW_8TeV*lumi/zbbnorm.nev_tW_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('tW')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_Wtbar/Wtbar_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_Wtbar/Wtbar_Summer12_final.root'),
             color = cms.uint32(EColor.kSpring+palette),
             scale = cms.double(zbbnorm.xsec_tbarW_8TeV*lumi/zbbnorm.nev_tbarW_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('#bar{t}W')
             ),
 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DYjets/DYjets_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DYjets/DYjets_Summer12_final.root'),
             color = cms.uint32(EColor.kRed+palette),
             scale = cms.double(zbbnorm.xsec_DYjets_8TeV*lumi/zbbnorm.nev_DYjets_summer12),#3048.*5051./35907791.), #NLO MCFM
             role = cms.string('Z+j')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_DYjets_M10to50/DYjets_M10to50_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_DYjets_M10to50/DYjets_M10to50_Summer12_final.root'),
             color = cms.uint32(EColor.kRed+palette),
             scale = cms.double(zbbnorm.xsec_DYjets_M10to50_8TeV*lumi/zbbnorm.nev_DYjets_M10to50_summer12),#3048.*5051./35907791.), #NLO MCFM
             role = cms.string('Z+j')
             ), 
         cms.PSet(
-            fileName = cms.string('/home/fynu/ajafari/storage/CP/V4/ControlPlots_CSV_EMU_afterSF_MC/ControlPlots_ZH125/ZH125_Summer12_final.root'),
+            fileName = cms.string('/home/fynu/ajafari/storage/CP/V9/ControlPlots_V1/ControlPlots_ZH125/ZH125_Summer12_final.root'),
             color = cms.uint32(EColor.kWhite),#EColor.kAzure+palette),
             scale = cms.double(zbbnorm.xsec_ZH125_8TeV*lumi/zbbnorm.nev_ZH125_summer12), #Xs 
             role = cms.string('ZH_125')
