@@ -30,23 +30,23 @@ class BtaggingWeight:
 
   def setMode(self,mode):
     #reminder: in the engine, the HP includes always HE.
-    if   mode==self.WP[1]: self.engine.setLimits(1,999,0,999)
-    elif mode==self.WP[0]: self.engine.setLimits(1,999,1,999)
-    elif mode==self.WP[1]+"excl": self.engine.setLimits(1,1,0,1)# M exclu
-    elif mode==self.WP[0]+"excl": self.engine.setLimits(1,1,1,1)
-    elif mode==self.WP[1]+self.WP[1]: self.engine.setLimits(2,999,0,999)
-    elif mode==self.WP[1]+self.WP[0]: self.engine.setLimits(2,999,1,999)
-    elif mode==self.WP[0]+self.WP[0]: self.engine.setLimits(2,999,2,999)
+    if   mode==self.WP[1]: self.engine.setLimits(1,999,0,999)#L
+    elif mode==self.WP[0]: self.engine.setLimits(1,999,1,999)#M
+    elif mode==self.WP[1]+"excl": self.engine.setLimits(1,1,0,1)#L exclusive
+    elif mode==self.WP[0]+"excl": self.engine.setLimits(1,999,1,1)#M exclusive
+    elif mode==self.WP[1]+self.WP[1]: self.engine.setLimits(2,999,0,999)#LL
+    elif mode==self.WP[1]+self.WP[0]: self.engine.setLimits(2,999,1,999)#LM
+    elif mode==self.WP[0]+self.WP[0]: self.engine.setLimits(2,999,2,999)#MM
     
-    elif mode==self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(2,2,0,1)#LL exclu
-    elif mode==self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(2,2,2,2)#MM exclu
-    elif mode==self.WP[1]+self.WP[0]+"excl": self.engine.setLimits(2,2,1,1)#ML exclu
-    
-    elif mode==self.WP[1]+self.WP[1]+self.WP[1]: self.engine.setLimits(3,999,0,999)#LLL exclu
-    elif mode==self.WP[0]+self.WP[0]+self.WP[0]: self.engine.setLimits(3,999,3,999)#MMM exclu    
-    
-    elif mode==self.WP[1]+self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(3,3,0,1)#LLL exclu
-    elif mode==self.WP[0]+self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(3,3,3,3)#MMM exclu
+    #Added for inclusive search
+    elif mode==self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(2,2,0,999)#LL exclusive
+    elif mode==self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(2,999,2,2)#MM exclusive
+    elif mode==self.WP[1]+self.WP[1]+self.WP[1]: self.engine.setLimits(3,999,0,999)#LLL
+    elif mode==self.WP[0]+self.WP[0]+self.WP[0]: self.engine.setLimits(3,999,3,999)#MMM    
+    elif mode==self.WP[1]+self.WP[1]+self.WP[1]+"excl": self.engine.setLimits(3,3,0,999)#LLL exclusive
+    elif mode==self.WP[0]+self.WP[0]+self.WP[0]+"excl": self.engine.setLimits(3,3,3,3)#MMM exclusive
+    elif mode=="0"+self.WP[1]+"excl": self.engine.setLimits(0,0,0,0)#0L exclusive
+    elif mode=="0"+self.WP[0]+"excl": self.engine.setLimits(0,999,0,0)#0M exclusive
    
     
     
@@ -119,9 +119,6 @@ class BtaggingWeight:
       else:
         return self.WP[1]+self.WP[1]
     elif catName.find("(HEHP") != -1:
-      if catName.find("exclusive") != -1:
-        return self.WP[1]+self.WP[0]+"excl"
-      else:
         return self.WP[1]+self.WP[0]
     elif catName.find("(HPHP") != -1:
       if catName.find("exclusive") != -1:
@@ -138,5 +135,9 @@ class BtaggingWeight:
         return self.WP[0]+"excl"
       else:
         return self.WP[0]
+    elif catName.find("(0HE") != -1:
+        return "0"+self.WP[1]+"excl"
+    elif catName.find("(0HP") != -1:
+        return "0"+self.WP[0]+"excl"
     return "None"
 
