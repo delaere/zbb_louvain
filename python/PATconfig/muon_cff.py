@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.trigTools import *
 from triggerList import singleMuPath, doubleMuPath, MuEGPath
 
-def setupPatMuons (process, runOnMC):
+def setupPatMuons (process, runOnMC, MuonPt = 8.):
      process.patMuons.pfMuonSource = cms.InputTag("pfSelectedMuons") #FIX: pfSelectedMuons is used instead of pfIsolatedMuons used in the ZH anlysis, reason no obvious need to use pre isolated muons -> isolation done after
      process.patMuons.useParticleFlow=True
      # embedding objects FIX: done in H to llqq  
@@ -42,7 +42,7 @@ def setupPatMuons (process, runOnMC):
      
 
      process.selectedPatMuons.cut = (
-         "pt > 18 && abs(eta) < 2.4"
+         "pt > "+str(MuonPt)+" && abs(eta) < 2.4"
          )
 
      # Classic Muons with UserData

@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.trigTools import *
 from triggerList import singleElePath, doubleElePath, MuEGPath
 
-def setupPatElectrons (process, runOnMC):
+def setupPatElectrons (process, runOnMC, ElePt = 8.):
     process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons', 'PFIso')
     process.patElectrons.pfElectronSource = cms.InputTag("pfSelectedElectrons")
 
@@ -90,7 +90,7 @@ def setupPatElectrons (process, runOnMC):
     
     #switchOnTriggerMatching( process, ['eleTriggerMatchHLT' ],sequence ='patDefaultSequence', hltProcess = '*' ) #needed ?? seems not
     
-    process.allElectrons = process.selectedPatElectrons.clone( cut = 'pt > 18 && abs(eta) < 2.5' )
+    process.allElectrons = process.selectedPatElectrons.clone( cut = "pt > "+str(ElePt)+" && abs(eta) < 2.5")
     process.allElectrons.src = "patElectronsWithTrigger"
 
     if runOnMC:
