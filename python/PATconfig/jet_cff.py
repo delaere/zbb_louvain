@@ -69,7 +69,7 @@ def setupPatJets (process, runOnMC):
      process.es_prefer_BTauMVAJetTagComputerRecord = cms.ESPrefer('PoolDBESSource','BTauMVAJetTagComputerRecord')
      
      #jet selection
-     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 2.5'
+     process.selectedPatJets.cut = 'pt > 15. & abs(eta) < 5.0'
 
      #PU JetID
      process.load("RecoJets.JetProducers.PileupJetID_cfi")
