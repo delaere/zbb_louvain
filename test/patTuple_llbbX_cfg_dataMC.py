@@ -9,6 +9,8 @@ runOnMC = True
 runOnCondor = False
 nevents = 1000
 makeNoPUMet = True
+muPt = 8.
+elePt = 8.
 
 #read options
 import sys
@@ -86,9 +88,9 @@ switchOnTrigger(process,sequence='patDefaultSequence',hltProcess = '*')
 from UserCode.zbb_louvain.PATconfig.vertex_cff import *
 setupGoodVertex(process)
 from UserCode.zbb_louvain.PATconfig.muon_cff import *
-setupPatMuons(process, runOnMC)
+setupPatMuons(process, runOnMC, muPt)
 from UserCode.zbb_louvain.PATconfig.electron_cff import *
-setupPatElectrons(process, runOnMC)
+setupPatElectrons(process, runOnMC, elePt)
 from UserCode.zbb_louvain.PATconfig.tau_cff import *
 setupPatTaus(process)
 from UserCode.zbb_louvain.PATconfig.jet_cff import *
@@ -132,6 +134,20 @@ process.llbbXSequence = cms.Sequence(
 #adapt the collection of vertices
 changeVertexCollection(process,seqName='llbbXSequence')
 
+#split jet collection in barrel and forward
+process.cleanPatJetsCentral = cms.EDFilter("PATJetSelector",
+                                   src = cms.InputTag("cleanPatJets"),
+                                   cut = cms.string('pt > 15 && abs(eta) < 2.5'),
+                                   filter = cms.bool(True)
+                                  )
+
+process.cleanPatJetsForward = cms.EDFilter("PATJetSelector",
+                                   src = cms.InputTag("cleanPatJets"),
+                                   cut = cms.string('pt > 25 && abs(eta) > 2.5 && abs(eta) < 5.0'),
+                                   filter = cms.bool(True)
+                                  )
+
+
 #path to run
 process.LeptMerger = cms.EDProducer("CandViewMerger",
                                     src = cms.VInputTag( "allMuons","allElectrons")
@@ -140,6 +156,12 @@ process.LeptMerger = cms.EDProducer("CandViewMerger",
 process.LeptFilter = cms.EDFilter("CandViewCountFilter",
                                   src = cms.InputTag("LeptMerger"),
                                   minNumber = cms.uint32(2),
+                                  )
+
+process.LeptFilterTight = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("LeptMerger"),
+				  cut = cms.string('pt > 17'),
+                                  minNumber = cms.uint32(1),
                                   )
 
 process.MuElCands = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -188,6 +210,27 @@ process.AllFilter = cms.EDFilter("CandViewCountFilter",
                                   minNumber = cms.uint32(3),
                                   )
 
+process.llCentralJetMerger = cms.EDProducer("CandViewMerger",
+                                    src = cms.VInputTag("LeptMerger","cleanPatJetsCentral","cleanPatJetsCA8CHS","cleanPatJetsCA8CHSpruned")
+                                    )
+
+process.llCentralJetFilter = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("llCentralJetMerger"),
+                                  minNumber = cms.uint32(3),
+                                  )
+
+
+process.llForwardJetMerger = cms.EDProducer("CandViewMerger",
+                                    src = cms.VInputTag("LeptMerger","cleanPatJetsForward")
+                                    )
+
+process.llForwardJetFilter = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("llForwardJetMerger"),
+                                  minNumber = cms.uint32(4),
+                                  )
+
+
+
 process.zMerger = cms.EDProducer("CandViewMerger",
                                  src = cms.VInputTag("zmuAllmuAll","zelAllelAll")
                                  )
@@ -197,9 +240,17 @@ process.zFilter = cms.EDFilter("CandViewCountFilter",
                                  minNumber = cms.uint32(1),
                                  )
 
+
 process.p1 = cms.Path(process.llbbXSequence*
-                      process.LeptMerger*process.LeptFilter*
-                      process.AllMerger*process.AllFilter*
+                      process.LeptMerger*process.LeptFilter*process.LeptFilterTight*
+                      process.cleanPatJetsCentral*process.llCentralJetMerger*process.llCentralJetFilter*
+                      process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
+                      process.metUncertaintySequence
+                      )
+
+process.p2 = cms.Path(process.llbbXSequence*
+                      process.LeptMerger*process.LeptFilter*process.LeptFilterTight*
+                      process.cleanPatJetsForward*process.llForwardJetMerger*process.llForwardJetFilter*
                       process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
                       process.metUncertaintySequence
                       )
@@ -208,7 +259,7 @@ process.p1 = cms.Path(process.llbbXSequence*
 process.out = cms.OutputModule(
     "PoolOutputModule",
     fileName = cms.untracked.string(out_fileName),
-    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1') ),
+    SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p1', 'p2') ),
     outputCommands = cms.untracked.vstring('drop *',
                                            #TRIGGER
                                            'keep *_patTriggerEvent_*_*',
