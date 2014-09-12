@@ -220,13 +220,13 @@ process.llCentralJetFilter = cms.EDFilter("CandViewCountFilter",
                                   )
 
 
-process.llForwardJetMerger = cms.EDProducer("CandViewMerger",
-                                    src = cms.VInputTag("LeptMerger","cleanPatJetsForward")
+process.ForwardJetMerger = cms.EDProducer("CandViewMerger",
+                                    src = cms.VInputTag("cleanPatJetsForward")
                                     )
 
-process.llForwardJetFilter = cms.EDFilter("CandViewCountFilter",
-                                  src = cms.InputTag("llForwardJetMerger"),
-                                  minNumber = cms.uint32(4),
+process.ForwardJetFilter = cms.EDFilter("CandViewCountFilter",
+                                  src = cms.InputTag("ForwardJetMerger"),
+                                  minNumber = cms.uint32(2),
                                   )
 
 
@@ -250,7 +250,7 @@ process.p1 = cms.Path(process.llbbXSequence*
 
 process.p2 = cms.Path(process.llbbXSequence*
                       process.LeptMerger*process.LeptFilter*process.LeptFilterTight*
-                      process.cleanPatJetsForward*process.llForwardJetMerger*process.llForwardJetFilter*
+                      process.cleanPatJetsForward*process.ForwardJetMerger*process.ForwardJetFilter*
                       process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
                       process.metUncertaintySequence
                       )
