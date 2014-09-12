@@ -138,13 +138,13 @@ changeVertexCollection(process,seqName='llbbXSequence')
 process.cleanPatJetsCentral = cms.EDFilter("PATJetSelector",
                                    src = cms.InputTag("cleanPatJets"),
                                    cut = cms.string('pt > 15 && abs(eta) < 2.5'),
-                                   filter = cms.bool(True)
+                                   filter = cms.bool(False)
                                   )
 
 process.cleanPatJetsForward = cms.EDFilter("PATJetSelector",
                                    src = cms.InputTag("cleanPatJets"),
                                    cut = cms.string('pt > 25 && abs(eta) > 2.5 && abs(eta) < 5.0'),
-                                   filter = cms.bool(True)
+                                   filter = cms.bool(False)
                                   )
 
 
