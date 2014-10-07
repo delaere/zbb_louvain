@@ -99,6 +99,7 @@ from UserCode.zbb_louvain.PATconfig.subjet_cff import *
 setupPatSubJets(process, runOnMC)
 from UserCode.zbb_louvain.PATconfig.met_cff import *
 setupPatMets(process, runOnMC, makeNoPUMet)
+from UserCode.zbb_louvain.PATconfig.triggerList import *
 
 #sequence to run before the pat default sequence
 process.preSequence = cms.Sequence(
@@ -241,19 +242,37 @@ process.zFilter = cms.EDFilter("CandViewCountFilter",
                                  )
 
 
-process.p1 = cms.Path(process.llbbXSequence*
+
+from HLTrigger.HLTfilters.hltHighLevel_cfi import *
+process.HLTforData = hltHighLevel.clone(HLTPaths = nonPrescalePath, throw=cms.bool(False))
+
+
+
+
+process.q1 = cms.Sequence()
+if not runOnMC: process.q1 += cms.Sequence(process.HLTforData)
+
+process.q1 +=                 cms.Sequence(process.llbbXSequence*
                       process.LeptMerger*process.LeptFilter*process.LeptFilterTight*
                       process.cleanPatJetsCentral*process.llCentralJetMerger*process.llCentralJetFilter*
                       process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
                       process.metUncertaintySequence
-                      )
+)
 
-process.p2 = cms.Path(process.llbbXSequence*
+process.p1 = cms.Path(process.q1)
+
+
+process.q2 = cms.Sequence()
+if not runOnMC: process.q2 += cms.Sequence(process.HLTforData)
+process.q2 += cms.Sequence(process.llbbXSequence*
                       process.LeptMerger*process.LeptFilter*process.LeptFilterTight*
                       process.cleanPatJetsForward*process.ForwardJetMerger*process.ForwardJetFilter*
                       process.MuElCands*process.ElMuCands*process.SSplusCands*process.SSminusCands*process.llMerger*process.llFilter*
                       process.metUncertaintySequence
-                      )
+)
+
+process.p2 = cms.Path(process.q2)
+		      
 
 #output
 process.out = cms.OutputModule(
