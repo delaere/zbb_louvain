@@ -63,7 +63,7 @@ class MonteCarloReWeighting:
         sfs_Zbb = 1.08*(njets==2)+1.14*(njets>2)
         sfs_Zbx = 1.14
         sfs_Zxx = 1.24
-     sfs_dy = sfs_Zbb*MonteCarloSelection.isRecoZbbEvent(fwevent) + sfs_Zbx*MonteCarloSelection.isRecoZbEvent(fwevent) + sfs_Zxx*(not MonteCarloSelection.isRecoZbbEvent(fwevent) and not MonteCarloSelection.isRecoZbEvent(fwevent))
+     sfs_dy = sfs_Zbb*MonteCarloSelection.isRecoZbbEvent(fwevent.dijet_all) + sfs_Zbx*MonteCarloSelection.isRecoZbEvent(fwevent.dijet_all) + sfs_Zxx*(not MonteCarloSelection.isRecoZbbEvent(fwevent.dijet_all) and not MonteCarloSelection.isRecoZbEvent(fwevent.dijet_all))
      sfs = sfs_tt*("sfs_tt" in mode) + sfs_dy*("sfs_dy" in mode)
 
      #dy merging reweighting

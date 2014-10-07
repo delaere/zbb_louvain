@@ -387,6 +387,7 @@ def hasNoOverlap(jet, Z = None, lepPair = None):
 
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
+  if not jet.isPFJet() : return True
   rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
@@ -427,7 +428,7 @@ def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
 
-def goodJets(event, muChannel=True, eleChannel=True, pt=30.):
+def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   # leptons pair
   if muChannel and eleChannel:
     pair = event.leptonsPair
@@ -438,7 +439,7 @@ def goodJets(event, muChannel=True, eleChannel=True, pt=30.):
   else:
     pair = None
   # compute the good jets
-  return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),event.jets)
+  return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),getattr(event,jets))
 
 def getMet(event,type="PF"):
   """Return the MET value you are interested in (type can be PF, MVA or NoPU)"""
@@ -863,9 +864,6 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   if (vertex_cond is True):
     result = True
 
-
-
-
   if (result == True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
@@ -883,57 +881,59 @@ def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
     except:
       return [None, None]
 
-def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
+def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False, prejets=""):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
+  goodJetsLabel = "good"+prejets+"Jets_"
+  jetsLabel = prejets+"jets"
   if muChannel and eleChannel:
-    goodJets = event.goodJets_all
+    goodJets = getattr(event,goodJetsLabel+"all")
   elif muChannel:
-    goodJets = event.goodJets_mu
+    goodJets = getattr(event,goodJetsLabel+"mu")
   elif eleChannel:
-    goodJets = event.goodJets_ele
+    goodJets = getattr(event,goodJetsLabel+"ele")
   else:
-    goodJets = event.goodJets_none
+    goodJets = getattr(event,goodJetsLabel+"none")
   # check number of good jets
-  indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
+  indices_pt = [index for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
   if btagging == "CSV":
-    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
   elif btagging == "JP":
-    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
 
   btagList.sort(reverse=True)
   indices = []
   for ibtag in btagList:
     indices.append(ibtag[1])
   if len(indices)<1: return (None, None)
-  if len(indices)<2: return (event.jets[indices[0]],None)
+  if len(indices)<2: return (getattr(event,jetsLabel)[indices[0]],None)
   jetList = []
   # start with HP b-jets
   for index in indices[:]:
-    if isBJet(event.jets[index],WP[0],btagging):
+    if isBJet(getattr(event,jetsLabel)[index],WP[0],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)
   if len(jetList)>=2:
-    if event.jets[jetList[0]].pt()>event.jets[jetList[1]].pt() :
-      return (event.jets[jetList[0]],event.jets[jetList[1]])
+    if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
+      return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
     else :
-      return (event.jets[jetList[1]],event.jets[jetList[0]])
+      return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
   # continue with HE b-jets
   for index in indices[:]:
-    if isBJet(event.jets[index],WP[1],btagging):
+    if isBJet(getattr(event,jetsLabel)[index],WP[1],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)
   if len(jetList)>=2:
-    if event.jets[jetList[0]].pt()>event.jets[jetList[1]].pt() :
-      return (event.jets[jetList[0]],event.jets[jetList[1]])
+    if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
+      return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
     else :
-      return (event.jets[jetList[1]],event.jets[jetList[0]])
+      return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
   # fill with remaining good jets
   for index in indices_pt:
     jetList.append(index)
-  return (event.jets[jetList[0]],event.jets[jetList[1]])
+  return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
 
 def vertex(event):
   vertices = event.vertices
@@ -942,21 +942,74 @@ def vertex(event):
   else:
     return None
 
+def fatjets(event, pt=30.):
+  fatjets = []
+  prunedPt = 0
+  fatjet = None
+  for pruned in event.rawprunedjets:
+    #if isGoodJet(pruned, Z = event.bestZcandidate, pt = pt) and pruned.pt()>prunedPt and pruned.numberOfDaughters() == 2:
+    if pruned.pt()>20. and pruned.pt()>prunedPt and pruned.numberOfDaughters() == 2:
+      if isGoodJet(pruned.daughter(0), Z = event.bestZcandidate, pt = pt) and isGoodJet(pruned.daughter(1), Z = event.bestZcandidate, pt = pt):
+        prunedPt = pruned.pt()
+        fatjet = pruned
+  if not fatjet is None : fatjets.append(fatjet)
+  return fatjets
+
 def subjets(event):
   subjets = []
   j1 = None
   j2 = None
   prunedPt = 0
-  for pruned in event.rawprunedjets:
-    if pruned.numberOfDaughters() == 2 and pruned.pt()>30. and abs(pruned.eta())<2.4 and pruned.pt()>prunedPt:
-      prunedPt = pruned.pt()
-      j1 = pruned.daughter(0)
-      j2 = pruned.daughter(1)
+  #for pruned in event.fatjets:
+  #prunedPt = pruned.pt()
+  if len(event.fatjets) == 1:
+    fatjet = event.fatjets[0]
+    pruned = None
+    for pruned in event.rawprunedjets:
+      if fatjet.eta() == pruned.eta() : break
+    if pruned is None : print "Info: pruned fat jets not found !!"
+    else :
+      #print "daught", pruned.numberOfDaughters()
+      if pruned.numberOfDaughters() == 2: 
+        j1 = pruned.daughter(0)
+        j2 = pruned.daughter(1)
+        #print "2 subjets"
+      elif pruned.numberOfDaughters() > 2 : print "Info: More than 2 subjets"
+  elif len(event.fatjets) > 1 : print "Error: more than 1 fat jets selected."
   if not (j1 is None and j2 is None):
-    j1v = ROOT.TLorentzVector(j1.px(),j1.py(),j1.pz(),j1.energy())
-    j2v = ROOT.TLorentzVector(j2.px(),j2.py(),j2.pz(),j2.energy())
-    if j1v.DeltaR(j2v) >= 0.4:
-      subjets.append(j1)
-      subjets.append(j2)
+    #j1v = ROOT.TLorentzVector(j1.px(),j1.py(),j1.pz(),j1.energy())
+    #j2v = ROOT.TLorentzVector(j2.px(),j2.py(),j2.pz(),j2.energy())
+    #if j1v.DeltaR(j2v) >= 0.4:
+    subjets.append(j1)
+    subjets.append(j2)
   if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
   return subjets
+
+def jetMult(event, btagging="CSV", WP=["M","L"], prejets=""):
+  goodJets = getattr(event, "good"+prejets+"Jets_all")
+  nJets = 0
+  nBjetsHE = 0
+  nBjetsHP = 0
+  nBjetsHEHP = 0
+  for index,jet in enumerate(getattr(event,prejets+"jets")):
+    if goodJets[index]:
+      nJets += 1
+      HE = isBJet(jet,WP[1],btagging)
+      HP = isBJet(jet,WP[0],btagging)
+      if HE: nBjetsHE += 1
+      if HP: nBjetsHP += 1
+      if HE and HP: nBjetsHEHP +=1
+  if nJets>1:
+    dijet = getattr(event, "di"+prejets+"jet_all")
+    j1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+    j2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+    dr = j1.DeltaR(j2)
+  else : dr = -1      
+  jetInfo = {
+    "nj" : nJets,
+    "nbHE" : nBjetsHE,
+    "nbHP" : nBjetsHP,
+    "nbHEHP" : nBjetsHEHP,
+    "drj1j2" : dr
+    }
+  return jetInfo

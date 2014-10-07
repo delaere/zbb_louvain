@@ -83,33 +83,33 @@ def match_GenToHad(genjets, hadrons, dr):
       genjets.remove(bestmatch)
   return (matched,genjets)
 
-def genjetCollectionsProducer(fwevent, ptcut=0, etacut=10):
+def genjetCollectionsProducer(fwevent, ptcut=0, etacut=10, prejets=""):
   """Event producer that returns three subcollections of genjets, for b,c,l jets"""
   # list of hadrons in the final state
   bhads = [part for part in fwevent.genParticles if is_final_Bhad(part)]
   chads = [part for part in fwevent.genParticles if is_final_Dhad(part)]
   # list of genjets passing the pt,eta cuts
   #genjets = [ jet for jet in fwevent.genJets if (jet.pt()>ptcut and abs(jet.eta())<etacut) ]
-  genjets = [ jet.genJet() for index,jet in enumerate(fwevent.jets) if (fwevent.goodJets_all[index] and jet.genJet()) ]
+  genjets = [ jet.genJet() for index,jet in enumerate(getattr(fwevent,prejets+"jets")) if (getattr(fwevent,"good"+prejets+"Jets_all")[index] and jet.genJet()) ]
   # now divide it in three independant collections
   (bjets, nonbjets)  = match_GenToHad(genjets,  bhads, 0.5)
   (cjets, lightjets) = match_GenToHad(nonbjets, chads, 0.5)
   return (bjets,cjets,lightjets)
 
-def isRecoZbbEvent(event):
+def isRecoZbbEvent(dijet):
   """Classify events according to recojet flavour"""
-  if not event.dijet_all[0] is None and not event.dijet_all[1] is None:
-    return abs(event.dijet_all[0].partonFlavour())==5 and abs(event.dijet_all[1].partonFlavour())==5
+  if not dijet[0] is None and not dijet[1] is None:
+    return abs(dijet[0].partonFlavour())==5 and abs(dijet[1].partonFlavour())==5
   else : return False
 
-def isRecoZbEvent(event):
+def isRecoZbEvent(dijet):
   """Classify events according to recojet flavour"""
-  if not event.dijet_all[0] is None and not event.dijet_all[1] is None:
-    return (abs(event.dijet_all[0].partonFlavour())!=5 and abs(event.dijet_all[1].partonFlavour())==5) or (abs(event.dijet_all[0].partonFlavour())==5 and abs(event.dijet_all[1].partonFlavour())!=5)
-  elif not event.dijet_all[0] is None:
-    return abs(event.dijet_all[0].partonFlavour())==5
-  elif not event.dijet_all[1] is None:
-    return abs(event.dijet_all[1].partonFlavour())==5
+  if not dijet[0] is None and not dijet[1] is None:
+    return (abs(dijet[0].partonFlavour())!=5 and abs(dijet[1].partonFlavour())==5) or (abs(dijet[0].partonFlavour())==5 and abs(dijet[1].partonFlavour())!=5)
+  elif not dijet[0] is None:
+    return abs(dijet[0].partonFlavour())==5
+  elif not dijet[1] is None:
+    return abs(dijet[1].partonFlavour())==5
   else : return False
 
 def isZbbEvent(event):

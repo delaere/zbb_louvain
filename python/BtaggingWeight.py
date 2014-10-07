@@ -28,7 +28,7 @@ class BtaggingWeight:
   def setLimits(self,jmin1,jmax1,jmin2,jmax2):
     self.engine.setLimits(jmin1,jmax1,jmin2,jmax2)
 
-  def setMode(self,mode):
+  def setMode(self, mode):
     #reminder: in the engine, the HP includes always HE.
     if   mode==self.WP[1]: self.engine.setLimits(1,999,0,999)
     elif mode==self.WP[0]: self.engine.setLimits(1,999,1,999)
@@ -41,7 +41,7 @@ class BtaggingWeight:
       print "btaggingWeight.py: Unknown mode:",mode
       self.engine.setLimits(0,999,0,999)
 
-  def weight(self,event, category=None, forceMode=None):
+  def weight(self, event, category=None, forceMode=None):
     """btag eff weight"""
     # set the mode
     if forceMode is None and  category is not None:
@@ -53,6 +53,11 @@ class BtaggingWeight:
     # for data, immediately return 1.
     if event.object().event().eventAuxiliary().isRealData() or Bmode=="None":
       return 1.
+    prejets = self.btaggingJet(event, categoryName(category), Bmode)
+    if prejets == "fat":
+      if self.WP[0] in Bmode : Bmode = self.WP[0]
+      else : Bmode = self.WP[1]
+    #if prejets == "sub" : print Bmode
     self.setMode(Bmode)
     # initialize counters
     self.myJetSet.reset()
@@ -61,8 +66,8 @@ class BtaggingWeight:
     ntagsNoFlvavorHE = 0
     ntagsNoFlvavorHP = 0
     # retrieve the jets
-    theGoodJets = event.goodJets_all
-    for index,jet in enumerate(event.jets):
+    theGoodJets = getattr(event,"good"+prejets+"Jets_all")
+    for index,jet in enumerate(getattr(event,prejets+"jets")):
       # apply selection
       if not theGoodJets[index]: continue
       # check flavor
@@ -107,3 +112,16 @@ class BtaggingWeight:
         return self.WP[0]
     return "None"
 
+  def btaggingJet(self, event, catName, Bmode):
+    jetColl = ""
+    if catName=="None" or Bmode=="None" : return jetColl
+    jetinfo = getattr(event,"jetInfo")
+    #if "AK5 or CA8 or subjets" in catName and jetinfo["nbHP"]>Bmode.count(self.WP[0]) and jetinfo["nbHE"]>Bmode.count(self.WP[1]) : jetColl = ""
+    if "CA8 or subjets" in catName:
+      subjetinfo = getattr(event,"subjetInfo")
+      if subjetinfo["drj1j2"]>=0.4 : jetColl = "sub"
+      else : jetColl = "fat"
+    elif "CA8" in catName : jetColl = "fat"
+    elif "Subjets" in catName : jetColl = "sub"
+    #print catName, jetColl
+    return jetColl

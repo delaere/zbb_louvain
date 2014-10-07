@@ -46,7 +46,7 @@ class configuration:
 
   # control plot classes
   controlPlots = [
-    controlPlot("jetmetAK5PF", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
+    controlPlot("jetmet", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
     controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
@@ -72,6 +72,7 @@ class configuration:
                        eventCollection("rawsubjets","vector<pat::Jet>","selectedPatJetsCA8PrunedSubjetsPF"),
                        eventCollection("rawfatjets","vector<pat::Jet>","selectedPatJetsCA8CHSwithNsub"),
                        eventCollection("rawprunedjets","vector<pat::Jet>","selectedPatJetsCA8CHSPrunedPacked"),
+                       eventCollection("rawprunedjets2","vector<pat::Jet>","selectedPatJetsCA8CHSpruned"),
                        eventCollection("MET","vector<pat::MET>","patType1CorrectedPFMet"),
                        eventCollection("METNNregression","vector<pat::MET>","patPFMet"),
 		       eventCollection("PFMETNoCorr","vector<pat::MET>","patPFMet"),
@@ -100,6 +101,7 @@ class configuration:
                        eventProducer("goodJets_none", "ObjectSelection", "goodJets", { "muChannel":False,"eleChannel":False,"pt":ptjet } ),
                        eventProducer("jets", "ObjectSelection", "allJets", {"jets":"rawjets" } ),
                        eventProducer("subjets", "ObjectSelection", "subjets", { } ),
+                       eventProducer("fatjets", "ObjectSelection", "fatjets", { "pt":ptjet } ),
                        eventProducer("isMuTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":False,"perRun":True } ),
                        eventProducer("isEleTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":False,"eleChannel":True,"perRun":True } ),
                        eventProducer("isINCTriggerOK", "ObjectSelection", "isTriggerIncOK", {"perRun":True } ),
