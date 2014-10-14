@@ -92,12 +92,12 @@ void ElectronIsolationEmbedder::produce( Event & evt, const EventSetup & ) {
 
     // introduce the new definition of the medium WP, approved on June 1st.
     LogDebug("ElectronIsolationEmbedder") << "WP inputs: " << charged << " " << photon << " " << neutral << " " << rho;
-    bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, gsfele, conversions_h, beamSpot, vtx_h, charged, photon, neutral, rho);
+    ElectronEffectiveArea *EEA;
+    bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, gsfele, conversions_h, beamSpot, vtx_h, charged, photon, neutral, rho, EEA->kEleEAData2012);
     el.addUserInt("MediumWP", medium);
     LogDebug("ElectronIsolationEmbedder") << "MediumWP: " << medium;
 
     // Effective area for 2012 data (Delta_R=0.3) (taken from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Isolation_cone_R_0_3)
-    ElectronEffectiveArea *EEA;
     double A_eff_PHNH = EEA->GetElectronEffectiveArea(EEA->kEleGammaAndNeutralHadronIso03, abs(eta), EEA->kEleEAData2012);
 
     LogDebug("ElectronIsolationEmbedder") << "Effective area, PH+NH: " << A_eff_PHNH ;

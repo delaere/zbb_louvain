@@ -4,6 +4,7 @@ from RecoJets.JetProducers.ak5PFJetsPruned_cfi import ak5PFJetsPruned
 from PhysicsTools.PatAlgos.tools.jetTools import *
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
 from UserCode.zbb_louvain.PATconfig.jet_cff import btagInfo, btagdiscriminators
+from RecoJets.JetAssociationProducers.ak5JTA_cff import ak5JetTracksAssociatorExplicit
 
 def setupPatSubJets (process, runOnMC):
     #CA8 jets
@@ -86,6 +87,92 @@ def setupPatSubJets (process, runOnMC):
     process.cleanPatJetsCA8CHSpruned.checkOverlaps.electrons.deltaR = cms.double(0.8)
                 
     #subjets
+    process.ak5JetTracksAssociatorExplicitCA8PrunedSubjetsPF = ak5JetTracksAssociatorExplicit.clone(
+                                                    jets = cms.InputTag("ca8PFJetsCHSpruned","SubJets")
+                                                    )
+    process.expImpactParameterTagInfos = process.impactParameterTagInfos.clone(jetTracks = cms.InputTag("ak5JetTracksAssociatorExplicitCA8PrunedSubjetsPF"))
+    process.expSecondaryVertexTagInfos = process.secondaryVertexTagInfos.clone(trackIPTagInfos = "expImpactParameterTagInfos")
+    process.expInclusiveSecondaryVertexFinderTagInfos = process.inclusiveSecondaryVertexFinderTagInfos.clone(trackIPTagInfos = "expImpactParameterTagInfos")
+    process.expInclusiveSecondaryVertexFinderFilteredTagInfos = process.inclusiveSecondaryVertexFinderFilteredTagInfos.clone(trackIPTagInfos = "expImpactParameterTagInfos")
+    
+    process.expTrackCountingHighEffBJetTags = process.trackCountingHighEffBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos")))
+    process.expTrackCountingHighPurBJetTags = process.trackCountingHighPurBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos")))
+    process.expJetProbabilityBJetTags = process.jetProbabilityBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos")))
+    process.expJetBProbabilityBJetTags = process.jetBProbabilityBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos")))
+
+    process.expSimpleSecondaryVertexHighEffBJetTags = process.simpleSecondaryVertexHighEffBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expSecondaryVertexTagInfos")))
+    process.expSimpleSecondaryVertexHighPurBJetTags = process.simpleSecondaryVertexHighPurBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expSecondaryVertexTagInfos")))
+    process.expSimpleInclusiveSecondaryVertexHighEffBJetTags = process.simpleInclusiveSecondaryVertexHighEffBJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos")))
+    process.expSimpleInclusiveSecondaryVertexHighPurBJetTags = process.simpleInclusiveSecondaryVertexHighPurBJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos")))
+    process.expDoubleSecondaryVertexHighEffBJetTags = process.doubleSecondaryVertexHighEffBJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos")))
+
+    process.expCombinedSecondaryVertexBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos"),
+                                 cms.InputTag("expSecondaryVertexTagInfos"))
+        )
+    process.expCombinedSecondaryVertexV1BJetTags = process.combinedSecondaryVertexV1BJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos"),
+                                 cms.InputTag("expSecondaryVertexTagInfos"))
+        )
+
+    process.expCombinedInclusiveSecondaryVertexBJetTags = process.combinedInclusiveSecondaryVertexBJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos"),
+                                 cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos"))
+        )
+    process.expCombinedSecondaryVertexSoftPFLeptonV1BJetTags = process.combinedSecondaryVertexSoftPFLeptonV1BJetTags.clone(
+        tagInfos = cms.VInputTag(cms.InputTag("expImpactParameterTagInfos"),
+                                 cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos"),
+                                 cms.InputTag("expSoftPFMuonsTagInfos"),
+                                 cms.InputTag("expSoftPFElectronsTagInfos")
+                                 )
+        )
+    
+    process.expSoftPFMuonsTagInfos = process.softPFMuonsTagInfos.clone(jets = cms.InputTag("ca8PFJetsCHSpruned","SubJets"))
+    process.expSoftPFElectronsTagInfos = process.softPFElectronsTagInfos.clone(jets = cms.InputTag("ca8PFJetsCHSpruned","SubJets"))
+    process.expSoftPFMuonBJetTags = process.softPFMuonBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expSoftPFMuonsTagInfos")))
+    process.expSoftPFElectronBJetTags = process.softPFElectronBJetTags.clone(tagInfos = cms.VInputTag(cms.InputTag("expSoftPFElectronsTagInfos")))
+
+    process.explicitBtag = cms.Sequence(process.ak5JetTracksAssociatorExplicitCA8PrunedSubjetsPF*
+                                        process.expImpactParameterTagInfos* process.expSecondaryVertexTagInfos*
+                                        process.expInclusiveSecondaryVertexFinderTagInfos* process.expInclusiveSecondaryVertexFinderFilteredTagInfos*
+                                        process.expTrackCountingHighEffBJetTags* process.expTrackCountingHighPurBJetTags*
+                                        process.expJetProbabilityBJetTags* process.expJetBProbabilityBJetTags*
+                                        process.expSimpleSecondaryVertexHighEffBJetTags* process.expSimpleSecondaryVertexHighPurBJetTags*
+                                        process.expSimpleInclusiveSecondaryVertexHighEffBJetTags* process.expSimpleInclusiveSecondaryVertexHighPurBJetTags*
+                                        process.expDoubleSecondaryVertexHighEffBJetTags*
+                                        process.expSoftPFMuonsTagInfos* process.expSoftPFElectronsTagInfos*
+                                        process.expSoftPFMuonBJetTags* process.expSoftPFElectronBJetTags*
+                                        process.expCombinedSecondaryVertexBJetTags* process.expCombinedSecondaryVertexV1BJetTags*
+                                        process.expCombinedInclusiveSecondaryVertexBJetTags* process.expCombinedSecondaryVertexSoftPFLeptonV1BJetTags
+                                        )
+    expinfo = cms.VInputTag(
+        cms.InputTag("expImpactParameterTagInfos"),
+        cms.InputTag("expSecondaryVertexTagInfos"),
+        cms.InputTag("expInclusiveSecondaryVertexFinderTagInfos"),
+        cms.InputTag("expInclusiveSecondaryVertexFinderFilteredTagInfos"),
+        cms.InputTag("expSoftPFMuonsTagInfos"),
+        cms.InputTag("expSoftPFElectronsTagInfos")
+        )
+    expbtag = cms.VInputTag(
+        cms.InputTag("expTrackCountingHighEffBJetTags"),
+        cms.InputTag("expTrackCountingHighPurBJetTags"),
+        cms.InputTag("expJetProbabilityBJetTags"),
+        cms.InputTag("expJetBProbabilityBJetTags"),
+        cms.InputTag("expSimpleSecondaryVertexHighEffBJetTags"),
+        cms.InputTag("expSimpleSecondaryVertexHighPurBJetTags"),
+        cms.InputTag("expSimpleInclusiveSecondaryVertexHighEffBJetTags"),
+        cms.InputTag("expSimpleInclusiveSecondaryVertexHighPurBJetTags"),
+        cms.InputTag("expDoubleSecondaryVertexHighEffBJetTags"),
+        cms.InputTag("expSoftPFMuonBJetTags"),
+        cms.InputTag("expSoftPFElectronBJetTags"),
+        cms.InputTag("expCombinedSecondaryVertexBJetTags"),
+        cms.InputTag("expCombinedSecondaryVertexV1BJetTags"),
+        cms.InputTag("expCombinedInclusiveSecondaryVertexBJetTags"),
+        cms.InputTag("expCombinedSecondaryVertexSoftPFLeptonV1BJetTags")
+        )
     inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']) #data
     if runOnMC : inputJetCorrLabel = ('AK5PFchs',['L1FastJet', 'L2Relative', 'L3Absolute'])
     addJetCollection(process,
@@ -104,6 +191,13 @@ def setupPatSubJets (process, runOnMC):
     process.patJetsCA8PrunedSubjetsPF.embedCaloTowers = False
     process.patJetsCA8PrunedSubjetsPF.embedPFCandidates = True
     process.patJetsCA8PrunedSubjetsPF.addTagInfos = cms.bool(True)
+    process.patJetsCA8PrunedSubjetsPF.tagInfoSources += expinfo
+    process.patJetsCA8PrunedSubjetsPF.discriminatorSources += expbtag
+
+    process.patDefaultSequence.replace(
+        process.patJetsCA8PrunedSubjetsPF,
+        process.explicitBtag * process.patJetsCA8PrunedSubjetsPF
+        )
     
     #CA8 genJets
     process.ca8GenJetsNoNu = process.ak7GenJetsNoNu.clone()
