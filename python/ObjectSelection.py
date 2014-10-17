@@ -405,26 +405,26 @@ def jetId(jet,level="loose"):
     print "Error: unknown jetid level:",level
     return False
 
-def allJets(event, jets="rawjets"):
+def allJets(event, jets="rawjets", checksubjets=False):
   eventrawjets = getattr(event, jets)
   if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
-  for jet in eventrawjets : JECuncertaintyProxy.Scale(jet)
+  for jet in eventrawjets:
+    JECuncertaintyProxy.Scale(jet)
+    if checksubjets:
+      for i in range(0,jet.numberOfDaughters()) : JECuncertaintyProxy.Scale(jet.daughter(i))
   return eventrawjets
 
 def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
   """Perform additional checks that define a good jet"""
   #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
-
   # overlap checking
   if not Z is None :
     if not hasNoOverlap(jet,Z=Z) :
       return False
-
   if not lepPair is None :
     if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
       return False
-
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
 
@@ -942,46 +942,38 @@ def vertex(event):
   else:
     return None
 
+#Get fat jets candidate with pt>20. and with 2 good subjets with pt>pt
 def fatjets(event, pt=30.):
   fatjets = []
-  prunedPt = 0
+  prunedCSV = 0
   fatjet = None
-  for pruned in event.rawprunedjets:
-    #if isGoodJet(pruned, Z = event.bestZcandidate, pt = pt) and pruned.pt()>prunedPt and pruned.numberOfDaughters() == 2:
-    if pruned.pt()>20. and pruned.pt()>prunedPt and pruned.numberOfDaughters() == 2:
+  #run over all pruned fat jets
+  prunedjets = allJets(event, jets="rawprunedjets", checksubjets=True)
+  for pruned in prunedjets:
+    if pruned.pt()>2*pt and pruned.bDiscriminator("combinedSecondaryVertexBJetTags")>prunedCSV and pruned.numberOfDaughters() == 2:
       if isGoodJet(pruned.daughter(0), Z = event.bestZcandidate, pt = pt) and isGoodJet(pruned.daughter(1), Z = event.bestZcandidate, pt = pt):
-        prunedPt = pruned.pt()
+        #if true replace the fatjet candidate
+        prunedCSV = pruned.bDiscriminator("combinedSecondaryVertexBJetTags")
         fatjet = pruned
   if not fatjet is None : fatjets.append(fatjet)
   return fatjets
 
+#Get the 2 subjets
 def subjets(event):
   subjets = []
   j1 = None
   j2 = None
   prunedPt = 0
-  #for pruned in event.fatjets:
-  #prunedPt = pruned.pt()
+  #check if a good fatjet candidate
   if len(event.fatjets) == 1:
-    fatjet = event.fatjets[0]
-    pruned = None
-    for pruned in event.rawprunedjets:
-      if fatjet.eta() == pruned.eta() : break
-    if pruned is None : print "Info: pruned fat jets not found !!"
-    else :
-      #print "daught", pruned.numberOfDaughters()
-      if pruned.numberOfDaughters() == 2: 
-        j1 = pruned.daughter(0)
-        j2 = pruned.daughter(1)
-        #print "2 subjets"
-      elif pruned.numberOfDaughters() > 2 : print "Info: More than 2 subjets"
+    pruned = event.fatjets[0]
+    j1 = pruned.daughter(0)
+    j2 = pruned.daughter(1)
   elif len(event.fatjets) > 1 : print "Error: more than 1 fat jets selected."
   if not (j1 is None and j2 is None):
-    #j1v = ROOT.TLorentzVector(j1.px(),j1.py(),j1.pz(),j1.energy())
-    #j2v = ROOT.TLorentzVector(j2.px(),j2.py(),j2.pz(),j2.energy())
-    #if j1v.DeltaR(j2v) >= 0.4:
     subjets.append(j1)
     subjets.append(j2)
+  #redifine the subjet flavour using hadron (default flavour definition can be wrong as can match one parton to several jets)
   if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
   return subjets
 
