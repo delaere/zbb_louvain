@@ -110,8 +110,25 @@ def get_etaFiner_key(eta):
 def get_pt_key(pt):
 
    range = ''
-   if (pt>=10 and  pt< 20 ):
-      range = '10_20'
+
+   if (pt>=3.5 and  pt< 3.75 ):
+      range = '3.5_3.75'
+   elif (pt>=3.75 and  pt< 4.0 ):
+      range = '3.75_4.0'
+   elif (pt>=4.0 and  pt< 4.5 ):
+      range = '4.0_4.5'
+   elif (pt>=4.5 and  pt< 5 ):
+      range = '4.5_5.0'
+   elif (pt>=5 and  pt< 6 ):
+      range = '5.0_6.0'
+   elif (pt>=6 and  pt< 8 ):
+      range = '6.0_8.0'
+   elif (pt>=8 and  pt< 10 ):
+      range = '8.0_10.0'
+   elif (pt>=10 and  pt< 15 ):
+      range = '10.0_15.0'
+   elif (pt>=15 and  pt< 20 ):
+      range = '15.0_20.0'
    elif (pt>=20 and  pt< 25 ):
       range = '20_25'
    elif (pt>=25 and  pt< 30 ):
@@ -303,8 +320,10 @@ class MuonIDSFReader:
    def __init__(self):
      """Construct a MuonIDSFReader using pikle files."""
      f = open(configuration.dataDirectory+'MuonEfficiencies_Run2012ReReco_53X.pkl', 'r')
-     if f :
+     f1 = open(configuration.dataDirectory+'Muon_ID_LowPt_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     if f and f1:
         self._map = pickle.load(f)
+        self._map1 = pickle.load(f1)
         self._eta_range = ''
         self._pt_range = ''
      else :
@@ -317,15 +336,26 @@ class MuonIDSFReader:
      self._eta_range= get_eta_key(eta)
      self._pt_range= get_pt_key(pt)
 
-     if mode == '0'  :
-        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
-     elif mode == '+1'  :
-        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
-     elif mode == '-1' :
-        return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
+     if pt<20:
+        if mode == '0'  :
+           return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
+        elif mode == '+1'  :
+           return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
+        elif mode == '-1' :
+           return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
+        else:
+           print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+           return 0
      else:
-        print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
-        return 0
+        if mode == '0'  :
+           return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
+        elif mode == '+1'  :
+           return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
+        elif mode == '-1' :
+           return self._map['Tight'][self._eta_range][self._pt_range]['data/mc']['err_low']
+        else:
+           print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+           return 0
 
 #===  Muon ISO SF
 #===  (https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs#22Jan2013_ReReco_of_2012_data_re)
