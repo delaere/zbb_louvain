@@ -379,7 +379,11 @@ class MuonISOSFReader:
      """Return the SF or the uncertainty for a given pt and eta."""
 
      self._eta_range= get_eta_key(eta)
-     self._pt_range= get_pt_key(pt)
+
+     if pt>20: 
+        self._pt_range= get_pt_key(pt)
+     else:
+        self._pt_range= '10_20'
 
      if mode == '0'  :
         return self._map['combRelIsoPF04dBeta<02_Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
