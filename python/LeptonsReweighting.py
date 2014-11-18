@@ -336,7 +336,21 @@ class MuonIDSFReader:
      self._eta_range= get_eta_key(eta)
      self._pt_range= get_pt_key(pt)
 
-     if pt<20:
+     ## workaround: set ID SF to 1 for the |eta|>2.1 region, given no values are provided (trigger intrinsic limitation?)
+     if pt<20 and abs(eta)> 2.1:
+        if mode == '0'  :
+           return 1.0
+        elif mode == '+1'  :
+           return 1.0
+        elif mode == '-1' :
+           return 1.0
+        else:
+           print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
+           return 0
+     ## ----------
+        
+     elif pt<20 and abs(eta)<= 2.1:    
+
         if mode == '0'  :
            return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
         elif mode == '+1'  :
@@ -380,7 +394,7 @@ class MuonISOSFReader:
 
      self._eta_range= get_eta_key(eta)
 
-     if pt>20: 
+     if pt>=20: 
         self._pt_range= get_pt_key(pt)
      else:
         self._pt_range= '10_20'
