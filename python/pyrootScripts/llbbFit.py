@@ -31,8 +31,8 @@ class options_():
     #Varibales
     BIN = 5
     vars = {
-        "zmassEle" : ["eventSelectionbestzmassEle", 7, 60., 120.] ,
-        "zmassMu"  : ["eventSelectionbestzmassMu", 7, 60., 120.] ,
+        "zmassEle" : ["boostSelectionbestzmassEle", 7, 60., 120.] ,
+        "zmassMu"  : ["boostSelectionbestzmassMu", 7, 60., 120.] ,
         "MET"      : ["jetmetMET", 7, 0., 100.] ,
         "JPprod"   : ["JPprod", BIN, 0., 1.5*1.5] ,
         "CSVprodMM": ["CSVprod", 4, 0.679*0.679, 1] ,
