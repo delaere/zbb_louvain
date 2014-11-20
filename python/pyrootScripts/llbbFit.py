@@ -14,10 +14,17 @@ class options_():
         "WW",
         "Wt",
         "Wtbar",
-        "ZH125",
+        "ZH125"
+        #"ZA_350_70",
         ]
     #template for file name
-    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed.root"
+
+    SYST = "Nominal"
+
+    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
+
+    #path = "/home/fynu/amertens/storage/Zbb_Analysis/JESup_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
+    #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed.root"
     #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed_zjets.root"
     #option to split or not the DY sample
     doDYsplit = True
@@ -28,8 +35,8 @@ class options_():
         "zmassMu"  : ["eventSelectionbestzmassMu", 7, 60., 120.] ,
         "MET"      : ["jetmetMET", 7, 0., 100.] ,
         "JPprod"   : ["JPprod", BIN, 0., 1.5*1.5] ,
-        #"CSVprodMM": ["CSVprod", 4, 0.679*0.679, 1] ,
-        "CSVprodML": ["CSVprod", 4, 0.244*0.679, 1] ,
+        "CSVprodMM": ["CSVprod", 4, 0.679*0.679, 1] ,
+        #"CSVprodML": ["CSVprod", 4, 0.244*0.679, 1] ,
         #"CSVprodLL": ["CSVprod", 12, 0.244*0.244, 1] ,
         "JP1"      : ["jetmetbjet1JPdisc", BIN, 0, 1.5] ,
         "JP2"      : ["jetmetbjet2JPdisc", BIN, 0, 1.5],
@@ -38,24 +45,26 @@ class options_():
         "SV1"      : ["jetmetbjet1SVmass", BIN, 0, 5] ,
         "SV2"      : ["jetmetbjet2SVmass", BIN, 0, 5] ,
         }
-    thevars = { "El" : ["zmassEle","CSVprodML"], "Mu" : ["zmassMu","CSVprodML"] }
+    thevars = { "El" : ["zmassEle","CSVprodMM"], "Mu" : ["zmassMu","CSVprodMM"] }
     #thevars = { "El" : ["CSV1","CSV2"], "Mu" : ["CSV1","CSV2"] }
     #thevars = { "El" : ["MET","CSVprodLL"], "Mu" : ["MET","CSVprodLL"] }
     print "variables to be used:", thevars
     #stages
     stages = {
-        "Mu" : "rc_stage_11",
-        "El" : "rc_stage_30"
+        "Mu" : "rc_stage_8",
+        "El" : "rc_stage_19"
         }
     print "stages:", stages
     #BTAG weight
-    BTAG = "BtaggingReweightingMM"
-    if "11" in stages["Mu"] or "14" in stages["Mu"] or "17" in stages["Mu"] : BTAG = "BtaggingReweightingLM"
-    elif "10" in stages["Mu"] or "13" in stages["Mu"] or "16" in stages["Mu"] : BTAG = "BtaggingReweightingLL"
+    BTAG = "btaggingReweightingMM"
+    #if "11" in stages["Mu"] or "14" in stages["Mu"] or "17" in stages["Mu"] : BTAG = "BtaggingReweightingLM"
+    #elif "10" in stages["Mu"] or "13" in stages["Mu"] or "16" in stages["Mu"] : BTAG = "BtaggingReweightingLL"
     print "BTAG:", BTAG
     #define cuts
     #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0 && ( (eventSelectiondijetM<50||eventSelectiondijetM>90) || (eventSelectionZbbM<300||eventSelectionZbbM>400) )"
-    cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0"
+#    cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0"
+    cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10"
+
     #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)"
     print "cut:", cuts
     #define categories
@@ -80,9 +89,10 @@ class options_():
         "Wt" : kSpring,
         "Wtbar" : kSpring,
         "ZH125" : kBlack,
+        #"ZA_350_70" : kBlack,
         }
     #name of the output file
-    output = "FitML_zmass7x4.root"
+    output = "FitMM_zmass7x4_signal.root"
     
 #method to make all needed RDS
 def createRDS(files={"test" : "test.root"}, options=None):
@@ -96,7 +106,9 @@ def createRDS(files={"test" : "test.root"}, options=None):
         newtree = tree.CopyTree(options.cuts)
         ws_ras = tf.Get("workspace_ras")
         ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats())
-        if not "DATA" in key : w = RooFormulaVar("w","w", "@0*@1*@2", RooArgList(ras["LeptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG]))
+        if not "DATA" in key : w = RooFormulaVar("w","w", "@0*@1*@2*@3",
+                                                 RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"])
+                                                 )
         csvprod = RooFormulaVar("CSVprod","CSVprod","@0*@1",RooArgList(ras["jetmetbjet1CSVdisc"],ras["jetmetbjet2CSVdisc"]))
         jpprod = RooFormulaVar("JPprod","JPprod","@0*@1",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
         rds = RooDataSet("rds_zbb"+key,"rds_zbb"+key,newtree,ras)
@@ -222,8 +234,9 @@ def main():
     #get file name
     files = {}
     for sample in options.samples:
-        if "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
-        else : files[sample] = options.path.replace("NAME","Double2012")
+	if "DY" in sample : files[sample] = options.path.replace("NAME","DY")
+        elif "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
+        else : files[sample] = options.path.replace("NAME","Data2012")
         print files[sample]                    
     #get RDS
     RDS = createRDS(files=files, options=options)
@@ -237,21 +250,30 @@ def main():
     #SFs
     print "Define SFs"
     SF_zbb_2jet=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 2.)
-    SF_zbx_2jet=RooRealVar("SF_zbx","SF_zbx",1.,0.5, 2.)
+    SF_zbx_2jet=RooRealVar("SF_zbbj","SF_zbbj",1.,0.5, 2.)
     SF_zxx_2jet=RooRealVar("SF_zxx","SF_zxx",1.,0.5, 5.)
-    #SF_zbb_3jet=SF_zbb_2jet
     SF_zbb_3jet=SF_zbx_2jet
     SF_zbx_3jet=SF_zbx_2jet
     SF_zxx_3jet=SF_zxx_2jet
     SF_tt=RooRealVar("SF_tt","SF_tt",1.,0.5, 2.)
     #SF_tt=RooRealVar("SF_tt", "SF_tt", 1.1, 1.1, 1.1)
     #SF_zz=RooRealVar("SF_zz", "SF_zz", 8.4/7.7, 8.4/7.7, 8.4/7.7)
+
+    #SF_zbb_2jetEE=RooRealVar("SF_zbbEE","SF_zbbEE",1.,0.5, 2.)
+    #SF_zbx_2jetEE=RooRealVar("SF_zbbjEE","SF_zbbjEE",1.,0.5, 2.)
+    #SF_zxx_2jetEE=RooRealVar("SF_zxxEE","SF_zxxEE",1.,0.5, 5.)
+    #SF_zbb_3jetEE=SF_zbx_2jetEE
+    #SF_zbx_3jetEE=SF_zbx_2jetEE
+    #SF_zxx_3jetEE=SF_zxx_2jetEE
+    #SF_ttEE=RooRealVar("SF_ttEE","SF_ttEE",1.,0.5, 2.)
+
     SF_zz=RooRealVar("SF_zz", "SF_zz", 1., 1., 1.)
     SF_wz=RooRealVar("SF_wz", "SF_wz", 1., 1., 1.)
     SF_ww=RooRealVar("SF_ww", "SF_ww", 1., 1., 1.)
     SF_wt=RooRealVar("SF_wt", "SF_wt", 1., 1., 1.)
     SF_wtbar=RooRealVar("SF_wtbar", "SF_wtbar", 1., 1., 1.)
     SF_zh=RooRealVar("SF_zh", "SF_zh", 1., 1., 1.)
+    SF_za=RooRealVar("SF_za", "SF_za", 1., 1., 1.)
 
     SFs={
         "TTFullLeptEl2j":SF_tt,
@@ -265,8 +287,8 @@ def main():
         "WtEl2j":SF_wt,
         "WtbarEl2j":SF_wtbar,
         "ZH125El2j":SF_zh,
+        "ZA_350_70El2j":SF_za,
 
-        "TTFullLeptMu2j":SF_tt,
         "TTSemiLeptMu2j":SF_tt,
         "ZbbMu2j":SF_zbb_2jet,
         "ZbxMu2j":SF_zbx_2jet,
@@ -277,6 +299,7 @@ def main():
         "WtMu2j":SF_wt,
         "WtbarMu2j":SF_wtbar,
         "ZH125Mu2j":SF_zh,
+        "ZA_350_70Mu2j":SF_za,
 
         "TTFullLeptEl3j":SF_tt,
         "TTSemiLeptEl3j":SF_tt,
@@ -289,8 +312,8 @@ def main():
         "WtEl3j":SF_wt,
         "WtbarEl3j":SF_wtbar,
         "ZH125El3j":SF_zh,
+        "ZA_350_70El3j":SF_za,
 
-        "TTFullLeptMu3j":SF_tt,
         "TTSemiLeptMu3j":SF_tt,
         "ZbbMu3j":SF_zbb_3jet,
         "ZbxMu3j":SF_zbx_3jet,
@@ -301,6 +324,7 @@ def main():
         "WtMu3j":SF_wt,
         "WtbarMu3j":SF_wtbar,
         "ZH125Mu3j":SF_zh,
+        "ZA_350_70Mu3j":SF_za,
         }
 
     #categories for simultaneous fit
