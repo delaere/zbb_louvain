@@ -110,7 +110,48 @@ def get_etaFiner_key(eta):
 def get_pt_key(pt):
 
    range = ''
+   if (pt>=3.5 and  pt< 3.75 ):
+      range = '3.5_3.75'
+   elif (pt>=3.75 and  pt< 4.0 ):
+      range = '3.75_4.0'
+   elif (pt>=4.0 and  pt< 4.5 ):
+      range = '4.0_4.5'
+   elif (pt>=4.5 and  pt< 5 ):
+      range = '4.5_5.0'
+   elif (pt>=5 and  pt< 6 ):
+      range = '5.0_6.0'
+   elif (pt>=6 and  pt< 8 ):
+      range = '6.0_8.0'
+   elif (pt>=8 and  pt< 10 ):
+      range = '8.0_10.0'
+   elif (pt>=10 and  pt< 20 ):
+      range = '10.0_20.0'
+   elif (pt>=20 and  pt< 25 ):
+      range = '20_25'
+   elif (pt>=25 and  pt< 30 ):
+      range = '25_30'
+   elif (pt>=30 and  pt< 35 ):
+      range = '30_35'
+   elif (pt>=35 and  pt< 40 ):
+      range = '35_40'
+   elif (pt>=40 and  pt< 50 ):
+      range = '40_50'
+   elif (pt>=50 and  pt< 60 ):
+      range = '50_60'
+   elif (pt>=60 and  pt< 90 ):
+      range = '60_90'
+   elif (pt>=90 and  pt<140 ):
+      range = '90_140'
+   elif (pt>= 140 ):
+      range = '140_300'
+   else:
+      print 'ERROR: value not in range'
 
+   return range
+
+def get_pt_key_eta09(pt):
+# needed becouse of the different pkl file structure for low pt muon ID SF
+   range = ''
    if (pt>=3.5 and  pt< 3.75 ):
       range = '3.5_3.75'
    elif (pt>=3.75 and  pt< 4.0 ):
@@ -126,7 +167,7 @@ def get_pt_key(pt):
    elif (pt>=8 and  pt< 10 ):
       range = '8.0_10.0'
    elif (pt>=10 and  pt< 15 ):
-      range = '10.0_15.0'
+      range = '10.0_15.0' 
    elif (pt>=15 and  pt< 20 ):
       range = '15.0_20.0'
    elif (pt>=20 and  pt< 25 ):
@@ -152,11 +193,15 @@ def get_pt_key(pt):
 
    return range
 
+
+
+
 class EleIDISO_SFReader:
 
   def __init__(self):
      """Embedding Ele ID-ISO SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdMedium_2012rereco.txt', 'r')
+     print 'WARNING [lepton SF]: code does not handle SFs for electron pT< 10GeV!'
      if f:
         self._file = f
      else :
@@ -321,6 +366,8 @@ class MuonIDSFReader:
      """Construct a MuonIDSFReader using pikle files."""
      f = open(configuration.dataDirectory+'MuonEfficiencies_Run2012ReReco_53X.pkl', 'r')
      f1 = open(configuration.dataDirectory+'Muon_ID_LowPt_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
+     print 'WARNING [lepton SF]: code does not handle SFs for muon pT< 5GeV!'
+     print 'WARNING [lepton SF]: SFs for muon with (|eta|>2.1 && pT<20 GeV) are set to 1.0 (not made available from POG)' 
      if f and f1:
         self._map = pickle.load(f)
         self._map1 = pickle.load(f1)
@@ -334,10 +381,15 @@ class MuonIDSFReader:
      """Return the SF or the uncertainty for a given pt and eta."""
 
      self._eta_range= get_eta_key(eta)
-     self._pt_range= get_pt_key(pt)
+
+     if self._eta_range == "ptabseta<0.9":
+        self._pt_range= get_pt_key_eta09(pt)
+     else:
+        self._pt_range= get_pt_key(pt)
+
 
      ## workaround: set ID SF to 1 for the |eta|>2.1 region, given no values are provided (trigger intrinsic limitation?)
-     if pt<20 and abs(eta)> 2.1:
+     if (pt<20 and abs(eta)> 2.1):
         if mode == '0'  :
            return 1.0
         elif mode == '+1'  :
@@ -349,10 +401,10 @@ class MuonIDSFReader:
            return 0
      ## ----------
         
-     elif pt<20 and abs(eta)<= 2.1:    
+     elif (pt<20 and abs(eta)<= 2.1):    
 
-        if mode == '0'  :
-           return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']
+        if mode == '0'  :           
+           return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['efficiency_ratio']   
         elif mode == '+1'  :
            return self._map1['Tight'][self._eta_range][self._pt_range]['data/mc']['err_hi']
         elif mode == '-1' :
