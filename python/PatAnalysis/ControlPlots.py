@@ -138,7 +138,7 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
         mod= __import__(configuration.pythonpath+cp.module)
         atts=(configuration.pythonpath+cp.module).split(".")[1:]
         for att in atts : mod = getattr(mod,att)
-        controlPlots.append(getattr(mod,cp.classname)(dir=None, mode="dataset", dataset=rds))
+        controlPlots.append(getattr(mod,cp.classname)(dir=None, purpose=cp.label, mode="dataset", dataset=rds))
 
   # book histograms (separate iteration for clarity)
   if configuration.runningMode=="plots":

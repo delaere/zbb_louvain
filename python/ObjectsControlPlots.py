@@ -12,9 +12,9 @@ else : from zbbConfig import configuration
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="muons", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="muons", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self, muonList="muons", muonType="tight"):
       # declare histograms
@@ -94,9 +94,9 @@ class MuonsControlPlots(BaseControlPlots):
 class ElectronsControlPlots(BaseControlPlots):
     """A class to create control plots for electrons"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="electrons", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="electrons", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self, electronList="electrons", electronType="tight"):
       # declare histograms
@@ -200,10 +200,9 @@ class JetmetControlPlots(BaseControlPlots):
     var_rho = array.array('f', [0])
     masspoints=[110,115,120,125,130,135,140,145,150]#needed for isrjet
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="jetmet", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-
-      BaseControlPlots.__init__(self, dir=dir, purpose=dir, dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
     def beginJob(self, btagging="CSV", WP=["M","L"], prejets=""):
@@ -576,9 +575,9 @@ class JetmetControlPlots(BaseControlPlots):
 class MetControlPlots(BaseControlPlots):
     """A class to create control plots for MET"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="mets", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="mets", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
 
     def beginJob(self):
       # declare histograms

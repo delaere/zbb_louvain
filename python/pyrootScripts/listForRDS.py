@@ -76,7 +76,9 @@ lumi = { "DATA"   : zbbnorm.lumi_tot2012,
          "ZH120"  : zbbnorm.nev_ZH120_summer12/zbbnorm.xsec_ZH120_8TeV/1000.,
          "ZH125"  : zbbnorm.nev_ZH125_summer12/zbbnorm.xsec_ZH125_8TeV/1000.,
          "ZH130"  : zbbnorm.nev_ZH130_summer12/zbbnorm.xsec_ZH130_8TeV/1000.,
-         "ZH135"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.
+         "ZH135"  : zbbnorm.nev_ZH135_summer12/zbbnorm.xsec_ZH135_8TeV/1000.,
+         #"ZA_350_70"  : zbbnorm.nev_ZH125_summer12/(50*zbbnorm.xsec_ZH125_8TeV)/1000.,
+         "ZA_350_70"  : 25000./0.02/1000.,
          }
 
 

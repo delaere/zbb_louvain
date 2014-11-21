@@ -12,4 +12,4 @@ class configuration(configuration):
     JERfactor = 1.
     JESfactor = 0.
     LeptonTnPfactor = 0 # Lepton reweighting uncertainty
-    SF_uncert="mean" #btagging reweighting:  choose among min/max/mean 
+    SF_uncert="mean" #btagging reweighting:  choose among min/max/mean (_l or _bc for light only or bc only unc.) 

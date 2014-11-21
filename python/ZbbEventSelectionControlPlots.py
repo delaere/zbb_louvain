@@ -9,9 +9,9 @@ else : from zbbConfig import configuration
 class ZbbEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="eventSelection", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self):
       # declare histograms

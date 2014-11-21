@@ -22,7 +22,7 @@ categories = [
   "Z (narrow)", 
   "Z+MET", 
   "Z+CA8 (HP+MET significance)",
-  "Z+CA8, subjets dr<0.4 (HP+MET significance)",
+  "Z+CA8, Subjets dr<0.4 (HP+MET significance)",
   "Z+Subjets (HPHP+MET significance)",
   "Z+Subjets, Subjets dr>=0.4 (HPHP+MET significance)",
   "Z+bb (HPHP+MET significance)",
@@ -46,17 +46,17 @@ def isInCategoryChannel(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
   Mll = float(getNumber(categoryTuple[0],"Mll"))
   subdrjj = float(getNumber(categoryTuple[0],"subdrjj"))
-  TrigAndZnarrow = "TriggerOK" in categoryTuple[0] and "OneZcand" in categoryTuple[0] and Mll<15.
+  TrigAndZnarrow = "TriggerOK" in categoryTuple[0] and "OneZcand" in categoryTuple[0] and Mll<30.
   zfilter = getNumber(categoryTuple[0],"Zfilter")
   # category 0: Trigger
   if category==0:
     return "TriggerOK" in categoryTuple[0] and (zfilter=="none" or zfilter=="0b")
   # category 1: Z candidate (wide mass window)
   elif category==1:
-    return isInCategoryChannel( 0, categoryTuple) and "OneZcand" in categoryTuple[0] and Mll<30.
+    return isInCategoryChannel( 0, categoryTuple) and "OneZcand" in categoryTuple[0] and Mll<15.
   # category 2: Z candidate (narrow mass window)
   elif category==2:
-    return isInCategoryChannel( 0, categoryTuple) and "OneZcand" in categoryTuple[0] and Mll<15.
+    return isInCategoryChannel( 0, categoryTuple) and "OneZcand" in categoryTuple[0] and Mll<30.
   # category 3: Z+MET
   elif category==3:
     return isInCategoryChannel( 2, categoryTuple) and "passMETsigCut" in categoryTuple[0]

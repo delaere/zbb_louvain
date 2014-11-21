@@ -4,9 +4,9 @@ from PatAnalysis.BaseControlPlots import BaseControlPlots
 class LeptonsReweightingControlPlots(BaseControlPlots):
     """A class to create control plots for lumi reweighting"""
 
-    def __init__(self, dir=None, category=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="leptonsReweighting", category=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="LeptonsReweighting", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
       #self.category = [int(s) for s in dir.GetName().split('_') if s.isdigit()]
       #if len(self.category): self.category=self.category[0] 
       #else: self.category=None

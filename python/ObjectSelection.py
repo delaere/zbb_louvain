@@ -405,11 +405,11 @@ def jetId(jet,level="loose"):
     print "Error: unknown jetid level:",level
     return False
 
-def allJets(event, jets="rawjets", checksubjets=False):
+def allJets(event, jets="rawjets", checksubjets=False, cone="AK5"):
   eventrawjets = getattr(event, jets)
   if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
   for jet in eventrawjets:
-    JECuncertaintyProxy.Scale(jet)
+    JECuncertaintyProxy.Scale(jet, cone)
     if checksubjets:
       for i in range(0,jet.numberOfDaughters()) : JECuncertaintyProxy.Scale(jet.daughter(i))
   return eventrawjets
@@ -948,7 +948,7 @@ def fatjets(event, pt=30.):
   prunedCSV = 0
   fatjet = None
   #run over all pruned fat jets
-  prunedjets = allJets(event, jets="rawprunedjets", checksubjets=True)
+  prunedjets = allJets(event, jets="rawprunedjets", checksubjets=True, cone="AK7")
   for pruned in prunedjets:
     if pruned.pt()>2*pt and pruned.bDiscriminator("combinedSecondaryVertexBJetTags")>prunedCSV and pruned.numberOfDaughters() == 2:
       if isGoodJet(pruned.daughter(0), Z = event.bestZcandidate, pt = pt) and isGoodJet(pruned.daughter(1), Z = event.bestZcandidate, pt = pt):

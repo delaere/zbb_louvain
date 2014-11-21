@@ -4,9 +4,9 @@ from MonteCarloSelection import isZbbEvent, isZbcEvent, isZblEvent, isZccEvent, 
 class MonteCarloSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for MC event selection"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="mcSelection", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="mcSelection", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
 
     def beginJob(self):
       # declare histograms
@@ -201,9 +201,9 @@ class MonteCarloSelectionControlPlots(BaseControlPlots):
 class genMetsControlPlots(BaseControlPlots):
     """A class to create control plots for generator Mets"""
     
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="genMets", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="genMets", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
 
     def beginJob(self):
       # declare histograms

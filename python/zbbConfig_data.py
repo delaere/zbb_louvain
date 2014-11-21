@@ -10,8 +10,9 @@ changeJetCollection(conf = configuration, jetcoll = "rawjets")
 class configuration(configuration):
   eventSelection = configuration.pythonpath+"BoostEventSelection"
   # mode: plots or dataset
-  runningMode = "plots"
+  #runningMode = "plots"
   #runningMode = "dataset"
+  RDSasCP = True
   # my variables: files, systematics and other options
   btagging = "CSV"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
@@ -35,6 +36,9 @@ class configuration(configuration):
     eventProducer("fatjetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP,"prejets":"fat" } ),
     eventProducer("subjetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP,"prejets":"sub" } ),
     ])
+
+  toupdateForBtag = configuration.toupdateForBtag
+  toupdateForBtag["controlPlots"].extend(["subjetmet","fatjetmet"])
   #end SPE
 
 changeJetPt(conf = configuration, ptjet=30.)

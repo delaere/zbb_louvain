@@ -10,22 +10,28 @@ else : from zbbConfig import configuration
 class JetCorrectionUncertaintyProxy:
   """A class to access JEC uncertainties"""
 
-  def __init__(self,file=configuration.jecUncertainty):
-    if not os.path.isfile(file):
-      print "Error: ",file, ": No such file."
-      self._engine = None
+  def __init__(self,fileAK5=configuration.jecUncertaintyAK5, fileAK7=configuration.jecUncertaintyAK7):
+    self._engine = {}
+    if not os.path.isfile(fileAK5):
+      print "Error: ",fileAK5, ": No such file."
+      self._engine["AK5"] = None
     else:
-      self._engine = ROOT.JetCorrectionUncertainty(ROOT.JetCorrectorParameters(file, "Total"))
+      self._engine["AK5"] = ROOT.JetCorrectionUncertainty(ROOT.JetCorrectorParameters(fileAK5, "Total"))
+    if not os.path.isfile(fileAK7):
+      print "Warning: ",fileAK7, ": No such file."
+      self._engine["AK7"] = None
+    else:
+      self._engine["AK7"] = ROOT.JetCorrectionUncertainty(ROOT.JetCorrectorParameters(fileAK7, "Total"))
 
-  def unc_tot_jet(self,jet):
+  def unc_tot_jet(self,jet,cone="AK5"):
     """Total (relative) JES uncertainty"""
-    if self._engine is None: return 0
-    self._engine.setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
-    self._engine.setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
-    unc = self._engine.getUncertainty(1)
+    if self._engine[cone] is None: return 0
+    self._engine[cone].setJetEta(jet.eta())# Give rapidity of jet you want uncertainty on
+    self._engine[cone].setJetPt(jet.pt()) #Also give the corrected pt of the jet you want the uncertainty on
+    unc = self._engine[cone].getUncertainty(1)
     return unc
 
-  def jetPt(self,jet):
+  def jetPt(self,jet,cone="AK5"):
     """Jet Pt, optionally varied for JES and JER"""
     jetpt = jet.pt()
     # smear to reproduce resolution measured in data
@@ -39,7 +45,7 @@ class JetCorrectionUncertaintyProxy:
       jetpt = max(0., ptgen + (1.+jersf)*(jetpt-ptgen))
     # take into account JEC uncertainty
     if abs(configuration.JESfactor)>0.01: # non-zero
-      jesunc = self.unc_tot_jet(jet) * configuration.JESfactor * jetpt
+      jesunc = self.unc_tot_jet(jet,cone) * configuration.JESfactor * jetpt
       jetpt = max(0., jetpt + jesunc)
     # return the jet pt, including all of the above
     return jetpt
@@ -89,7 +95,7 @@ class JetCorrectionUncertaintyProxy:
       d = 0.193137
     return sqrt(((cmp(a,0)*(a/jetpt)**2)+(b**2*(pow(jetpt,(d-1))))))
 
-  def Scale(self,jet):
+  def Scale(self,jet,cone="AK5"):
     """Jet Pt, optionally varied for JES and JER"""
     jetpt = jet.pt()
     # smear to reproduce resolution measured in data
@@ -105,7 +111,7 @@ class JetCorrectionUncertaintyProxy:
     # take into account JEC uncertainty
     if abs(configuration.JESfactor)>0.01: # non-zero
       #print "JEC"
-      jesunc = self.unc_tot_jet(jet) * configuration.JESfactor * jetpt
+      jesunc = self.unc_tot_jet(jet, cone) * configuration.JESfactor * jetpt
       jetpt = max(0., jetpt + jesunc)
     # return the jet pt, including all of the above
     if abs(configuration.JERfactor)>0.01 or abs(configuration.JESfactor)>0.01 : jet.scaleEnergy(jetpt/jet.pt())

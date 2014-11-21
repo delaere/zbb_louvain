@@ -22,10 +22,11 @@ class configuration:
   WSname = "workspace_ras"
 
   # mode: plots or dataset
-  runningMode = "plots"
-  #runningMode = "dataset"
-
-  # event selection class
+  #runningMode = "plots"
+  runningMode = "dataset"
+  RDSasCP = False #put to True if you want the variables in the RDS to start with the same name as the CP directories for the CP for which this option is implemented, if False the default purpose name will be used
+  
+  # Event selection class
   eventSelection = pythonpath+"ZbbEventSelection"
 
   # my variables: files, systematics and other options
@@ -39,7 +40,8 @@ class configuration:
   JERfactor = 0. # don't change it, should be 0 on data
   JESfactor = 0. # don't change it, should be 0 on data
   dataDirectory = str(os.environ["CMSSW_BASE"])+"/src/UserCode/zbb_louvain/data/"
-  jecUncertainty=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
+  jecUncertaintyAK5=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK5PFchs.txt"
+  jecUncertaintyAK7=dataDirectory+"Summer13_V5_DATA_UncertaintySources_AK7PFchs.txt"
 
   #parameter you want to print
   toprint = ['runningMode', 'eventSelection', 'ptjet', 'btagging', 'WP', 'muChannel', 'eleChannel', 'doMEcontrolPlots', 'doNNJetRegression']
@@ -127,7 +129,7 @@ class configuration:
 
   #list of objects to update if you plan to chenge the b-tag WP and/or algo (see: "changeBTAG" below)
   toupdateForBtag = {
-    "controlPlots" : ["jetmetAK5PF"],
+    "controlPlots" : ["jetmet"],
     "eventProducers" : ["category", "dijet_muChannel", "dijet_eleChannel", "dijet_all"]
     }
 
@@ -190,7 +192,7 @@ def updateConfMC(c=configuration):
 
     # control plot classes
     updateControlPlots = [
-        controlPlot("MCselection", "MonteCarloSelectionControlPlots", "MonteCarloSelectionControlPlots", { }),
+        controlPlot("mcSelection", "MonteCarloSelectionControlPlots", "MonteCarloSelectionControlPlots", { }),
         controlPlot("genMets","MonteCarloSelectionControlPlots","genMetsControlPlots",{}),
         controlPlot("leptonsReweighting", "LeptonsReweightingControlPlots", "LeptonsReweightingControlPlots", { }),
         controlPlot("mcReweighting", "MonteCarloReweightingControlPlots", "MonteCarloReweightingControlPlots", { }),

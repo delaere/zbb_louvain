@@ -9,9 +9,9 @@ else : from zbbConfig import configuration
 class BoostEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="eventSelection", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self):
       # declare histograms
@@ -39,6 +39,7 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
       self.add("dphiZbb","dphiZbb",40,0,3.15)
       self.add("drZbb","drZbb",100,0,5)
       self.add("Centrality","Centrality",100,0,1)
+      self.add("CentralityBoost","CentralityBoost",100,0,1)
       self.add("detab1l2","detab1l2",100,0,5)
       self.add("detab2l1","detab2l1",100,0,5)
       self.add("dijetM","b bbar invariant mass",3000,0,3000)
@@ -58,6 +59,7 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
       self.add("sub_dphiZbb","dphiZbb",40,0,3.15)
       self.add("sub_drZbb","drZbb",100,0,5)
       self.add("sub_Centrality","Centrality",100,0,1)
+      self.add("sub_CentralityBoost","CentralityBoost",100,0,1)
       self.add("sub_detab1l2","detab1l2",100,0,5)
       self.add("sub_detab2l1","detab2l1",100,0,5)
       self.add("sub_dijetM","b bbar invariant mass",3000,0,3000)
@@ -197,10 +199,32 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
           elif bestZcandidate.daughter(0).isMuon() : result["detab1l2"] = abs(b1.Eta() - lvmu2.Eta())
         if not dijet[1] is None:
           b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+          bb = b1 + b2
+          Zbb = Zb + b2
           if bestZcandidate.daughter(0).isElectron() : result["detab2l1"] = abs(b2.Eta() - lvele1.Eta())
           elif bestZcandidate.daughter(0).isMuon() : result["detab2l1"] = abs(b2.Eta() - lvmu1.Eta())
-          if bestZcandidate.daughter(0).isElectron() : result["Centrality"] = (b1.Pt()+b2.Pt()+lvele1.Pt()+lvele2.Pt())/(b1.E()+b2.E()+lvele1.E()+lvele2.E())
-          elif bestZcandidate.daughter(0).isMuon() : result["Centrality"] = (b1.Pt()+b2.Pt()+lvmu1.Pt()+lvmu2.Pt())/(b1.E()+b2.E()+lvmu1.E()+lvmu2.E())
+          if bestZcandidate.daughter(0).isElectron():
+              ub1 = ROOT.TLorentzVector(b1)
+              ub2 = ROOT.TLorentzVector(b2)
+              ulvele1 = ROOT.TLorentzVector(lvele1)
+              ulvele2 = ROOT.TLorentzVector(lvele2)
+              ub1.Boost(-Zbb.BoostVector())
+              ub2.Boost(-Zbb.BoostVector())
+              ulvele1.Boost(-Zbb.BoostVector())
+              ulvele2.Boost(-Zbb.BoostVector())
+              result["Centrality"] = (b1.Pt()+b2.Pt()+lvele1.Pt()+lvele2.Pt())/(b1.E()+b2.E()+lvele1.E()+lvele2.E())
+              result["CentralityBoost"] = (ub1.Pt()+ub2.Pt()+ulvele1.Pt()+ulvele2.Pt())/(ub1.E()+ub2.E()+ulvele1.E()+ulvele2.E())
+          elif bestZcandidate.daughter(0).isMuon():
+              ub1 = ROOT.TLorentzVector(b1)
+              ub2 = ROOT.TLorentzVector(b2)
+              ulvmu1 = ROOT.TLorentzVector(lvmu1)
+              ulvmu2 = ROOT.TLorentzVector(lvmu2)
+              ub1.Boost(-Zbb.BoostVector())
+              ub2.Boost(-Zbb.BoostVector())
+              ulvmu1.Boost(-Zbb.BoostVector())
+              ulvmu2.Boost(-Zbb.BoostVector())
+              result["Centrality"] = (b1.Pt()+b2.Pt()+lvmu1.Pt()+lvmu2.Pt())/(b1.E()+b2.E()+lvmu1.E()+lvmu2.E())
+              result["CentralityBoost"] = (ub1.Pt()+ub2.Pt()+ulvmu1.Pt()+ulvmu2.Pt())/(ub1.E()+ub2.E()+ulvmu1.E()+ulvmu2.E())
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
             b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
@@ -209,8 +233,6 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
             svdr = b1SV.DeltaR(b2SV)
           else:
             svdr = -1
-          bb = b1 + b2
-          Zbb = Zb + b2
           met = event.MET
           met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
           result["dijetM"] = bb.M()
@@ -240,10 +262,32 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
           elif bestZcandidate.daughter(0).isMuon() : result["sub_detab1l2"] = abs(b1.Eta() - lvmu2.Eta())
         if not dijet[1] is None:
           b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+          bb = b1 + b2
+          Zbb = Zb + b2
           if bestZcandidate.daughter(0).isElectron() : result["sub_detab2l1"] = abs(b2.Eta() - lvele1.Eta())
           elif bestZcandidate.daughter(0).isMuon() : result["sub_detab2l1"] = abs(b2.Eta() - lvmu1.Eta())
-          if bestZcandidate.daughter(0).isElectron() : result["sub_Centrality"] = (b1.Pt()+b2.Pt()+lvele1.Pt()+lvele2.Pt())/(b1.E()+b2.E()+lvele1.E()+lvele2.E())
-          elif bestZcandidate.daughter(0).isMuon() : result["sub_Centrality"] = (b1.Pt()+b2.Pt()+lvmu1.Pt()+lvmu2.Pt())/(b1.E()+b2.E()+lvmu1.E()+lvmu2.E())
+          if bestZcandidate.daughter(0).isElectron():
+              ub1 = ROOT.TLorentzVector(b1)
+              ub2 = ROOT.TLorentzVector(b2)
+              ulvele1 = ROOT.TLorentzVector(lvele1)
+              ulvele2 = ROOT.TLorentzVector(lvele2)
+              ub1.Boost(-Zbb.BoostVector())
+              ub2.Boost(-Zbb.BoostVector())
+              ulvele1.Boost(-Zbb.BoostVector())
+              ulvele2.Boost(-Zbb.BoostVector())
+              result["sub_Centrality"] = (b1.Pt()+b2.Pt()+lvele1.Pt()+lvele2.Pt())/(b1.E()+b2.E()+lvele1.E()+lvele2.E())
+              result["sub_CentralityBoost"] = (ub1.Pt()+ub2.Pt()+ulvele1.Pt()+ulvele2.Pt())/(ub1.E()+ub2.E()+ulvele1.E()+ulvele2.E())
+          elif bestZcandidate.daughter(0).isMuon():
+              ub1 = ROOT.TLorentzVector(b1)
+              ub2 = ROOT.TLorentzVector(b2)
+              ulvmu1 = ROOT.TLorentzVector(lvmu1)
+              ulvmu2 = ROOT.TLorentzVector(lvmu2)
+              ub1.Boost(-Zbb.BoostVector())
+              ub2.Boost(-Zbb.BoostVector())
+              ulvmu1.Boost(-Zbb.BoostVector())
+              ulvmu2.Boost(-Zbb.BoostVector())
+              result["sub_Centrality"] = (b1.Pt()+b2.Pt()+lvmu1.Pt()+lvmu2.Pt())/(b1.E()+b2.E()+lvmu1.E()+lvmu2.E())
+              result["sub_CentralityBoost"] = (ub1.Pt()+ub2.Pt()+ulvmu1.Pt()+ulvmu2.Pt())/(ub1.E()+ub2.E()+ulvmu1.E()+ulvmu2.E())
           if dijet[0].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 and dijet[1].tagInfoSecondaryVertex("secondaryVertex").nVertices()>0 :
             b1SVvec = dijet[0].tagInfoSecondaryVertex("secondaryVertex").flightDirection(0)
             b1SV = ROOT.TVector3(b1SVvec.x(),b1SVvec.y(),b1SVvec.z())
@@ -252,8 +296,6 @@ class BoostEventSelectionControlPlots(BaseControlPlots):
             svdr = b1SV.DeltaR(b2SV)
           else:
             svdr = -1
-          bb = b1 + b2
-          Zbb = Zb + b2
           met = event.MET
           met4v = ROOT.TLorentzVector(met[0].px(),met[0].py(),met[0].pz(),met[0].energy())
           result["sub_dijetM"] = bb.M()
