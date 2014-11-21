@@ -37,6 +37,36 @@ if sampleName=="DY":
     pathList = [path1,path2,path3]
     njobs=1500
     
+if "ZA" in sampleName:
+    runOnMC = True
+    path = "/home/fynu/amertens/storage/CMS_Prod/2HDM/THDM_"+sampleName.replace("ZA_","")+"_RECO/"
+    pathList = [path]
+    njobs=250
+
+if sampleName=="ZA_575_142":
+    runOnMC = True
+    path = "/home/fynu/amertens/storage/CMS_Prod/2HDM/THDM_575_142_RECO/"
+    pathList = [path]
+    njobs=250
+
+if sampleName=="ZA_350_15":
+    runOnMC = True
+    path = "/nfs/user/quertenmont/Higgs/i2HDM_Samples/14_04_22/llbb_350_15_RECO/"
+    pathList = [path]
+    njobs=250
+
+if sampleName=="ZA_350_30":
+    runOnMC = True
+    path = "/nfs/user/quertenmont/Higgs/i2HDM_Samples/14_04_22/llbb_350_30_RECO/"
+    pathList = [path]
+    njobs=250
+
+if sampleName=="ZA_350_70":
+    runOnMC = True
+    path = "/nfs/user/quertenmont/Higgs/i2HDM_Samples/14_04_22/llbb_350_70_RECO/"
+    pathList = [path]
+    njobs=250
+
 if sampleName=="TT":
     runOnMC = True
     path = "/storage/data/cms/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7A-v1/0000/"

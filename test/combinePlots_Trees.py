@@ -33,36 +33,19 @@ class EColor:
 palette=-7
 print "ok"
 process = cms.Process("merge")
+f = open("input.txt","r")
+DIR = f.read()
+DIR = DIR.replace("\n","")
+print DIR
+#DIR = "ZbbMET_beforeRew_ZjjM_largerbin"
 
 process.CombinePlots = cms.PSet(
-  outputFile = cms.string('mergedPlots_2012ABCD_V1_higgs_allMC_30GeV_database_centrality_V57_JES0.root'),
+  outputFile = cms.string(DIR+'_testRew.root'),
     
   data = cms.VPSet (
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleEle2012A/DoubleEle2012A_Summer12_final.root')
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/Data2012.root')
             ), 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleEle2012B/DoubleEle2012B_Summer12_final.root')
-            ), 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleEle2012C/DoubleEle2012C_Summer12_final.root')
-            ), 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleEle2012D/DoubleEle2012D_Summer12_final.root')
-            ), 
-
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleMu2012A/DoubleMu2012A_Summer12_final.root') 
-            ),
-        cms.PSet(
-           fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleMu2012B/DoubleMu2012B_Summer12_final.root') 
-            ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleMu2012C/DoubleMu2012C_Summer12_final.root') 
-            ),
-        cms.PSet(
-           fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DoubleMu2012D/DoubleMu2012D_Summer12_final.root') 
-            ),
         
   ),
     
@@ -70,21 +53,21 @@ process.CombinePlots = cms.PSet(
   mc   = cms.VPSet (
         
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_ZZ/ZZ_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/ZZ.root'),
             color = cms.uint32(EColor.kMagenta+palette),
             scale = cms.double(getSample(name="ZZ_2014").source_dataset.xsection*lumi/getSample(name="ZZ_2014").nevents_processed),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('ZZ')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_WZ/WZ_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/WZ.root'),
             color = cms.uint32(EColor.kCyan+palette),
             scale = cms.double(getSample(name="WZ_2014").source_dataset.xsection*lumi/getSample(name="WZ_2014").nevents_processed),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('WZ')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_WW/WW_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/WW.root'),
             color = cms.uint32(EColor.kOrange+palette),
             scale = cms.double(getSample(name="WW_2014").source_dataset.xsection*lumi/getSample(name="WW_2014").nevents_processed),#6.206*5051./(4191045.)), #Xs 
             role = cms.string('WW')
@@ -92,81 +75,87 @@ process.CombinePlots = cms.PSet(
 
         cms.PSet(
             #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V12/ControlPlots_TTjets/TTjets_Summer12_final.root'),
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_TTFullLept/TTFullLept_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/TTFullLept.root'),
             color = cms.uint32(EColor.kYellow+palette),
-            #scale = cms.double(getSample(name="_2014").source_dataset.xsectionTTjets_8TeV*lumi/getSample(name="_2014").nevents_processedTTjets_summer12),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
-            scale = cms.double(getSample(name="TTFullLept_2014").source_dataset.xsection*lumi/getSample(name="TTFullLept_2014").nevents_processed),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
+            #scale = cms.double(getSample(name="_2014").source_dataset.xsectionTTjets_8TeV*lumi/getSample(name="_2014").nevents_processedTTjets_summer12),#161.5*5051./(3701947.)), #NLO MCFM proper Xs
+            scale = cms.double(getSample(name="TTFullLept_2014").source_dataset.xsection*lumi/getSample(name="TTFullLept_2014").nevents_processed),#161.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('t#bar{t} dilep')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_TTSemiLept/TTSemiLept_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/TTSemiLept.root'),
             color = cms.uint32(EColor.kTeal+palette),
             scale = cms.double(getSample(name="TTSemiLept_2014").source_dataset.xsection*lumi/getSample(name="TTSemiLept_2014").nevents_processed),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('t#bar{t} lept')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_Wt/Wt_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/Wt.root'),
             color = cms.uint32(EColor.kSpring+palette),
             scale = cms.double(getSample(name="Wt_2014").source_dataset.xsection*lumi/getSample(name="Wt_2014").nevents_processed),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('tW')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_Wtbar/Wtbar_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/Wtbar.root'),
             color = cms.uint32(EColor.kSpring+palette),
             scale = cms.double(getSample(name="Wtbar_2014").source_dataset.xsection*lumi/getSample(name="Wtbar_2014").nevents_processed),#157.5*5051./(3701947.)), #NLO MCFM proper Xs
             role = cms.string('#bar{t}W')
             ),
 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DYjets_0b.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/DY.root'),
             color = cms.uint32(EColor.kBlue+palette),
-            scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./35907791.), #NLO MCFM
-            role = cms.string('Z+xx')
+            scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./36107791.), #NLO MCFM
+            role = cms.string('DY+jets')
             ),
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/DYjets_0b.root'),
+            #color = cms.uint32(EColor.kBlue+palette),
+            #scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./36107791.), #NLO MCFM
+            #role = cms.string('Z+xx')
+            #),
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/DYjets_1b.root'),     
+            #color = cms.uint32(EColor.kGreen+palette),
+            #scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./36107791.), #NLO MCFM
+            #role = cms.string('Z+bx')
+            #), 
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/DYjets_2b.root'),
+            ##fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V60/ControlPlots_Zbb_Zb/Zbb_Zb_Summer12_final.root'),
+            #color = cms.uint32(EColor.kRed+palette),
+            #scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./36107791.), #NLO MCFM
+            ##scale = cms.double(getSample(name="_2014").source_dataset.xsectionZbb_8TeV*lumi/getSample(name="_2014").nevents_processedZbb_summer12),
+            #role = cms.string('Z+bb')
+            #), 
         cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DYjets_1b.root'),     
-            color = cms.uint32(EColor.kGreen+palette),
-            scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./35907791.), #NLO MCFM
-            role = cms.string('Z+bx')
-            ), 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_DYjets_2b.root'),
-            #fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp537/ControlPlots_V57/ControlPlots_Zbb_Zb/Zbb_Zb_Summer12_final.root'),
-            color = cms.uint32(EColor.kRed+palette),
-            scale = cms.double(getSample(name="DY_2014").source_dataset.xsection*lumi/46515036.),#3048.*5051./35907791.), #NLO MCFM
-            #scale = cms.double(getSample(name="_2014").source_dataset.xsectionZbb_8TeV*lumi/getSample(name="_2014").nevents_processedZbb_summer12),
-            role = cms.string('Z+bb')
-            ), 
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_ZH125/ZH125_Summer12_final.root'),
+            fileName = cms.string('../python/pyrootScripts/'+DIR+'/ZH125.root'),
             color = cms.uint32(EColor.kWhite),#EColor.kAzure+palette),
             scale = cms.double(getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
             role = cms.string('ZH_125')
             ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_ZA_350_15/ZA_350_15_Summer12_final.root'),
-            color = cms.uint32(1),#EColor.kAzure+palette),
-            scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
-            role = cms.string('50*ZA_350_15'),
-            stacked = cms.untracked.bool(False)
-            ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_ZA_350_30/ZA_350_30_Summer12_final.root'),
-            color = cms.uint32(3),#EColor.kAzure+palette),
-            scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
-            role = cms.string('50*ZA_350_30'),
-            stacked = cms.untracked.bool(False)
-            ),
-        cms.PSet(
-            fileName = cms.string('/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V57/ControlPlots_ZA_350_70/ZA_350_70_Summer12_final.root'),
-            color = cms.uint32(4),#EColor.kAzure+palette),
-            scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
-            role = cms.string('50*ZA_350_70'),
-            stacked = cms.untracked.bool(False)
-            ),
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/ControlPlots_ZA_350_15/ZA_350_15_Summer12_final.root'),
+            #color = cms.uint32(1),#EColor.kAzure+palette),
+            #scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
+            #role = cms.string('50*ZA_350_15'),
+            #stacked = cms.untracked.bool(False)
+            #),
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/ControlPlots_ZA_350_30/ZA_350_30_Summer12_final.root'),
+            #color = cms.uint32(3),#EColor.kAzure+palette),
+            #scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
+            #role = cms.string('50*ZA_350_30'),
+            #stacked = cms.untracked.bool(False)
+            #),
+        #cms.PSet(
+            #fileName = cms.string('../python/pyrootScripts/'+DIR+'/ControlPlots_ZA_350_70/ZA_350_70_Summer12_final.root'),
+            #color = cms.uint32(4),#EColor.kAzure+palette),
+            #scale = cms.double(50*getSample(name="ZH125_2014").source_dataset.xsection*lumi/getSample(name="ZH125_2014").nevents_processed), #Xs 
+            #role = cms.string('50*ZA_350_70'),
+            #stacked = cms.untracked.bool(False)
+            #),
   ),
 
   options = cms.PSet (

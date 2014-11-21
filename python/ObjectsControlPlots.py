@@ -12,9 +12,9 @@ else : from zbbConfig import configuration
 class MuonsControlPlots(BaseControlPlots):
     """A class to create control plots for muons"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="muons", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="muons", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self, muonList="muons", muonType="tight"):
       # declare histograms
@@ -94,9 +94,9 @@ class MuonsControlPlots(BaseControlPlots):
 class ElectronsControlPlots(BaseControlPlots):
     """A class to create control plots for electrons"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="electrons", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="electrons", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
     
     def beginJob(self, electronList="electrons", electronType="tight"):
       # declare histograms
@@ -200,15 +200,15 @@ class JetmetControlPlots(BaseControlPlots):
     var_rho = array.array('f', [0])
     masspoints=[110,115,120,125,130,135,140,145,150]#needed for isrjet
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="jetmet", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-
-      BaseControlPlots.__init__(self, dir=dir, purpose="jetmet", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, btagging="CSV", WP=["M","L"]):
+    def beginJob(self, btagging="CSV", WP=["M","L"], prejets=""):
       self.btagging=btagging
       self.WP=WP
+      self.prejets=prejets
       # declare histograms
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,0,10)
       self.add("SSVHPdiscDisc1","SSVHPdiscDisc1",200,0,10)
@@ -309,9 +309,9 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      dijet = event.dijet_all
-      goodJets = event.goodJets_all
-      for index,jet in enumerate(event.jets):
+      dijet = getattr(event,"di"+self.prejets+"jet_all")
+      goodJets = getattr(event,"good"+self.prejets+"Jets_all")
+      for index,jet in enumerate(getattr(event,self.prejets+"jets")):
         jetPt = jet.pt()
         if goodJets[index]:
           rawjet = jet.correctedJet("Uncorrected")
@@ -327,19 +327,20 @@ class JetmetControlPlots(BaseControlPlots):
           elif jetId(jet,"loose"): result["jetsjetid"].append(1)
           else: result["jetsjetid"].append(0)
           result["jetsFlavor"].append(jet.partonFlavour())
-          result["jetsnpf"].append(rawjet.numberOfDaughters())
-          result["jetsnch"].append(rawjet.chargedMultiplicity())
-          result["jetsChf"].append(jet.chargedHadronEnergyFraction())
-          result["jetsNhf"].append(jet.neutralHadronEnergyFraction())
-          result["jetsnef"].append(rawjet.neutralEmEnergyFraction())
-          result["jetscef"].append(rawjet.chargedEmEnergyFraction())
-          result["jetsPhf"].append(jet.photonEnergyFraction())
-          result["jetsElf"].append(jet.electronEnergyFraction())
-          result["jetsMuf"].append(jet.muonEnergyFraction())
+          if jet.isPFJet():
+              result["jetsnpf"].append(rawjet.numberOfDaughters())
+              result["jetsnch"].append(rawjet.chargedMultiplicity())
+              result["jetsChf"].append(jet.chargedHadronEnergyFraction())
+              result["jetsNhf"].append(jet.neutralHadronEnergyFraction())
+              result["jetsnef"].append(rawjet.neutralEmEnergyFraction())
+              result["jetscef"].append(rawjet.chargedEmEnergyFraction())
+              result["jetsPhf"].append(jet.photonEnergyFraction())
+              result["jetsElf"].append(jet.electronEnergyFraction())
+              result["jetsMuf"].append(jet.muonEnergyFraction())
+              result["jetsPtD"].append(jetPtD(jet))
           result["jetsVtx3dL"].append(jetVtx3dL(jet))
           result["jetsVtx3deL"].append(jetVtx3deL(jet))
           result["jetsVtxPt"].append(jetVtxPt(jet))
-          result["jetsPtD"].append(jetPtD(jet))
           result["jetsSSVHEdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags"))
           result["jetsSSVHPdisc"].append(jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags"))
 	  tISV = jet.tagInfoSecondaryVertex("secondaryVertex")
@@ -380,19 +381,20 @@ class JetmetControlPlots(BaseControlPlots):
               elif jetId(jet,"loose"): result["jet"+str(nj)+"jetid"] = 1
               else: result["jet"+str(nj)+"jetid"] = 0
               result["jet"+str(nj)+"Flavor"] = jet.partonFlavour()
-              result["jet"+str(nj)+"npf"] = jet.numberOfDaughters()
-              result["jet"+str(nj)+"nch"] = jet.chargedMultiplicity()
-              result["jet"+str(nj)+"Chf"] = jet.chargedHadronEnergyFraction()
-              result["jet"+str(nj)+"Nhf"] = jet.neutralHadronEnergyFraction()
-              result["jet"+str(nj)+"nef"] = jet.neutralEmEnergyFraction()
-              result["jet"+str(nj)+"cef"] = jet.chargedEmEnergyFraction()
-              result["jet"+str(nj)+"Phf"] = jet.photonEnergyFraction()
-              result["jet"+str(nj)+"Elf"] = jet.electronEnergyFraction()
-              result["jet"+str(nj)+"Muf"] = jet.muonEnergyFraction()
+              if jet.isPFJet():
+                  result["jet"+str(nj)+"npf"] = jet.numberOfDaughters()
+                  result["jet"+str(nj)+"nch"] = jet.chargedMultiplicity()
+                  result["jet"+str(nj)+"Chf"] = jet.chargedHadronEnergyFraction()
+                  result["jet"+str(nj)+"Nhf"] = jet.neutralHadronEnergyFraction()
+                  result["jet"+str(nj)+"nef"] = jet.neutralEmEnergyFraction()
+                  result["jet"+str(nj)+"cef"] = jet.chargedEmEnergyFraction()
+                  result["jet"+str(nj)+"Phf"] = jet.photonEnergyFraction()
+                  result["jet"+str(nj)+"Elf"] = jet.electronEnergyFraction()
+                  result["jet"+str(nj)+"Muf"] = jet.muonEnergyFraction()
+                  result["jet"+str(nj)+"PtD"] = jetPtD(jet)
               result["jet"+str(nj)+"Vtx3dL"] = jetVtx3dL(jet)
               result["jet"+str(nj)+"Vtx3deL"] = jetVtx3deL(jet)
               result["jet"+str(nj)+"VtxPt"] = jetVtxPt(jet)
-              result["jet"+str(nj)+"PtD"] = jetPtD(jet)
               result["jet"+str(nj)+"SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["jet"+str(nj)+"SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
               result["jet"+str(nj)+"nVertHE"] = nHEvert
@@ -428,19 +430,20 @@ class JetmetControlPlots(BaseControlPlots):
               elif jetId(jet,"medium"): result["bjet"+str(indexDijet)+"jetid"] = 2
               elif jetId(jet,"loose"): result["bjet"+str(indexDijet)+"jetid"] = 1
               else: result["bjet"+str(indexDijet)+"jetid"] = 0
-              result["bjet"+str(indexDijet)+"npf"] = jet.numberOfDaughters()
-              result["bjet"+str(indexDijet)+"nch"] = jet.chargedMultiplicity()
-              result["bjet"+str(indexDijet)+"Chf"] = jet.chargedHadronEnergyFraction()
-              result["bjet"+str(indexDijet)+"Nhf"] = jet.neutralHadronEnergyFraction()
-              result["bjet"+str(indexDijet)+"nef"] = jet.neutralEmEnergyFraction()
-              result["bjet"+str(indexDijet)+"cef"] = jet.chargedEmEnergyFraction()
-              result["bjet"+str(indexDijet)+"Phf"] = jet.photonEnergyFraction()
-              result["bjet"+str(indexDijet)+"Elf"] = jet.electronEnergyFraction()
-              result["bjet"+str(indexDijet)+"Muf"] = jet.muonEnergyFraction()
+              if jet.isPFJet():
+                  result["bjet"+str(indexDijet)+"npf"] = jet.numberOfDaughters()
+                  result["bjet"+str(indexDijet)+"nch"] = jet.chargedMultiplicity()
+                  result["bjet"+str(indexDijet)+"Chf"] = jet.chargedHadronEnergyFraction()
+                  result["bjet"+str(indexDijet)+"Nhf"] = jet.neutralHadronEnergyFraction()
+                  result["bjet"+str(indexDijet)+"nef"] = jet.neutralEmEnergyFraction()
+                  result["bjet"+str(indexDijet)+"cef"] = jet.chargedEmEnergyFraction()
+                  result["bjet"+str(indexDijet)+"Phf"] = jet.photonEnergyFraction()
+                  result["bjet"+str(indexDijet)+"Elf"] = jet.electronEnergyFraction()
+                  result["bjet"+str(indexDijet)+"Muf"] = jet.muonEnergyFraction()
+                  result["bjet"+str(indexDijet)+"PtD"] = jetPtD(jet)
               result["bjet"+str(indexDijet)+"Vtx3dL"] = jetVtx3dL(jet)
               result["bjet"+str(indexDijet)+"Vtx3deL"] = jetVtx3deL(jet)
               result["bjet"+str(indexDijet)+"VtxPt"] = jetVtxPt(jet)
-              result["bjet"+str(indexDijet)+"PtD"] = jetPtD(jet)
               result["bjet"+str(indexDijet)+"SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
               result["bjet"+str(indexDijet)+"SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
               result["bjet"+str(indexDijet)+"nVertHE"] = nHEvert
@@ -483,7 +486,7 @@ class JetmetControlPlots(BaseControlPlots):
       if nj > 2 : #if there are 3 good jets and we select 2 b-jets
           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
           b2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-          for index,jet in enumerate(event.jets):
+          for index,jet in enumerate(getattr(event,self.prejets+"jets")):
               if goodJets[index] and not jet in dijet:
                   #print "there is isrjet"
                   if firstJet == True:
@@ -572,9 +575,9 @@ class JetmetControlPlots(BaseControlPlots):
 class MetControlPlots(BaseControlPlots):
     """A class to create control plots for MET"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, purpose="mets", dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="mets", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
 
     def beginJob(self):
       # declare histograms

@@ -1,8 +1,10 @@
 
 from ROOT import *
 from listForRDS import lumi
+gROOT.SetBatch()
 
 class options_():
+    subjets = False
     #list of samples
     samples = [
         "DATA",
@@ -20,7 +22,6 @@ class options_():
     #template for file name
 
     SYST = "Nominal"
-
     path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
 
     #path = "/home/fynu/amertens/storage/Zbb_Analysis/JESup_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
@@ -31,11 +32,14 @@ class options_():
     #Varibales
     BIN = 5
     vars = {
-        "zmassEle" : ["boostSelectionbestzmassEle", 7, 60., 120.] ,
-        "zmassMu"  : ["boostSelectionbestzmassMu", 7, 60., 120.] ,
+        #"zmassEle" : ["eventSelectionbestzmassEle", 7, 60., 120.] ,
+        #"zmassMu"  : ["eventSelectionbestzmassMu", 7, 60., 120.] ,
+        "zmassEle" : ["boostselectionbestzmassEle", 7, 60., 120.] ,
+        "zmassMu"  : ["boostselectionbestzmassMu", 7, 60., 120.] ,
         "MET"      : ["jetmetMET", 7, 0., 100.] ,
         "JPprod"   : ["JPprod", BIN, 0., 1.5*1.5] ,
         "CSVprodMM": ["CSVprod", 4, 0.679*0.679, 1] ,
+        "CSVprodSubMM": ["CSVprodSub", 4, 0, 1] ,
         #"CSVprodML": ["CSVprod", 4, 0.244*0.679, 1] ,
         #"CSVprodLL": ["CSVprod", 12, 0.244*0.244, 1] ,
         "JP1"      : ["jetmetbjet1JPdisc", BIN, 0, 1.5] ,
@@ -45,7 +49,9 @@ class options_():
         "SV1"      : ["jetmetbjet1SVmass", BIN, 0, 5] ,
         "SV2"      : ["jetmetbjet2SVmass", BIN, 0, 5] ,
         }
+    #thevars = { "El" : ["zmassEle","CSVprodSubMM"], "Mu" : ["zmassMu","CSVprodSubMM"] }
     thevars = { "El" : ["zmassEle","CSVprodMM"], "Mu" : ["zmassMu","CSVprodMM"] }
+    if subjets : thevars = { "El" : ["zmassEle","CSVprodSubMM"], "Mu" : ["zmassMu","CSVprodSubMM"] }
     #thevars = { "El" : ["CSV1","CSV2"], "Mu" : ["CSV1","CSV2"] }
     #thevars = { "El" : ["MET","CSVprodLL"], "Mu" : ["MET","CSVprodLL"] }
     print "variables to be used:", thevars
@@ -54,18 +60,22 @@ class options_():
         "Mu" : "rc_stage_8",
         "El" : "rc_stage_19"
         }
+    if subjets:
+        stages = {
+            "Mu" : "rc_stage_9",
+            "El" : "rc_stage_20"
+            }
     print "stages:", stages
     #BTAG weight
     BTAG = "btaggingReweightingMM"
     #if "11" in stages["Mu"] or "14" in stages["Mu"] or "17" in stages["Mu"] : BTAG = "BtaggingReweightingLM"
     #elif "10" in stages["Mu"] or "13" in stages["Mu"] or "16" in stages["Mu"] : BTAG = "BtaggingReweightingLL"
+    if subjets : BTAG = "btaggingReweightingCA8subjetsMM"
     print "BTAG:", BTAG
+    
     #define cuts
-    #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0 && ( (eventSelectiondijetM<50||eventSelectiondijetM>90) || (eventSelectionZbbM<300||eventSelectionZbbM>400) )"
-#    cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0"
     cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10"
-
-    #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)"
+    #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0 && ( (boostselectiondijetM<54||boostselectiondijetM>86) || (boostselectionZbbM<197||boostselectionZbbM>403) )"
     print "cut:", cuts
     #define categories
     categories = {
@@ -74,6 +84,13 @@ class options_():
         "Mu2j" : stages["Mu"]+"&&jetmetnj==2",
         "Mu3j" : stages["Mu"]+"&&jetmetnj>2"
         }
+    if subjets:
+        categories = {
+            "El2j" : stages["El"]+"&&jetmetnj==2",
+            "El3j" : stages["El"]+"&&jetmetnj>2",
+            "Mu2j" : stages["Mu"]+"&&jetmetnj==2",
+            "Mu3j" : stages["Mu"]+"&&jetmetnj>2"
+            }
     print "categories:", categories
     #colour code for the plots
     Colour = {
@@ -89,10 +106,10 @@ class options_():
         "Wt" : kSpring,
         "Wtbar" : kSpring,
         "ZH125" : kBlack,
-        #"ZA_350_70" : kBlack,
+        "ZA_350_70" : kBlack,
         }
     #name of the output file
-    output = "FitMM_zmass7x4_signal.root"
+    output = "FitMM_zmass7x4_btag_lightDown.root"
     
 #method to make all needed RDS
 def createRDS(files={"test" : "test.root"}, options=None):
@@ -104,16 +121,19 @@ def createRDS(files={"test" : "test.root"}, options=None):
         tree = tf.Get("rds_zbb")
         tmpfile=TFile("tmp.root","RECREATE")
         newtree = tree.CopyTree(options.cuts)
+        print "entries", newtree.GetEntries()
         ws_ras = tf.Get("workspace_ras")
         ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats())
         if not "DATA" in key : w = RooFormulaVar("w","w", "@0*@1*@2*@3",
                                                  RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"])
                                                  )
         csvprod = RooFormulaVar("CSVprod","CSVprod","@0*@1",RooArgList(ras["jetmetbjet1CSVdisc"],ras["jetmetbjet2CSVdisc"]))
+        csvprodSub = RooFormulaVar("CSVprodSub","CSVprodSub","@0*@1",RooArgList(ras["subjetmetbjet1CSVdisc"],ras["subjetmetbjet2CSVdisc"]))
         jpprod = RooFormulaVar("JPprod","JPprod","@0*@1",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
         rds = RooDataSet("rds_zbb"+key,"rds_zbb"+key,newtree,ras)
         if not "DATA" in key : rds.addColumn(w)
         rds.addColumn(csvprod)
+        rds.addColumn(csvprodSub)
         rds.addColumn(jpprod)
         if not "DATA" in key : rds = RooDataSet(rds.GetName(),rds.GetName(),rds,rds.get(),"",w.GetName())
         for cat in options.categories : RDS[key+cat] = rds.reduce(options.categories[cat])
@@ -126,10 +146,13 @@ def splitDY(RDS, cat):
     print "Will split DYjets in Zbb, Zbx and Zxx"
     rds = RDS["DYjets"+cat]
     RDS["Zbb"+cat] = rds.reduce("abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
+    #RDS["Zbb"+cat] = rds.reduce("abs(subjetmetbjet1Flavor)==5 & abs(subjetmetbjet2Flavor)==5")
     RDS["Zbb"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zbb"),rds.GetName().replace("DYjets","Zbb"))
     RDS["Zbx"+cat] = rds.reduce("(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
+    #RDS["Zbx"+cat] = rds.reduce("(abs(subjetmetbjet1Flavor)!=5 & abs(subjetmetbjet2Flavor)==5) || (abs(subjetmetbjet1Flavor)==5 & abs(subjetmetbjet2Flavor)!=5)")
     RDS["Zbx"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zbx"),rds.GetName().replace("DYjets","Zbx"))
     RDS["Zxx"+cat] = rds.reduce("abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)!=5")
+    #RDS["Zxx"+cat] = rds.reduce("abs(subjetmetbjet1Flavor)!=5 & abs(subjetmetbjet2Flavor)!=5")
     RDS["Zxx"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zxx"),rds.GetName().replace("DYjets","Zxx"))
     del RDS["DYjets"+cat]
     return RDS
@@ -234,9 +257,8 @@ def main():
     #get file name
     files = {}
     for sample in options.samples:
-	if "DY" in sample : files[sample] = options.path.replace("NAME","DY")
-        elif "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
-        else : files[sample] = options.path.replace("NAME","Data2012")
+        if "DATA" not in sample : files[sample] = options.path.replace("NAME",sample.replace("jets",""))
+        else : files[sample] = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"#options.path.replace("NAME","Data2012")
         print files[sample]                    
     #get RDS
     RDS = createRDS(files=files, options=options)
@@ -256,8 +278,6 @@ def main():
     SF_zbx_3jet=SF_zbx_2jet
     SF_zxx_3jet=SF_zxx_2jet
     SF_tt=RooRealVar("SF_tt","SF_tt",1.,0.5, 2.)
-    #SF_tt=RooRealVar("SF_tt", "SF_tt", 1.1, 1.1, 1.1)
-    #SF_zz=RooRealVar("SF_zz", "SF_zz", 8.4/7.7, 8.4/7.7, 8.4/7.7)
 
     #SF_zbb_2jetEE=RooRealVar("SF_zbbEE","SF_zbbEE",1.,0.5, 2.)
     #SF_zbx_2jetEE=RooRealVar("SF_zbbjEE","SF_zbbjEE",1.,0.5, 2.)
