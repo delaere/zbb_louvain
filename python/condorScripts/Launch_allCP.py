@@ -24,7 +24,7 @@ dir_plot = {
   "ajafari": "/home/fynu/ajafari/storage/CP/V5/",
   "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
-  "vizangarciaj": "/home/fynu/vizangarciaj/storage/CP/testJune2014/",
+  "vizangarciaj": "/home/fynu/vizangarciaj/storage/CP/testOct2014/",
 }
 
 dir_rds = {
@@ -33,21 +33,21 @@ dir_rds = {
   "ajafari": "/home/fynu/ajafari/storage/RDS/V1/",
   "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
-  "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testJune2014/",
+  "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
 }
 
 
 
         
 samples = [
-    "DATA",
-    #"DY",
-    #"TT",
-    #"ZZ",
-    #"ZH",
-    #"WW",
-    #"WZ",
-    #"SingleT",
+    ##"DATA",
+    "DY",
+    "TT",
+    "ZZ",
+    "ZH",
+    "WW",
+    "WZ",
+    "SingleT",
     #"ZA"
     ]
 
@@ -219,35 +219,35 @@ if "TT" in samples :
     for tt in TTsamples :
         njobs = jobs[tt]
         for i in range(0,njobs):
-            LaunchOnCondor.SendCluster_Push(["BASH", "export weightmode='"+ttweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+tt+"/ -o "+tt+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+            LaunchOnCondor.SendCluster_Push(["BASH", "export weightmode='"+ttweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+tt+"/ -o "+tt+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "SingleT" in samples :
     for St in SingleTsamples :
         njobs = jobs[St]
         for i in range(0,njobs):
-            LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+St+"/ -o "+St+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+            LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+St+"/ -o "+St+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZZ" in samples :
     njobs = jobs["ZZ"]
     for i in range(0,njobs):
-        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_ZZ/ -o ZZ_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_ZZ/ -o ZZ_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "WZ" in samples :
     njobs = jobs["WZ"]
     for i in range(0,njobs):
-        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_WZ/ -o WZ_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_WZ/ -o WZ_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "WW" in samples :
     njobs = jobs["WW"]
     for i in range(0,njobs):
-        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_WW/ -o WW_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+        LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_WW/ -o WW_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "DATA" in samples :
     for ch in DataChannel :
         for period in listdata :
             njobs = jobs[period]
             for i in range(0,njobs):
-                LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+"_data -i /nfs/user/llbb/Pat_8TeV_ReReco/"+ch+DATA+period+"/ -o "+ch+DATA+period+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+                LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+"_data -i /nfs/user/llbb/Pat_8TeV_5320/"+ch+DATA+period+"/ -o "+ch+DATA+period+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "DY" in samples :
     for dy in DYsamples :
@@ -255,17 +255,17 @@ if "DY" in samples :
         if dybjetsplitting: 
             for fl in DYbcl :
                 for i in range(0,njobs):
-                    LaunchOnCondor.SendCluster_Push(["BASH", "export ZjetFilter='"+fl.replace("_","")+"'; export weightmode='"+dyweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+dy+"/ -o "+dy+fl+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+                    LaunchOnCondor.SendCluster_Push(["BASH", "export ZjetFilter='"+fl.replace("_","")+"'; export weightmode='"+dyweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+dy+"/ -o "+dy+fl+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
         else:
             for i in range(0,njobs):
-		LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_"+dy+"/ -o "+dy+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+		LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+dy+"/ -o "+dy+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZH" in samples :
     mass = [125]#[115,120,125,130,135]
     for m in mass:
         njobs = jobs["ZH"]
         for i in range(0,njobs):
-            LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_ReReco/Summer12_ZH"+str(m)+"/ -o ZH"+str(m)+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+            LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_ZH"+str(m)+"/ -o ZH"+str(m)+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZA" in samples :
     for za in ZAsamples:
