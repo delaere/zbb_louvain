@@ -201,7 +201,7 @@ class EleIDISO_SFReader:
   def __init__(self):
      """Embedding Ele ID-ISO SF."""
      f = open(configuration.dataDirectory+'scalefactors_ele_GsfIdMedium_2012rereco.txt', 'r')
-     print 'WARNING [lepton SF]: code does not handle SFs for electron pT< 10GeV!'
+     print 'WARNING [lepton SF]: code does not handle proper SFs for electron pT< 10 GeV (so far lower has been extended down to 0.0 GeV)'
      if f:
         self._file = f
      else :
@@ -366,7 +366,7 @@ class MuonIDSFReader:
      """Construct a MuonIDSFReader using pikle files."""
      f = open(configuration.dataDirectory+'MuonEfficiencies_Run2012ReReco_53X.pkl', 'r')
      f1 = open(configuration.dataDirectory+'Muon_ID_LowPt_Efficiencies_Run_2012ABCD_53X.pkl', 'r')
-     print 'WARNING [lepton SF]: code does not handle SFs for muon pT< 5GeV!'
+     print 'WARNING [lepton SF]: code does not handle proper SFs for muon pT< 5GeV!'
      print 'WARNING [lepton SF]: SFs for muon with (|eta|>2.1 && pT<20 GeV) are set to 1.0 (not made available from POG)' 
      if f and f1:
         self._map = pickle.load(f)
