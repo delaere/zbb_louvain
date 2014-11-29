@@ -9,10 +9,9 @@ else : from zbbConfig import configuration
 class IncEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, purpose="eventSelection", dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      if not configuration.RDSasCP : purpose="eventSelection"
-      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
     
     def beginJob(self):
       # declare histograms
@@ -160,16 +159,17 @@ class IncEventSelectionControlPlots(BaseControlPlots):
         result["zptEle"].append(z.pt())
 	
       bestZcandidate = event.bestZcandidate
-      bestDileptcandidate = event.bestDiLeptCandidate
+      #bestDileptcandidate = event.bestDiLeptCandidate
+      leptons = event.leptonsPair
       #if we have 2 lept. passing sanity cut, trigger matching and vertex association (so not coming from Z necessairly)
-      if not bestDileptcandidate is None : 
+      if not leptons is None : 
         nlept = 0
         for i in range(0,3) :
-          if bestDileptcandidate[i] is not None:
+          if leptons[i] is not None:
             nlept += 1 
-        lept1=bestDileptcandidate[0]
-        lept2=bestDileptcandidate[1]
-	lept3=bestDileptcandidate[2]
+        lept1=leptons[0]
+        lept2=leptons[1]
+	lept3=leptons[2]
  	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
         l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
 	mass=(l1+l2).M()

@@ -27,14 +27,8 @@ if configuration.run_on_emu == True:
     "e-mu + 1b (HP)",
     "e-mu + 2b (HEHE)",
     "e-mu + 2b (HPHP)",
-    "e-mu + 2b (HEHE) + METSIG",
-    "e-mu + Mll > 95 GeV",
-    "e-mu + jets + Mll > 95 GeV",
-    "e-mu + 1b (HE)+ Mll > 95 GeV",
-    "e-mu + 1b (HP)+ Mll > 95 GeV",
-    "e-mu + 2b (HEHE)+ Mll > 95 GeV",
-    "e-mu + 2b (HPHP)+ Mll > 95 GeV",
-    "e-mu + 2b (HEHE) + METSIG + Mll > 95 GeV",
+    "e-mu + 2b (HEHE) + METSIG < cut",
+    "e-mu + 2b (HEHE) + METSIG > cut",
 ]
 else:
 
@@ -66,7 +60,7 @@ def isInCategoryChannel(category, categoryTuple):
       return categoryTuple[0]==1
     # category 1:e-mu
     elif category==1:
-      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==3  and categoryTuple[2]>10
+      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==3  
     # category 2:e-mu + jets
     elif category==2:
       return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0
@@ -84,59 +78,43 @@ def isInCategoryChannel(category, categoryTuple):
       return isInCategoryChannel( 4, categoryTuple) and categoryTuple[5]>1
      # category 7:e-mu + 2b (HEHE) + MET_sig
     elif category==7:
-      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8]>0
-  #   # category 8:e-mu + Mll > 95 GeV
+      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 1
+  #   # category 9:e-mu + 2b (HEHE) + MET_sig
     elif category==8:
-      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[2]>95
-    # category 9:e-mu + jets + Mll > 95 GeV
-    elif category==9:
-      return isInCategoryChannel( 2, categoryTuple) and  categoryTuple[2]>95
-    # category 10: e-mu + 1b (HE)+ Mll > 95 GeV
-    elif category==10:
-      return isInCategoryChannel( 3, categoryTuple) and  categoryTuple[2]>95
-    # category 11: e-mu + 1b (HP)+ Mll > 95 GeV
-    elif category==11:
-      return isInCategoryChannel( 4, categoryTuple) and  categoryTuple[2]>95
-    # category 12: e-mu + 2b (HEHE) + Mll > 95 GeV
-    elif category==12:
-      return isInCategoryChannel( 5, categoryTuple) and  categoryTuple[2]>95
-     # category 13:e-mu + 2b (HPHP) + Mll > 95 GeV
-    elif category==13:
-      return isInCategoryChannel( 6, categoryTuple) and  categoryTuple[2]>95
-      # category 14:e-mu + 2b (HEHE) + Mll > 95 GeV
-    elif category==14:
-      return isInCategoryChannel( 7, categoryTuple) and categoryTuple[2]>95
+      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0
     else:
       return False
   else:
     # category 0: Trigger
     if category==0:
       return categoryTuple[0]==1
-   # category 1:e-e + 2b (HPHP) + Mll >20  GeV
+   # category 1:e-e 
     elif category==1:
-      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1 and categoryTuple[2] > 10 and categoryTuple[2] > 20
-   # category 2:e-e + 2b (HEHE) + Mll > 20 GeV + MET_sig
+      return isInCategoryChannel( 0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2)  
+   # category 2:e-e + jets 
     elif category==2:
-      return isInCategoryChannel(1, categoryTuple) and categoryTuple[8]>0
-   # category 3:e-e + 2b (HEHE) + 20 < Mll < 60 GeV
+      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0
+   # category 3:e-e + 1b (HE)
     elif category==3:
-      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1  and categoryTuple[2] > 20 and categoryTuple[2] < 60
-   # category 4:e-e + 2b (HEHE) + 20 < Mll < 60 GeV + MET_sig
+      return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
+   # category 4:e-e + 1b (HP)
     elif category==4:
-      return isInCategoryChannel(3, categoryTuple) and categoryTuple[8]>0
-   # category 5:e-e + 2b (HEHE) + 60 < Mll < 120 GeV
+      return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>0
+   # category 5:e-e + 2b (HEHE)
     elif category==5:
-      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1  and categoryTuple[2] > 60 and categoryTuple[2] < 120
-   # category 6:e-e + 2b (HEHE) + 60 < Mll < 120 GeV + MET_sig
+      return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>1
+   # category 6:e-e + 2b (HPHP)
     elif category==6:
-      return isInCategoryChannel(5, categoryTuple) and categoryTuple[8]>0
-   # category 7:e-e + 2b (HEHE) + 120 < Mll
+      return isInCategoryChannel( 4, categoryTuple) and categoryTuple[5]>1
+   # category 7:e-e + 2b (HEHE) + MET_sig
     elif category==7:
-      return isInCategoryChannel(0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2) and categoryTuple[5]>1  and categoryTuple[2] > 120
-   # category 8:e-e + 2b (HEHE) + 120 < Mll  + MET_sig
+      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 1
+   # category 8:e-e + 2b (HEHE) + MET_sig
     elif category==8:
-      return isInCategoryChannel(7, categoryTuple) and categoryTuple[8]>0
-
+      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0
+    else:
+      return False
+      
 def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   if event.object().event().eventAuxiliary().isRealData():
     configuration.JERfactor = 0
@@ -153,7 +131,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
-  bestDiLeptcandidate = event.ptSortedLeptons_DRll
+  bestDiLeptcandidate = event.ptSortedLeptons
   if bestDiLeptcandidate is None : nlept=0
   else : nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all
@@ -174,19 +152,6 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
 
     lept1=bestDiLeptcandidate[0]
     lept2=bestDiLeptcandidate[1]
-    if nlept >2:
-      lept3= bestDiLeptcandidate[2]
-    else:
-      lept3=None
-    l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
-    l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
-    mass=(l1+l2).M()
-    mass2 = 0
-    mass3 = 0
-    if lept3 is not None:
-      l3 = ROOT.TLorentzVector(lept3.px(),lept3.py(),lept3.pz(),lept3.energy())
-      mass2 =  (l3+l2).M()
-      mass3 =  (l3+l1).M()
 
     
     if lept1.isMuon() and lept2.isMuon() :
@@ -203,21 +168,9 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
 
     if (lept1.isElectron() and lept2.isMuon()) or (lept2.isElectron() and lept1.isMuon()) :
       output.append(3) 
-    if nlept > 2:
-      output.append(4)
-    if lept3 is not None:
-      if mass >5 and mass3 >5 and mass2 > 5:
-        m1 = abs(mass-91)
-        m2 = abs(mass2-91)
-	m3 = abs(mass3-91)
-	if m1 > m2 and m1 > m3:
-	  output.append (mass)
-	elif m2 > m1 and m2 > m3:
-	  output.append (mass2)
-	elif m3 > m1 and m3 > m2:
-	  output.append (mass3)
-    else:
-      output.append(mass)
+
+  #fill dummy Mll mass
+  output.append(0)
 
   # output[3] -> output[6] : (b)jets
   nJets = 0
