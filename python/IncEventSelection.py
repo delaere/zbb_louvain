@@ -131,7 +131,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
-  bestDiLeptcandidate = event.ptSortedLeptons
+  bestDiLeptcandidate = event.leptonsPair
   if bestDiLeptcandidate is None : nlept=0
   else : nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all

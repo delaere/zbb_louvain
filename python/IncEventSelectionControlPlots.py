@@ -9,10 +9,11 @@ else : from zbbConfig import configuration
 class IncEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None,purpose="eventSelection", mode="plots"):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
-    
+      if not configuration.RDSasCP : purpose="eventSelection"
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
+      
     def beginJob(self):
       # declare histograms
       self.add("run","Run number",50000,160000,210000)

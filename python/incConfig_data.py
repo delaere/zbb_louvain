@@ -2,6 +2,8 @@ from basicConfig import *
 
 #update dilepton selection
 changeDiLeptCand(conf = configuration, names = {"leptonsPair" : "ptSortedLeptons_DRll"})
+changeBTAG(conf = configuration,btagging="JP")
+changeJetPt(conf = configuration, ptjet=20)
 
 class configuration(configuration):
 
@@ -22,11 +24,10 @@ class configuration(configuration):
   MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
 
   # my variables: files, systematics and other options
-  btagging = "CSV"
+  #btagging = "JP"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
-    controlPlot("matrixElements", "MatrixElementControlPlotsInc", "MatrixElementControlPlotsInc", { }),
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
     ])
