@@ -8,7 +8,7 @@ confCfg = os.environ["PatAnalysisCfg"]
 if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
 else : from zbbConfig import configuration
 
-class MatrixElementControlPlots(BaseControlPlots):
+class MatrixElementControlPlotsInc(BaseControlPlots):
     """A class to create control plots for event selection"""
 
     readerREG = ROOT.TMVA.Reader("!Color:!Silent")
@@ -28,9 +28,10 @@ class MatrixElementControlPlots(BaseControlPlots):
     var_met = array.array('f', [0])
     var_rho = array.array('f', [0])
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    def __init__(self, dir=None, dataset=None, purpose="matrixElements", mode="plots", prejets=""):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
+      self.prejets = prejets
     
     def beginJob(self):
       # declare histograms
@@ -148,7 +149,7 @@ class MatrixElementControlPlots(BaseControlPlots):
         self.readerREG.BookMVA("BDT_REG","/nfs/user/llbb/TMVAregression/factoryJetReg_BDT.weights.xml")
       
     def process(self, event):
-      """matrixElementControlPlots"""
+      """MatrixElementControlPlotsInc"""
       result = { }
       # in all cases, we need a reco Z
       #bestZcandidate = event.bestZcandidate
@@ -322,7 +323,7 @@ class MatrixElementControlPlots(BaseControlPlots):
       #Then Fill ME inputs related to jets and if MC event and matching jet rec-gen fill info for TF
       #both jets should be matched in order to fill the TF info
       if not leptons is None:
-        dijet = event.dijet_all
+	dijet = getattr(event,"di"+self.prejets+"jet_all")
         if not dijet[0] is None:
           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy()) #self._JECuncertainty.jet(dijet[0])
 	  jetPt = b1.Pt()
@@ -505,5 +506,5 @@ def Delta(par1,par2):
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest
-  runTest(sys.argv[1], MatrixElementControlPlots())
+  runTest(sys.argv[1], MatrixElementControlPlotsInc())
 
