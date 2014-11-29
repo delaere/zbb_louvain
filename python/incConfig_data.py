@@ -27,5 +27,6 @@ class configuration(configuration):
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
+    controlPlot("matrixElements", "MatrixElementControlPlotsInc", "MatrixElementControlPlotsInc", { }),
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
     ])
