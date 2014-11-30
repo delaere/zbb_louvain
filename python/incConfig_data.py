@@ -24,10 +24,14 @@ class configuration(configuration):
   MetType = "PF" # Define the type of MET you want to use. Can be PF, MVA or NoPU
 
   # my variables: files, systematics and other options
-  #btagging = "JP"
+  btagging = "JP"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
+    ])
+  eventProducers = configuration.eventProducers
+  eventProducers.extend([
+    eventProducer("jetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP } ),
     ])
