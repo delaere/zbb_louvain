@@ -27,21 +27,21 @@ if configuration.run_on_emu == True:
     "e-mu + 1b (HP)",
     "e-mu + 2b (HEHE)",
     "e-mu + 2b (HPHP)",
-    "e-mu + 2b (HEHE) + METSIG < cut",
-    "e-mu + 2b (HEHE) + METSIG > cut",
+    "e-mu + 2b (HPHP) + METSIG < cut",
+    "e-mu + 2b (HPHP) + METSIG > cut",
 ]
 else:
 
   categories = [ 
   "Trigger", 
-  "ll + 2b (HPHP) + Mll > 20 GeV ",
-  "ll + 2b (HPHP) + Mll > 20 GeV + METSIG",      
-  "ll + 2b (HPHP) + 20 <  Mll < 60 GeV ",
-  "ll + 2b (HPHP) + 20 <  Mll < 60 GeV + METSIG",
-  "ll + 2b (HPHP) + 60 <  Mll < 120 GeV ",
-  "ll + 2b (HPHP) + 60 <  Mll < 120 GeV + METSIG",
-  "ll + 2b (HPHP) + 120 <  Mll  GeV ",
-  "ll + 2b (HPHP) + 120 <  Mll  GeV + METSIG",
+  "ll ",
+  "ll + jets",
+  "ll + 1b (HE)",
+  "ll + 1b (HP)",
+  "ll + 2b (HEHE)",
+  "ll + 2b (HPHP)",
+  "ll + 2b (HEHE) + METSIG < cut",
+  "ll + 2b (HEHE) + METSIG > cut",
   ]
 
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
@@ -131,7 +131,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
-  bestDiLeptcandidate = event.leptonsPair
+  bestDiLeptcandidate = event.ptSortedLeptons_DRll
   if bestDiLeptcandidate is None : nlept=0
   else : nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all
