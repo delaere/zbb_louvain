@@ -161,16 +161,16 @@ class IncEventSelectionControlPlots(BaseControlPlots):
 	
       bestZcandidate = event.bestZcandidate
       #bestDileptcandidate = event.bestDiLeptCandidate
-      leptons = event.leptonsPair
+      leptons = event.ptSortedLeptons_DRll
       #if we have 2 lept. passing sanity cut, trigger matching and vertex association (so not coming from Z necessairly)
       if not leptons is None : 
         nlept = 0
-        for i in range(0,3) :
+        for i in range(0,2) :
           if leptons[i] is not None:
             nlept += 1 
         lept1=leptons[0]
         lept2=leptons[1]
-	lept3=leptons[2]
+	#lept3=leptons[2]
  	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
         l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
 	mass=(l1+l2).M()
