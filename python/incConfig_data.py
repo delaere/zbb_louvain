@@ -30,8 +30,11 @@ class configuration(configuration):
   controlPlots = configuration.controlPlots
   controlPlots.extend([
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
+    
     ])
   eventProducers = configuration.eventProducers
   eventProducers.extend([
     eventProducer("jetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP } ),
     ])
+    
+

@@ -69,23 +69,35 @@ class IncEventSelectionControlPlots(BaseControlPlots):
       self.add("mu2eta_inc","subleading muon Eta",25,0,2.5)
       self.add("mu1etapm_inc","leading muon Eta",50,-2.5,2.5)
       self.add("mu2etapm_inc","subleading muon Eta",50,-2.5,2.5)
-      self.add("mu2etapm_inc","subleading muon Eta",50,-2.5,2.5)
-      self.add("mu1charge","mu1 charge",5,-2.5,2.5)
-      self.add("mu2charge","mu2 charge",5,-2.5,2.5)      
+      self.add("mu1charge_inc","mu1 charge",5,-2.5,2.5)
+      self.add("mu2charge_inc","mu2 charge",5,-2.5,2.5)
+      self.add("mu3pt_inc","third muon Pt",500,0,500)
+      self.add("mu4pt_inc","fourth muon Pt",500,0,500)
+      self.add("mu3eta_inc","third muon Eta",25,0,2.5)
+      self.add("mu4eta_inc","fourth muon Eta",25,0,2.5)
+      self.add("mu3etapm_inc","third muon Eta",50,-2.5,2.5)
+      self.add("mu4etapm_inc","fourth muon Eta",50,-2.5,2.5)
+      self.add("mu3charge","mu3 charge",5,-2.5,2.5)
+      self.add("mu4charge","mu4 charge",5,-2.5,2.5)      
       self.add("el1pt_inc","leading electron Pt",1000,0,1000)
       self.add("el2pt_inc","subleading electron Pt",1000,0,1000)
       self.add("el1eta_inc","leading electron Eta",25,0,2.5)
       self.add("el2eta_inc","subleading electron Eta",25,0,2.5)
       self.add("el1etapm_inc","leading electron Eta",50,-2.5,2.5)
       self.add("el2etapm_inc","subleading electron Eta",50,-2.5,2.5)      
-      self.add("el1charge","el1 charge",5,-2.5,2.5)
-      self.add("el2charge","el2 charge",5,-2.5,2.5)
-      self.add("lep1charge","Lepton1 charge",5,-2.5,2.5)
-      self.add("lep2charge","Lepton2 charge",5,-2.5,2.5)
-      self.add("dilepchargesum","Lepton1 charge + Lepton 2 charge",5,-2.5,2.5)
-      self.add("invMass_inc","invariant mass of the two leptons",50,0,200)
-      self.add("dilepM","dilepM",1000,0,1000)
-      self.add("dilepPt","dilepPt",1000,0,1000)
+      self.add("el1charge_inc","el1 charge",5,-2.5,2.5)
+      self.add("el2charge_inc","el2 charge",5,-2.5,2.5)
+      self.add("el3pt_inc","third electron Pt",1000,0,1000)
+      self.add("el4pt_inc","fourth electron Pt",1000,0,1000)
+      self.add("el3eta_inc","third electron Eta",25,0,2.5)
+      self.add("el4eta_inc","fourth electron Eta",25,0,2.5)
+      self.add("el3etapm_inc","third electron Eta",50,-2.5,2.5)
+      self.add("el4etapm_inc","fourth electron Eta",50,-2.5,2.5)      
+      self.add("el3charge","el3 charge",5,-2.5,2.5)
+      self.add("el4charge","el4 charge",5,-2.5,2.5)     
+      self.add("dilepchargesum_inc","Lepton1 charge + Lepton 2 charge",5,-2.5,2.5)
+      self.add("dilepM_inc","dilepM_inc",1000,0,1000)
+      self.add("dilepPt_inc","dilepPt_inc",1000,0,1000)
       self.add("drll_inc","drll_inc",50,0,5)
       self.add("dphill_inc","dphill_inc",50,0,3.15)
       self.add("dijetM_inc","b bbar invariant mass",500,0,1000)
@@ -161,51 +173,70 @@ class IncEventSelectionControlPlots(BaseControlPlots):
 	
       bestZcandidate = event.bestZcandidate
       #bestDileptcandidate = event.bestDiLeptCandidate
-      leptons = event.ptSortedLeptons_DRll
+      leptons = event.leptonsPair
       #if we have 2 lept. passing sanity cut, trigger matching and vertex association (so not coming from Z necessairly)
+      nlept = 0
       if not leptons is None : 
-        nlept = 0
-        for i in range(0,2) :
-          if leptons[i] is not None:
-            nlept += 1 
+        nlept= len(leptons)
         lept1=leptons[0]
         lept2=leptons[1]
-	#lept3=leptons[2]
+	lept3= None
+	lept4= None
+	if nlept > 2: lept3=leptons[2]
+	if nlept > 3: lept4=leptons[3]
  	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
         l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
 	mass=(l1+l2).M()
 
         result["nlept_inc"] =nlept	
-        result["invMass_inc"] =mass	
-        result["dilepM"] =mass	
-        result["dilepPt"] =(l1+l2).Pt()	
+        result["dilepM_inc"] =mass	
+        result["dilepPt_inc"] =(l1+l2).Pt()	
 	result["drll_inc"] = l1.DeltaR(l2)  
 	result["dphill_inc"] = abs(l1.DeltaPhi(l2))  
-	result["dilepchargesum"] = lept1.charge() + lept2.charge()
+	result["dilepchargesum_inc"] = lept1.charge() + lept2.charge()
 	if lept1.isMuon():
           result["mu1pt_inc"] = lept1.pt()
           result["mu1etapm_inc"] = lept1.eta()
           result["mu1eta_inc"] = abs(lept1.eta())
-          result["mu1charge"] = lept1.charge()
-          result["lep1charge"] = lept1.charge()
+          result["mu1charge_inc"] = lept1.charge()
 	elif lept1.isElectron():
           result["el1pt_inc"] = lept1.pt()
           result["el1etapm_inc"] = lept1.eta()
           result["el1eta_inc"] = abs(lept1.eta())	  
-          result["el1charge"] = lept1.charge()
-          result["lep1charge"] = lept1.charge()
+          result["el1charge_inc"] = lept1.charge()
 	if lept2.isMuon():
           result["mu2pt_inc"] = lept2.pt()
           result["mu2etapm_inc"] = lept2.eta()
           result["mu2eta_inc"] = abs(lept2.eta())	    
-          result["mu2charge"] = lept2.charge()
-          result["lep2charge"] = lept2.charge()
+          result["mu2charge_inc"] = lept2.charge()
 	elif lept2.isElectron():
           result["el2pt_inc"] = lept2.pt()
           result["el2etapm_inc"] = lept2.eta()
           result["el2eta_inc"] = abs(lept2.eta())            
-          result["el2charge"] = lept2.charge()
-          result["lep2charge"] = lept2.charge()
+          result["el2charge_inc"] = lept2.charge()
+	if lept3 is not None:
+	  if lept3.isMuon():	  
+            result["mu3pt_inc"] = lept3.pt()
+            result["mu3etapm_inc"] = lept3.eta()
+            result["mu3eta_inc"] = abs(lept3.eta())
+            result["mu3charge_inc"] = lept3.charge()
+	  elif lept3.isElectron():	  
+            result["el3pt_inc"] = lept3.pt()
+            result["el3etapm_inc"] = lept3.eta()
+            result["el3eta_inc"] = abs(lept3.eta())
+            result["el3charge_inc"] = lept3.charge()	  
+	  if lept4 is not None:	  
+	    if lept4.isMuon():	  
+              result["mu4pt_inc"] = lept4.pt()
+              result["mu4etapm_inc"] = lept4.eta()
+              result["mu4eta_inc"] = abs(lept4.eta())
+              result["mu4charge_inc"] = lept4.charge()
+	    elif lept4.isElectron():	  
+              result["el4pt_inc"] = lept4.pt()
+              result["el4etapm_inc"] = lept4.eta()
+              result["el4eta_inc"] = abs(lept4.eta())
+              result["el4charge_inc"] = lept4.charge()	  
+  	  
 
         dijet = event.dijet_all
         if not dijet[0] is None:

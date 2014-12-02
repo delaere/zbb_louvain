@@ -308,13 +308,13 @@ def isTriggerHambOK(event,perRun=True):
 
 
 
-def isLooseMuon(muon):
+def isLooseMuon(muon, pt_lep=10.0):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything on top of PAT cfg ?
   # cleaning ?
   #return True
-  return muon.pt()>20.
+  return muon.pt()>pt_lep
 
 def isTightMuon(muon):
   """Perform additional checks that define a tight muon"""
@@ -338,22 +338,22 @@ def isMatchedMuon(muon):
   # cleaning ?
   return (isTightMuon(muon) and True)
 
-def isGoodMuon(muon,role):
+def isGoodMuon(muon,role,pt_lep=10.0):
   """Perform additional checks that define a good muon"""
-  if string.find(role,"all")!=-1     : return isLooseMuon(muon)
+  if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
   if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
 
-def isLooseElectron(electron):
+def isLooseElectron(electron, pt_lep=10.0):
   """Perform additional checks that define a loose electron"""
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return electron.pt()>20. # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
+  return electron.pt()> pt_lep# and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
   #return True
 
 def isTightElectron(electron):
@@ -381,9 +381,9 @@ def isMatchedElectron(electron):
   #if electron.hasOverlaps("muons"): return False
   return (isTightElectron(electron) and True)
 
-def isGoodElectron(electron,role):
+def isGoodElectron(electron,role, pt_lep=10.0):
   """Perform additional checks that define a good electron"""
-  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
+  if string.find(role,"all")!=-1   : return isLooseElectron(electron, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
@@ -626,9 +626,9 @@ def isZcandidate(zCandidate,vertex=None):
     charge *= daughter.charge()
     if daughter.isMuon():
       flavor *= -1
-      result = result and isGoodMuon(zCandidate.daughter(r),r)
+      result = result and isGoodMuon(zCandidate.daughter(r),r, pt_lep=20.0)
     elif zCandidate.daughter(r).isElectron():
-      result = result and isGoodElectron(zCandidate.daughter(r),r)
+      result = result and isGoodElectron(zCandidate.daughter(r),r, pt_lep=20.0)
   # check that leptons are opposite charge (should always be the case)
   if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"

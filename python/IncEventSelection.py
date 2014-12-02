@@ -40,8 +40,8 @@ else:
   "ll + 1b (HP)",
   "ll + 2b (HEHE)",
   "ll + 2b (HPHP)",
-  "ll + 2b (HEHE) + METSIG < cut",
-  "ll + 2b (HEHE) + METSIG > cut",
+  "ll + 2b (HPHP) + METSIG < cut",
+  "ll + 2b (HPHP) + METSIG > cut",
   ]
 
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
@@ -63,7 +63,7 @@ def isInCategoryChannel(category, categoryTuple):
       return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==3  
     # category 2:e-mu + jets
     elif category==2:
-      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0
+      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
     # category 3: e-mu + 1b (HE)
     elif category==3:
       return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
@@ -93,7 +93,7 @@ def isInCategoryChannel(category, categoryTuple):
       return isInCategoryChannel( 0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2)  
    # category 2:e-e + jets 
     elif category==2:
-      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>0
+      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
    # category 3:e-e + 1b (HE)
     elif category==3:
       return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
@@ -131,7 +131,7 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if (not MonteCarloSelection.isRecoZbbEvent(event) and not MonteCarloSelection.isRecoZbEvent(event)) and not ('0b' in ZjetFilter): return [-1]
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
-  bestDiLeptcandidate = event.ptSortedLeptons_DRll
+  bestDiLeptcandidate = event.leptonsPair
   if bestDiLeptcandidate is None : nlept=0
   else : nlept= len(bestDiLeptcandidate)
   goodJets = event.goodJets_all
