@@ -14,25 +14,9 @@ else : from zbbConfig import configuration
 # For simplicity and clarity, methods are defined generically for each
 # and the final (public) methods work by concatenating/splitting
 
-channels = [ "Muon", "Electron"]
+channels = ["Muon", "Electron","MuE"]
 
-categories = []
-
-if configuration.run_on_emu == True:
-  categories = [
-    "Trigger",
-    "e-mu",
-    "e-mu + jets",
-    "e-mu + 1b (HE)",
-    "e-mu + 1b (HP)",
-    "e-mu + 2b (HEHE)",
-    "e-mu + 2b (HPHP)",
-    "e-mu + 2b (HPHP) + METSIG < cut",
-    "e-mu + 2b (HPHP) + METSIG > cut",
-]
-else:
-
-  categories = [ 
+categories = [ 
   "Trigger", 
   "ll ",
   "ll + jets",
@@ -48,49 +32,20 @@ categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
 
 def isInCategory(category, categoryTuple):
   if category<len(categories):
-    return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/2])
+    return isInCategoryChannel(category%len(categories), categoryTuple[:len(categoryTuple)/3])
+  elif category >= len(categories) and category < 2*len(categories) :
+    return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/3:2*len(categoryTuple)/3])
   else:
-    return isInCategoryChannel(category%len(categories), categoryTuple[len(categoryTuple)/2:])
+    return isInCategoryChannel(category%len(categories), categoryTuple[2*len(categoryTuple)/3:len(categoryTuple)])
 
 def isInCategoryChannel(category, categoryTuple):
-  """Check if the event enters category X, given the tuple computed by eventCategory."""
-  if configuration.run_on_emu == True:
-    # category 0: Trigger
-    if category==0:
-      return categoryTuple[0]==1
-    # category 1:e-mu
-    elif category==1:
-      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==3  
-    # category 2:e-mu + jets
-    elif category==2:
-      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
-    # category 3: e-mu + 1b (HE)
-    elif category==3:
-      return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
-    # category 4: e-mu + 1b (HP)
-    elif category==4:
-      return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>0
-    # category 5: e-mu + 2b (HEHE)
-    elif category==5:
-      return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>1
-     # category 6:e-mu + 2b (HPHP)
-    elif category==6:
-      return isInCategoryChannel( 4, categoryTuple) and categoryTuple[5]>1
-     # category 7:e-mu + 2b (HEHE) + MET_sig
-    elif category==7:
-      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 1
-  #   # category 9:e-mu + 2b (HEHE) + MET_sig
-    elif category==8:
-      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0
-    else:
-      return False
-  else:
-    # category 0: Trigger
+    """Check if the event enters category X, given the tuple computed by eventCategory."""
+   # category 0: Trigger
     if category==0:
       return categoryTuple[0]==1
    # category 1:e-e 
     elif category==1:
-      return isInCategoryChannel( 0, categoryTuple) and (categoryTuple[1]==1 or categoryTuple[1]==2)  
+      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1  
    # category 2:e-e + jets 
     elif category==2:
       return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
@@ -119,8 +74,9 @@ def eventCategory(event,btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   if event.object().event().eventAuxiliary().isRealData():
     configuration.JERfactor = 0
     configuration.JESfactor = 0
-  return eventCategoryChannel(event, muChannel=configuration.muChannel, eleChannel=False,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter) + \
-         eventCategoryChannel(event, muChannel=False, eleChannel=configuration.eleChannel,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
+  return eventCategoryChannel(event, muChannel=True, eleChannel=False,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter) + \
+         eventCategoryChannel(event, muChannel=False, eleChannel=True,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter) + \
+	 eventCategoryChannel(event, muChannel=False, eleChannel=False,btagging=btagging, WP=WP, ZjetFilter=ZjetFilter)
   
 def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV", WP=["M","L"], ZjetFilter="none"):
   """Check analysis requirements for various steps."""
@@ -163,11 +119,13 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     if lept1.isElectron() and lept2.isElectron() :
       #elel channel only filled for elChannel=True
       if eleChannel:
-        output.append(2)
+        output.append(1)
       else: output.append(0)
 
     if (lept1.isElectron() and lept2.isMuon()) or (lept2.isElectron() and lept1.isMuon()) :
-      output.append(3) 
+	if not eleChannel and not muChannel :
+         output.append(1)
+	else : output.append(0) 
 
   #fill dummy Mll mass
   output.append(0)
@@ -219,4 +177,3 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
       output.append(-1)
   # return the list of results
   return output
-
