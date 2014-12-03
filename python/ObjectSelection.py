@@ -236,7 +236,7 @@ def isTriggerIncOK(event,perRun=True):
   runNumber = event.run()
   l1= None
   l2= None
-  bestDileptcandidate = event.bestDiLeptCandidate
+  bestDileptcandidate = event.ptSortedLeptons_DRll
   if bestDileptcandidate is not None:
     l1=bestDileptcandidate[0]
     l2=bestDileptcandidate[1]
@@ -308,13 +308,13 @@ def isTriggerHambOK(event,perRun=True):
 
 
 
-def isLooseMuon(muon):
+def isLooseMuon(muon, pt_lep=10.0):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything on top of PAT cfg ?
   # cleaning ?
   #return True
-  return muon.pt()>20.
+  return muon.pt()>pt_lep
 
 def isTightMuon(muon):
   """Perform additional checks that define a tight muon"""
@@ -338,22 +338,22 @@ def isMatchedMuon(muon):
   # cleaning ?
   return (isTightMuon(muon) and True)
 
-def isGoodMuon(muon,role):
+def isGoodMuon(muon,role,pt_lep=10.0):
   """Perform additional checks that define a good muon"""
-  if string.find(role,"all")!=-1     : return isLooseMuon(muon)
+  if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
   if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
 
-def isLooseElectron(electron):
+def isLooseElectron(electron, pt_lep=10.0):
   """Perform additional checks that define a loose electron"""
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return electron.pt()>20. # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
+  return electron.pt()> pt_lep# and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
   #return True
 
 def isTightElectron(electron):
@@ -381,9 +381,9 @@ def isMatchedElectron(electron):
   #if electron.hasOverlaps("muons"): return False
   return (isTightElectron(electron) and True)
 
-def isGoodElectron(electron,role):
+def isGoodElectron(electron,role, pt_lep=10.0):
   """Perform additional checks that define a good electron"""
-  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
+  if string.find(role,"all")!=-1   : return isLooseElectron(electron, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
@@ -436,7 +436,7 @@ def jetId(jet,level="loose"):
   else:
     print "Error: unknown jetid level:",level
     return False
-
+    
 def allJets(event, jets="rawjets", checksubjets=False, cone="AK5"):
   eventrawjets = getattr(event, jets)
   if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
@@ -450,16 +450,19 @@ def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
   """Perform additional checks that define a good jet"""
   #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
+
   # overlap checking
   if not Z is None :
     if not hasNoOverlap(jet,Z=Z) :
       return False
+
   if not lepPair is None :
     if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
       return False
+
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
-
+  
 def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   # leptons pair
   if muChannel and eleChannel:
@@ -473,6 +476,7 @@ def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   # compute the good jets
   return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),getattr(event,jets))
 
+  
 def getMet(event,type="PF"):
   """Return the MET value you are interested in (type can be PF, MVA or NoPU)"""
   return{
@@ -622,9 +626,9 @@ def isZcandidate(zCandidate,vertex=None):
     charge *= daughter.charge()
     if daughter.isMuon():
       flavor *= -1
-      result = result and isGoodMuon(zCandidate.daughter(r),r)
+      result = result and isGoodMuon(zCandidate.daughter(r),r, pt_lep=20.0)
     elif zCandidate.daughter(r).isElectron():
-      result = result and isGoodElectron(zCandidate.daughter(r),r)
+      result = result and isGoodElectron(zCandidate.daughter(r),r, pt_lep=20.0)
   # check that leptons are opposite charge (should always be the case)
   if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"
@@ -896,6 +900,9 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
   if (vertex_cond is True):
     result = True
 
+
+
+
   if (result == True):
     return (leptList[0],leptList[1],leptList[2],leptList[3])
   else:
@@ -925,6 +932,7 @@ def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
       return [cand.daughter(0), cand.daughter(1)]
     except:
       return [None, None]
+
 
 def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False, prejets=""):
   """Find the best jet pair: high Pt and btagging."""
@@ -979,7 +987,8 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
   for index in indices_pt:
     jetList.append(index)
   return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
-
+  
+  
 def vertex(event):
   vertices = event.vertices
   if vertices.size()>0 :

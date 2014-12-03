@@ -53,7 +53,7 @@ class MuonsControlPlots(BaseControlPlots):
       nmu = 0
       for muon in getattr(event, self.muonList):
         # for muons:
-        if muon.pt()<20. : continue
+        if muon.pt()<10. : continue
         
         chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt
         chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt  
@@ -153,7 +153,7 @@ class ElectronsControlPlots(BaseControlPlots):
       nel = 0
       for electron in getattr(event, self.electronList):
         # for electrons
-        if electron.pt()<20. : continue
+        if electron.pt()<10. : continue
         scEt = (electron.ecalEnergy()*sin(electron.theta()))
         result["eleid"].append(electron.userInt("MediumWP"))
         result["eleMVAnontrig"].append(electron.electronID("mvaNonTrigV0"))
@@ -266,11 +266,11 @@ class JetmetControlPlots(BaseControlPlots):
               self.varOrdering.remove(var)
               continue
           self.add("jets"+var,"All jet "+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
-      self.njets = 2
+      self.njets = 4
       for ijet in range(0,self.njets):
           for var in self.varOrdering:
               self.add("jet"+str(ijet+1)+var,"Jet "+str(ijet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
-      self.nbjets = 2
+      self.nbjets = 4
       for ibjet in range(0,self.nbjets):
           for var in self.varOrdering:
               self.add("bjet"+str(ibjet+1)+var,"b-jet "+str(ibjet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
