@@ -14,7 +14,6 @@ class configuration(configuration):
   runningMode = "dataset"
 
   #produce EMU or LL CP:
-  run_on_emu = False
 
   #information about the MET cut
   #NB : the choice to cut on MET or on MET significance is done in eventSelection
