@@ -419,6 +419,7 @@ def hasNoOverlap(jet, Z = None, lepPair = None):
 
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
+  if not jet.isPFJet() : return True
   rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
@@ -439,7 +440,6 @@ def jetId(jet,level="loose"):
 def allJets(event, jets="rawjets", checksubjets=False, cone="AK5"):
   eventrawjets = getattr(event, jets)
   if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
-  for jet in eventrawjets : JECuncertaintyProxy.Scale(jet)
   for jet in eventrawjets:
     JECuncertaintyProxy.Scale(jet, cone)
     if checksubjets:
