@@ -8,7 +8,7 @@ confCfg = os.environ["PatAnalysisCfg"]
 if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
 else : from zbbConfig import configuration
 
-class MatrixElementControlPlots(BaseControlPlots):
+class MatrixElementControlPlotsInc(BaseControlPlots):
     """A class to create control plots for event selection"""
 
     readerREG = ROOT.TMVA.Reader("!Color:!Silent")
@@ -30,7 +30,7 @@ class MatrixElementControlPlots(BaseControlPlots):
 
     def __init__(self, dir=None, dataset=None, purpose="matrixElements", mode="plots", prejets=""):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
       self.prejets = prejets
     
     def beginJob(self):
@@ -56,7 +56,17 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("mu2etapm","subleading muon Eta",50,-2.5,2.5)
       self.add("mu2phi","subleading muon phi",30,-4,4)
       self.add("mu2mass","subleading muon mass",1,0,99999.)
-      self.add("mu2charge","subleading muon charge",3,-1.5,1.5)    
+      self.add("mu2charge","subleading muon charge",3,-1.5,1.5)
+      self.add("mu3pt","third muon Pt",1,0,99999.)
+      self.add("mu3etapm","third muon Eta",50,-2.5,2.5)
+      self.add("mu3phi","third muon phi",30,-4,4)
+      self.add("mu3mass","third muon mass",1,0,99999.)
+      self.add("mu3charge","third muon charge",3,-1.5,1.5)
+      self.add("mu4pt","fourth muon Pt",1,0,99999.)
+      self.add("mu4etapm","fourth muon Eta",50,-2.5,2.5)
+      self.add("mu4phi","fourth muon phi",30,-4,4)
+      self.add("mu4mass","fourth muon mass",1,0,99999.)
+      self.add("mu4charge","fourth muon charge",3,-1.5,1.5)          
       self.add("el1pt","leading electron Pt",1,0,99999.)
       self.add("el1etapm","leading electron Eta",50,-2.5,2.5)
       self.add("el1phi","leading electron phi",30,-4,4)
@@ -67,6 +77,16 @@ class MatrixElementControlPlots(BaseControlPlots):
       self.add("el2phi","subleading electron phi",30,-4,4)
       self.add("el2mass","subleading electron mass",1,0,99999.)
       self.add("el2charge","subleading electron charge",3,-1.5,1.5)
+      self.add("el3pt","third electron Pt",1,0,99999.)
+      self.add("el3etapm","third electron Eta",50,-2.5,2.5)
+      self.add("el3phi","third electron phi",30,-4,4)
+      self.add("el3mass","third electron mass",1,0,99999.)
+      self.add("el3charge","third electron charge",3,-1.5,1.5)
+      self.add("el4pt","fourth electron Pt",1,0,99999.)
+      self.add("el4etapm","fourth electron Eta",50,-2.5,2.5)
+      self.add("el4phi","fourth electron phi",30,-4,4)
+      self.add("el4mass","fourth electron mass",1,0,99999.)
+      self.add("el4charge","fourth electron charge",3,-1.5,1.5)      
       self.add("MET","MET",1,0,99999.)
       self.add("METphi","MET #phi",70,-3.5,3.5)
       self.add("bbM","",1000,0,1000)
@@ -149,11 +169,12 @@ class MatrixElementControlPlots(BaseControlPlots):
         self.readerREG.BookMVA("BDT_REG","/nfs/user/llbb/TMVAregression/factoryJetReg_BDT.weights.xml")
       
     def process(self, event):
-      """matrixElementControlPlots"""
+      """MatrixElementControlPlotsInc"""
       result = { }
       # in all cases, we need a reco Z
-      bestZcandidate = event.bestZcandidate
-      if bestZcandidate is None:
+      #bestZcandidate = event.bestZcandidate
+      leptons = event.leptonsPair
+      if leptons is None:
         return result
       ## First initialize generator level infor for Transfer Function if MC sample\
       
@@ -191,16 +212,16 @@ class MatrixElementControlPlots(BaseControlPlots):
 	    #print "found bbar"
             
           #If mu channel search for dimuon pair, if el channel search for dielectron pair
-          if bestZcandidate.daughter(0).isMuon() and partg.pdgId()==13 and partg.status()==3:
+          if leptons[0].isMuon() and partg.pdgId()==13 and partg.status()==3:
             lm+=[partg]
 	    #print "found lm"
-          elif bestZcandidate.daughter(0).isMuon() and partg.pdgId()==-13 and partg.status()==3:
+          elif leptons[0].isMuon() and partg.pdgId()==-13 and partg.status()==3:
             lp+=[partg]
 	    #print "found lp"
-          elif bestZcandidate.daughter(0).isElectron() and partg.pdgId()==11 and partg.status()==3:
+          elif leptons[0].isElectron() and partg.pdgId()==11 and partg.status()==3:
             lm+=[partg]
 	    #print "found lm"
-          elif bestZcandidate.daughter(0).isElectron() and partg.pdgId()==-11 and partg.status()==3:
+          elif leptons[0].isElectron() and partg.pdgId()==-11 and partg.status()==3:
             lp+=[partg]
 	    #print "found lp"
 
@@ -208,59 +229,130 @@ class MatrixElementControlPlots(BaseControlPlots):
       result["MET"] = event.MET[0].pt()
       result["METphi"] = event.MET[0].phi()
 
-      #Then Fill ME inputs related to leptons and if MC event and matching lep rec-gen fill info for TF
+      #Then Fill ME inputs related to leptons and if MC event and matching lep rec-gen fill info for TFz
       #both leptons should be matched in order to fill the TF info
-      if not bestZcandidate is None:
+#      if not leptons is None:
+#        lrecpos = None
+#	lrecneg = None
+#	if leptons[0].isMuon():
+#          mu1 = leptons[0]
+#          mu2 = leptons[1]
+#          if mu1.pt() < mu2.pt():
+#            mu1 = leptons[1]
+#            mu2 = leptons[0]
+#          lvmu1 = ROOT.TLorentzVector(mu1.px(),mu1.py(),mu1.pz(),mu1.energy())
+#          lvmu2 = ROOT.TLorentzVector(mu2.px(),mu2.py(),mu2.pz(),mu2.energy())
+#          result["mu1pt"] = mu1.pt()
+#          result["mu2pt"] = mu2.pt()
+#          result["mu1etapm"] = mu1.eta()
+#          result["mu2etapm"] = mu2.eta()
+#          result["mu1phi"] = mu1.phi()
+#          result["mu2phi"] = mu2.phi()
+#          result["mu1mass"] = mu1.mass()
+#          result["mu2mass"] = mu2.mass()
+#          result["mu1charge"] = mu1.charge()
+#          result["mu2charge"] = mu2.charge()
+#          if mu1.charge() > 0 and mu2.charge() < 0:
+#            lrecpos = mu1
+#            lrecneg = mu2
+#          elif mu2.charge() > 0 and mu1.charge() < 0:
+#            lrecpos = mu2
+#            lrecneg = mu1
+#        if leptons[0].isElectron() :
+#          ele1 = leptons[0]
+#          ele2 = leptons[1]
+#          if ele1.pt() < ele2.pt():
+#            ele1 = leptons[1]
+#            ele2 = leptons[0]
+#          lvele1 = ROOT.TLorentzVector(ele1.px(),ele1.py(),ele1.pz(),ele1.energy())
+#          lvele2 = ROOT.TLorentzVector(ele2.px(),ele2.py(),ele2.pz(),ele2.energy())
+#          result["el1pt"] = ele1.pt()
+#          result["el2pt"] = ele2.pt()
+#          result["el1etapm"] = ele1.eta()
+#          result["el2etapm"] = ele2.eta()
+#          result["el1phi"] = ele1.phi()
+#          result["el2phi"] = ele2.phi()
+#          result["el1mass"] = ele1.mass()
+#          result["el2mass"] = ele2.mass()
+#          result["el1charge"] = ele1.charge()
+#          result["el2charge"] = ele2.charge()
+#          if ele1.charge() > 0 and ele2.charge() < 0:
+#            lrecpos = ele1
+#            lrecneg = ele2
+#          elif ele2.charge() > 0 and ele1.charge() < 0:
+#            lrecpos = ele2
+#            lrecneg = ele1
+    
+      if not leptons is None : 
         lrecpos = None
-	lrecneg = None
-	if bestZcandidate.daughter(0).isMuon():
-          mu1 = bestZcandidate.daughter(0)
-          mu2 = bestZcandidate.daughter(1)
-          if mu1.pt() < mu2.pt():
-            mu1 = bestZcandidate.daughter(1)
-            mu2 = bestZcandidate.daughter(0)
-          lvmu1 = ROOT.TLorentzVector(mu1.px(),mu1.py(),mu1.pz(),mu1.energy())
-          lvmu2 = ROOT.TLorentzVector(mu2.px(),mu2.py(),mu2.pz(),mu2.energy())
-          result["mu1pt"] = mu1.pt()
-          result["mu2pt"] = mu2.pt()
-          result["mu1etapm"] = mu1.eta()
-          result["mu2etapm"] = mu2.eta()
-          result["mu1phi"] = mu1.phi()
-          result["mu2phi"] = mu2.phi()
-          result["mu1mass"] = mu1.mass()
-          result["mu2mass"] = mu2.mass()
-          result["mu1charge"] = mu1.charge()
-          result["mu2charge"] = mu2.charge()
-          if mu1.charge() > 0 and mu2.charge() < 0:
-            lrecpos = mu1
-            lrecneg = mu2
-          elif mu2.charge() > 0 and mu1.charge() < 0:
-            lrecpos = mu2
-            lrecneg = mu1
-        if bestZcandidate.daughter(0).isElectron() :
-          ele1 = bestZcandidate.daughter(0)
-          ele2 = bestZcandidate.daughter(1)
-          if ele1.pt() < ele2.pt():
-            ele1 = bestZcandidate.daughter(1)
-            ele2 = bestZcandidate.daughter(0)
-          lvele1 = ROOT.TLorentzVector(ele1.px(),ele1.py(),ele1.pz(),ele1.energy())
-          lvele2 = ROOT.TLorentzVector(ele2.px(),ele2.py(),ele2.pz(),ele2.energy())
-          result["el1pt"] = ele1.pt()
-          result["el2pt"] = ele2.pt()
-          result["el1etapm"] = ele1.eta()
-          result["el2etapm"] = ele2.eta()
-          result["el1phi"] = ele1.phi()
-          result["el2phi"] = ele2.phi()
-          result["el1mass"] = ele1.mass()
-          result["el2mass"] = ele2.mass()
-          result["el1charge"] = ele1.charge()
-          result["el2charge"] = ele2.charge()
-          if ele1.charge() > 0 and ele2.charge() < 0:
-            lrecpos = ele1
-            lrecneg = ele2
-          elif ele2.charge() > 0 and ele1.charge() < 0:
-            lrecpos = ele2
-            lrecneg = ele1
+	lrecneg = None        
+	nlept= len(leptons)
+        lept1=leptons[0]
+        lept2=leptons[1]
+	lept3= None
+	lept4= None
+	if nlept > 2: lept3=leptons[2]
+	if nlept > 3: lept4=leptons[3]
+ 	l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
+        l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
+        if lept1.charge() > 0 and lept2.charge() < 0:
+            lrecpos = lept1
+            lrecneg = lept2
+        elif lept2.charge() > 0 and lept1.charge() < 0:	
+            lrecpos = lept2
+            lrecneg = lept1	
+	    
+	if lept1.isMuon():
+          result["mu1pt"] = lept1.pt()
+          result["mu1etapm"] = lept1.eta()
+          result["mu1charge"] = lept1.charge()
+	  result["mu1phi"] = lept1.phi()
+	  result["mu1mass"] = lept1.mass()
+	elif lept1.isElectron():
+          result["el1pt"] = lept1.pt()
+          result["el1etapm"] = lept1.eta()
+          result["el1charge"] = lept1.charge()
+	  result["el1phi"] = lept1.phi()
+	  result["el1mass"] = lept1.mass()
+	  
+	if lept2.isMuon():
+          result["mu2pt"] = lept2.pt()
+          result["mu2etapm"] = lept2.eta()
+          result["mu2charge"] = lept2.charge()
+	  result["mu2phi"] = lept2.phi()
+	  result["mu2mass"] = lept2.mass()
+	elif lept2.isElectron():
+          result["el2pt"] = lept2.pt()
+          result["el2etapm"] = lept2.eta()
+          result["el2charge"] = lept2.charge()
+	  result["el2phi"] = lept2.phi()
+	  result["el2mass"] = lept2.mass()
+	if lept3 is not None:
+	  if lept3.isMuon():	  
+            result["mu3pt"] = lept3.pt()
+            result["mu3etapm"] = lept3.eta()
+            result["mu3charge"] = lept3.charge()
+	    result["mu3phi"] = lept3.phi()
+	    result["mu3mass"] = lept3.mass()
+	  elif lept3.isElectron():	  
+            result["el3pt"] = lept3.pt()
+            result["el3etapm"] = lept3.eta()
+            result["el3charge"] = lept3.charge()
+	    result["el3phi"] = lept3.phi()
+	    result["el3mass"] = lept3.mass()	  
+	  if lept4 is not None:	  
+	    if lept4.isMuon():	  
+              result["mu4pt"] = lept4.pt()
+              result["mu4etapm"] = lept4.eta()
+              result["mu4charge"] = lept4.charge()
+	      result["mu4phi"] = lept4.phi()
+	      result["mu4mass"] = lept4.mass()
+	    elif lept4.isElectron():	  
+              result["el4pt"] = lept4.pt()
+              result["el4etapm"] = lept4.eta()
+              result["el4charge"] = lept4.charge()	  
+              result["el4phi"] = lept4.phi()
+              result["el4mass"] = lept4.mass()
         
         if lp:
 	  "lp exist"
@@ -321,8 +413,8 @@ class MatrixElementControlPlots(BaseControlPlots):
 
       #Then Fill ME inputs related to jets and if MC event and matching jet rec-gen fill info for TF
       #both jets should be matched in order to fill the TF info
-      if not bestZcandidate is None:
-        dijet = getattr(event,"di"+self.prejets+"jet_all")
+      if not leptons is None:
+	dijet = getattr(event,"di"+self.prejets+"jet_all")
         if not dijet[0] is None:
           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy()) #self._JECuncertainty.jet(dijet[0])
 	  jetPt = b1.Pt()
@@ -505,5 +597,5 @@ def Delta(par1,par2):
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest
-  runTest(sys.argv[1], MatrixElementControlPlots())
+  runTest(sys.argv[1], MatrixElementControlPlotsInc())
 
