@@ -69,7 +69,7 @@ def isInCategoryChannel(category, categoryTuple):
     elif category==8:
       return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0    
    # category 1:3 leptons    
-     elif category==9:
+    elif category==9:
       return isInCategoryChannel( 1, categoryTuple) and categoryTuple[2]> 2
     else:
       return False

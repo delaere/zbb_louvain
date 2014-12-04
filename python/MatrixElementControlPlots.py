@@ -8,7 +8,7 @@ confCfg = os.environ["PatAnalysisCfg"]
 if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
 else : from zbbConfig import configuration
 
-class MatrixElementControlPlotsInc(BaseControlPlots):
+class MatrixElementControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
     readerREG = ROOT.TMVA.Reader("!Color:!Silent")
@@ -169,7 +169,7 @@ class MatrixElementControlPlotsInc(BaseControlPlots):
         self.readerREG.BookMVA("BDT_REG","/nfs/user/llbb/TMVAregression/factoryJetReg_BDT.weights.xml")
       
     def process(self, event):
-      """MatrixElementControlPlotsInc"""
+      """MatrixElementControlPlots"""
       result = { }
       # in all cases, we need a reco Z
       #bestZcandidate = event.bestZcandidate
@@ -597,5 +597,5 @@ def Delta(par1,par2):
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest
-  runTest(sys.argv[1], MatrixElementControlPlotsInc())
+  runTest(sys.argv[1], MatrixElementControlPlots())
 
