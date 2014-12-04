@@ -19,14 +19,14 @@ channels = ["Muon", "Electron","MuE"]
 categories = [ 
   "Trigger", 
   "ll ",
-  "lll ",
   "ll + jets",
   "ll + 1b (HE)",
   "ll + 1b (HP)",
   "ll + 2b (HEHE)",
   "ll + 2b (HPHP)",
   "ll + 2b (HPHP) + METSIG < cut",
-  "ll + 2b (HPHP) + METSIG > cut",
+  "ll + 2b (HPHP) + METSIG > cut",  
+  "3lep ",
   ]
 
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
@@ -47,30 +47,30 @@ def isInCategoryChannel(category, categoryTuple):
    # category 1:e-e 
     elif category==1:
       return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1 
-    # category 1:3 leptons    
-     elif category==2:
-      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[2]> 2     
    # category 2:e-e + jets 
-    elif category==3:
+    elif category==2:
       return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
    # category 3:e-e + 1b (HE)
-    elif category==4:
+    elif category==3:
       return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
    # category 4:e-e + 1b (HP)
-    elif category==5:
+    elif category==4:
       return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>0
    # category 5:e-e + 2b (HEHE)
-    elif category==6:
+    elif category==5:
       return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>1
    # category 6:e-e + 2b (HPHP)
-    elif category==7:
+    elif category==6:
       return isInCategoryChannel( 4, categoryTuple) and categoryTuple[5]>1
    # category 7:e-e + 2b (HEHE) + MET_sig
-    elif category==8:
+    elif category==7:
       return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 1
    # category 8:e-e + 2b (HEHE) + MET_sig
-    elif category==9:
-      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0
+    elif category==8:
+      return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0    
+   # category 1:3 leptons    
+     elif category==9:
+      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[2]> 2
     else:
       return False
       
