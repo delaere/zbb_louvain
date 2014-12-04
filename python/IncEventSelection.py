@@ -19,6 +19,7 @@ channels = ["Muon", "Electron","MuE"]
 categories = [ 
   "Trigger", 
   "ll ",
+  "lll ",
   "ll + jets",
   "ll + 1b (HE)",
   "ll + 1b (HP)",
@@ -45,27 +46,30 @@ def isInCategoryChannel(category, categoryTuple):
       return categoryTuple[0]==1
    # category 1:e-e 
     elif category==1:
-      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1  
+      return isInCategoryChannel( 0, categoryTuple) and categoryTuple[1]==1 
+    # category 1:3 leptons    
+     elif category==2:
+      return isInCategoryChannel( 1, categoryTuple) and categoryTuple[2]> 2     
    # category 2:e-e + jets 
-    elif category==2:
+    elif category==3:
       return isInCategoryChannel( 1, categoryTuple) and categoryTuple[3]>1
    # category 3:e-e + 1b (HE)
-    elif category==3:
+    elif category==4:
       return isInCategoryChannel( 2, categoryTuple) and categoryTuple[4]>0
    # category 4:e-e + 1b (HP)
-    elif category==4:
+    elif category==5:
       return isInCategoryChannel( 3, categoryTuple) and categoryTuple[5]>0
    # category 5:e-e + 2b (HEHE)
-    elif category==5:
+    elif category==6:
       return isInCategoryChannel( 3, categoryTuple) and categoryTuple[4]>1
    # category 6:e-e + 2b (HPHP)
-    elif category==6:
+    elif category==7:
       return isInCategoryChannel( 4, categoryTuple) and categoryTuple[5]>1
    # category 7:e-e + 2b (HEHE) + MET_sig
-    elif category==7:
+    elif category==8:
       return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 1
    # category 8:e-e + 2b (HEHE) + MET_sig
-    elif category==8:
+    elif category==9:
       return isInCategoryChannel( 5, categoryTuple) and categoryTuple[8] == 0
     else:
       return False
@@ -98,8 +102,8 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
     output.append(1)
   else:
     output.append(0)
-  # output[1], 1: mumu, 2:ee, 3:emu, 4:more than 2 leptons
-  # output[2]: di-lepton system mass
+  # output[1], 1 if the muon (electron) channel is on and the two leading leptons are muons (electrons). For e-mu, it's 1 if the leading leptons are e-mu and Mu/El channel are at false
+  # output[2]: number of leptons
 
   if bestDiLeptcandidate is None:
     output.append(0)
@@ -127,8 +131,8 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
          output.append(1)
 	else : output.append(0) 
 
-  #fill dummy Mll mass
-  output.append(0)
+  #fill with number of leptons
+  output.append(nlept)
 
   # output[3] -> output[6] : (b)jets
   nJets = 0
