@@ -6,7 +6,7 @@ from VertexAssociation import zVertex, isfromVertex, isFromVertex_SingleLepton
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from MonteCarloSelection import hadronFlavour
 from math import sqrt
-from operator import attrgetter
+from operator import attrgetter, methodcaller
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 
@@ -236,7 +236,7 @@ def isTriggerIncOK(event,perRun=True):
   runNumber = event.run()
   l1= None
   l2= None
-  bestDileptcandidate = event.ptSortedLeptons_DRll
+  bestDileptcandidate = event.leptonsPair
   if bestDileptcandidate is not None:
     l1=bestDileptcandidate[0]
     l2=bestDileptcandidate[1]
@@ -308,7 +308,7 @@ def isTriggerHambOK(event,perRun=True):
 
 
 
-def isLooseMuon(muon, pt_lep=10.0):
+def isLooseMuon(muon, pt_lep=0.0):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything on top of PAT cfg ?
@@ -338,7 +338,7 @@ def isMatchedMuon(muon):
   # cleaning ?
   return (isTightMuon(muon) and True)
 
-def isGoodMuon(muon,role,pt_lep=10.0):
+def isGoodMuon(muon,role,pt_lep=0.0):
   """Perform additional checks that define a good muon"""
   if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightMuon(muon)
@@ -347,7 +347,7 @@ def isGoodMuon(muon,role,pt_lep=10.0):
   print "Warning: Unknown muon role:",role
   return True
 
-def isLooseElectron(electron, pt_lep=10.0):
+def isLooseElectron(electron, pt_lep=0.0):
   """Perform additional checks that define a loose electron"""
   # anything else on top of PAT cfg ?
   # cleaning ?
@@ -381,7 +381,7 @@ def isMatchedElectron(electron):
   #if electron.hasOverlaps("muons"): return False
   return (isTightElectron(electron) and True)
 
-def isGoodElectron(electron,role, pt_lep=10.0):
+def isGoodElectron(electron,role, pt_lep=0.0):
   """Perform additional checks that define a good electron"""
   if string.find(role,"all")!=-1   : return isLooseElectron(electron, pt_lep)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
@@ -780,15 +780,15 @@ def leptonsFromPV_ptSorted(event):
 	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight") and isFromVertex_SingleLepton(muon,0.05,event.vertex)]
  	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight") and isFromVertex_SingleLepton(electron,0.05,event.vertex)]
 	lepList=muList+elList
-	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
+	ptSortedLepList = sorted(lepList,reverse=True,key=methodcaller('pt'))
 	return ptSortedLepList if len(ptSortedLepList)>1 else None
 
-def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3):
+def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3, ptLeadLep=17.0, ptSubLeadLep=8.0):
 	if event.ptSortedLeptons is not None :
 		l1=event.ptSortedLeptons[0]
 		l2=event.ptSortedLeptons[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
-		return event.ptSortedLeptons if DRll>DRll_cut else None
+		return event.ptSortedLeptons if (DRll>DRll_cut and l1.pt() > ptLeadLep and l2.pt() > ptSubLeadLep) else None
 	else :
 		return None
 
