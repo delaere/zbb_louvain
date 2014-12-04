@@ -305,6 +305,7 @@ class JetmetControlPlots(BaseControlPlots):
       nb  = 0
       nbP = 0
       indexDijet = 0
+      ind=2
       maxbdiscSSVHE = -1
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
@@ -415,7 +416,7 @@ class JetmetControlPlots(BaseControlPlots):
 	    j1pt=jetPt
           if isBJet(jet,self.WP[1],self.btagging): 
             nb += 1
-            if jet in dijet:
+	    if jet in dijet:
               indexDijet+=1
               if indexDijet > self.nbjets : print "Error: more than 2 jets in dijet pair!!"
               result["bjet"+str(indexDijet)+"pt"] = jetPt
@@ -466,6 +467,59 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet"+str(indexDijet)+"overlapele"] = jet.hasOverlaps("electrons")
 
               result["dptj1b1"] = jetPt-j1pt
+            else:	      
+              ind+=1
+              if ind > self.nbjets : print "Error: more than 4 b jets in the event!!"
+	      else: 
+                result["bjet"+str(ind)+"pt"] = jetPt
+	        result["bjet"+str(ind)+"pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+	        result["bjet"+str(ind)+"eta"] = abs(jet.eta())
+                result["bjet"+str(ind)+"etapm"] = jet.eta()
+                result["bjet"+str(ind)+"phi"] = jet.phi()
+                result["bjet"+str(ind)+"energy"] = jet.energy()
+                result["bjet"+str(ind)+"mass"] = jet.mass()
+                result["bjet"+str(ind)+"Flavor"] = jet.partonFlavour()
+                if jetId(jet,"tight"): result["bjet"+str(ind)+"jetid"] = 3
+                elif jetId(jet,"medium"): result["bjet"+str(ind)+"jetid"] = 2
+                elif jetId(jet,"loose"): result["bjet"+str(ind)+"jetid"] = 1
+                else: result["bjet"+str(ind)+"jetid"] = 0
+                if jet.isPFJet():
+                  result["bjet"+str(ind)+"npf"] = jet.numberOfDaughters()
+                  result["bjet"+str(ind)+"nch"] = jet.chargedMultiplicity()
+                  result["bjet"+str(ind)+"Chf"] = jet.chargedHadronEnergyFraction()
+                  result["bjet"+str(ind)+"Nhf"] = jet.neutralHadronEnergyFraction()
+                  result["bjet"+str(ind)+"nef"] = jet.neutralEmEnergyFraction()
+                  result["bjet"+str(ind)+"cef"] = jet.chargedEmEnergyFraction()
+                  result["bjet"+str(ind)+"Phf"] = jet.photonEnergyFraction()
+                  result["bjet"+str(ind)+"Elf"] = jet.electronEnergyFraction()
+                  result["bjet"+str(ind)+"Muf"] = jet.muonEnergyFraction()
+                  result["bjet"+str(ind)+"PtD"] = jetPtD(jet)
+                result["bjet"+str(ind)+"Vtx3dL"] = jetVtx3dL(jet)
+                result["bjet"+str(ind)+"Vtx3deL"] = jetVtx3deL(jet)
+                result["bjet"+str(ind)+"VtxPt"] = jetVtxPt(jet)
+                result["bjet"+str(ind)+"SSVHEdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighEffBJetTags")
+                result["bjet"+str(ind)+"SSVHPdisc"] = jet.bDiscriminator("simpleSecondaryVertexHighPurBJetTags")
+                result["bjet"+str(ind)+"nVertHE"] = nHEvert
+                result["bjet"+str(ind)+"nVertHP"] = nHPvert
+	        bjetsvmass=-1
+	        bjetsvpt=-1
+	        if tISV :
+	          if tISV.secondaryVertex(0) :
+	            bjetsvmass = tISV.secondaryVertex(0).p4().mass()
+                    bjetsvpt = tISV.secondaryVertex(0).p4().pt()
+                result["bjet"+str(ind)+"SVmass"] = bjetsvmass
+	        result["bjet"+str(ind)+"SVpT"] = bjetsvpt
+	        result["bjet"+str(ind)+"CSVdisc"] = jet.bDiscriminator("combinedSecondaryVertexBJetTags")
+                result["bjet"+str(ind)+"JPdisc"] = jet.bDiscriminator("jetProbabilityBJetTags")
+	        result["bjet"+str(ind)+"beta"] = jet.userFloat("beta")
+                result["bjet"+str(ind)+"betaStar"] = jet.userFloat("betaStar")
+                result["bjet"+str(ind)+"PUIdMva"] = jet.userFloat("puJetMva")
+                result["bjet"+str(ind)+"PUIdWP"] = jet.userInt("puJetId")
+                result["bjet"+str(ind)+"overlapmu"] = jet.hasOverlaps("muons")
+                result["bjet"+str(ind)+"overlapele"] = jet.hasOverlaps("electrons")
+
+                result["dptj1b1"] = jetPt-j1pt	      
+	      
           if isBJet(jet,self.WP[0],self.btagging): nbP += 1
 
       #second loop to jets to chose ISR and FSR jets. It would be better to do this with only one loop
