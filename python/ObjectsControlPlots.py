@@ -266,7 +266,7 @@ class JetmetControlPlots(BaseControlPlots):
               self.varOrdering.remove(var)
               continue
           self.add("jets"+var,"All jet "+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
-      self.njets = 4
+      self.njets = 5
       for ijet in range(0,self.njets):
           for var in self.varOrdering:
               self.add("jet"+str(ijet+1)+var,"Jet "+str(ijet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
