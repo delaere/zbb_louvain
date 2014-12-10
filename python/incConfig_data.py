@@ -24,10 +24,11 @@ class configuration(configuration):
 
   # my variables: files, systematics and other options
   btagging = "JP"
-  WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
+  WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]    NB : only the first one will be read for the IncJets
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
+    #controlPlot("IncJets", "IncEventSelectionControlPlots", "IncJetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
     
     ])
