@@ -463,6 +463,24 @@ def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
   
+def isGoodJet_fwd(jet, Z = None, lepPair = None, pt = 30.):
+  """Perform additional checks that define a good jet"""
+  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
+  #If lepPair is given, it checks the overlap of the jet with the pair of leptons
+
+  # overlap checking
+  if not Z is None :
+    if not hasNoOverlap(jet,Z=Z) :
+      return False
+
+  if not lepPair is None :
+    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
+      return False
+
+  # pt, eta, and jetid
+  return abs(jet.eta())>2.4 and jet.pt()>pt and jetId(jet,"loose")  
+  
+  
 def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   # leptons pair
   if muChannel and eleChannel:
@@ -476,7 +494,20 @@ def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   # compute the good jets
   return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),getattr(event,jets))
 
+def goodJets_fwd(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
+  # leptons pair
+  if muChannel and eleChannel:
+    pair = event.leptonsPair
+  elif muChannel:
+    pair = event.muonsPair
+  elif eleChannel:
+    pair = event.electronsPair
+  else:
+    pair = None
+  # compute the good jets
+  return map(lambda jet:isGoodJet_fwd(jet,lepPair=pair,pt=pt),getattr(event,jets)) 
   
+   
 def getMet(event,type="PF"):
   """Return the MET value you are interested in (type can be PF, MVA or NoPU)"""
   return{
