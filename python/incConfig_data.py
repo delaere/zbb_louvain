@@ -11,7 +11,7 @@ class configuration(configuration):
   eventSelection = configuration.pythonpath+"IncEventSelection"
 
   # mode: plots or dataset
-  runningMode = "dataset"
+  runningMode = "plots"
 
   #produce EMU or LL CP:
 
@@ -28,13 +28,15 @@ class configuration(configuration):
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
-    #controlPlot("IncJets", "IncEventSelectionControlPlots", "IncJetControlPlots", { "btagging":btagging, "WP":WP }),
+    controlPlot("IncJets", "IncEventSelectionControlPlots", "IncJetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
     
     ])
   eventProducers = configuration.eventProducers
   eventProducers.extend([
     eventProducer("jetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP } ),
+    eventProducer("goodJets_fwd", "ObjectSelection", "goodJets_fwd", { "muChannel":True,"eleChannel":True,"pt":20 } ),
+    
     ])
     
 
