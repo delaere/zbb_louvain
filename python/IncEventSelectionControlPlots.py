@@ -549,6 +549,55 @@ class IncJetControlPlots(BaseControlPlots):
       return result			
 			
 
+class IncLepControlPlots(BaseControlPlots):
+    """A class to create control plots for leptons inclusively"""
+
+    def __init__(self, dir=None, dataset=None,purpose="IncLep", mode="plots"):
+      # create output file if needed. If no file is given, it means it is delegated
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
+
+    def beginJob(self):
+      #List of the variables related to leps in the oreder of plotting (from python 2.7 use of 'OrderedDict' can simplify this)
+      self.varOrdering = ["pt","eta", "etapm", "phi", "energy", "isMuon", "isElectron"]
+      #Definitions (title, bins, xmin, xmax) of the variables to be plotted
+      dicoVar = {
+          "pt" : ["Pt",1000,0,1000],
+          "eta" : ["Eta",25,0,2.5],
+          "etapm" : ["Eta",50,-2.5,2.5],
+          "phi" : ["Phi",25,-4,4],
+          "energy" : ["energy",125,0,3000],
+          "isMuon" : ["isMuon",2,0,2],
+          "isElectron" : ["isElectron",2,0,2],
+          }
+      self.add("Nel","Number of electrons",5,0,5)
+      self.add("Nmu","Number of muons",5,0,5)
+      self.nleps = 4
+      for ilep in range(0,self.nleps):
+          for var in self.varOrdering:
+              self.add("lep"+str(ilep+1)+var,"Lep "+str(ilep+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
+
+    def process(self,event):
+      """IncLepControlPlots"""
+      result = {}
+      # declare histograms
+      nel=0
+      nmu=0
+      goodLeps = event.leptonsPair
+      if goodLeps is not None:
+	      for index,lep in enumerate(goodLeps):
+		if index < self.nleps:
+			result["lep"+str(index+1)+"pt"] = lep.pt()
+			result["lep"+str(index+1)+"eta"] = abs(lep.eta())
+			result["lep"+str(index+1)+"etapm"] = lep.eta()
+			result["lep"+str(index+1)+"phi"] = lep.phi()
+			result["lep"+str(index+1)+"energy"] = lep.energy()
+			result["lep"+str(index+1)+"isMuon"] = lep.isMuon()
+			result["lep"+str(index+1)+"isElectron"] = lep.isElectron()
+			if lep.isElectron() : nel += 1 
+			elif lep.isMuon(): nmu +=1
+      result["Nel"]=nel
+      result["Nmu"]=nmu
+      return result			
 if __name__=="__main__":
   import sys
   from BaseControlPlots import runTest
