@@ -30,6 +30,7 @@ class configuration(configuration):
   controlPlots.extend([
     controlPlot("IncJets", "IncEventSelectionControlPlots", "IncJetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("IncLeps", "IncEventSelectionControlPlots", "IncLepControlPlots", {}),
+    controlPlot("FwdJets", "IncEventSelectionControlPlots", "IncForwardJetControlPlots", {}),
     controlPlot("selection", "IncEventSelectionControlPlots", "IncEventSelectionControlPlots", { })
     
     ])

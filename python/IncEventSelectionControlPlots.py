@@ -435,7 +435,7 @@ class IncJetControlPlots(BaseControlPlots):
       # declare histograms
       nj=0
       nb=0
-      goodJets = getattr(event,"good"+self.prejets+"Jets_all")
+      goodJets = getattr(event,"good"+self.prejets+"Jets_all")      
       for index,jet in enumerate(getattr(event,self.prejets+"jets")):
         jetPt = jet.pt()
         if goodJets[index]: 
@@ -546,8 +546,65 @@ class IncJetControlPlots(BaseControlPlots):
 			        result["jet"+str(nj)+"overlapele"] = jet.hasOverlaps("electrons")
 		result["NlightJets"]=nj
 		result["NbJets"]=nb
+		
       return result			
 			
+class IncForwardJetControlPlots(BaseControlPlots):
+    """A class to create control plots for lightjets and b-jets separately"""
+    readerREG = ROOT.TMVA.Reader("!Color:!Silent")
+    var_jetPt = array.array('f', [0])
+    var_jetEta = array.array('f', [0])
+
+    def __init__(self, dir=None, dataset=None,purpose="IncJet", mode="plots"):
+      # create output file if needed. If no file is given, it means it is delegated
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
+      self._JECuncertainty = JetCorrectionUncertaintyProxy()
+
+    def beginJob(self, prejets=""):
+
+      self.prejets=prejets
+      #List of the variables related to jets in the oreder of plotting (from python 2.7 use of 'OrderedDict' can simplify this)
+      self.varOrdering = ["pt", "pt_totunc", "eta", "etapm", "phi", "energy", "mass", "Flavor"]
+      #Definitions (title, bins, xmin, xmax) of the variables to be plotted
+      dicoVar = {
+          "pt" : ["Pt",1000,0,1000],
+          "pt_totunc" : ["Pt total uncertainty",100,0,1],
+          "eta" : ["Eta",25,0,5.0],
+          "etapm" : ["Eta",50,-5.0,5.0],
+          "phi" : ["Phi",25,-4,4],
+          "energy" : ["energy",125,0,3000],
+          "mass" : ["mass",125,0,500],
+          "Flavor" : ["Flavor (MC)",29,-6.5,22.5],
+          }
+      self.add("NForwardJets","Number of forward jets",6,0,6)
+      self.njets = 3
+      for ijet in range(0,self.njets):
+          for var in self.varOrdering:
+              self.add("FwdJet"+str(ijet+1)+var,"Forward Jet "+str(ijet+1)+dicoVar[var][0],dicoVar[var][1],dicoVar[var][2],dicoVar[var][3])
+
+    def process(self,event):
+      """IncForwardJetControlPlots"""
+      result = {}
+      # declare histograms
+      nj=0
+      goodJets = getattr(event,"goodJets_fwd")
+      for index,jet in enumerate(getattr(event,self.prejets+"jets")):
+        jetPt = jet.pt()
+        if goodJets[index]: 
+			nj+=1
+			if nj < self.njets+1 :
+				result["FwdJet"+str(nj)+"pt"] = jetPt
+			        result["FwdJet"+str(nj)+"pt_totunc"] = self._JECuncertainty.unc_tot_jet(jet)
+			        result["FwdJet"+str(nj)+"eta"] = abs(jet.eta())
+			        result["FwdJet"+str(nj)+"etapm"] = jet.eta()
+			        result["FwdJet"+str(nj)+"phi"] = jet.phi()
+			        result["FwdJet"+str(nj)+"energy"] = jet.energy()
+			        result["FwdJet"+str(nj)+"mass"] = jet.mass()	    
+			        result["FwdJet"+str(nj)+"Flavor"] = jet.partonFlavour()
+	result["NForwardJets"]=nj
+ 		
+		
+      return result			
 
 class IncLepControlPlots(BaseControlPlots):
     """A class to create control plots for leptons inclusively"""

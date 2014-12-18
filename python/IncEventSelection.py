@@ -112,21 +112,24 @@ def eventCategoryChannel(event, muChannel=True, eleChannel=True, btagging="CSV",
 
     lept1=bestDiLeptcandidate[0]
     lept2=bestDiLeptcandidate[1]
-
+    l1 = ROOT.TLorentzVector(lept1.px(),lept1.py(),lept1.pz(),lept1.energy())
+    l2 = ROOT.TLorentzVector(lept2.px(),lept2.py(),lept2.pz(),lept2.energy())
+    mass=(l1+l2).M()
+    Mll_cut= 15
     
-    if lept1.isMuon() and lept2.isMuon() :
+    if lept1.isMuon() and lept2.isMuon() and mass > Mll_cut:
       #mumu channel only filled for muChannel=True
       if muChannel:
         output.append(1)
       else: output.append(0)
       #ee channel only filled for eleChannel=True
-    if lept1.isElectron() and lept2.isElectron() :
+    if lept1.isElectron() and lept2.isElectron() and mass > Mll_cut :
       #elel channel only filled for elChannel=True
       if eleChannel:
         output.append(1)
       else: output.append(0)
 
-    if (lept1.isElectron() and lept2.isMuon()) or (lept2.isElectron() and lept1.isMuon()) :
+    if (lept1.isElectron() and lept2.isMuon() and mass > Mll_cut) or (lept2.isElectron() and lept1.isMuon() and mass > Mll_cut) :
 	if not eleChannel and not muChannel :
          output.append(1)
 	else : output.append(0) 
