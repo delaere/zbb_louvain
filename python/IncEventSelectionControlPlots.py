@@ -583,17 +583,18 @@ class IncLepControlPlots(BaseControlPlots):
       nel=0
       nmu=0
       goodLeps = event.leptonsPair
-      for index,lep in enumerate(goodLeps):
-	if index < self.nleps:
-		result["lep"+str(index+1)+"pt"] = lep.pt()
-		result["lep"+str(index+1)+"eta"] = abs(lep.eta())
-		result["lep"+str(index+1)+"etapm"] = lep.eta()
-		result["lep"+str(index+1)+"phi"] = lep.phi()
-		result["lep"+str(index+1)+"energy"] = lep.energy()
-		result["lep"+str(index+1)+"isMuon"] = lep.isMuon()
-		result["lep"+str(index+1)+"isElectron"] = lep.isElectron()
-		if lep.isElectron() : nel += 1 
-		elif lep.isMuon(): nmu +=1
+      if goodLeps is not None:
+	      for index,lep in enumerate(goodLeps):
+		if index < self.nleps:
+			result["lep"+str(index+1)+"pt"] = lep.pt()
+			result["lep"+str(index+1)+"eta"] = abs(lep.eta())
+			result["lep"+str(index+1)+"etapm"] = lep.eta()
+			result["lep"+str(index+1)+"phi"] = lep.phi()
+			result["lep"+str(index+1)+"energy"] = lep.energy()
+			result["lep"+str(index+1)+"isMuon"] = lep.isMuon()
+			result["lep"+str(index+1)+"isElectron"] = lep.isElectron()
+			if lep.isElectron() : nel += 1 
+			elif lep.isMuon(): nmu +=1
       result["Nel"]=nel
       result["Nmu"]=nmu
       return result			
