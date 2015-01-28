@@ -10,6 +10,9 @@
 
 // uncertainties in Pt bins 
 // according POG reccom., computed for pt 20-800, for pt > 800 GeV: use the SFb value at 800 GeV with twice the quoted uncertainty (go to 1000 GeV for light)
+// according to POG, for pt < 20 GeV: use the SFb value at 20 GeV with twice the quoted uncertainty 
+// https://hypernews.cern.ch/HyperNews/CMS/get/btag/1153.html
+// Also since we don't have the information in our MC for pt below 20, the same approach is followed for those cases using our MC (Nadjieh)
 
 float btagPerfPOGFormulas_nofit::SFb_error_CSVL[] = {
   0.033299,
@@ -141,13 +144,16 @@ btagPerfPOGFormulas_nofit::~btagPerfPOGFormulas_nofit() {
 }
 
 btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, int algo, double pt, double eta) const {
-
   // values for Moriond 2013, see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
   int index=999;
   float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
   float ptmax[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
-  if(pt>800) pt=800;
+  if(pt>800) pt=800; //Question to developers: this assignement here makes the uncertainty part invalid.  
+
+  //to handle low pt jets and keep their information
+  double ptstore = pt;
+  if(pt<20) pt=20;
 
   // determine the index
   for(int ind = 0; ind < 16 ; ind++) {
@@ -155,7 +161,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
       index=ind;
     }
   }
-
+  pt = ptstore;
   // prescription for the first bin: use the upper bound.
   //if(index==0) pt = ptmax[0];
   
@@ -167,6 +173,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
      // b-jets
      int ERR = 1;
      if(pt>800) {pt=800; ERR=2;}
+     if(pt<20.) {pt=20.; ERR=2;}
      //Tagger: CSVL within 20 < pt GeV, abs(eta) < 2.4, x = pt
      if(algo==1) {
        SFb = 0.997942*((1.+(0.00923753*pt))/(1.+(0.0096119*pt)));   
@@ -187,6 +194,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
      // c-jets // assumes the same SF as for b-jets: THE SAME as for the b (but twice the uncertainty)   
      int ERR = 1;
      if(pt>800) {pt=800; ERR=2;}
+     if(pt<20) {pt=20; ERR=2;}
      //Tagger: CSVL within 20 < pt GeV, abs(eta) < 2.4, x = pt
      if(algo==1) {
        SFb = 0.997942*((1.+(0.00923753*pt))/(1.+(0.0096119*pt)));   
@@ -208,7 +216,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
      if(pt>850 && fabs(eta)>1.5 && algo == 1) {pt=850; ERR=2;}
      else if(pt>850 && fabs(eta)>1.6 && algo == 2) {pt=850; ERR=2;}
      else if(pt>1000) {pt=1000; ERR=2;}
-
+     else if(pt<20) {pt=20.; ERR = 2;}
      if( algo == 1 && fabs(eta)>0.0 &&  fabs(eta)<= 0.5) {
        //   Tagger: CSVL within 20 < pt GeV, abs(eta) < 0.5, x = pt
        SFb = GetSFlmeanCSVL00->Eval(pt);
@@ -255,7 +263,9 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEfficiency(int flavor, int al
   if(pt>=1000) pt=999;
   switch(abs(flavor)) {
   case 5: {
+    
     if(pt>800) pt=800;
+    if(pt<20) pt=20;
     // this is not in the db and must be parametrized from OUR mc
     if(fabs(eta)<1.2 && algo==1)
       return std::make_pair(h_eff_csvl_b_brl_->GetBinContent(h_eff_csvl_b_brl_->FindBin(pt)),
@@ -280,6 +290,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEfficiency(int flavor, int al
   }
   case 4: {
     if(pt>800) pt=800;
+    if(pt<20) pt=20;
     // this is not in the db and must be parametrized from OUR mc
     if(fabs(eta)<1.2 && algo==1)
       return std::make_pair(h_eff_csvl_c_brl_->GetBinContent(h_eff_csvl_c_brl_->FindBin(pt)),
@@ -306,7 +317,7 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEfficiency(int flavor, int al
     // this better parametrized from OUR mc
     if(pt>850 && fabs(eta)>1.5 && algo == 1) pt=850;
     else if(pt>850 && fabs(eta)>1.6 && algo == 2) pt=850;
-    
+    if(pt<20) pt=20.; 
     if(fabs(eta)<1.2 && algo==1)
       return std::make_pair(h_eff_csvl_l_brl_->GetBinContent(h_eff_csvl_l_brl_->FindBin(pt)),
 			    h_eff_csvl_l_brl_->GetBinError(h_eff_csvl_l_brl_->FindBin(pt)));
