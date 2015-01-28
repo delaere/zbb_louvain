@@ -149,10 +149,11 @@ btagPerfBase::value btagPerfPOGFormulas_nofit::getbEffScaleFactor(int flavor, in
   float ptmin[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
   float ptmax[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
-  if(pt>800) pt=800; //Question to developers: this assignement here makes the uncertainty part invalid.  
-
   //to handle low pt jets and keep their information
   double ptstore = pt;
+
+  if(pt>800) pt=800;  
+
   if(pt<20) pt=20;
 
   // determine the index
