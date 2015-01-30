@@ -487,10 +487,8 @@ class MuonTriggerEffReader_Mu17Mu8_OR_Mu17TkMu8:
 
      if mode == '0'  :
         return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['efficiency']
-     elif mode == '+1'  :
-        return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' :
-        return self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     elif mode == '+1' or mode == '-1' :
+        return sqrt((self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['syst_uncrt'])**2 + (self._map['Mu17Mu8_OR_Mu17TkMu8']['Tight']['(eta,eta)']['(20<mu1<Infty,20<mu2<Infty)'][self._eta_range]['data']['stat_uncrt'])**2)
      else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
@@ -519,10 +517,8 @@ class MuonTriggerEffReader_Mu17Leg:
 
      if mode == '0'  :
         return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
-     elif mode == '+1'  :
-        return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' :
-        return self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     elif mode == '+1' or mode == '-1'  :
+        return sqrt((self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['syst_uncrt'])**2 + (self._map['Mu17Mu8_Mu17Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'])**2)
      else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
         return 0
@@ -552,10 +548,8 @@ class MuonTriggerEffReader_Mu8Leg:
 
      if mode == '0'  :
         return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['efficiency']
-     elif mode == '+1'  :
-        return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
-     elif mode == '-1' :
-        return self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'] ## add in quadrature the stats uncertainties (TBD)
+     elif mode == '+1' or mode == '-1' :
+        return sqrt((self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['syst_uncrt'])**2 + (self._map['Mu17Mu8_Mu8Leg']['Tight']['eta']['20<mu2<Infty'][self._eta_range]['data']['stat_uncrt'])**2)
 
      else:
         print 'ERROR: wrong \'mode\' specified: try \'0\',\'+1\' or \'-1\''
@@ -593,7 +587,7 @@ class LeptonsReWeighting:
      if abs(configuration.LeptonTnPfactor)<0.01 :
        return lw
      else:
-       return lw + configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
+       return lw + lw*configuration.LeptonTnPfactor*self.uncertainty_mm(m1,m2)
 
 
 
@@ -601,10 +595,10 @@ class LeptonsReWeighting:
      """Relative uncertainty on the total weight.
         We assume the different contributions to be uncorrelated and sum the relative uncertainties in quadrature."""
 
-     unc =  (self._muIDWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDWeight.value(m1.pt(),m1.eta(),'0') +   \
-            self._muIDWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDWeight.value(m2.pt(),m2.eta(),'0'))**2 +   \
-            (self._muISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muISOWeight.value(m1.pt(),m1.eta(),'0') + \
-            self._muISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muISOWeight.value(m2.pt(),m2.eta(),'0'))**2 + \
+     unc =  (self._muIDWeight.value(m1.pt(),m1.eta(),'+1')/self._muIDWeight.value(m1.pt(),m1.eta(),'0'))**2 +   \
+            (self._muIDWeight.value(m2.pt(),m2.eta(),'+1')/self._muIDWeight.value(m2.pt(),m2.eta(),'0'))**2 +   \
+            (self._muISOWeight.value(m1.pt(),m1.eta(),'+1')/self._muISOWeight.value(m1.pt(),m1.eta(),'0'))**2 + \
+            (self._muISOWeight.value(m2.pt(),m2.eta(),'+1')/self._muISOWeight.value(m2.pt(),m2.eta(),'0'))**2 + \
             (self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'+1')/self._muTRIGGERWeight.value(m1.eta(),m2.eta(),'0'))**2
 
      return sqrt(unc)
