@@ -95,7 +95,7 @@ def makeDataCards(options,dirLimits, JESsystValues, JERsystValues,BTAGbcsystValu
                     if "Zbb" in key or "Zbx" in key : nloSystString += (15-len(str("%.3f" % tgZbx.Eval(mH))))*" "+str("%.3f" % tgZbx.Eval(mH))
                     elif "Zxx" in key : nloSystString += (15-len(str("%.3f" % tgZxx.Eval(mH))))*" "+str("%.3f" % tgZxx.Eval(mH))
                     else : nloSystString += (15-len("-"))*" "+"-"
-                    if not "Zbb" in key and not "Zbx" in key and not "Zxx" in key and not "TT" in key : lumiSystString += (15-len(str(1.023)))*" "+str(1.023)
+                    if not "Zbb" in key and not "Zbx" in key and not "Zxx" in key and not "TT" in key : lumiSystString += (15-len(str(1.026)))*" "+str(1.026)
                     else : lumiSystString += (15-len("-"))*" "+"-"
                     leptSystString += (15-len(str(1.02)))*" "+str(1.02)
                     if "TT" in key :
@@ -124,15 +124,15 @@ def makeDataCards(options,dirLimits, JESsystValues, JERsystValues,BTAGbcsystValu
                         bkg2SystString += (15-len("-"))*" "+"-"
                         bkg3SystString += (15-len("-"))*" "+"-"
                         bkg4SystString += (15-len("-"))*" "+"-"
-                    if "ZZ" in key : zzSystString += (15-len(str(1.15)))*" "+str(1.15)
+                    if "ZZ" in key : zzSystString += (15-len(str(1.15)))*" "+str(1.11)
                     else : zzSystString += (15-len("-"))*" "+"-"
-                    if "WZ" in key : wzSystString += (15-len(str(1.15)))*" "+str(1.15)
+                    if "WZ" in key : wzSystString += (15-len(str(1.15)))*" "+str(1.06)
                     else : wzSystString += (15-len("-"))*" "+"-"
-                    if "WW" in key : wwSystString += (15-len(str(1.15)))*" "+str(1.15)
+                    if "WW" in key : wwSystString += (15-len(str(1.15)))*" "+str(1.09)
                     else : wwSystString += (15-len("-"))*" "+"-"
-                    if "ZH" in key : zhSystString += (15-len(str(1.15)))*" "+str(1.15)
+                    if "ZH" in key : zhSystString += (15-len(str(1.15)))*" "+str(1.07)
                     else : zhSystString += (15-len("-"))*" "+"-"
-                    if "Wt" in key : twSystString += (15-len(str(1.15)))*" "+str(1.15)
+                    if "Wt" in key : twSystString += (15-len(str(1.15)))*" "+str(1.23)
                     else : twSystString += (15-len("-"))*" "+"-"
             #Get the template files and replace with the good values
             f = open("template.txt","r")
