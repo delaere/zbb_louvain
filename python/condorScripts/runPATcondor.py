@@ -39,7 +39,7 @@ if sampleName=="DY":
     
 if "ZA" in sampleName:
     runOnMC = True
-    path = "/home/fynu/amertens/storage/CMS_Prod/2HDM/THDM_"+sampleName.replace("ZA_","")+"_RECO/"
+    path = "/home/fynu/amertens/storage/CMS_Prod/2HDM_v1/THDM_"+sampleName.replace("ZA_","")+"_RECO/"
     pathList = [path]
     njobs=250
 

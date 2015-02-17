@@ -327,7 +327,7 @@ class JetmetControlPlots(BaseControlPlots):
           elif jetId(jet,"medium"): result["jetsjetid"].append(2)
           elif jetId(jet,"loose"): result["jetsjetid"].append(1)
           else: result["jetsjetid"].append(0)
-          result["jetsFlavor"].append(jet.partonFlavour())
+          result["jetsFlavor"].append(jet.partonFlavour() if jet.genJet() else 20)
           if jet.isPFJet():
               result["jetsnpf"].append(rawjet.numberOfDaughters())
               result["jetsnch"].append(rawjet.chargedMultiplicity())
@@ -381,7 +381,7 @@ class JetmetControlPlots(BaseControlPlots):
               elif jetId(jet,"medium"): result["jet"+str(nj)+"jetid"] = 2
               elif jetId(jet,"loose"): result["jet"+str(nj)+"jetid"] = 1
               else: result["jet"+str(nj)+"jetid"] = 0
-              result["jet"+str(nj)+"Flavor"] = jet.partonFlavour()
+              result["jet"+str(nj)+"Flavor"] = jet.partonFlavour() if jet.genJet() else 20
               if jet.isPFJet():
                   result["jet"+str(nj)+"npf"] = jet.numberOfDaughters()
                   result["jet"+str(nj)+"nch"] = jet.chargedMultiplicity()
@@ -426,7 +426,7 @@ class JetmetControlPlots(BaseControlPlots):
               result["bjet"+str(indexDijet)+"phi"] = jet.phi()
               result["bjet"+str(indexDijet)+"energy"] = jet.energy()
               result["bjet"+str(indexDijet)+"mass"] = jet.mass()
-              result["bjet"+str(indexDijet)+"Flavor"] = jet.partonFlavour()
+              result["bjet"+str(indexDijet)+"Flavor"] = jet.partonFlavour() if jet.genJet() else 20
               if jetId(jet,"tight"): result["bjet"+str(indexDijet)+"jetid"] = 3
               elif jetId(jet,"medium"): result["bjet"+str(indexDijet)+"jetid"] = 2
               elif jetId(jet,"loose"): result["bjet"+str(indexDijet)+"jetid"] = 1

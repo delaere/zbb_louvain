@@ -2,6 +2,8 @@
 from ROOT import *
 from listForRDS import lumi
 gROOT.SetBatch()
+formulaName = "formulaPol3_C.so"
+gSystem.Load(formulaName)
 
 class options_():
     subjets = False
@@ -22,6 +24,7 @@ class options_():
     #template for file name
 
     SYST = "Nominal"
+    print SYST
     path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
 
     #path = "/home/fynu/amertens/storage/Zbb_Analysis/JESup_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
@@ -109,24 +112,31 @@ class options_():
         "ZA_350_70" : kBlack,
         }
     #name of the output file
-    output = "FitMM_zmass7x4_btag_lightDown.root"
+    output = "FitMM_zmass7x4_"+SYST+"pol3.root"
     
 #method to make all needed RDS
 def createRDS(files={"test" : "test.root"}, options=None):
     if options is None : return None
     RDS = {}
-    for key in files:
+    for key in sorted(files.keys()):
         print "Make RDS for", key
         tf = TFile.Open(files[key])
         tree = tf.Get("rds_zbb")
-        tmpfile=TFile("tmp.root","RECREATE")
+        tmpfile=TFile("tmp"+options.SYST+".root","RECREATE")
         newtree = tree.CopyTree(options.cuts)
         print "entries", newtree.GetEntries()
         ws_ras = tf.Get("workspace_ras")
         ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats())
-        if not "DATA" in key : w = RooFormulaVar("w","w", "@0*@1*@2*@3",
-                                                 RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"])
-                                                 )
+        if not "DATA" in key:
+            if not "DYjets" in key : w = RooFormulaVar("w","w", "@0*@1*@2*@3",
+                                                       RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"])
+                                                       )
+            else :
+                print key
+                myform = "( (abs(@5)==5 || abs(@6)==5)*(0.135957+0.0042069*@4-4.74489e-06*@4*@4+1.33892e-09*@4*@4*@4) + (abs(@5)!=5 & abs(@6)!=5)*(0.506381+0.00245601*@4-2.93631e-06*@4*@4+9.19538e-10*@4*@4*@4) )"
+                w = RooFormulaVar("w","w", "@0*@1*@2*@3*"+myform,
+                                     RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"],ras["boostselectionZbbM"],ras["jetmetbjet1Flavor"],ras["jetmetbjet2Flavor"])
+                                     )
         csvprod = RooFormulaVar("CSVprod","CSVprod","@0*@1",RooArgList(ras["jetmetbjet1CSVdisc"],ras["jetmetbjet2CSVdisc"]))
         csvprodSub = RooFormulaVar("CSVprodSub","CSVprodSub","@0*@1",RooArgList(ras["subjetmetbjet1CSVdisc"],ras["subjetmetbjet2CSVdisc"]))
         jpprod = RooFormulaVar("JPprod","JPprod","@0*@1",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
@@ -309,6 +319,7 @@ def main():
         "ZH125El2j":SF_zh,
         "ZA_350_70El2j":SF_za,
 
+        "TTFullLeptMu2j":SF_tt,
         "TTSemiLeptMu2j":SF_tt,
         "ZbbMu2j":SF_zbb_2jet,
         "ZbxMu2j":SF_zbx_2jet,
@@ -333,7 +344,8 @@ def main():
         "WtbarEl3j":SF_wtbar,
         "ZH125El3j":SF_zh,
         "ZA_350_70El3j":SF_za,
-
+        
+        "TTFullLeptMu3j":SF_tt,
         "TTSemiLeptMu3j":SF_tt,
         "ZbbMu3j":SF_zbb_3jet,
         "ZbxMu3j":SF_zbx_3jet,

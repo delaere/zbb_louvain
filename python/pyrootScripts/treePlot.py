@@ -11,16 +11,28 @@ lumi=(19.7)*1000
 from ROOT import *
 import Options
 
-def make1Dplot(tree, Stage, Var, output, rewFrom):
+def make1Dplot(tree, Stage, DYdiv, Var, output, rewFrom):
     th1d = TH1D(Var["name"],Var["title"],Var["bin"],Var["xmin"],Var["xmax"])
-    tree.Draw(Var["name"]+">>"+Var["name"],Stage["cut"]+rewFrom)
+    tree.Draw(Var["title"]+">>"+Var["name"],"("+Stage["cut"]+DYdiv+")"+rewFrom)
     if not output.cd(Stage["dir"]) : output.mkdir(Stage["dir"])
     output.cd(Stage["dir"])
     th1d.Write()
     return
 
+def make2Dplot(tree, Stage, Var1, Var2, output, rewFrom):
+    th2d = TH2D(Var1["name"]+"_vs_"+Var2["name"],Var1["title"]+" vs "+Var2["title"],Var1["bin"]/5,Var1["xmin"],Var1["xmax"],Var2["bin"]/5,Var2["xmin"],Var2["xmax"])
+    tree.Draw("("+Var2["title"]+"):("+Var1["title"]+")>>"+Var1["name"]+"_vs_"+Var2["name"],Stage["cut"]+rewFrom,"colz")
+    print "("+Var1["title"]+"):("+Var2["title"]+")>>"+Var1["name"]+"_vs_"+Var2["name"], th2d.Integral(1,Var1["bin"],1,Var2["bin"]), th2d.GetBinContent(0,0)
+    if not output.cd(Stage["dir"]) : output.mkdir(Stage["dir"])
+    output.cd(Stage["dir"])
+    th2d.Write()
+    return
+
 def readTree(sample,DirOut,rewFrom={"Mu":"","Ele":""}):
-    input = TFile.Open(Options.fileName.replace("SAMPLE",sample))
+    fileName = Options.fileName
+    if sample == "Data2012" : fileName = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"
+    if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample : input = TFile.Open(fileName.replace("SAMPLE","DY"))
+    else : input = TFile.Open(fileName.replace("SAMPLE",sample))
     tree = input.Get("rds_zbb")
     if not os.path.isdir(DirOut) : os.system('mkdir '+DirOut)
     outputName=DirOut+"/"+sample+".root"
@@ -30,7 +42,11 @@ def readTree(sample,DirOut,rewFrom={"Mu":"","Ele":""}):
     for stage in stages:
         print rewFrom[stage]
         print stages[stage]
-        for Var in Options.Vars[DirOut[:3]] : make1Dplot(tree,stages[stage],Options.Vars[DirOut[:3]][Var],output,rewFrom[stage])
+        if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample :
+            for Var in sorted(Options.Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"&&"+Options.DYdiv[sample],Options.Vars[DirOut[:3]][Var],output,rewFrom[stage])
+        else :
+            for Var in sorted(Options.Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"",Options.Vars[DirOut[:3]][Var],output,rewFrom[stage])
+        #for var2D in Options.Vars2D[DirOut[:3]] : make2Dplot(tree,stages[stage],Options.Vars[DirOut[:3]][var2D[0]],Options.Vars[DirOut[:3]][var2D[1]],output,rewFrom[stage])
     return
 
 def readPlots(sample,DirOut,plot,rescale=False):

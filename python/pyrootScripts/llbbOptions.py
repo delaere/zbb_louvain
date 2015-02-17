@@ -8,7 +8,7 @@ gROOT.SetBatch()
 class options_():
     #list of samples
     samples = [
-#        "DATA",
+        #"DATA",
         "DYjets",
         "TTFullLept",
         "TTSemiLept",
@@ -21,31 +21,35 @@ class options_():
 #        "ZA_350_70",
         ]
 
-    Condition = "JESup"
-	#[
-	##"Nom",
-	#"JESup",
-	#"JESdown"]
-
+    #SYST = "Nominal" 
+    #SYST = "JESup" 
+    #SYST = "JESdown" 
+    #SYST = "JERup" 
+    #SYST = "JERdown" 
+    #SYST = "BTAG_bc_up" 
+    #SYST = "BTAG_bc_down" 
+    SYST = "BTAG_light_up" 
+    #SYST = "BTAG_light_down" 
+	
     #template for file name
     #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/latestRDS/NAME_Summer12_final_skimedLL.root"
-    path = "/home/fynu/amertens/storage/Zbb_Analysis/"+Condition+"_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
+    #path = "/home/fynu/amertens/storage/Zbb_Analysis/"+Condition+"_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
+    path_data = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
+    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
     #option to split or not the DY sample
     doDYsplit = True
     #stages
     stages = {
-        "Mu" : "rc_stage_18_idx",
-        "El" : "rc_stage_37_idx"
+        "Mu" : "rc_stage_8_idx",
+        "El" : "rc_stage_19_idx"
         }
     print "stages:", stages
     #BTAG weight
-    BTAG = "BtaggingReweightingMM"
-    if "11" in stages["Mu"] or "14" in stages["Mu"] or "17" in stages["Mu"] : BTAG = "BtaggingReweightingLM"
-    elif "10" in stages["Mu"] or "13" in stages["Mu"] or "16" in stages["Mu"] : BTAG = "BtaggingReweightingLL"
+    BTAG = "btaggingReweightingMM"
     print "BTAG:", BTAG
     #define cuts
     presel = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)"
-
+    
     rangeMassA = []
     mbb=10
     for i in range(1,36):
@@ -73,7 +77,7 @@ class options_():
     for mA in rangeMassA:
         for mH in rangeMassH:
             key = "mA"+str(mA[0])+"to"+str(mA[1])+"_mH"+str(mH[0])+"to"+str(mH[1])
-            cut[key] = "eventSelectiondijetM>="+str(mA[0])+"&&eventSelectiondijetM<"+str(mA[1])+"&&eventSelectionZbbM>="+str(mH[0])+"&&eventSelectionZbbM<"+str(mH[1])
+            cut[key] = "boostselectiondijetM>="+str(mA[0])+"&&boostselectiondijetM<"+str(mA[1])+"&&boostselectionZbbM>="+str(mH[0])+"&&boostselectionZbbM<"+str(mH[1])
             mA_list[key] = mA[2]
             mA_list_down[key] = mA[0]
             mA_list_up[key] = mA[1]
@@ -94,7 +98,7 @@ class options_():
 
     BTAG = "*"+BTAG
     #define reweighting formula              
-    baseForm = "*LeptonsReweightingweight*lumiReweightingLumiWeight*MonteCarloReweightingweight"+BTAG
+    baseForm = "*leptonsReweightingweight*lumiReweightingLumiWeight*mcReweightingweight"+BTAG
     rewForm = {"Mu":baseForm,"El":baseForm}
 
     wZbb  = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 )"
@@ -102,14 +106,18 @@ class options_():
     wZbx  = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"
     wZxx  = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"
     wtt   = "*1.05"
-#    wdy   = "*("+wZbb+"+"+wZbbj+"+"+wZbx+"+"+wZxx+")"
+    #wdy   = "*("+wZbb+"+"+wZbbj+"+"+wZbx+"+"+wZxx+")"
 
-
+    TTBKG = [1.00,1.02,1.00,0.98]
+    ZbbBKG = [1.00,0.99,0.97,0.99]
+    ZbbjBKG = [0.99,0.97,1.02,0.98]
+    ZxxBKG = [1.08,0.98,1.00,0.99]
 
     print "categories:", categories
     #name of the output file
-    output = "tree_"+Condition+".root"
+    output = "tree_"+SYST+".root"
     #name of the directory where the txt for the limit will be written
-    dirLimits = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/"
+    #dirLimits = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/"
+    dirLimits = "/home/fynu/acaudron/scratch/CMSSW_6_1_1/src/2HDM/"
 
 
