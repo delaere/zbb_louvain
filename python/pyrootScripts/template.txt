@@ -16,6 +16,19 @@ process         ModInd  PROCESSES
 process         0       ORDER    
 rate            SIGNAL  YIELDS     
 --------------------------------
-JES lnN		JESSIG	JESBkg
-
-
+CMS_scale_j       lnN	   JESSIG    JESBkg
+CMS_res_j         lnN      JERSIG    JERBkg
+btagSFs_bcjets    lnN	   BTAGbcSIG BTAGbcBkg
+btagSFs_lightjets lnN      BTAGlSIG  BTAGlBkg
+lumi_8TeV         lnN      LUMISIG   LUMIBKG
+Lept_SFs            lnN      LEPTSIG   LEPTBKG
+DY_NLO            lnN      -         DYNLO
+bkgNorm1          lnN      -         BKG1BKG
+bkgNorm2          lnN      -         BKG2BKG
+bkgNorm3          lnN      -         BKG3BKG
+bkgNorm4          lnN      -         BKG4BKG
+ZZnorm            lnN      -         ZZNORM
+WZnorm            lnN      -         WZNORM
+WWnorm            lnN      -         WWNORM
+ZHnorm            lnN      -         ZHNORM
+tWnorm            lnN      -         tWNORM

@@ -4,7 +4,8 @@ from llbbOptions import options_
 import llbbSF
 import array
 import os
-
+formulaName = "formulaPol3_C.so"
+gSystem.Load(formulaName)
 gROOT.SetBatch()
 
 def createTree(files={"test" : "test.root"}, options=None):
@@ -124,15 +125,15 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
                     if "DATA" in key : 
 			reweighting = "" 
 		    else :
-			condition = options.Condition
+			condition = options.SYST
 			reweighting = options.rewForm[cat]
 		        if "TT" in key: reweighting += llbbSF.SFlist[condition]["TT"]
 
 		    if "DY" in key:
-			condition = options.Condition
-			reweighting_Zbb= reweighting+llbbSF.SFlist[condition]["Zbb"]
-			reweighting_Zbx= reweighting+llbbSF.SFlist[condition]["Zbx"]
-			reweighting_Zxx= reweighting+llbbSF.SFlist[condition]["Zxx"]
+			condition = options.SYST
+			reweighting_Zbb = reweighting+llbbSF.SFlist[condition]["Zbb"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
+			reweighting_Zbx = reweighting+llbbSF.SFlist[condition]["Zbx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
+			reweighting_Zxx = reweighting+llbbSF.SFlist[condition]["Zxx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
 			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
 			a["Zbb"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
 			tmpTH1.Delete()
@@ -164,8 +165,9 @@ def main():
     #get file name
     files = {}
     for sample in options.samples:
-        if "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
-        else : files[sample] = options.path.replace("NAME","Double2012")
+	if "DY" in sample : files[sample] = options.path.replace("NAME","DY")
+        elif "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
+        else : files[sample] = options.path_data.replace("NAME","Data2012")
         print files[sample]
     #get RDS
     Trees = createTree(files=files, options=options)

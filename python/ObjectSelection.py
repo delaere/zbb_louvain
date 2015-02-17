@@ -390,24 +390,19 @@ def isGoodElectron(electron,role):
   print "Warning: Unknown electron role:",role
   return True
 
-def hasNoOverlap(jet, Z = None, lepPair = None):
+def hasNoOverlap(jet, lepPair = None):
   """check overlap between jets and leptons"""
 
-  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
-  #Only Z candidate or lepPair should be provided, otherwise the code exits
-
-  if (not Z is None) and (not lepPair is None):
-    print "hasNoOverlap called with both Z and lepPair candidate, aborting!"
-    sys.exit(1)
-
-  if (not Z is None) :
-    l1 = Z.daughter(0)
-    l2 = Z.daughter(1)
 
   if (not lepPair is None) :
-    l1 = lepPair[0]
-    l2 = lepPair[1]
+    try:
+      l1 = lepPair[0]
+      l2 = lepPair[1]
+    except:
+      l1 = lepPair.daughter(0)
+      l2 = lepPair.daughter(1)
+  else : return True
 
   l1v = ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
   l2v = ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy())
@@ -446,16 +441,12 @@ def allJets(event, jets="rawjets", checksubjets=False, cone="AK5"):
       for i in range(0,jet.numberOfDaughters()) : JECuncertaintyProxy.Scale(jet.daughter(i))
   return eventrawjets
 
-def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
+def isGoodJet(jet, lepPair = None, pt = 30.):
   """Perform additional checks that define a good jet"""
-  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
   # overlap checking
-  if not Z is None :
-    if not hasNoOverlap(jet,Z=Z) :
-      return False
   if not lepPair is None :
-    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
+    if not hasNoOverlap(jet,lepPair=lepPair) :
       return False
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
@@ -978,7 +969,10 @@ def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChanne
   # fill with remaining good jets
   for index in indices_pt:
     jetList.append(index)
-  return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
+  if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
+    return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
+  else:
+    return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
 
 def vertex(event):
   vertices = event.vertices
@@ -996,7 +990,7 @@ def fatjets(event, pt=30.):
   prunedjets = allJets(event, jets="rawprunedjets", checksubjets=True, cone="AK7")
   for pruned in prunedjets:
     if pruned.pt()>2*pt and pruned.bDiscriminator("combinedSecondaryVertexBJetTags")>prunedCSV and pruned.numberOfDaughters() == 2:
-      if isGoodJet(pruned.daughter(0), Z = event.bestZcandidate, pt = pt) and isGoodJet(pruned.daughter(1), Z = event.bestZcandidate, pt = pt):
+      if isGoodJet(pruned.daughter(0), lepPair = event.bestZcandidate, pt = pt) and isGoodJet(pruned.daughter(1), lepPair = event.bestZcandidate, pt = pt):
         #if true replace the fatjet candidate
         prunedCSV = pruned.bDiscriminator("combinedSecondaryVertexBJetTags")
         fatjet = pruned
