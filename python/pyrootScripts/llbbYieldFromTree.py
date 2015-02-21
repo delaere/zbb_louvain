@@ -1,12 +1,41 @@
 from ROOT import *
-from listForRDS import lumi
-from llbbOptions import options_
-import llbbSF
+from llbbOptions import *
 import array
 import os
 formulaName = "formulaPol3_C.so"
 gSystem.Load(formulaName)
 gROOT.SetBatch()
+
+class options_(options_):
+    #list of samples
+    samples = [
+        "DATA",
+        "DYjets",
+        "TTFullLept",
+        "TTSemiLept",
+        "ZZ",
+        "WZ",
+        "WW",
+        "Wt",
+        "Wtbar",
+        "ZH125",
+        ]
+    print samples
+    
+    #Systematics
+    #SYST = "Nominal"
+    #SYST = "JESup"
+    #SYST = "JESdown"
+    #SYST = "JERup"
+    #SYST = "JERdown"
+    #SYST = "BTAG_bc_up"
+    #SYST = "BTAG_bc_down"
+    #SYST = "BTAG_light_up"
+    SYST = "BTAG_light_down"
+    path = options_.path.replace("SYST",SYST)
+    
+    #output
+    output = options_.output.replace("SYST",SYST).replace("V2","V3")
 
 def createTree(files={"test" : "test.root"}, options=None):
     if options is None : return None
@@ -18,66 +47,6 @@ def createTree(files={"test" : "test.root"}, options=None):
         tf = TFile.Open(files[key])
 	Trees[key] = tf.Get("rds_zbb")
     return Trees
-
-def createRDS(files={"test" : "test.root"}, options=None):
-    if options is None : return None
-    RDS = {}
-    #run over all the samples
-    for key in files:
-        print "Make RDS for", key
-        #Get file and tree
-        tf = TFile.Open(files[key])
-        tree = tf.Get("rds_zbb")
-        #temporary file use to host the new "lighter" tree to be used to create the RDS
-        tmpfile=TFile("tmp.root","RECREATE")
-        newtree = tree.CopyTree(options.presel)
-        #make the RDS
-        ws_ras = tf.Get("workspace_ras")
-        ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats())
-        rds = RooDataSet("rds_zbb"+key,"rds_zbb"+key,newtree,ras)
-        #Add a variable with the reweighting information
-        if not "DATA" in key :
-            w = RooFormulaVar("w","w", "@0*@1*@2*@3",
-                              RooArgList(ras["LeptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["MonteCarloReweightingweight"])
-                              )
-            rds.addColumn(w)
-        #Reduce RDS
-        for cat in options.categories : RDS[key+cat] = rds.reduce(options.categories[cat])
-    #Split DY sample
-    for cat in options.categories:
-        if "DYjets"+cat in RDS and options.doDYsplit : RDS = splitDY(RDS, cat)
-    return RDS
-
-#method to split the DY sample in Zbb, Zbx, Zxx
-def splitDY(RDS, cat):
-    print cat, "Will split DYjets in Zbb, Zbx and Zxx"
-    rds = RDS["DYjets"+cat]
-    #Split with jet flavour
-    RDS["Zbb"+cat] = rds.reduce("abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)==5")
-    RDS["Zbb"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zbb"),rds.GetName().replace("DYjets","Zbb"))
-    RDS["Zbx"+cat] = rds.reduce("(abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 & abs(jetmetbjet2Flavor)!=5)")
-    RDS["Zbx"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zbx"),rds.GetName().replace("DYjets","Zbx"))
-    RDS["Zxx"+cat] = rds.reduce("abs(jetmetbjet1Flavor)!=5 & abs(jetmetbjet2Flavor)!=5")
-    RDS["Zxx"+cat].SetNameTitle(rds.GetName().replace("DYjets","Zxx"),rds.GetName().replace("DYjets","Zxx"))
-    #Remove the DY RDS
-    del RDS["DYjets"+cat]
-    return RDS
-
-def bkgNorm(RDS):
-    #reweight the MC considering also the bkg normalisation from data
-    for key in RDS:
-        formula = "@0"
-        if "DATA" in key : continue
-        if "Zbb" in key : formula = "@0*(1.15*(@1==2)+1.30*(@1>2))"
-        if "Zbx" in key : formula = "@0*1.30"
-        if "Zxx" in key : formula = "@0*1.28"
-        if "TT" in key : formula = "@0*1.05"
-        ras = RDS[key].get()
-        sfs = RooFormulaVar("sfs","sfs", formula, RooArgList(ras["w"], ras["jetmetnj"]))
-        RDS[key].addColumn(sfs)
-        RDS[key] = RooDataSet(RDS[key].GetName(),RDS[key].GetName(),RDS[key],RDS[key].get(),"",sfs.GetName())
-    return RDS
-
 
 def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
     tree = TTree("yields","tree containing all informations for yields")
@@ -99,8 +68,10 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
     for key in keys:
 	for cat in options.categories :
 	    if "DY" in key:
-		a["Zbb"+cat] = array.array('d', [0.0])
-                tree.Branch("Zbb"+cat,a["Zbb"+cat],"Zbb"+cat+'/D')
+		a["Zbb2j"+cat] = array.array('d', [0.0])
+                tree.Branch("Zbb2j"+cat,a["Zbb2j"+cat],"Zbb2j"+cat+'/D')
+		a["Zbb3j"+cat] = array.array('d', [0.0])
+                tree.Branch("Zbb3j"+cat,a["Zbb3j"+cat],"Zbb3j"+cat+'/D')
                 a["Zbx"+cat] = array.array('d', [0.0])
                 tree.Branch("Zbx"+cat,a["Zbx"+cat],"Zbx"+cat+'/D')
                 a["Zxx"+cat] = array.array('d', [0.0])
@@ -108,7 +79,7 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
 	    else :
                 a[key+cat] = array.array('d', [0.0])
 	        tree.Branch(key+cat,a[key+cat],key+cat+'/D')
-	    print 'key : ', key+cat
+	    #print 'key : ', key+cat
 
     print 'run over the samples'
     #Run over the samples
@@ -116,42 +87,60 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
         print 'cutkey : ', cutkey
         mH[0] = float(options.mH_list[cutkey])
         mA[0] = float(options.mA_list[cutkey])
-        print 'mH , mA : ', mH, mA
-        if (mA < mH) :
+        print 'mH , mA : ', mH[0], mA[0]
+        if mA < mH : 
             for key in keys:
-                for cat in options.categories :
+                print "key is ", key
+                for cat in options.categories:
+                    print "cat is ", cat
                     #Select phase space
-                    tmpTH1 = TH1D('MET','MET',100,0,1000)
-                    if "DATA" in key : 
-			reweighting = "" 
+                    #tmpTH1 = TH1D('MET','MET',100,0,1000)
+                    if "DATA" in key : reweighting = "" 
 		    else :
 			condition = options.SYST
-			reweighting = options.rewForm[cat]
-		        if "TT" in key: reweighting += llbbSF.SFlist[condition]["TT"]
+			reweighting = options.rewForm["Zbb"][cat]
+		        if "TT" in key : reweighting += SFlist[condition]["TT"]
 
 		    if "DY" in key:
 			condition = options.SYST
-			reweighting_Zbb = reweighting+llbbSF.SFlist[condition]["Zbb"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
-			reweighting_Zbx = reweighting+llbbSF.SFlist[condition]["Zbx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
-			reweighting_Zxx = reweighting+llbbSF.SFlist[condition]["Zxx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
-			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
-			a["Zbb"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
+			reweighting_Zbb = reweighting+SFlist[condition]["Zbb"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
+			reweighting_Zbx = reweighting+SFlist[condition]["Zbx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
+			reweighting_Zxx = reweighting+SFlist[condition]["Zxx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
+
+			tmpTH1 = TH1D('MET','MET',100,0,1000)
+			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
+                        a["Zbb2j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
 			tmpTH1.Delete()
+			
+			tmpTH1 = TH1D('MET','MET',100,0,1000)
+			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
+			a["Zbb3j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
+			tmpTH1.Delete()
+			
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
 			Trees[key].Draw("jetmetMET >> MET","(((abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5)) && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbx)
                         a["Zbx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbx"])
                         tmpTH1.Delete()
+
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
 			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zxx)
                         a["Zxx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zxx"])	
 			tmpTH1.Delete()
 		    else :
+			tmpTH1 = TH1D('MET','MET',100,0,1000)
                         Trees[key].Draw("jetmetMET >> MET","("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting)
+                        print "("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting
                         a[key+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi[key])
+                        print "Option Mll", mA[0], mH[0], a[key+cat][0]
                         tmpTH1.Delete()
-	                print 'a[key+cat] :', a[key+cat]
+                        #tmpTH1 = TH1D('MET','MET',100,0,1000)
+                        #Trees[key].Draw("jetmetMET >> MET","("+options.cut[cutkey]+" && "+options.categories[cat]+"&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"+reweighting)
+                        #print "("+options.cut[cutkey]+" && "+options.categories[cat]+"&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"+reweighting
+                        #print "Small Mll", mA[0], mH[0], tmpTH1.Integral()*(lumi["DATA"]/lumi[key])
+                        #tmpTH1.Delete()
+	                #print 'a[key+cat] :', a[key+cat]
             tree.Fill()
-                 
+            #if a["TTFullLeptMu"][0]>1 : break         
     #Write output
     tree.Write()
     output.Write()
@@ -167,7 +156,7 @@ def main():
     for sample in options.samples:
 	if "DY" in sample : files[sample] = options.path.replace("NAME","DY")
         elif "DATA" not in sample : files[sample] = options.path.replace("NAME",sample)
-        else : files[sample] = options.path_data.replace("NAME","Data2012")
+        else : files[sample] = options.path_data
         print files[sample]
     #get RDS
     Trees = createTree(files=files, options=options)

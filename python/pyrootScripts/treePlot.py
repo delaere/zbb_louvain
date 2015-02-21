@@ -1,15 +1,9 @@
-import os, sys
-lib_path = os.path.abspath('/nfs/soft/python/python-2.7.3-sl5_amd64_gcc41/lib/python2.7/site-packages/storm-0.20-py2.7-linux-x86_64.egg/')
-lib_path2 = os.path.abspath('/nfs/soft/python/python-2.7.3-sl5_amd64_gcc41/lib/python2.7/site-packages/MySQL_python-1.2.3-py2.7-linux-x86_64.egg')
-lib_path3 = os.path.abspath('/nfs/soft/python/python-2.7.3-sl5_amd64_gcc41/lib/python2.7/site-packages/setuptools-0.6c11-py2.7.egg/')
-sys.path.append(lib_path)
-sys.path.append(lib_path2)
-sys.path.append(lib_path3)
-from UserCode.zbb_louvain.zbbSamples import *
-lumi=(19.7)*1000
-
 from ROOT import *
-import Options
+from llbbOptions import *
+import os
+
+Options = options_()
+Options.fileName = Options.path.replace("SYST","Nominal")
 
 def make1Dplot(tree, Stage, DYdiv, Var, output, rewFrom):
     th1d = TH1D(Var["name"],Var["title"],Var["bin"],Var["xmin"],Var["xmax"])
@@ -28,11 +22,11 @@ def make2Dplot(tree, Stage, Var1, Var2, output, rewFrom):
     th2d.Write()
     return
 
-def readTree(sample,DirOut,rewFrom={"Mu":"","Ele":""}):
+def readTree(sample,DirOut,rewFrom={"Mu":"","El":""}):
     fileName = Options.fileName
-    if sample == "Data2012" : fileName = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"
-    if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample : input = TFile.Open(fileName.replace("SAMPLE","DY"))
-    else : input = TFile.Open(fileName.replace("SAMPLE",sample))
+    if sample == "Data2012" : fileName = Options.path_data
+    if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample : input = TFile.Open(fileName.replace("NAME","DY"))
+    else : input = TFile.Open(fileName.replace("NAME",sample))
     tree = input.Get("rds_zbb")
     if not os.path.isdir(DirOut) : os.system('mkdir '+DirOut)
     outputName=DirOut+"/"+sample+".root"
@@ -43,16 +37,16 @@ def readTree(sample,DirOut,rewFrom={"Mu":"","Ele":""}):
         print rewFrom[stage]
         print stages[stage]
         if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample :
-            for Var in sorted(Options.Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"&&"+Options.DYdiv[sample],Options.Vars[DirOut[:3]][Var],output,rewFrom[stage])
+            for Var in sorted(Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"&&"+Options.DYdiv[sample],Vars[DirOut[:3]][Var],output,rewFrom[stage])
         else :
-            for Var in sorted(Options.Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"",Options.Vars[DirOut[:3]][Var],output,rewFrom[stage])
-        #for var2D in Options.Vars2D[DirOut[:3]] : make2Dplot(tree,stages[stage],Options.Vars[DirOut[:3]][var2D[0]],Options.Vars[DirOut[:3]][var2D[1]],output,rewFrom[stage])
+            for Var in sorted(Vars[DirOut[:3]].keys()) : make1Dplot(tree,stages[stage],"",Vars[DirOut[:3]][Var],output,rewFrom[stage])
+        #for var2D in Vars2D[DirOut[:3]] : make2Dplot(tree,stages[stage],Vars[DirOut[:3]][var2D[0]],Vars[DirOut[:3]][var2D[1]],output,rewFrom[stage])
     return
 
 def readPlots(sample,DirOut,plot,rescale=False):
     input = TFile.Open(DirOut+"/"+sample+".root")
     th1d = input.Get(plot)
     if rescale:
-        if sample=="DY" : th1d.Scale(getSample(name=sample+"_2014").source_dataset.xsection*lumi/46515036.)
-        else : th1d.Scale(getSample(name=sample+"_2014").source_dataset.xsection*lumi/getSample(name=sample+"_2014").nevents_processed)
+        if sample=="DY" : th1d.Scale(lumi["DATA"]/lumi["Zbb"])
+        else : th1d.Scale(lumi["DATA"]/lumi[sample])
     return th1d

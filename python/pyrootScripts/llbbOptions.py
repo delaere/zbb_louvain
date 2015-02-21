@@ -1,26 +1,24 @@
-from ROOT import *
 from listForRDS import lumi
-import array
-import os
-
-gROOT.SetBatch()
+from llbbSF import SFlist
+from llbbPlotsList import *
 
 class options_():
     #list of samples
     samples = [
-        #"DATA",
-        "DYjets",
+        "DATA",
+        #"DYjets",
         "TTFullLept",
-        "TTSemiLept",
-        "ZZ",
-        "WZ",
-        "WW",
-        "Wt",
-        "Wtbar",
-        "ZH125",
-#        "ZA_350_70",
+        #"TTSemiLept",
+        #"ZZ",
+        #"WZ",
+        #"WW",
+        #"Wt",
+        #"Wtbar",
+        #"ZH125",
         ]
+    print samples
 
+    #Systematics
     #SYST = "Nominal" 
     #SYST = "JESup" 
     #SYST = "JESdown" 
@@ -28,25 +26,48 @@ class options_():
     #SYST = "JERdown" 
     #SYST = "BTAG_bc_up" 
     #SYST = "BTAG_bc_down" 
-    SYST = "BTAG_light_up" 
+    #SYST = "BTAG_light_up" 
     #SYST = "BTAG_light_down" 
+    #print SYST
 	
     #template for file name
-    #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/latestRDS/NAME_Summer12_final_skimedLL.root"
-    #path = "/home/fynu/amertens/storage/Zbb_Analysis/"+Condition+"_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
-    path_data = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
-    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
+    path_data = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"
+    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/SYST/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
+
     #option to split or not the DY sample
     doDYsplit = True
+    DYdiv = {
+        "Zbb" : "(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5)",
+        "Zbx" : "((abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5))",
+        "Zxx" : "(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5)"
+        }
+
     #stages
     stages = {
-        "Mu" : "rc_stage_8_idx",
-        "El" : "rc_stage_19_idx"
+        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)",
+        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"
+        #"Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10)",
+        #"El" : "(rc_stage_19_idx&&jetmetMETsignificance<10)"
         }
+    
+    stagesFit = {
+        "Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10)",
+        "El" : "(rc_stage_19_idx&&jetmetMETsignificance<10)"
+        }
+
     print "stages:", stages
-    #BTAG weight
-    BTAG = "btaggingReweightingMM"
-    print "BTAG:", BTAG
+
+    Stages = {}
+    Stages["Zjj"] = {
+        "Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"},
+        "El":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106)"}
+        }
+
+    Stages["Zbb"] = {
+        "Mu":{"dir":"Muon","cut":stages["Mu"]},
+        "El":{"dir":"Electron","cut":stages["El"]}
+        }
+
     #define cuts
     presel = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)"
     
@@ -85,39 +106,49 @@ class options_():
             mH_list_down[key] = mH[0]
             mH_list_up[key] = mH[1]
 
-            print "signal regions:", key, cut[key]
     #categories
     categories = {
         "Mu" : stages["Mu"],
         "El" : stages["El"],
-        #"El2j" : stages["El"]+"&&jetmetnj==2",
-        #"El3j" : stages["El"]+"&&jetmetnj>2",
-        #"Mu2j" : stages["Mu"]+"&&jetmetnj==2",
-        #"Mu3j" : stages["Mu"]+"&&jetmetnj>2"
         }
 
-    BTAG = "*"+BTAG
+    #BTAG weight
+    BTAG = "*btaggingReweightingMM"
+    print "BTAG:", BTAG
+
     #define reweighting formula              
-    baseForm = "*leptonsReweightingweight*lumiReweightingLumiWeight*mcReweightingweight"+BTAG
-    rewForm = {"Mu":baseForm,"El":baseForm}
+    baseForm = "*leptonsReweightingweight*lumiReweightingLumiWeight*mcReweightingweight"
 
-    wZbb  = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 )"
-    wZbbj = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 )"
-    wZbx  = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"
-    wZxx  = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"
-    wtt   = "*1.05"
-    #wdy   = "*("+wZbb+"+"+wZbbj+"+"+wZbx+"+"+wZxx+")"
+    rewForm = {}
+    rewForm["Zjj"] = {
+        "Mu":baseForm,
+        "El":baseForm
+        }
+    
+    rewForm["Zbb"] = {
+        "Mu":baseForm+BTAG,
+        "El":baseForm+BTAG
+    }
+    
+    wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 )"+SFlist["Nominal"]["Zbb"]
+    wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"+SFlist["Nominal"]["Zbx"]
+    wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"+SFlist["Nominal"]["Zxx"]
+    wtt = SFlist["Nominal"]["TT"].replace("*","")
+    wdy = "("+wZbb+"+"+wZbx+"+"+wZxx+")"
 
-    TTBKG = [1.00,1.02,1.00,0.98]
-    ZbbBKG = [1.00,0.99,0.97,0.99]
-    ZbbjBKG = [0.99,0.97,1.02,0.98]
-    ZxxBKG = [1.08,0.98,1.00,0.99]
+    #Uncertainty on the bkg fit
+    TTBKG =   [1.00, 1.02, 1.00, 0.98]
+    ZbbBKG =  [1.00, 0.99, 0.97, 0.99]
+    ZbbjBKG = [0.99, 0.98, 1.02, 0.98]
+    ZxxBKG =  [1.08, 0.98, 1.00, 0.99]
 
     print "categories:", categories
-    #name of the output file
-    output = "tree_"+SYST+".root"
+
+    #output llbbYield
+    output = "treeV3_SYST.root"
     #name of the directory where the txt for the limit will be written
-    #dirLimits = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/"
-    dirLimits = "/home/fynu/acaudron/scratch/CMSSW_6_1_1/src/2HDM/"
+    TRUEYIELDS = True
+    if not TRUEYIELDS : dirLimits = "/nfs/user/acaudron/datacards2HDM/"
+    else : dirLimits = "/nfs/user/acaudron/datacards2HDMyieldsSignal/"
 
 

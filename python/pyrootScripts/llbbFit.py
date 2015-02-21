@@ -1,11 +1,15 @@
+"""
+Script to fit the backround to the data
+"""
 
 from ROOT import *
-from listForRDS import lumi
+from llbbOptions import *
 gROOT.SetBatch()
+
 formulaName = "formulaPol3_C.so"
 gSystem.Load(formulaName)
 
-class options_():
+class options_(options_):
     subjets = False
     #list of samples
     samples = [
@@ -18,25 +22,31 @@ class options_():
         "WW",
         "Wt",
         "Wtbar",
-        "ZH125"
+        "ZH125",
         #"ZA_350_70",
         ]
     #template for file name
 
-    SYST = "Nominal"
+    #Systematics
+    #SYST = "Nominal"
+    #SYST = "JESup"
+    #SYST = "JESdown"
+    #SYST = "JERup"
+    #SYST = "JERdown"
+    #SYST = "BTAG_bc_up"
+    #SYST = "BTAG_bc_down"
+    #SYST = "BTAG_light_up"
+    #SYST = "BTAG_light_down"
+    #SYST = "LEPup"
+    SYST = "LEPdown"
     print SYST
-    path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/"+SYST+"/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
+    
+    #template for file name
+    path = options_.path.replace("SYST",SYST)
 
-    #path = "/home/fynu/amertens/storage/Zbb_Analysis/JESup_Syst/RDS_NAME/NAME_Summer12_final_skimedLL.root"
-    #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed.root"
-    #path = "/nfs/user/acaudron/ControlPlots/cp5314p1/ControlPlots_V33/ControlPlots_NAME/NAME_Summer12_final_skimed_zjets.root"
-    #option to split or not the DY sample
-    doDYsplit = True
     #Varibales
     BIN = 5
     vars = {
-        #"zmassEle" : ["eventSelectionbestzmassEle", 7, 60., 120.] ,
-        #"zmassMu"  : ["eventSelectionbestzmassMu", 7, 60., 120.] ,
         "zmassEle" : ["boostselectionbestzmassEle", 7, 60., 120.] ,
         "zmassMu"  : ["boostselectionbestzmassMu", 7, 60., 120.] ,
         "MET"      : ["jetmetMET", 7, 0., 100.] ,
@@ -59,40 +69,37 @@ class options_():
     #thevars = { "El" : ["MET","CSVprodLL"], "Mu" : ["MET","CSVprodLL"] }
     print "variables to be used:", thevars
     #stages
-    stages = {
-        "Mu" : "rc_stage_8",
-        "El" : "rc_stage_19"
-        }
+    stages = options_.stagesFit
+
     if subjets:
         stages = {
-            "Mu" : "rc_stage_9",
-            "El" : "rc_stage_20"
+            "Mu" : "rc_stage_9_idx",
+            "El" : "rc_stage_20_idx"
             }
     print "stages:", stages
+
     #BTAG weight
-    BTAG = "btaggingReweightingMM"
-    #if "11" in stages["Mu"] or "14" in stages["Mu"] or "17" in stages["Mu"] : BTAG = "BtaggingReweightingLM"
-    #elif "10" in stages["Mu"] or "13" in stages["Mu"] or "16" in stages["Mu"] : BTAG = "BtaggingReweightingLL"
+    BTAG = options_.BTAG.replace("*","")
     if subjets : BTAG = "btaggingReweightingCA8subjetsMM"
     print "BTAG:", BTAG
     
     #define cuts
-    cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10"
+    cuts = "("+stages["El"]+" || "+stages["Mu"]+")&&jetmetMETsignificance < 10"
     #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0 && ( (boostselectiondijetM<54||boostselectiondijetM>86) || (boostselectionZbbM<197||boostselectionZbbM>403) )"
     print "cut:", cuts
     #define categories
     categories = {
-        "El2j" : stages["El"]+"&&jetmetnj==2",
-        "El3j" : stages["El"]+"&&jetmetnj>2",
-        "Mu2j" : stages["Mu"]+"&&jetmetnj==2",
-        "Mu3j" : stages["Mu"]+"&&jetmetnj>2"
+        "El2j" : stages["El"].replace("_idx","")+"&&jetmetnj==2",
+        "El3j" : stages["El"].replace("_idx","")+"&&jetmetnj>2",
+        "Mu2j" : stages["Mu"].replace("_idx","")+"&&jetmetnj==2",
+        "Mu3j" : stages["Mu"].replace("_idx","")+"&&jetmetnj>2"
         }
     if subjets:
         categories = {
-            "El2j" : stages["El"]+"&&jetmetnj==2",
-            "El3j" : stages["El"]+"&&jetmetnj>2",
-            "Mu2j" : stages["Mu"]+"&&jetmetnj==2",
-            "Mu3j" : stages["Mu"]+"&&jetmetnj>2"
+            "El2j" : stages["El"].replace("_idx","")+"&&jetmetnj==2",
+            "El3j" : stages["El"].replace("_idx","")+"&&jetmetnj>2",
+            "Mu2j" : stages["Mu"].replace("_idx","")+"&&jetmetnj==2",
+            "Mu3j" : stages["Mu"].replace("_idx","")+"&&jetmetnj>2"
             }
     print "categories:", categories
     #colour code for the plots
@@ -112,7 +119,7 @@ class options_():
         "ZA_350_70" : kBlack,
         }
     #name of the output file
-    output = "FitMM_zmass7x4_"+SYST+"pol3.root"
+    output = "FitMM_zmass7x4_"+SYST+"pol3_NewLumi.root"
     
 #method to make all needed RDS
 def createRDS(files={"test" : "test.root"}, options=None):
@@ -133,7 +140,7 @@ def createRDS(files={"test" : "test.root"}, options=None):
                                                        )
             else :
                 print key
-                myform = "( (abs(@5)==5 || abs(@6)==5)*(0.135957+0.0042069*@4-4.74489e-06*@4*@4+1.33892e-09*@4*@4*@4) + (abs(@5)!=5 & abs(@6)!=5)*(0.506381+0.00245601*@4-2.93631e-06*@4*@4+9.19538e-10*@4*@4*@4) )"
+                myform = "( formula(@4,@5,@6) )"
                 w = RooFormulaVar("w","w", "@0*@1*@2*@3*"+myform,
                                      RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"],ras["boostselectionZbbM"],ras["jetmetbjet1Flavor"],ras["jetmetbjet2Flavor"])
                                      )

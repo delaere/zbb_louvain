@@ -1,5 +1,5 @@
 """
-Script containing some options for python scripts
+List of plots to produce
 """
 
 #Define a list of intersting plots
@@ -155,62 +155,3 @@ Vars["Zjj"] = {
     #"vertexAssociationnvertices":{"name":"vertexAssociationnvertices","title":"vertexAssociationnvertices","bin":60,"xmin":-0.5,"xmax":59.5},
     #"":{"name":"","title":"","bin":30,"xmin":76,"xmax":106},
 }
-
-#define a template for the rootfile name
-fileName = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_SAMPLE/SAMPLE_Summer12_final_skimed_zmet.root"
-
-#selection to compute rewweighting
-Stages = {}
-Stages["Zjj"] = {
-    #"Mu":{"dir":"Muon","cut":"(rc_stage_3_idx&&jetmetnj>1&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)"},
-    #"Ele":{"dir":"Electron","cut":"(rc_stage_14_idx&&jetmetnj>1&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"}
-    "Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"},
-    "Ele":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106)"}
-    #"Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&matrixElementsbjet1etapm>-1.5&&matrixElementsbjet1etapm<1.5&&matrixElementsbjet2etapm>-1.5&&matrixElementsbjet2etapm<1.5)"},
-    #"Ele":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&jetmetMETsignificance<10&&matrixElementsbjet1etapm>-1.5&&matrixElementsbjet1etapm<1.5&&matrixElementsbjet2etapm>-1.5&&matrixElementsbjet2etapm<1.5)"}
-    #"Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetnj>1)"},#&&jetmetMETsignificance>10)"},
-    #"Ele":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetnj>1)"}#&&jetmetMETsignificance>10)"}
-    
-    }
-
-Stages["Zbb"] = {
-    #"Mu":{"dir":"Muon","cut":"(rc_stage_8_idx&&jetmetMETsignificance<10&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)"},
-    #"Ele":{"dir":"Electron","cut":"(rc_stage_19_idx&&jetmetMETsignificance<10&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"}
-    #"Mu":{"dir":"Muon","cut":"(rc_stage_8_idx&&jetmetMETsignificance>10)"},
-    #"Ele":{"dir":"Electron","cut":"(rc_stage_19_idx&&jetmetMETsignificance>10)"}
-    "Mu":{"dir":"Muon","cut":"(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetnj>1&&jetmetMETsignificance<10)"},
-    "Ele":{"dir":"Electron","cut":"(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetnj>1&&jetmetMETsignificance<10)"}
-    }
-
-DYdiv = {
-    "Zbb" : "(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5)",
-    "Zbx" : "((abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5))",
-    "Zxx" : "(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5)"
-    }
-
-#Define BTAG WP
-#BTAG = ""
-BTAG = "*btaggingReweightingMM"
-#define reweighting formula
-baseFrom = "*leptonsReweightingweight*lumiReweightingLumiWeight*mcReweightingweight"
-rewFrom = {}
-rewFrom["Zjj"] = {
-    "Mu":baseFrom,
-    "Ele":baseFrom
-    }
-
-rewFrom["Zbb"] = {
-    "Mu":baseFrom+BTAG,
-    "Ele":baseFrom+BTAG 
-    }
-
-wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 )*1.18"
-wZbbj = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 )*1.29"
-wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )*1.29"
-wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )*1.29"
-#wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 )*1.15"
-#wZbbj = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 )*1.30"
-#wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )*1.30"
-#wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )*1.28"
-wtt = "1.05"
-wdy = "("+wZbb+"+"+wZbbj+"+"+wZbx+"+"+wZxx+")"

@@ -316,7 +316,7 @@ def isLooseMuon(muon, pt_lep=0.0):
   #return True
   return muon.pt()>pt_lep
 
-def isTightMuon(muon):
+def isTightMuon(muon,pt_lep=0):
   """Perform additional checks that define a tight muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # to requires both muons to be matched
@@ -329,20 +329,20 @@ def isTightMuon(muon):
   #  ROOT.SetOwnership( mu, False )
   #else:
   #  mu = muon
-  return (isLooseMuon(muon))
+  return (isLooseMuon(muon,pt_lep))
 
-def isMatchedMuon(muon):
+def isMatchedMuon(muon, pt_lep=0.):
   """Perform additional checks that define a matched muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything else on top of PAT cfg ?
   # cleaning ?
-  return (isTightMuon(muon) and True)
+  return (isTightMuon(muon,pt_lep) and True)
 
 def isGoodMuon(muon,role,pt_lep=0.0):
   """Perform additional checks that define a good muon"""
   if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_lep)
-  if string.find(role,"tight")!=-1   : return isTightMuon(muon)
-  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon)
+  if string.find(role,"tight")!=-1   : return isTightMuon(muon, pt_lep)
+  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon, pt_lep)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
