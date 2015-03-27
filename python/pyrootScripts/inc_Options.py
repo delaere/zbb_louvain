@@ -10,16 +10,33 @@ Script containing some options for python scripts
     
 #########################################################################    
 #path = "/home/fynu/bfrancois/storage/RDS/5320_BTAG_Skimmed_V5/SAMPLE_Summer12_final_skimed_ll2jetsX.root"
-path = "/home/fynu/cbeluffi/storage/RDS/5320_BTAG_Skimmed_V5/llbbX/SAMPLE_Summer12_final_skimed_llbbX_withWeights_V3_BDT.root"
+path = "/home/fynu/cbeluffi/storage/RDS/5320_BTAG_Skimmed_SYST/llbbX/SAMPLE_Summer12_final_skimed_llbbX_withWeights_V3_BDT.root"
 
+#Systematics
+#SYST = "Nominal"
+#SYST = "JESup"
+#SYST = "JESdown"
+#SYST = "JERup"
+#SYST = "JERdown"
+#SYST = "BTAG_bc_up"
+#SYST = "BTAG_bc_down"
+#SYST = "BTAG_light_up"
+#SYST = "BTAG_light_down"
+#SYST = "LEPup"
+#SYST = "LEPdown"
+SYST = "Nominal"
+print SYST
 
 #########################################################################
 stagesFit = {
     "Mu" : "(rc_stage_6_idx &&jetmetMETsignificance<10&& eventSelectionmu1pt_inc>20 && eventSelectionmu2pt_inc>20 &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30)",
-    "El" : "(rc_stage_16_idx&&jetmetMETsignificance<10&& eventSelectionel1pt_inc>20 && eventSelectionel2pt_inc>20 &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30)"
+    "El" : "(rc_stage_16_idx&&jetmetMETsignificance<10&& eventSelectionel1pt_inc>20 && eventSelectionel2pt_inc>20 &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30)",
+    "MuE" : "(rc_stage_26_idx&&jetmetMETsignificance<10&& (eventSelectionel1pt_inc>20 ||eventSelectionmu1pt_inc>20 ) && (eventSelectionel2pt_inc>20 ||eventSelectionmu2pt_inc>20 ) &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30)"
+    
     }
     
-cat="2j" #2j or 3j or noCat
+cat="3j" #2j or 3j or noCat
+
 extraCutsCat=""
 if cat== "2j": extraCutsCat="&&jetmetnj==2&&(eventSelectiondijetM<80||eventSelectiondijetM>150)"
 elif cat== "3j": extraCutsCat="&&jetmetnj>2&&(eventSelectiondijetM<50||eventSelectiondijetM>150)"    
@@ -44,23 +61,23 @@ rewForm = {}
 rewForm["lljets"] = {
     "Mu":baseForm,
     "El":baseForm,
-    #"MuE":baseForm
+    "MuE":baseForm
     }
 
 rewForm["llbbX"] = {
     "Mu":baseForm+BTAG,
     "El":baseForm+BTAG, 
-    #"MuE":baseForm+BTAG 
+    "MuE":baseForm+BTAG 
     }
 #########################################################################
         
 SFlist = {}
 
 SFlist["Nominal"]={
-  "Zbb" : "*((jetmetnj==2&&(eventSelectiondijetM<80||eventSelectiondijetM>150) )*1.363 + (jetmetnj>2&&(eventSelectiondijetM<50||eventSelectiondijetM>150))*1.454)",
-  "Zbx" : "*1.454",
-  "Zxx" : "*2.34",
-  "TT" : "*1.014",
+  "Zbb" : "*((jetmetnj==2&&(eventSelectiondijetM<80||eventSelectiondijetM>150) )*1.373 + (jetmetnj>2&&(eventSelectiondijetM<50||eventSelectiondijetM>150))*1.502)",
+  "Zbx" : "*1.502",
+  "Zxx" : "*2.37",
+  "TT" : "*0.982",
   }    
     
 
@@ -82,8 +99,8 @@ Vars["llbbX"] = {
     "IncLepslep2pt":{"name":"IncLepslep2pt","title":"IncLepslep2pt","bin":50,"xmin":0,"xmax":200},
     "IncLepslep2etapm":{"name":"IncLepslep2etapm","title":"IncLepslep2etapm","bin":20,"xmin":-2.6,"xmax":2.6},
     "IncLepslep2phi":{"name":"IncLepslep2phi","title":"IncLepslep2phi","bin":25,"xmin":-3.2,"xmax":3.2},
-    "Mll":{"name":"eventSelectiondilepM_inc","title":"Mll","bin":5,"xmin":60,"xmax":120},
-    "DRll":{"name":"eventSelectiondrll_inc","title":"DRll","bin":50,"xmin":0,"xmax":5},
+    "Mll":{"name":"eventSelectiondilepM_inc","title":"Mll","bin":30,"xmin":60,"xmax":120},
+    "DRll":{"name":"eventSelectiondrll_inc","title":"DRll","bin":30,"xmin":0,"xmax":5},
     "PTll":{"name":"eventSelectiondilepPt_inc","title":"PTll","bin":50,"xmin":0,"xmax":250},
     "dEtall":{"name":"abs(IncLepslep1etapm-IncLepslep2etapm)","title":"dEtall","bin":50,"xmin":0,"xmax":5},
     "dPhill":{"name":"abs(abs(abs(IncLepslep1phi-IncLepslep2phi)-3.14159)-3.14159)","title":"dPhill","bin":50,"xmin":0,"xmax":3.2},
@@ -133,8 +150,8 @@ Vars["llbbX"] = {
     "MinusLogW_gg_Zbb":{"name":"MinusLogW_gg_Zbb","title":"-logW Zbbgg","bin":100,"xmin":-5,"xmax":100},
     "MinusLogW_qq_Zbb":{"name":"MinusLogW_qq_Zbb","title":"-logW Zbbqq","bin":100,"xmin":-5,"xmax":100},
 
-    "MLPTTDY_El_noCat":{"name":"MLPTTDY_El_noCat","title":"MLPTTDY_El_noCat","bin":4,"xmin":-0.1,"xmax":1.1}, 
-    "MLPTTDY_Mu_noCat":{"name":"MLPTTDY_Mu_noCat","title":"MLPTTDY_Mu_noCat","bin":4,"xmin":-0.1,"xmax":1.1}, 
+    "MLPTTDY_El_noCat":{"name":"MLPTTDY_El_noCat","title":"MLPTTDY_El_noCat","bin":50,"xmin":-0.1,"xmax":1.1}, 
+    "MLPTTDY_Mu_noCat":{"name":"MLPTTDY_Mu_noCat","title":"MLPTTDY_Mu_noCat","bin":50,"xmin":-0.1,"xmax":1.1}, 
     "bdtTTDY_El_noCat":{"name":"bdtTTDY_El_noCat","title":"bdtTTDY_El_noCat","bin":100,"xmin":-1.2,"xmax":1.2}, 
     "bdtTTDY_Mu_noCat":{"name":"bdtTTDY_Mu_noCat","title":"bdtTTDY_Mu_noCat","bin":100,"xmin":-1.2,"xmax":1.2},    
     
@@ -233,5 +250,5 @@ Stages["llbbX"] = {
     ######################
     "Mu":{"dir":"Muon","cut":"(rc_stage_6_idx&&jetmetMETsignificance<10&& eventSelectionmu1pt_inc>20 && eventSelectionmu2pt_inc>20 &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30"+extraCutsCat+")"},
     "El":{"dir":"Electron","cut":"(rc_stage_16_idx&&jetmetMETsignificance<10&& eventSelectionel1pt_inc>20 && eventSelectionel2pt_inc>20 &&  eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120  && jetmetbjet1pt>30 && jetmetbjet2pt>30"+extraCutsCat+")"},
-    #"MuE":{"dir":"MuE","cut":"(rc_stage_26_idx && ((eventSelectionel1pt_inc >20 && eventSelectionmu2pt_inc >20) || (eventSelectionel2pt_inc >20 && eventSelectionmu1pt_inc >20)) && eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120 && jetmetMETsignificance<10 && jetmetbjet1pt>30 && jetmetbjet2pt>30&&jetmetnj==2&&(eventSelectiondijetM<80||eventSelectiondijetM>150))"}
+    "MuE":{"dir":"MuE","cut":"(rc_stage_26_idx && ((eventSelectionel1pt_inc >20 && eventSelectionmu2pt_inc >20) || (eventSelectionel2pt_inc >20 && eventSelectionmu1pt_inc >20)) && eventSelectiondilepM_inc > 60 &&  eventSelectiondilepM_inc < 120 && jetmetMETsignificance<10 && jetmetbjet1pt>30 && jetmetbjet2pt>30&&jetmetnj==2&&(eventSelectiondijetM<80||eventSelectiondijetM>150))"}
     }

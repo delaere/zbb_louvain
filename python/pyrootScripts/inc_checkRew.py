@@ -6,7 +6,7 @@ gROOT.SetBatch()
 
 bTag=inc_Options.bTag
 stage0 = "llbbX"     #"lljets"  #"llbbX"
-chanToRunOn=["Mu","El"]
+chanToRunOn=["Mu","El","MuE"]
 cat=inc_Options.cat
 
 
@@ -90,7 +90,7 @@ plots={
     #"Ele":"Electron/boostselectionCentralityBoost"
     "Mu":"Muon/boostselectionCentrality",
     "El":"Electron/boostselectionCentrality",
-    #"MuE":"MuE/boostselectionCentrality"
+    "MuE":"MuE/boostselectionCentrality"
     }
 
 
@@ -103,8 +103,8 @@ def main():
     for sample in samples:
         if sample in sampleNoWeight : readTree(sample,DirRew)
         elif sample in sampleToRew and applySF:
-            if   sample=="TTFullLept"  : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+inc_Options.wtt,"El":rewForm["El"]+"*"+inc_Options.wtt})
-            elif (sample=="DYjets" or sample=="Zbb" or sample=="Zbx" or sample=="Zxx")  : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+inc_Options.wdy,"El":rewForm["El"]+"*"+inc_Options.wdy})
+            if   sample=="TTFullLept"  : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+inc_Options.wtt,"El":rewForm["El"]+"*"+inc_Options.wtt,"MuE":rewForm["MuE"]+"*"+inc_Options.wtt})
+            elif (sample=="DYjets" or sample=="Zbb" or sample=="Zbx" or sample=="Zxx")  : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+inc_Options.wdy,"El":rewForm["El"]+"*"+inc_Options.wdy,"MuE":rewForm["MuE"]+"*"+inc_Options.wdy})
        
         else:
             readTree(sample,DirRew,rewForm)

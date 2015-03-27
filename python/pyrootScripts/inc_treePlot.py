@@ -20,11 +20,11 @@ def make1Dplot(tree, Stage, DYdiv, Var, output, rewFrom):
     return
 
 
-def readTree(sample,DirOut,rewForm={"Mu":"","El":""},chanToRunOn=["Mu","El"],bTag="JP"):
-    theFile = inc_Options.path.replace("SAMPLE",sample).replace("BTAG",bTag)
+def readTree(sample,DirOut,rewForm={"Mu":"","El":"","MuE":""},chanToRunOn=["Mu","El","MuE"],bTag="JP"):
+    theFile = inc_Options.path.replace("SAMPLE",sample).replace("BTAG",bTag).replace("SYST",inc_Options.SYST)
     print theFile
     if "Zbb" in sample or "Zbx" in sample or "Zxx" in sample : 
-      input = TFile.Open(theFile.replace(sample,"DY").replace("BTAG",bTag))
+      input = TFile.Open(theFile.replace(sample,"DY").replace("BTAG",bTag).replace("SYST",inc_Options.SYST))
     else : 
       input = TFile.Open(theFile)
     tree = input.Get("rds_zbb")

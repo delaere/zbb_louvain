@@ -26,23 +26,10 @@ class options_():
         #"ZH125",
         #"ZA_350_70",
         ]
-    #template for file name
 
-    #Systematics
-    #SYST = "Nominal"
-    #SYST = "JESup"
-    #SYST = "JESdown"
-    #SYST = "JERup"
-    #SYST = "JERdown"
-    #SYST = "BTAG_bc_up"
-    #SYST = "BTAG_bc_down"
-    #SYST = "BTAG_light_up"
-    #SYST = "BTAG_light_down"
-    #SYST = "LEPup"
-    SYST = "Nominal"
+    SYST = inc_Options.SYST
     print SYST
-    
-    #template for file name
+
     path = inc_Options.path.replace("SYST",SYST)
 
     #Varibales
@@ -51,7 +38,7 @@ class options_():
         "zmassEle" : ["eventSelectiondilepM_inc", 4, 60., 120.] ,
         "zmassMu"  : ["eventSelectiondilepM_inc", 4, 60., 120.] ,
         "MET"      : ["jetmetMET", 7, 0., 100.] ,
-        "JPprodMM"   : ["JPprod", BIN, 0, 2.6] ,
+        "JPprodMM"   : ["JPprod", BIN, 0, 2.1] ,
         "CSVprodMM": ["CSVprod", 4, 0.679*0.679, 1] ,
         #"CSVprodML": ["CSVprod", 4, 0.244*0.679, 1] ,
         #"CSVprodLL": ["CSVprod", 12, 0.244*0.244, 1] ,
@@ -121,7 +108,7 @@ def createRDS(files={"test" : "test.root"}, options=None):
     for key in sorted(files.keys()):
     
     
-	fileIn = TFile.Open("/nfs/user/cbeluffi/ControlPlots/RDS_JP_V4/RDS_TTFullLept/TTFullLept_Summer12_final.root","read")
+	fileIn = TFile.Open("/nfs/user/cbeluffi/ControlPlots/RDS_JP_Nominal/RDS_TTFullLept/TTFullLept_Summer12_final.root","read")
 	ws_ras = fileIn.Get("workspace_ras") # get the RooArgSet from the file
 	
 	ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats()) # define a new RooArgSet using the one you got from the file
@@ -152,7 +139,8 @@ def createRDS(files={"test" : "test.root"}, options=None):
 
  
         csvprod = RooFormulaVar("CSVprod","CSVprod","@0*@1",RooArgList(ras["jetmetbjet1CSVdisc"],ras["jetmetbjet2CSVdisc"]))
-        jpprod = RooFormulaVar("JPprod","JPprod","@0*@1*(@0*@1<2.5)+2.5*(@0*@1>=2.5)",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
+
+        jpprod = RooFormulaVar("JPprod","JPprod","@0*@1*(@0*@1<2.0)+2.0*(@0*@1>=2.0)",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
 	#jpprod = RooFormulaVar("JPprod","JPprod","@0*@1",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
 	#jpprod = RooFormulaVar("JPprod","JPprod","0*(@0*@1<=1.0)+1*(1<@0*@1<=1.5)+2*(@0*@1>1.5)",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
         rds = RooDataSet("rds_zbb"+key,"rds_zbb"+key,newtree,ras)
@@ -300,9 +288,10 @@ def main():
     #get file name
     files = {}
     bTag=options.bTag
+    SYST=options.SYST
     for sample in options.samples:
-        if "DATA" not in sample : files[sample] = inc_Options.path.replace("SAMPLE",sample).replace("BTAG",bTag)
-        else : files[sample] = options.path.replace("SAMPLE","Data2012").replace("BTAG",bTag)
+        if "DATA" not in sample : files[sample] = options.path.replace("SAMPLE",sample).replace("BTAG",bTag)
+        else : files[sample] = options.path.replace("SAMPLE","Data2012").replace("BTAG",bTag).replace("SYST",SYST)
         print files[sample]                    
     #get RDS
     RDS = createRDS(files=files, options=options)
