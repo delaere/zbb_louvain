@@ -40,7 +40,7 @@ dir_rds = {
 
         
 samples = [
-    ##"DATA",
+    "DATA",
     "DY",
     "TT",
     "ZZ",
@@ -63,14 +63,15 @@ DYsamples = [
     #"DY2jets",
     #"DY3jets",
     #"DY4jets",
-    #"DYjets_Pt50to70",
-    #"DYjets_Pt70to100",
-    #"DYjets_Pt100",
-    #"DYjets_Pt180",
-    #"DYjets_HT200to400",
-    #"DYjets_HT400",
+    "DYjets_Pt50to70",
+    "DYjets_Pt70to100",
+    "DYjets_Pt100",
+    "DYjets_Pt180",
+    "DYjets_HT200to400",
+    "DYjets_HT400",
     #"Zbb",
-    "DYjets_M10to50",
+    #"DYjets_M10to50",
+    #"DYjets_aMCatNLO",
     ]
 
 DYbcl = [""]
@@ -109,10 +110,11 @@ stages = "--all"
 #stages = "-l 18,37"
 
 #dyweight = 'Merging' #apply weight in order to merge DY ptZ, HT and inclusive
+#dyweight = 'mc' #apply weight for DY aMC@NLO
 #dyweight = 'sfs_dy__Merging' 
 #dyweight = 'sfs_dy' #apply data driven normalisation for bkg
 #ttweight = 'sfs_tt'
-dyweight = '' # no weight
+dyweight = 'Merging' # no weight
 ttweight = ''
 dybjetsplitting = False
 
@@ -162,6 +164,7 @@ jobs = {
     "SingleT_t-Channel" : 100,
     #"SingleT_t-Channel" : 100,
     "DYjets_M10to50" : 100,
+    "DYjets_aMCatNLO" : 300,
     }
 
 if mode == "plots":
@@ -258,7 +261,7 @@ if "DY" in samples :
                     LaunchOnCondor.SendCluster_Push(["BASH", "export ZjetFilter='"+fl.replace("_","")+"'; export weightmode='"+dyweight+"'; "+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+dy+"/ -o "+dy+fl+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
         else:
             for i in range(0,njobs):
-		LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+dy+"/ -o "+dy+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+		LaunchOnCondor.SendCluster_Push(["BASH", "export weightmode='"+dyweight+"';"+os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_5320/Summer12_"+dy+"/ -o "+dy+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
 
 if "ZH" in samples :
     mass = [125]#[115,120,125,130,135]
