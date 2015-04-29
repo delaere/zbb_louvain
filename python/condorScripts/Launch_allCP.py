@@ -22,7 +22,7 @@ dir_plot = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
   "ajafari": "/home/fynu/ajafari/storage/CP/V5/",
-  "bfrancois": "/home/fynu/bfrancois/storage/ControlPlots/",
+  "bfrancois": "/nfs/user/bfrancois/RDS/ControlPlots/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/CP/testOct2014/",
 }
@@ -31,7 +31,7 @@ dir_rds = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
   "ajafari": "/home/fynu/ajafari/storage/RDS/V1/",
-  "bfrancois": "/home/fynu/bfrancois/storage/RDS/",
+  "bfrancois": "/nfs/user/bfrancois/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
 }
