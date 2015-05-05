@@ -459,13 +459,13 @@ def isGoodJet_fwd(jet, Z = None, lepPair = None, pt = 30.):
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
 
   # overlap checking
-  if not Z is None :
-    if not hasNoOverlap(jet,Z=Z) :
-      return False
-
-  if not lepPair is None :
-    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
-      return False
+#  if not Z is None :
+#    if not hasNoOverlap(jet,Z=Z) :
+#      return False
+#
+#  if not lepPair is None :
+#    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
+#      return False
 
   # pt, eta, and jetid
   return abs(jet.eta())>2.4 and jet.pt()>pt and jetId(jet,"loose")  
