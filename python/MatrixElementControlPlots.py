@@ -30,7 +30,7 @@ class MatrixElementControlPlots(BaseControlPlots):
 
     def __init__(self, dir=None, dataset=None, purpose="matrixElements", mode="plots", prejets=""):
       # create output file if needed. If no file is given, it means it is delegated
-      BaseControlPlots.__init__(self, dir=dir, purpose="me", dataset=dataset, mode=mode)
+      BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
       self.prejets = prejets
     
     def beginJob(self):

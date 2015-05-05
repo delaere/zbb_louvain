@@ -2,6 +2,7 @@ from ROOT import *
 from llbbOptions import *
 import array
 import os
+from math import sqrt
 formulaName = "formulaPol3_C.so"
 gSystem.Load(formulaName)
 gROOT.SetBatch()
@@ -19,11 +20,13 @@ class options_(options_):
         "Wt",
         "Wtbar",
         "ZH125",
+        #"ZA_286_93",
+        #"ZA_262_99"
         ]
     print samples
     
     #Systematics
-    #SYST = "Nominal"
+    SYST = "Nominal"
     #SYST = "JESup"
     #SYST = "JESdown"
     #SYST = "JERup"
@@ -31,11 +34,11 @@ class options_(options_):
     #SYST = "BTAG_bc_up"
     #SYST = "BTAG_bc_down"
     #SYST = "BTAG_light_up"
-    SYST = "BTAG_light_down"
+    #SYST = "BTAG_light_down"
     path = options_.path.replace("SYST",SYST)
     
     #output
-    output = options_.output.replace("SYST",SYST).replace("V2","V3")
+    output = options_.output.replace("SYST",SYST).replace("V3","V4")
 
 def createTree(files={"test" : "test.root"}, options=None):
     if options is None : return None
@@ -87,6 +90,8 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
         print 'cutkey : ', cutkey
         mH[0] = float(options.mH_list[cutkey])
         mA[0] = float(options.mA_list[cutkey])
+        #if int(mH[0]) != 216 : continue
+        #if int(mA[0]) != 23 : continue
         print 'mH , mA : ', mH[0], mA[0]
         if mA < mH : 
             for key in keys:
@@ -100,7 +105,7 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
 			condition = options.SYST
 			reweighting = options.rewForm["Zbb"][cat]
 		        if "TT" in key : reweighting += SFlist[condition]["TT"]
-
+                    err = True
 		    if "DY" in key:
 			condition = options.SYST
 			reweighting_Zbb = reweighting+SFlist[condition]["Zbb"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
@@ -108,30 +113,60 @@ def makeRF(output, Trees, options): #opt_cut, categories, dirLmits):
 			reweighting_Zxx = reweighting+SFlist[condition]["Zxx"]+"*formula(boostselectionZbbM,jetmetbjet1Flavor,jetmetbjet2Flavor)"
 
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
-			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
-                        a["Zbb2j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
+                        tmpTH1.Sumw2();
+			numEnt = Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj==2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
+                        tmpArray = tmpTH1.GetSumw2()
+                        sum = 0
+                        for arr in range(0,tmpArray.GetSize()) : sum+=tmpArray[arr]
+                        if not err : a["Zbb2j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
+                        else : a["Zbb2j"+cat][0] = sqrt(sum)*(lumi["DATA"]/lumi["Zbb"])
+                        #print "Zbb2j"+cat, numEnt, a["Zbb2j"+cat][0], (lumi["DATA"]/lumi["Zbb"])
+                        tmpTH1.Delete()
+			
+			tmpTH1 = TH1D('MET','MET',100,0,1000)
+                        tmpTH1.Sumw2();
+			numEnt = Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
+                        tmpArray = tmpTH1.GetSumw2()
+                        sum = 0
+                        for arr in range(0,tmpArray.GetSize()) : sum+=tmpArray[arr]
+                        if not err : a["Zbb3j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
+                        else : a["Zbb3j"+cat][0] = sqrt(sum)*(lumi["DATA"]/lumi["Zbb"])
+                        #print "Zbb3j"+cat, numEnt, a["Zbb3j"+cat][0], (lumi["DATA"]/lumi["Zbb"])
 			tmpTH1.Delete()
 			
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
-			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 && jetmetnj>2 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbb)
-			a["Zbb3j"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbb"])
-			tmpTH1.Delete()
-			
-			tmpTH1 = TH1D('MET','MET',100,0,1000)
-			Trees[key].Draw("jetmetMET >> MET","(((abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5)) && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbx)
-                        a["Zbx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbx"])
+                        tmpTH1.Sumw2();
+			numEnt = Trees[key].Draw("jetmetMET >> MET","(((abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5)) && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zbx)
+                        tmpArray = tmpTH1.GetSumw2()
+                        sum = 0
+                        for arr in range(0,tmpArray.GetSize()) : sum+=tmpArray[arr]
+                        if not err : a["Zbx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zbx"])
+                        else : a["Zbx"+cat][0] = sqrt(sum)*(lumi["DATA"]/lumi["Zbx"])
+                        #print "Zbx"+cat, numEnt, a["Zbx"+cat][0], (lumi["DATA"]/lumi["Zbx"])
                         tmpTH1.Delete()
 
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
-			Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zxx)
-                        a["Zxx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zxx"])	
+                        tmpTH1.Sumw2();
+			numEnt = Trees[key].Draw("jetmetMET >> MET","(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 && "+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting_Zxx)
+                        tmpArray = tmpTH1.GetSumw2()
+                        sum = 0
+                        for arr in range(0,tmpArray.GetSize()) : sum+=tmpArray[arr]
+                        if not err : a["Zxx"+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi["Zxx"])
+                        else : a["Zxx"+cat][0] = sqrt(sum)*(lumi["DATA"]/lumi["Zxx"])
+                        #print "Zxx"+cat, numEnt, a["Zxx"+cat][0], (lumi["DATA"]/lumi["Zxx"])
 			tmpTH1.Delete()
 		    else :
 			tmpTH1 = TH1D('MET','MET',100,0,1000)
-                        Trees[key].Draw("jetmetMET >> MET","("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting)
-                        print "("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting
-                        a[key+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi[key])
-                        print "Option Mll", mA[0], mH[0], a[key+cat][0]
+                        tmpTH1.Sumw2();
+                        numEnt = Trees[key].Draw("jetmetMET >> MET","("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting)
+                        #print "("+options.cut[cutkey]+" && "+options.categories[cat]+")"+reweighting
+                        tmpArray = tmpTH1.GetSumw2()
+                        sum = 0
+                        for arr in range(0,tmpArray.GetSize()) : sum+=tmpArray[arr]
+                        if not err : a[key+cat][0] = tmpTH1.Integral()*(lumi["DATA"]/lumi[key])
+                        else : a[key+cat][0] = sqrt(sum)*(lumi["DATA"]/lumi[key])
+                        #print key+cat, numEnt, a[key+cat][0], (lumi["DATA"]/lumi[key])
+                        #print "Option Mll", mA[0], mH[0], a[key+cat][0]
                         tmpTH1.Delete()
                         #tmpTH1 = TH1D('MET','MET',100,0,1000)
                         #Trees[key].Draw("jetmetMET >> MET","("+options.cut[cutkey]+" && "+options.categories[cat]+"&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"+reweighting)

@@ -1,8 +1,17 @@
+'''
+Test script to compute the background SFs in order to normalize them to Data.
+Idea: define 4 control regions, one for each main background (here tt, Zbb, Zb, Zxx), and resolve the system of equation.
+Nota Bene: here the script only compute SFs for Zbb, Zb and Zxx and check if effectively the tt contribution is 1.
+Warning: no guarantee of good results as used only for a "test".
+Warning2: this should work in principle but only if you assume that the cuts defining the control regions have not impact on the normalisation (e.g. b-tagging, MET...).
+Warning3: script not maintained!
+'''
 
 from ROOT import *
 from time import strftime
-from listForRDS import lumi
+from llbbNorm import lumi
 
+#function to estimate the number of events for each control regions
 def countEvents(files={"test" : "test.root"}):
     events = {}
     #run over all the samples
@@ -78,6 +87,7 @@ def countEvents(files={"test" : "test.root"}):
                 else :
                     if event.rc_stage_18_idx : stagesZxx["zbb"]+=w2b
                     if event.rc_stage_15_idx and event.jetmetMETsignificance>10. : stagesZxx["tt"]+=w2b
+        #normalisation to cross-section and luminosity
         if key=="DYjets":
             for s in stagesZbb :
                 stagesZbb[s] *= lumi["DATA"]/lumi["Zbb"]
@@ -94,8 +104,10 @@ def countEvents(files={"test" : "test.root"}):
             events[key] = stages
     return events
 
+#function to resolve the system of equation
 def computeSFs(N1,L1,N2,L2,N3,L3,keys=[]):
     print N1, L1, N2, L2, N3, L3
+    #express SF of A as a function of SF of B and C
     SF_A = {
         "const" : N1/L1[0],
         "SF_B" : -L1[1]/L1[0],
@@ -103,23 +115,27 @@ def computeSFs(N1,L1,N2,L2,N3,L3,keys=[]):
         }
     print SF_A
 
+    #rewrite the L2 equation injecting the definition of SF of A
     newL2 = [
         L2[1]+L2[0]*SF_A["SF_B"],
         L2[2]+L2[0]*SF_A["SF_C"]
         ]
     newN2 = N2-L2[0]*SF_A["const"]
     print newL2, L2
-    
+
+    #express SF of B as a function of SF of C
     SF_B = {
         "const" : newN2/newL2[0],
         "SF_C" : -newL2[1]/newL2[0]
         }
 
+    #modify SF of A with SF of B
     newSF_A = {
         "const" : SF_A["const"]+SF_A["SF_B"]*SF_B["const"],
         "SF_C" : SF_A["SF_C"]+SF_A["SF_B"]*SF_B["SF_C"]
         }
 
+    #compute all the 3 SFs
     SF_C_ = (N3-L3[0]*newSF_A["const"]-L3[1]*SF_B["const"])/(L3[2]+L3[0]*newSF_A["SF_C"]+L3[1]*SF_B["SF_C"])
     SF_A_ = newSF_A["const"]+SF_C_*newSF_A["SF_C"]
     SF_B_ =SF_B["const"]+SF_C_*SF_B["SF_C"]
@@ -137,7 +153,9 @@ def computeSFs(N1,L1,N2,L2,N3,L3,keys=[]):
 def main():
     print "Start"
     #sample definition
+    #first Data
     dataKey = ["DATA"]
+    #Small background for which normalisation is fixed
     fixSamples = [
         "ZZ",
         "WW",
@@ -146,6 +164,7 @@ def main():
         "Wtbar",
         "ZH125",
         ]
+    #samples to estimate 
     fitSamples = ["DYjets"]
     checkSamples = [
         "TTFullLept",

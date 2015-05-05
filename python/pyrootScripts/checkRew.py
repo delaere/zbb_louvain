@@ -4,6 +4,7 @@ from ROOT import TH1D, TH2D, TFile, TFormula
 gROOT.SetBatch()
 formulaName = "formulaPol3_C.so"
 gSystem.Load(formulaName)
+#gSystem.Load("ReadMVA_C.so")
 
 samples = [
     "Data2012",
@@ -18,6 +19,10 @@ samples = [
     "Wtbar",
     "TTFullLept",
     "TTSemiLept",
+    #"ZA_662_500",
+    #"ZA_286_93",
+    #"ZA_660_450",
+    "ZA_262_99",
     ]
 sampleToRew = [
     "Zbb",
@@ -34,6 +39,10 @@ sampleToSub = [
     "Wtbar",
     "TTFullLept",
     "TTSemiLept",
+    #"ZA_662_500",
+    #"ZA_286_93",
+    #"ZA_660_450",
+    "ZA_262_99",
     ]
 plots={
     #"Mu":"Muon/boostselectionbestzmassMu",
@@ -51,7 +60,7 @@ plots={
     }
 
 #extra = "ttbarCR_METsig15"
-extra = "lowMET_smallMll_RewForm"+formulaName.replace("formula_","").replace("_C.so","")+"DYdivNewSFs"
+extra = "lowMET_smallMll_RewForm"+formulaName.replace("formula_","").replace("_C.so","")+"_AddMVA"
 
 makeNoRew = False
 stage0 = "Zbb"
@@ -62,6 +71,7 @@ makeRew = True
 NormWeights = False
 NormOut = False
 stage1 = "Zbb"
+make2Dratio2 = True
 DirRew = stage1+"_Rew_"+stage0+extra#+"_"+plots["Mu"].split("/")[1].replace("Mu","").replace("Ele","").replace("boostselection","")
 if not NormWeights : DirRew += "_NotNorm"
 if NormOut : DirRew += "_OutNorm"
@@ -76,7 +86,7 @@ def main():
                 if "TT" in sample and stage0=="Zbb" : readTree(sample,DirNoRew,{"Mu":rewForm["Mu"]+"*"+Options.wtt,"El":rewForm["El"]+"*"+Options.wtt})
                 elif (sample=="DY" or sample=="Zbb" or sample=="Zbx" or sample=="Zxx") and stage0=="Zbb" : readTree(sample,DirNoRew,{"Mu":rewForm["Mu"]+"*"+Options.wdy,"El":rewForm["El"]+"*"+Options.wdy})
                 else : readTree(sample,DirNoRew,rewForm)
-        os.system('cd '+DirNoRew+'; cp ../SUM.sh .; source SUM.sh; cd ..')
+            os.system("cd "+DirNoRew+"; root -l -q '../../../scripts/sumChannels.C(\""+sample+".root\")'; cd ..")
         f = open("../../test/input.txt","w")
         f.write(DirNoRew)
         f.close()
@@ -168,10 +178,37 @@ def main():
             if "TT" in sample and stage1=="Zbb" : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+Options.wtt,"El":rewForm["El"]+"*"+Options.wtt})
             elif (sample=="DY" or sample=="Zbb" or sample=="Zbx" or sample=="Zxx") and stage1=="Zbb" : readTree(sample,DirRew,{"Mu":rewForm["Mu"]+"*"+Options.wdy,"El":rewForm["El"]+"*"+Options.wdy})
             else : readTree(sample,DirRew,rewForm)
-    os.system('cd '+DirRew+'; cp ../SUM.sh .; source SUM.sh; cd ..')
+        os.system("cd "+DirRew+"; root -l -q '../../../scripts/sumChannels.C(\""+sample+".root\")'; cd ..")
+    #os.system('cd '+DirRew+'; cp ../SUM.sh .; source SUM.sh; cd ..')
     f = open("../../test/input.txt","w")
     f.write(DirRew)
     f.close()
     os.system('cd ../../test/; combinePlots combinePlots_Trees.py; cd -')
+    if make2Dratio2:
+        fratio = TFile("../../test/"+DirRew+"_testRew.root","UPDATE")
+        for plot2D in Vars2D[stage0]:
+            Var1 = Vars[stage1][plot2D[0]]
+            Var2 = Vars[stage1][plot2D[1]]
+            for channel in ["Muon","Electron","Combined"]:
+                data = TH2D(Var1["name"]+"_vs_"+Var2["name"]+"_data",Var1["title"]+" vs "+Var2["title"],Var1["bin"],Var1["xmin"],Var1["xmax"],Var2["bin"],Var2["xmin"],Var2["xmax"])
+                mc = TH2D(Var1["name"]+"_vs_"+Var2["name"]+"_mc",Var1["title"]+" vs "+Var2["title"],Var1["bin"],Var1["xmin"],Var1["xmax"],Var2["bin"],Var2["xmin"],Var2["xmax"])
+                th2d = {}
+                #get histos
+                for sample in samples:
+                    print sample, channel+"/"+plot2D[0]+"_vs_"+plot2D[1]
+                    if sample in sampleNoWeight:
+                        th2d[sample] = readPlots(sample,DirRew,channel+"/"+plot2D[0]+"_vs_"+plot2D[1])
+                        data.Add(th2d[sample])
+                    else:
+                        th2d[sample] = readPlots(sample,DirRew,channel+"/"+plot2D[0]+"_vs_"+plot2D[1],rescale=True)
+                        mc.Add(th2d[sample])
+                ratio = TH2D(data)
+                ratio.SetName(data.GetName()+"MC_ratio")
+                ratio.Divide(mc)
+                print data.GetName()
+                fratio.cd(channel)
+                data.Write()
+                mc.Write()
+                ratio.Write()
 
 main()

@@ -8,6 +8,8 @@ os.environ["PatAnalysisCfg"]='UserCode.zbb_louvain.zbbConfig'
 from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
 import UserCode.zbb_louvain.PatAnalysis.EventSelection as EventSelection
 from UserCode.zbb_louvain.ZbbEventSelection import *
+from UserCode.zbb_louvain.BtaggingWeight import *
+btagW = BtaggingWeight(1,999,1,999,configuration.btagperfData)
 
 def btagEfficiencyTreeProducer(stageName="Z+jet", output="mybtagEfftree.root", path='../testfiles/'):
   #search for category number
@@ -37,12 +39,13 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", output="mybtagEfftree.root", p
      Float_t     csvivf;\
      Float_t     csvv1sl;\
      Float_t     eventWeight;\
+     Float_t     CSVMWeight;\
   };" )
   from ROOT import MyStruct
   mystruct = MyStruct()
   f = ROOT.TFile( output, 'RECREATE' )
   tree = ROOT.TTree( 'btagEff', 'btag efficiency' )
-  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:csv/F:jbp/F:jp/F:csvv1/F:ivfhe/F:ivfhp/F:sv2/F:csvivf/F:csvv1sl/F:eventWeight/F' )
+  tree.Branch( 'data', mystruct, 'pt/F:eta/F:flavor/I:ssvhe/F:ssvhp/F:csv/F:jbp/F:jp/F:csvv1/F:ivfhe/F:ivfhp/F:sv2/F:csvivf/F:csvv1sl/F:eventWeight/F:CSVMWeight/F' )
   # input
   if os.path.isdir(path):
     dirList=os.listdir(path)
@@ -60,10 +63,7 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", output="mybtagEfftree.root", p
   print "starting loop on events"
   for event in events:
     categoryData = event.category
-    if event.bestZmumuCandidate and event.bestZelelCandidate : goodJets = event.goodJets_all
-    elif event.bestZelelCandidate : goodJets = event.goodJets_ele
-    elif event.bestZmumuCandidate : goodJets = event.goodJets_mu
-    else : goodJets = event.goodJets_none
+    goodJets = event.goodJets_all
     Pass = 0
     for ls in liststage:
       if isInCategory(ls, categoryData) : Pass+=1
@@ -90,6 +90,9 @@ def btagEfficiencyTreeProducer(stageName="Z+jet", output="mybtagEfftree.root", p
         mystruct.sv2 = jet.bDiscriminator("doubleSecondaryVertexHighEffBJetTags")
         mystruct.csvivf = jet.bDiscriminator("combinedInclusiveSecondaryVertexBJetTags")
         mystruct.csvv1sl = jet.bDiscriminator("combinedSecondaryVertexSoftPFLeptonV1BJetTags")
+        btagW.myJetSet.reset()
+        btagW.myJetSet.addJet(configuration.SF_uncert, jet.partonFlavour(),jet.pt(),jet.eta(), btagW.algo1, btagW.algo2)
+        mystruct.CSVMWeight = btagW.getWeight(btagW.myJetSet, 1, 1)
         tree.Fill()
   f.Write()
   f.Close()

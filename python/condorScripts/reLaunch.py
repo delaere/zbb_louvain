@@ -1,20 +1,26 @@
 #Where is the condor FARM
-farmPATH = "/nfs/user/acaudron/ControlPlots/cp5314p1/FARM_CP_V6/"
+farmPATH = "/nfs/user/acaudron/ControlPlots/cp5314p1/FARM_RDS_V86/"
+#farmPATH = "./FARM_ZA_200_90/"
 #What is the job name
-jobName = "CoPl_list_V6"
-#Which string to grep for failing jobs
-grepString = "Error"
+jobName = "CoPl_list_V86"
+#jobName = "ZA_200_90pat"
+#Which string to grep for failing jobs (should find one line / job)
+#grepString = "does not exist"
+grepString = "'Error in <TFile::TFile>'"
 
 #create the new cmd file with failing jobs
 import subprocess
 proc = subprocess.Popen(['grep '+grepString+' '+farmPATH+'logs/*.err'], stdout=subprocess.PIPE, shell=True)
+#proc = subprocess.Popen(['grep "'+grepString+'" '+farmPATH+'inputs/*.sh'], stdout=subprocess.PIPE, shell=True)
 (out, err) = proc.communicate()
 
-print 'run:', 'grep '+grepString+' '+farmPATH+'logs/*.err'
+print 'run:', 'grep "'+grepString+'" '+farmPATH+'logs/*.err'
+#print 'run:', 'grep "'+grepString+'" '+farmPATH+'inputs*.sh'
 print 'output is:'
 print out
 
 errList = out.split(farmPATH+'logs/')
+#errList = out.split(farmPATH+'inputs/')
 
 jobList = []
 

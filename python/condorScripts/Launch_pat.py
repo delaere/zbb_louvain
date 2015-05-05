@@ -9,10 +9,10 @@ import glob
 
 #first to last jobs
 start = 1
-njobs = 5
+njobs = 250
 
 #sample name
-sample="DY"
+sample="ZA_875_761"
 if len(sys.argv)>1:
     sample=sys.argv[1]
 
@@ -21,8 +21,8 @@ OUTDIR = '/nfs/user/'+str(os.environ["USER"])+'/'+sample+'_PAT2014'
 os.system('if [[ -d '+OUTDIR+' ]]; then echo "Directory '+OUTDIR+' exists";  else mkdir '+OUTDIR+'; fi;')
 
 #LaunchOnCondor
-FarmDirectory = "FARM_"+sample+"_"+str(start)+"to"+str(start+njobs-1)
-#FarmDirectory = "FARM_"+sample+"_testMemory"
+#FarmDirectory = "FARM_"+sample+"_"+str(start)+"to"+str(start+njobs-1)
+FarmDirectory = "FARM_"+sample
 JobName = sample+"pat"
 LaunchOnCondor.Jobs_FinalCmds = ['mv pat53_*.root '+OUTDIR+'/ \n']
 LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)

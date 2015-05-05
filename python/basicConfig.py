@@ -51,7 +51,7 @@ class configuration:
     controlPlot("jetmet", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
     controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
-    controlPlot("matrixElements", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
+    controlPlot("me", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
     ]
 
   if runningMode == "plots" :

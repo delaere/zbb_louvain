@@ -3,7 +3,7 @@
 ###############
 
 import math
-import os
+import os, sys
 from ROOT import *
 
 ###################
@@ -29,6 +29,8 @@ mABin = {  30:1,
 
 numDirs=36
 numFiles=36
+#numDirs=40
+#numFiles=20
 massResol=0.15
 bin_width = 1.5
 step_fraction = 2.0/3.0
@@ -41,14 +43,28 @@ myTGraph.SetNpy(500)
 
 
 mllbb=10
+#mllbb=206
 
-mkdir_cmd = "mkdir /nfs/user/acaudron/datacards2HDM/Combined"
+#DIR = "/nfs/user/acaudron/datacards2HDMyieldsSignal/"
+#DIR = "/nfs/user/acaudron/unblindedDatacards2HDMyieldsSignal/"
+DIR = "/nfs/user/acaudron/unblindedDatacards2HDMMCstatV2/"
+#DIR = "/nfs/user/acaudron/unblindedDatacards2HDMyieldsSignalSignalInjec/"
+#DIR = "/nfs/user/acaudron/datacards2HDM/"
+#DIR = "/nfs/user/acaudron/unblindedDatacards2HDM/"
+#DIR = "/nfs/user/acaudron/unblindedDatacards2HDMyieldsSignalzoomLo/"
+#DIR = "/nfs/user/acaudron/toyDatacards2HDM/"
+toy = ""
+if len(sys.argv)==2 : toy = "_"+sys.argv[1] 
+
+mkdir_cmd = "mkdir "+DIR+"Combined"
 os.system(str(mkdir_cmd))
 
 for i in range(1,numDirs):
   dmllbb=massResol*mllbb*bin_width
   step_mllbb = dmllbb*step_fraction
+  #step_mllbb = 4
   mbb=10.0
+  #mbb=63
 
 #  mkdir_cmd = "mkdir /home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/mH"+str(int(mllbb-dmllbb))+"to"+str(int(mllbb+dmllbb))+"/Combined"
 #  os.system(str(mkdir_cmd))
@@ -56,15 +72,16 @@ for i in range(1,numDirs):
   for j in range(1,numFiles):
     dmbb=massResol*mbb*bin_width
     step_mbb = dmbb*step_fraction
+    #step_mbb = 3
 
     print step_mbb
 #    yield_Mu = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/mH"+str(int(mllbb-dmllbb))+"to"+str(int(mllbb+dmllbb))+"/Mu/testmA"+str(int(mbb-dmbb))+"to"+str(int(mbb+dmbb))+".txt"
 #    yield_El = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/mH"+str(int(mllbb-dmllbb))+"to"+str(int(mllbb+dmllbb))+"/El/testmA"+str(int(mbb-dmbb))+"to"+str(int(mbb+dmbb))+".txt"
 
-    yield_Mu = "/nfs/user/acaudron/datacards2HDM/Mu/"+str(int(mbb))+"_"+str(int(mllbb))+".txt"
-    yield_El = "/nfs/user/acaudron/datacards2HDM/El/"+str(int(mbb))+"_"+str(int(mllbb))+".txt"
+    yield_Mu = ""+DIR+"Mu/"+str(int(mbb))+"_"+str(int(mllbb))+toy+".txt"
+    yield_El = ""+DIR+"El/"+str(int(mbb))+"_"+str(int(mllbb))+toy+".txt"
 #    yield_comb = "/home/fynu/amertens/scratch/CMSSW/CMSSW_6_1_1/src/2HDM/mH"+str(int(mllbb-dmllbb))+"to"+str(int(mllbb+dmllbb))+"/Combined/testmA"+str(int(mbb-dmbb))+"to"+str(int(mbb+dmbb))+".txt"
-    yield_comb = "/nfs/user/acaudron/datacards2HDM/Combined/"+str(int(mbb))+"_"+str(int(mllbb))+".txt"
+    yield_comb = ""+DIR+"Combined/"+str(int(mbb))+"_"+str(int(mllbb))+toy+".txt"
 
     if os.path.isfile(yield_Mu) :
       combine_cmd = "combineCards.py "+yield_Mu+" "+yield_El+" > "+yield_comb

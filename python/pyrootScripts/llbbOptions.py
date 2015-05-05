@@ -1,4 +1,4 @@
-from listForRDS import lumi
+from llbbNorm import lumi
 from llbbSF import SFlist
 from llbbPlotsList import *
 
@@ -19,7 +19,7 @@ class options_():
     print samples
 
     #Systematics
-    #SYST = "Nominal" 
+    SYST = "Nominal" 
     #SYST = "JESup" 
     #SYST = "JESdown" 
     #SYST = "JERup" 
@@ -44,10 +44,31 @@ class options_():
 
     #stages
     stages = {
-        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)",
-        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"
-        #"Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10)",
-        #"El" : "(rc_stage_19_idx&&jetmetMETsignificance<10)"
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>513&&boostselectionZbbM<811&&boostselectiondijetM>446&&boostselectiondijetM<704)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>513&&boostselectionZbbM<811&&boostselectiondijetM>446&&boostselectiondijetM<704)"
+
+        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)",
+        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)"
+
+#        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265&&boostselectiondijetM>18&&boostselectiondijetM<28)",
+#        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265&&boostselectiondijetM>18&&boostselectiondijetM<28)"
+
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectiondijetM>18&&boostselectiondijetM<28)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectiondijetM>18&&boostselectiondijetM<28)"
+
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265)"
+
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectiondijetM>72&&boostselectiondijetM<114)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectiondijetM>72&&boostselectiondijetM<114)"
+
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350)"
+
+        #"Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10&&jetmetnj>2)",
+        #"El" : "(rc_stage_19_idx&&jetmetMETsignificance<10&&jetmetnj>2)"
         }
     
     stagesFit = {
@@ -59,8 +80,8 @@ class options_():
 
     Stages = {}
     Stages["Zjj"] = {
-        "Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"},
-        "El":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<1500&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106)"}
+        "Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<10000&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"},
+        "El":{"dir":"Electron","cut":"(rc_stage_13_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<10000&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106)"}
         }
 
     Stages["Zbb"] = {
@@ -73,19 +94,29 @@ class options_():
     
     rangeMassA = []
     mbb=10
+    #mbb=63
+    sigma=1.0
     for i in range(1,36):
+    #for i in range(1,20):
       dmbb=0.15*mbb*1.5
-      step_mbb = dmbb/1.5
+      step_mbb = sigma*0.15*mbb
+      #step_mbb = 3
       rangeMassA.append([int(mbb-dmbb),int(mbb+dmbb),int(mbb)])
       mbb+=step_mbb
 
     rangeMassH = []
     mllbb=10
+    #mllbb=286-80
     for i in range(1,36):
+    #for i in range(1,40):
       dmllbb=0.15*mllbb*1.5
       step_mllbb = dmllbb/1.5
+      #step_mllbb = 4
       rangeMassH.append([int(mllbb-dmllbb),int(mllbb+dmllbb),int(mllbb)])
       mllbb+=step_mllbb
+
+    #rangeMassA = [[int(99*0.775),int(99*1.225),int(99)],[int(104*0.775),int(104*1.225),int(104)]]
+    #rangeMassH = [[int(263*0.775),int(263*1.225),int(263)],[int(270*0.775),int(270*1.225),int(270)]]
 
     cut = {}
     mA_list = {}
@@ -130,10 +161,10 @@ class options_():
         "El":baseForm+BTAG
     }
     
-    wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 )"+SFlist["Nominal"]["Zbb"]
-    wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"+SFlist["Nominal"]["Zbx"]
-    wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"+SFlist["Nominal"]["Zxx"]
-    wtt = SFlist["Nominal"]["TT"].replace("*","")
+    wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 )"+SFlist[SYST]["Zbb"]
+    wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"+SFlist[SYST]["Zbx"]
+    wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"+SFlist[SYST]["Zxx"]
+    wtt = SFlist[SYST]["TT"].replace("*","")
     wdy = "("+wZbb+"+"+wZbx+"+"+wZxx+")"
 
     #Uncertainty on the bkg fit
@@ -145,10 +176,23 @@ class options_():
     print "categories:", categories
 
     #output llbbYield
+    #output = "treeOnlyLoExcess_SYST.root"
     output = "treeV3_SYST.root"
+    #output = "treeFineBinningLo_SYST.root"
+    #output = "treeErrStat_SYST.root"
+    #data option
+    #data="useToy"
+    #data="sigInj"
+    data=""
     #name of the directory where the txt for the limit will be written
-    TRUEYIELDS = True
-    if not TRUEYIELDS : dirLimits = "/nfs/user/acaudron/datacards2HDM/"
-    else : dirLimits = "/nfs/user/acaudron/datacards2HDMyieldsSignal/"
+    TRUEYIELDS = False
 
+    dirLimits = "/nfs/user/acaudron/"
+    if data=="useToy" : dirLimits+="toy"
+    else : dirLimits+="unblinded"
+    dirLimits+="Datacards2HDM"
+    if TRUEYIELDS : dirLimits+="yieldsSignal"
+    if data=="sigInj" : dirLimits+="SignalInjec"
+    dirLimits+="MCstatV2/"
+    #dirLimits+="/"
 

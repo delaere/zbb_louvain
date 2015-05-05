@@ -11,10 +11,10 @@ bin 1
 observation OBSERVED
 ------------------------------
 # number of expected events, per source 
-bin             1       BINS
-process         ModInd  PROCESSES   
-process         0       ORDER    
-rate            SIGNAL  YIELDS     
+bin                        1         BINS
+process                    ModInd    PROCESSES   
+process                    0         ORDER    
+rate                       SIGNAL    YIELDS     
 --------------------------------
 CMS_scale_j       lnN	   JESSIG    JESBkg
 CMS_res_j         lnN      JERSIG    JERBkg
@@ -32,3 +32,18 @@ WZnorm            lnN      -         WZNORM
 WWnorm            lnN      -         WWNORM
 ZHnorm            lnN      -         ZHNORM
 tWnorm            lnN      -         tWNORM
+SIGeff            lnN      SIGSIG    SIGBKG
+SIGpfd            lnN      1.06      SIGBKG
+SIGscale          lnN      1.05      SIGBKG
+Lept_Zbb2jStat    lnN      -         Zbb2jSTAT
+Lept_Zbb3jStat    lnN      -         Zbb3jSTAT
+Lept_ZbxStat      lnN      -         ZbxSTAT
+Lept_ZxxStat      lnN      -         ZxxSTAT
+Lept_TTFullStat   lnN      -         TTFullSTAT
+Lept_TTSemiStat   lnN      -         TTSemiSTAT
+Lept_ZZStat       lnN      -         ZZSTAT
+Lept_WZStat       lnN      -         WZSTAT
+Lept_WWStat       lnN      -         WWSTAT
+Lept_ZHStat       lnN      -         ZHSTAT
+Lept_tWStat       lnN      -         tWSTAT
+Lept_tbarWStat    lnN      -         tbarWSTAT
