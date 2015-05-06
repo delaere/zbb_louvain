@@ -51,13 +51,13 @@ class MonteCarloReWeighting:
                  0.00266683   * weightArgument**2 + 0.0646297   * weightArgument + 0.320127
      #bkg sfs
      if "Merging" in mode:
-        sfs_tt = 1.05
+        sfs_tt = 1.04
         njets = len([x for x in fwevent.goodJets_all if x])
-        sfs_Zbb = 1.15*(njets==2)+1.30*(njets>2)
-        sfs_Zbx = 1.30
-        sfs_Zxx = 1.28
+        sfs_Zbb = 1.16*(njets==2)+1.27*(njets>2)
+        sfs_Zbx = 1.27
+        sfs_Zxx = 1.27
      else:
-        #in case ontly the inclusive sample is used
+        #in case ontly the inclusive sample is used: outdated number, better not use
         sfs_tt = 1.09
         njets = len([x for x in fwevent.goodJets_all if x])
         sfs_Zbb = 1.08*(njets==2)+1.14*(njets>2)
