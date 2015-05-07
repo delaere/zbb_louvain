@@ -1,4 +1,8 @@
+## Combine plots from different samples and make the comparison to the data ##
+## Costumized to run on plots produced from trees ##
+
 import FWCore.ParameterSet.Config as cms
+### Get normalisation factor ###
 from UserCode.zbb_louvain.pyrootScripts.llbbNorm import *
 
 class EColor:
@@ -22,6 +26,8 @@ class EColor:
 palette=-7
 print "ok"
 process = cms.Process("merge")
+
+### read the input directory ###
 f = open("input.txt","r")
 DIR = f.read()
 DIR = DIR.replace("\n","")
