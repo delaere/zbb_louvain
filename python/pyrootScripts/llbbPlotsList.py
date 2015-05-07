@@ -2,10 +2,11 @@
 List of plots to produce
 """
 
-#Define a list of intersting plots
+#Define a list of intersting plots for different stages as binning may change
 Vars = {}
 Vars2D = {}
 rebin = 2
+### stage Zbb ###
 Vars["Zbb"] = {
     #"boostselectionbestzmassMu":{"name":"boostselectionbestzmassMu","title":"boostselectionbestzmassMu","bin":30,"xmin":76,"xmax":106},
     #"boostselectionbestzmassEle":{"name":"boostselectionbestzmassEle","title":"boostselectionbestzmassEle","bin":30,"xmin":76,"xmax":106},
@@ -94,6 +95,7 @@ Vars["Zbb"] = {
     #"":{"name":"","title":"","bin":30,"xmin":76,"xmax":106},
 }
 
+### 2D plots -> you need to produce the 1D of the variables in the 2D map ###
 Vars2D["Zbb"] = [
     #["minjeteta","jetmetjet1pt_etaorder"],
     #["maxjeteta","jetmetjet2pt_etaorder"],
@@ -102,7 +104,7 @@ Vars2D["Zbb"] = [
     #["boostselectiondijetM","boostselectionZbbM"],
     ]
     
-
+### stage Z+2j ####
 Vars["Zjj"] = {
     #"boostselectionbestzmassMu":{"name":"boostselectionbestzmassMu","title":"boostselectionbestzmassMu","bin":60,"xmin":60,"xmax":120},
     #"boostselectionbestzmassEle":{"name":"boostselectionbestzmassEle","title":"boostselectionbestzmassEle","bin":60,"xmin":60,"xmax":120},
