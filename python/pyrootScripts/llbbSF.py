@@ -4,7 +4,7 @@
 # Compute for H -> ZA analysis at 8 TeV using a 2D map of M(ll) between 60-120 GeV (7 bins) and CSV product of the 2 selected b-tagged jets (4 bins)
 # Simulinous fit of ee and mm channels and ==2jets >=3jets categories
 # Same is done for Nominal and systematics
-# DY reweighted for M(lljj) at NLO using NLO/LO ratio derived with Delphes
+# After DY reweighted for M(lljj) at NLO using NLO/LO ratio derived with Delphes
 #
 ##############################################
 
@@ -16,6 +16,12 @@ SFlist["Nominal"]={
     "Zxx"    : "*1.27",
     "TT"     : "*1.04"
     }
+#SFlist["Nominal"]={
+#    "Zbb"    : "*((jetmetnj==2 )*1. + (jetmetnj>2)*1.)",
+#    "Zbx"    : "*1.",
+#    "Zxx"    : "*1.",
+#    "TT"     : "*1."
+#    }
 #*******************************************
 SFlist["JESup"]={
     "Zbb"    : "*((jetmetnj==2 )*1.12 + (jetmetnj>2)*1.15)",
