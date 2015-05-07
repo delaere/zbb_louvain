@@ -1,24 +1,30 @@
+## This script centralised the core of the H to ZA analysis from the trees produced from the PATtuples ##
+## Default selection, normalisation, reweighting... can be retrieved from here and updated/custumised in each scripts which makes use of it ##
+
+### Get the normalisation map ###
 from llbbNorm import lumi
+### Get the SFs to normalised the TTbar and the DY ###
 from llbbSF import SFlist
+### Get the list of plot to be produced ###
 from llbbPlotsList import *
 
+### Class containing default options ###
 class options_():
-    #list of samples
+    ### list of samples ###
     samples = [
         "DATA",
-        #"DYjets",
+        "DYjets",
         "TTFullLept",
-        #"TTSemiLept",
-        #"ZZ",
-        #"WZ",
-        #"WW",
-        #"Wt",
-        #"Wtbar",
-        #"ZH125",
+        "TTSemiLept",
+        "ZZ",
+        "WZ",
+        "WW",
+        "Wt",
+        "Wtbar",
+        "ZH125",
         ]
-    print samples
 
-    #Systematics
+    ### Systematics ###
     SYST = "Nominal" 
     #SYST = "JESup" 
     #SYST = "JESdown" 
@@ -28,13 +34,12 @@ class options_():
     #SYST = "BTAG_bc_down" 
     #SYST = "BTAG_light_up" 
     #SYST = "BTAG_light_down" 
-    #print SYST
 	
-    #template for file name
+    ### template for file name ###
     path_data = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"
     path = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/SYST/RDS_NAME/NAME_Summer12_final_skimed_zmet.root"
 
-    #option to split or not the DY sample
+    ### option to split or not the DY sample ###
     doDYsplit = True
     DYdiv = {
         "Zbb" : "(abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5)",
@@ -42,15 +47,15 @@ class options_():
         "Zxx" : "(abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5)"
         }
 
-    #stages
+    ### analysis selection ###
     stages = {
-        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)",
-        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"
+        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10)",
+        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10)"
         #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>513&&boostselectionZbbM<811&&boostselectiondijetM>446&&boostselectiondijetM<704)",
         #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>513&&boostselectionZbbM<811&&boostselectiondijetM>446&&boostselectiondijetM<704)"
 
-        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)",
-        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)"
+        #"Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)",
+        #"El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>222&&boostselectionZbbM<350&&boostselectiondijetM>72&&boostselectiondijetM<114)"
 
 #        "Mu" : "(rc_stage_8_idx&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265&&boostselectiondijetM>18&&boostselectiondijetM<28)",
 #        "El" : "(rc_stage_19_idx&&boostselectionbestzmassEle>76&&boostselectionbestzmassEle<106&&jetmetMETsignificance<10&&boostselectionZbbM>167&&boostselectionZbbM<265&&boostselectiondijetM>18&&boostselectiondijetM<28)"
@@ -70,14 +75,14 @@ class options_():
         #"Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10&&jetmetnj>2)",
         #"El" : "(rc_stage_19_idx&&jetmetMETsignificance<10&&jetmetnj>2)"
         }
-    
+
+    ### selection to the backgrounds ###
     stagesFit = {
         "Mu" : "(rc_stage_8_idx&&jetmetMETsignificance<10)",
         "El" : "(rc_stage_19_idx&&jetmetMETsignificance<10)"
         }
 
-    print "stages:", stages
-
+    ### selection to make plots ###
     Stages = {}
     Stages["Zjj"] = {
         "Mu":{"dir":"Muon","cut":"(rc_stage_2_idx&&jetmetnj>1&&jetmetMETsignificance<10&&boostselectionZbbM>0&&boostselectionZbbM<10000&&boostselectionbestzmassMu>76&&boostselectionbestzmassMu<106)"},
@@ -89,9 +94,7 @@ class options_():
         "El":{"dir":"Electron","cut":stages["El"]}
         }
 
-    #define cuts
-    presel = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)"
-    
+    ### Define 2D mapping for the search in the M(bb) - M(llbb) plane ###
     rangeMassA = []
     mbb=10
     #mbb=63
@@ -137,17 +140,17 @@ class options_():
             mH_list_down[key] = mH[0]
             mH_list_up[key] = mH[1]
 
-    #categories
+    ### define a set of categories ###
     categories = {
         "Mu" : stages["Mu"],
         "El" : stages["El"],
         }
 
-    #BTAG weight
+    ### BTAG weight ###
     BTAG = "*btaggingReweightingMM"
     print "BTAG:", BTAG
 
-    #define reweighting formula              
+    ### define reweighting formula ###
     baseForm = "*leptonsReweightingweight*lumiReweightingLumiWeight*mcReweightingweight"
 
     rewForm = {}
@@ -160,32 +163,34 @@ class options_():
         "Mu":baseForm+BTAG,
         "El":baseForm+BTAG
     }
-    
+
+    ### define rescaling of the backgrounds to the fitted normalisation ###
     wZbb = "( abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)==5 )"+SFlist[SYST]["Zbb"]
     wZbx = "( (abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)==5) || (abs(jetmetbjet1Flavor)==5 && abs(jetmetbjet2Flavor)!=5) )"+SFlist[SYST]["Zbx"]
     wZxx = "( abs(jetmetbjet1Flavor)!=5 && abs(jetmetbjet2Flavor)!=5 )"+SFlist[SYST]["Zxx"]
     wtt = SFlist[SYST]["TT"].replace("*","")
     wdy = "("+wZbb+"+"+wZbx+"+"+wZxx+")"
 
-    #Uncertainty on the bkg fit
+    ### Uncertainty on the bkg fit ###
     TTBKG =   [1.00, 1.02, 1.00, 0.98]
     ZbbBKG =  [1.00, 0.99, 0.97, 0.99]
     ZbbjBKG = [0.99, 0.98, 1.02, 0.98]
     ZxxBKG =  [1.08, 0.98, 1.00, 0.99]
 
-    print "categories:", categories
-
+    ### define output rootfile name for the tree used to fill the datacards ###
     #output llbbYield
     #output = "treeOnlyLoExcess_SYST.root"
     output = "treeV3_SYST.root"
     #output = "treeFineBinningLo_SYST.root"
     #output = "treeErrStat_SYST.root"
-    #data option
-    #data="useToy"
-    #data="sigInj"
-    data=""
-    #name of the directory where the txt for the limit will be written
-    TRUEYIELDS = False
+    
+    ### data options to fill the datacards###
+    #data="useToy" #will take data from toys
+    #data="sigInj" #will consider bkg+signal as data
+    data="" #will use real data
+    
+    ### name of the directory where the datacards for the limit computation will be written ###
+    TRUEYIELDS = False # if False: consider signal yield (ee+mm)=1. ; if True: take the expected number of signal events for a given model
 
     dirLimits = "/nfs/user/acaudron/"
     if data=="useToy" : dirLimits+="toy"
@@ -193,6 +198,6 @@ class options_():
     dirLimits+="Datacards2HDM"
     if TRUEYIELDS : dirLimits+="yieldsSignal"
     if data=="sigInj" : dirLimits+="SignalInjec"
-    dirLimits+="MCstatV2/"
-    #dirLimits+="/"
+    #dirLimits+="MCstatV2/"
+    dirLimits+="/"
 
