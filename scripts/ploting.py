@@ -3,15 +3,16 @@ import os
 gSystem.Load("DrawCanvas_C.so")
 
 #Dir = "~/workspace/rootfiles/"
-Dir = "~/workspace/testRew2/" ###### 1. DIRECOTY WHERE THE ROOTFILES ARE
+#Dir = "~/workspace/testRew2/" ###### 1. DIRECOTY WHERE THE ROOTFILES ARE
+Dir = "~/workspace/finalCP/" ###### 1. DIRECOTY WHERE THE ROOTFILES ARE
 #file = TFile(Dir+"MERGEDoverflowWithZH125.root","READ")
 #file = TFile(Dir+"MERGEDoverflowWithHiggs.root","READ")
 #file = TFile(Dir+"bkgNorm/mergedPlots_2012ABCD_V1_higgs_allMC_30GeV_stage18_database_bkgnorm.root","READ")
 #file = TFile(Dir+"mergedPlots_2012ABCD_V1_higgs_allMC_30GeV_database_centrality_V57_JES0.root","READ")
 #file = TFile(Dir+"mergedPlots_2012ABCD_V1_higgs_allMC_30GeV_subjets18.root","READ")
 #nameF = "ZbblowMET_smallMll_RewFormformulaPol3DYdiv_NoRew_testRew.root"
-#nameF = "Zbb_Rew_ZbblowMET_smallMll_RewFormformulaPol3DYdivNewSFs_NotNorm_testRew.root"
-nameF = "Zjj_Rew_ZjjlowMET_smallMll_Mllbb350to750_RewFormformulaPol3DYdiv_NotNorm_testRew.root" ########## 2. NAME OF THE ROOTFILE
+nameF = "Zbb_Rew_ZbblowMET_smallMll_RewFormformulaPol3_Mllbb286Mbb93_nosig_AN_NotNorm_testRew.root"
+#nameF = "Zjj_Rew_ZjjlowMET_smallMll_Mllbb350to750_RewFormformulaPol3DYdiv_NotNorm_testRew.root" ########## 2. NAME OF THE ROOTFILE
 file = TFile(Dir+nameF,"READ")
 #file = TFile(Dir+"MERGEDoverflowWithZZ_ZHtop.root","READ")
 #path = "Electron/stage_37/jetmetAK5PF/"
@@ -37,7 +38,7 @@ else : postfix+="_SR"
 #postfix = "ZbbCombMM"+"subjet"
 #postfix = "ZbbEMUComb"+"NoRew"+"highMET"
 #postfix = nameF.replace("_NoRew_testRew.root","") ######### 4. DEFINE SOME POSTFIX DIRECTLY FROM THE INPUT ROOFILENAME TO DEFINE THE OUTPUT DIRECTORY
-postfix = nameF.replace("_NotNorm_testRew.root","") ######### 4. DEFINE SOME POSTFIX DIRECTLY FROM THE INPUT ROOFILENAME TO DEFINE THE OUTPUT DIRECTORY
+postfix = nameF.replace("_NotNorm_testRew","").replace(".root","") ######### 4. DEFINE SOME POSTFIX DIRECTLY FROM THE INPUT ROOFILENAME TO DEFINE THE OUTPUT DIRECTORY
 #postfix = "ZbbMuMM"
 os.system('mkdir '+Dir+postfix)
 print postfix
@@ -54,6 +55,8 @@ listofvars = [ ##### 5. CHOOSE THE VARIABLE TO PLOT
     #"boostselectiondijetPt",
     #"jetmetnj",
     #"jetmetMETsignificance",
+    #"boostselectionZbbPt",
+    #"absCosThetab1",
     #"jetmetbjet1pt",
     #"jetmetbjet2pt",
     #"jetmetbjet1SVmass",
@@ -66,13 +69,15 @@ listofvars = [ ##### 5. CHOOSE THE VARIABLE TO PLOT
     #"nSVsHP",
     #"sumSVs",
 
-    #"boostselectionbestzmass",
+    "boostselectionbestzmass",
     "boostselectiondphiZbb",
     #"jetmetbjet1CSVdisc",
-    #"boostselectiondrll",
-    #"boostselectiondijetdR",
+    "boostselectiondrll",
+    "boostselectiondijetdR",
     #"jetmetbjet2CSVdisc",
     "boostselectiondrZbb",
+    "boostselectionCentrality",
+    "boostselectionCentralityBoost",
     
     #"detab1b2",
     #"eventSelectionllbbM_inc",
@@ -95,9 +100,6 @@ listofvars = [ ##### 5. CHOOSE THE VARIABLE TO PLOT
     #"vertexAssociationnvertices",
     #"boostselectionbestzmassMu",
     #"boostselectiondetab2l1",
-    #"boostselectionZbbPt",
-    #"boostselectionCentrality",
-    #"boostselectionCentralityBoost",
 
     #"maxjeteta",
     #"minjeteta",
