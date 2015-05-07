@@ -76,7 +76,7 @@ void setTDRStyle() {
   gStyle->SetPadTopMargin(0.05);
   gStyle->SetPadBottomMargin(0.13);
   gStyle->SetPadLeftMargin(0.16);
-  gStyle->SetPadRightMargin(0.02);
+  gStyle->SetPadRightMargin(0.05);
   // For the Global title:
   gStyle->SetOptTitle(0);
   gStyle->SetTitleFont(42);
