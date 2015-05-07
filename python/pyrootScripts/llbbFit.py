@@ -9,9 +9,11 @@ gROOT.SetBatch()
 formulaName = "formulaPol3_C.so"
 gSystem.Load(formulaName)
 
+### Update of options_ ###
 class options_(options_):
+    ### use subjets?, warning: not fully automised ###
     subjets = False
-    #list of samples
+    ### list of samples ###
     samples = [
         "DATA",
         "DYjets",
@@ -25,10 +27,9 @@ class options_(options_):
         "ZH125",
         #"ZA_350_70",
         ]
-    #template for file name
 
-    #Systematics
-    #SYST = "Nominal"
+    ### Systematics ###
+    SYST = "Nominal"
     #SYST = "JESup"
     #SYST = "JESdown"
     #SYST = "JERup"
@@ -38,13 +39,13 @@ class options_(options_):
     #SYST = "BTAG_light_up"
     #SYST = "BTAG_light_down"
     #SYST = "LEPup"
-    SYST = "LEPdown"
+    #SYST = "LEPdown"
     print SYST
     
-    #template for file name
+    ### template for file name ###
     path = options_.path.replace("SYST",SYST)
 
-    #Varibales
+    ### Variables defintion ###
     BIN = 5
     vars = {
         "zmassEle" : ["boostselectionbestzmassEle", 7, 60., 120.] ,
@@ -62,13 +63,16 @@ class options_(options_):
         "SV1"      : ["jetmetbjet1SVmass", BIN, 0, 5] ,
         "SV2"      : ["jetmetbjet2SVmass", BIN, 0, 5] ,
         }
+    
+    ### Which variables to use for the fit ###
     #thevars = { "El" : ["zmassEle","CSVprodSubMM"], "Mu" : ["zmassMu","CSVprodSubMM"] }
     thevars = { "El" : ["zmassEle","CSVprodMM"], "Mu" : ["zmassMu","CSVprodMM"] }
     if subjets : thevars = { "El" : ["zmassEle","CSVprodSubMM"], "Mu" : ["zmassMu","CSVprodSubMM"] }
     #thevars = { "El" : ["CSV1","CSV2"], "Mu" : ["CSV1","CSV2"] }
     #thevars = { "El" : ["MET","CSVprodLL"], "Mu" : ["MET","CSVprodLL"] }
     print "variables to be used:", thevars
-    #stages
+
+    ### stages ###
     stages = options_.stagesFit
 
     if subjets:
@@ -78,16 +82,17 @@ class options_(options_):
             }
     print "stages:", stages
 
-    #BTAG weight
+    ### BTAG weight ###
     BTAG = options_.BTAG.replace("*","")
     if subjets : BTAG = "btaggingReweightingCA8subjetsMM"
     print "BTAG:", BTAG
     
-    #define cuts
+    ### define cuts ###
     cuts = "("+stages["El"]+" || "+stages["Mu"]+")&&jetmetMETsignificance < 10"
     #cuts = "("+stages["El"]+"_idx || "+stages["Mu"]+"_idx)&&jetmetMETsignificance < 10 && jetmetMETsignificance != 0 && ( (boostselectiondijetM<54||boostselectiondijetM>86) || (boostselectionZbbM<197||boostselectionZbbM>403) )"
     print "cut:", cuts
-    #define categories
+    
+    ### define categories ###
     categories = {
         "El2j" : stages["El"].replace("_idx","")+"&&jetmetnj==2",
         "El3j" : stages["El"].replace("_idx","")+"&&jetmetnj>2",
@@ -102,7 +107,7 @@ class options_(options_):
             "Mu3j" : stages["Mu"].replace("_idx","")+"&&jetmetnj>2"
             }
     print "categories:", categories
-    #colour code for the plots
+    ### colour code for the plots ###
     Colour = {
         "DYjets" : kBlue,
         "Zbb" : kRed,
@@ -118,22 +123,28 @@ class options_(options_):
         "ZH125" : kBlack,
         "ZA_350_70" : kBlack,
         }
-    #name of the output file
+    ### name of the output file ###
     output = "FitMM_zmass7x4_"+SYST+"pol3_NewLumi.root"
     
-#method to make all needed RDS
+### method to make all needed RDS ###
 def createRDS(files={"test" : "test.root"}, options=None):
     if options is None : return None
     RDS = {}
     for key in sorted(files.keys()):
         print "Make RDS for", key
+        ### get file ###
         tf = TFile.Open(files[key])
+        ### get tree ###
         tree = tf.Get("rds_zbb")
+        ### create temporary file to stored the new tree ###
         tmpfile=TFile("tmp"+options.SYST+".root","RECREATE")
+        ### skim the tree ###
         newtree = tree.CopyTree(options.cuts)
         print "entries", newtree.GetEntries()
+        ### get the rooargset ###
         ws_ras = tf.Get("workspace_ras")
         ras = RooArgSet(ws_ras.allVars(),ws_ras.allCats())
+        ### create rooformula for the reweightings ###
         if not "DATA" in key:
             if not "DYjets" in key : w = RooFormulaVar("w","w", "@0*@1*@2*@3",
                                                        RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"])
@@ -144,21 +155,26 @@ def createRDS(files={"test" : "test.root"}, options=None):
                 w = RooFormulaVar("w","w", "@0*@1*@2*@3*"+myform,
                                      RooArgList(ras["leptonsReweightingweight"],ras["lumiReweightingLumiWeight"],ras[options.BTAG],ras["mcReweightingweight"],ras["boostselectionZbbM"],ras["jetmetbjet1Flavor"],ras["jetmetbjet2Flavor"])
                                      )
+        ### define new variables ###
         csvprod = RooFormulaVar("CSVprod","CSVprod","@0*@1",RooArgList(ras["jetmetbjet1CSVdisc"],ras["jetmetbjet2CSVdisc"]))
         csvprodSub = RooFormulaVar("CSVprodSub","CSVprodSub","@0*@1",RooArgList(ras["subjetmetbjet1CSVdisc"],ras["subjetmetbjet2CSVdisc"]))
         jpprod = RooFormulaVar("JPprod","JPprod","@0*@1",RooArgList(ras["jetmetbjet1JPdisc"],ras["jetmetbjet2JPdisc"]))
+        ### define roodataset ###
         rds = RooDataSet("rds_zbb"+key,"rds_zbb"+key,newtree,ras)
+        ### add weight and new variables to the RDS ###
         if not "DATA" in key : rds.addColumn(w)
         rds.addColumn(csvprod)
         rds.addColumn(csvprodSub)
         rds.addColumn(jpprod)
+        ### redefine the RDS for MC to consider the weight ###
         if not "DATA" in key : rds = RooDataSet(rds.GetName(),rds.GetName(),rds,rds.get(),"",w.GetName())
         for cat in options.categories : RDS[key+cat] = rds.reduce(options.categories[cat])
+    ### split the DY RDS in 3 ###
     for cat in options.categories:
         if "DYjets"+cat in RDS and options.doDYsplit : RDS = splitDY(RDS, cat) 
     return RDS
 
-#method to split the DY sample in Zbb, Zbx, Zxx
+### method to split the DY sample in Zbb, Zbx, Zxx ###
 def splitDY(RDS, cat):
     print "Will split DYjets in Zbb, Zbx and Zxx"
     rds = RDS["DYjets"+cat]
@@ -174,7 +190,7 @@ def splitDY(RDS, cat):
     del RDS["DYjets"+cat]
     return RDS
 
-#method to get roovars from the rooargset
+### method to get roovars from the rooargset ###
 def getVars(vars, ras):
     print "Getting variables"
     myvars = {}
@@ -185,17 +201,21 @@ def getVars(vars, ras):
         myvars[key].setMax(vars[key][3])
     return myvars
 
+### method to create the PDFs ###
 def makePdfs(RDS, myvars, thevars):
     print "Make PDFs"
     RDH = {}
     RHP = {}
     for key in RDS:
+        ### make the rooargset with the 2 variables to be used ###
         if "Mu" in key : ras_vars = RooArgSet(myvars[thevars["Mu"][0]],myvars[thevars["Mu"][1]])
         else : ras_vars = RooArgSet(myvars[thevars["El"][0]],myvars[thevars["El"][1]])
+        ### create the RDH and RHP ###
         RDH[key] = RooDataHist("RDH_"+key,"RDH_"+key, ras_vars, RDS[key])
         RHP[key] = RooHistPdf("RHP_"+key,"RHP_"+key, ras_vars, RDH[key])
     return (RDH, RHP)
 
+### create final PDFs ###
 def addPdfs(RDS, RHP, categories, SFs, flavor):
     print "Add PDFs"
     PdfList2D = {}
@@ -210,15 +230,21 @@ def addPdfs(RDS, RHP, categories, SFs, flavor):
         for key in RHP :
             if "DATA" in key : continue
             if not cat in key : continue
+            ### add the roohistpdf to the PDF list
             PdfList2D[cat].add(RHP[key])
+            ### Compute the number of expected events with the normalisation to the cross-section and luminosity ###
             N_exp[key]=RooConstVar("N_exp_"+key,"N_exp_"+key,
                                    (RDS[key].sumEntries()*(lumi["DATA"]/lumi[key.replace(cat,"")])))
+            ### Define the number of events as the prodct of N_exp*SFs ###
             N[key] = RooFormulaVar("N_"+key,"N_"+key,"@0*@1",RooArgList(N_exp[key],SFs[key]))
             YieldList2D[cat].add(N[key])
+        ### create final pdf with the list of pdfs ###
         Pdf2D[cat] = RooAddPdf("Pdf2D"+cat,"Pdf2D"+cat,PdfList2D[cat],YieldList2D[cat])
+        ### add the pdf to the RooSimultaneous object ###
         simPdf.addPdf(Pdf2D[cat],cat)
     return (Pdf2D,simPdf,PdfList2D,N_exp,N,YieldList2D)
-            
+
+### function to draw 1D projection of the fitted variables after fit. WARNING: it looks to not work properly ###
 def drawFit(RHP, RAP, RDS, myvars, options=None):
     if options is None : return
     c = {}
@@ -227,11 +253,15 @@ def drawFit(RHP, RAP, RDS, myvars, options=None):
         if "Mu" in cat : thevars = options.thevars["Mu"]
         else : thevars = options.thevars["El"]
         for var in thevars:
+            ### create single canvas ###
             CANVAS = TCanvas(var+cat,var+cat,300,300)
+            ### create frame ###
             frame[var+cat] =  myvars[var].frame()
+            ### add Data to the frame ###
             RDS["DATA"+cat].plotOn(frame[var+cat])
             sumSample = ""
             keys = []
+            ### Define strings with the sum of RHPs to be plotted ###
             for sample in options.samples:
                 if sample == "DATA" : continue
                 if sample == "DYjets" and options.doDYsplit :
@@ -240,6 +270,7 @@ def drawFit(RHP, RAP, RDS, myvars, options=None):
                 else :
                     keys.append(sample)
                     sumSample += RHP[sample+cat].GetName()+","
+            ### Add to the frame the sume of the RHP-1 at each iteration: not really beautifull ###
             for index, k in enumerate(keys):
                 if index > 0 : sumSample = sumSample.replace(RHP[keys[index-1]+cat].GetName()+",","")
                 RAP[cat].plotOn(frame[var+cat],
@@ -249,10 +280,13 @@ def drawFit(RHP, RAP, RDS, myvars, options=None):
                                 RooFit.FillColor(options.Colour[k]-7),
                                 RooFit.LineWidth(1)
                                 )
+            ### Add Data on top ###
             RDS["DATA"+cat].plotOn(frame[var+cat])
             RAP[cat].paramOn(frame[var+cat],RDS["DATA"+cat])
+            ### Draw the frame on the canvas ###
             frame[var+cat].Draw()
             c[var+cat] = CANVAS
+    ### Add all single canvases in a bigger one ###
     C = TCanvas("CANVAS","CANVAS",1200,600)
     C.Divide(len(options.categories),2)
     i = 1
@@ -266,27 +300,29 @@ def drawFit(RHP, RAP, RDS, myvars, options=None):
             c[key].DrawClonePad()
     C.SaveAs(options.output)
     return C
-    
+
+### main function to execute ###
 def main():
     print "Start main"
+    ### get options_ ###
     options = options_()
     print options.samples
-    #get file name
+    ### get file name ###
     files = {}
     for sample in options.samples:
         if "DATA" not in sample : files[sample] = options.path.replace("NAME",sample.replace("jets",""))
         else : files[sample] = "/nfs/user/acaudron/ControlPlots/cp5314p1/AllRDS/Nominal/RDS_Data2012/Data2012_Summer12_final_skimed_zmet.root"#options.path.replace("NAME","Data2012")
         print files[sample]                    
-    #get RDS
+    ### get RDS ###
     RDS = createRDS(files=files, options=options)
-    #Get RooArgSet
+    ### Get RooArgSet ###
     for key in RDS:
         if "DATA" in key : continue
         ras = RDS[key].get()
         break
-    #get roovars
+    ### get roovars ###
     myvars = getVars(options.vars, ras)
-    #SFs
+    ### SFs ###
     print "Define SFs"
     SF_zbb_2jet=RooRealVar("SF_zbb","SF_zbb",1.,0.5, 2.)
     SF_zbx_2jet=RooRealVar("SF_zbbj","SF_zbbj",1.,0.5, 2.)
@@ -366,7 +402,7 @@ def main():
         "ZA_350_70Mu3j":SF_za,
         }
 
-    #categories for simultaneous fit
+    ### categories for simultaneous fit ###
     flavor = RooCategory("cat","cat")
     flavor.defineType("El2j")
     flavor.defineType("El3j")
@@ -385,20 +421,20 @@ def main():
     flavor.setLabel("Mu3j")
     RDS["DATAMu3j"].addColumn(flavor)
 
-    #get roohistpdfs and roodatahists
+    ### get roohistpdfs and roodatahists ###
     (RDH, RHP) = makePdfs(RDS, myvars, options.thevars)       
-    #get rooaddpdf
+    ### get rooaddpdf ###
     (RAP, simPdfs,PdfList2D,N_exp,N,YieldList2D) = addPdfs(RDS, RHP, options.categories, SFs, flavor)
-    #make the data
+    ### make the data ###
     print "Make DATA to be fitted"
     DATA = RooDataSet("DATA","DATA",RDS["DATAEl2j"],RDS["DATAEl2j"].get())
     DATA.append(RDS["DATAMu2j"])
     DATA.append(RDS["DATAEl3j"])
     DATA.append(RDS["DATAMu3j"])
-    #do the fit
+    ### do the fit ###
     print "Do the fit..."
     simPdfs.fitTo(DATA)
-    #draw fit
+    ### draw fit ###
     return drawFit(RHP, RAP, RDS, myvars, options)
 
 c_ = main()
