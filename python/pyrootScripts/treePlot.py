@@ -1,11 +1,17 @@
-from ROOT import *
-gSystem.Load("ReadMVA_C.so")
-from llbbOptions import *
-import os
+## Set of functions to make plots from a tree ##
 
+import os
+from llbbOptions import *
+from ROOT import *
+### Get function to compute the MVA output ###
+gSystem.Load("ReadMVA_C.so")
+
+### Get the options from llbbOptions ###
 Options = options_()
+### Get the path of the trees ###
 Options.fileName = Options.path.replace("SYST",Options.SYST)
 
+### Function to make 1D plot ###
 def make1Dplot(tree, Stage, DYdiv, Var, output, rewFrom):
     th1d = TH1D(Var["name"],Var["title"],Var["bin"],Var["xmin"],Var["xmax"])
     th1d.Sumw2()
@@ -15,6 +21,7 @@ def make1Dplot(tree, Stage, DYdiv, Var, output, rewFrom):
     th1d.Write()
     return
 
+### Function to make 2D plot ###
 def make2Dplot(tree, Stage, DYdiv, Var1, Var2, output, rewFrom):
     th2d = TH2D(Var1["name"]+"_vs_"+Var2["name"],Var1["title"]+" vs "+Var2["title"],Var1["bin"],Var1["xmin"],Var1["xmax"],Var2["bin"],Var2["xmin"],Var2["xmax"])
     th2d.Sumw2()
@@ -25,6 +32,7 @@ def make2Dplot(tree, Stage, DYdiv, Var1, Var2, output, rewFrom):
     th2d.Write()
     return
 
+### Function reading a tree and make 1D and 2D plots using the above functions ###
 def readTree(sample,DirOut,rewFrom={"Mu":"","El":""}):
     fileName = Options.fileName
     if sample == "Data2012" : fileName = Options.path_data
@@ -47,6 +55,7 @@ def readTree(sample,DirOut,rewFrom={"Mu":"","El":""}):
             for var2D in Vars2D[DirOut[:3]] : make2Dplot(tree,stages[stage],"",Vars[DirOut[:3]][var2D[0]],Vars[DirOut[:3]][var2D[1]],output,rewFrom[stage])
     return
 
+### Function to read the produced plots and rescaling them to the liminosity and cross-section ###
 def readPlots(sample,DirOut,plot,rescale=False):
     input = TFile.Open(DirOut+"/"+sample+".root")
     th1d = input.Get(plot)
