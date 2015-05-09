@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#run as 'python Launch_pat.py TT' to run over TT sample, number of jobs to be changed below
+#run as 'python Launch_toys.py
 import urllib
 import string
 import os
