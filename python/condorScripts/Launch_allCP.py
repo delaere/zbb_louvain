@@ -30,7 +30,7 @@ dir_plot = {
 dir_rds = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-  "ajafari": "/home/fynu/ajafari/storage/RDS/V1/",
+  "ajafari": "/home/fynu/ajafari/storage/RDS/VTest2/",
   "bfrancois": "/nfs/user/bfrancois/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
@@ -40,15 +40,16 @@ dir_rds = {
 
         
 samples = [
-    "DATA",
-    "DY",
-    "TT",
-    "ZZ",
-    "ZH",
-    "WW",
-    "WZ",
-    "SingleT",
+    #"DATA",
+    #"DY",
+    #"TT",
+    #"ZZ",
+    #"ZH",
+    #"WW",
+    #"WZ",
+    #"SingleT",
     #"ZA"
+    "Hamb"
     ]
 
 ZAsamples = [
@@ -106,7 +107,9 @@ TTsamples = [
     "TTSemiLept",
     #"TTHadronic"
     ]
-
+Hambsamples = [
+   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-30_LowJetPt10"
+]
 mass = [125] #[110,115,120,125,130,135]
 
 SingleTsamples = [
@@ -185,6 +188,7 @@ jobs = {
     #"SingleT_t-Channel" : 100,
     "DYjets_M10to50" : 100,
     "DYjets_aMCatNLO" : 300,
+    "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-30_LowJetPt10" : 50,
     }
 
 if mode == "plots":
@@ -229,6 +233,10 @@ for sample in samples :
             for period in listdata :
                 os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+ch+DATA+period)
                 LaunchOnCondor.Jobs_FinalCmds.append('mv '+ch+DATA+period+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+ch+DATA+period+'/ \n')
+    elif sample=="Hamb":
+        for St in Hambsamples :
+            os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+St)
+            LaunchOnCondor.Jobs_FinalCmds.append('mv '+St+'_'+MC+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+St+'/ \n')
     else :
         os.system('mkdir '+dir+string_mode+cpVersion+'/'+string_mode+sample)
         LaunchOnCondor.Jobs_FinalCmds.append('mv '+sample+'_*.root '+dir+string_mode+cpVersion+'/'+string_mode+sample+'/ \n')
@@ -295,5 +303,13 @@ if "ZA" in samples :
         njobs = jobs["ZA"]
         for i in range(0,njobs):
             LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/acaudron/"+za+"_PAT2014/ -o "+za+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+
+if "Hamb" in samples :
+    for St in Hambsamples :
+        njobs = jobs[St]
+        for i in range(0,njobs):
+            LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/../PatAnalysis/ControlPlots.py -c "+theConfig+" -i /nfs/user/llbb/Pat_8TeV_"+PATversion+"/Summer12_"+St+"/ -o "+St+"_"+MC+"_"+str(i)+".root "+stages+" --Njobs "+str(njobs)+" --jobNumber "+str(i)])
+
+
 
 LaunchOnCondor.SendCluster_Submit()

@@ -205,10 +205,12 @@ class JetmetControlPlots(BaseControlPlots):
       BaseControlPlots.__init__(self, dir=dir, purpose=purpose, dataset=dataset, mode=mode)
       self._JECuncertainty = JetCorrectionUncertaintyProxy()
     
-    def beginJob(self, btagging="CSV", WP=["M","L"], prejets=""):
+    def beginJob(self, btagging="CSV", WP=["M","L"], prejets="", postjetsall="all",postjetsgood="all"):
       self.btagging=btagging
       self.WP=WP
       self.prejets=prejets
+      self.postjetsall=postjetsall
+      self.postjetsgood=postjetsgood
       # declare histograms
       self.add("SSVHEdiscDisc1","SSVHEdiscDisc1",200,0,10)
       self.add("SSVHPdiscDisc1","SSVHPdiscDisc1",200,0,10)
@@ -310,8 +312,14 @@ class JetmetControlPlots(BaseControlPlots):
       maxbdiscSSVHP = -1
       maxbdiscCSV  = -1
       maxbdiscJP  = -1
-      dijet = getattr(event,"di"+self.prejets+"jet_all")
-      goodJets = getattr(event,"good"+self.prejets+"Jets_all")
+      dijet = getattr(event,"di"+self.prejets+"jet_"+self.postjetsall)
+      goodJets = getattr(event,"good"+self.prejets+"Jets_"+self.postjetsgood)
+#      if dijet is None or goodJets is None:
+#	print "Cannot process event"	
+#	return result
+#      if dijet is None:
+#	print "Cannot process event"	
+#	return
       for index,jet in enumerate(getattr(event,self.prejets+"jets")):
         jetPt = jet.pt()
         if goodJets[index]:
@@ -625,6 +633,7 @@ class JetmetControlPlots(BaseControlPlots):
       result["rho"] = event.rho[0]
 
       return result
+
 
 class MetControlPlots(BaseControlPlots):
     """A class to create control plots for MET"""

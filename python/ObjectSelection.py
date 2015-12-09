@@ -6,7 +6,7 @@ from VertexAssociation import zVertex, isfromVertex, isFromVertex_SingleLepton
 from JetCorrectionUncertainty import JetCorrectionUncertaintyProxy
 from MonteCarloSelection import hadronFlavour
 from math import sqrt
-from operator import attrgetter, methodcaller
+from operator import attrgetter
 
 JECuncertaintyProxy = JetCorrectionUncertaintyProxy()
 
@@ -236,7 +236,7 @@ def isTriggerIncOK(event,perRun=True):
   runNumber = event.run()
   l1= None
   l2= None
-  bestDileptcandidate = event.leptonsPair
+  bestDileptcandidate = event.bestDiLeptCandidate
   if bestDileptcandidate is not None:
     l1=bestDileptcandidate[0]
     l2=bestDileptcandidate[1]
@@ -305,18 +305,59 @@ def isTriggerHambOK(event,perRun=True):
   outcome = len(intersect)>0
   return (outcome and isTriggerMatchDileptcandidate(bestDileptcandidate,runNumber,event.lumi()))
 
+#Splitting the tirgger selection and matching (29-11-2015 -- Nadjieh)
+def passDiMuTrigger(event,perRun=True):
+  """Checks if the proper trigger is passed, no matching with offline muons"""
+  triggerInfo = event.triggerInfo
+  runNumber = event.run()
+  if triggerInfo is None:
+    return True
+  paths = triggerInfo.acceptedPaths()
+  pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+  intersect = set()
+  if not perRun:
+    intersect = set(pathnames) & set(ourtriggers.mutriggers)
+  else:
+        if ourtriggers.murunMap[runNumber] is None:
+          print "muon unexpected runNumber : " , runNumber
+        else:
+          intersect = set(pathnames) & set(ourtriggers.murunMap[runNumber])
+  outcome = len(intersect)>0
+  return outcome
 
 
 
-def isLooseMuon(muon, pt_lep=0.0):
+#Does not do matching for the moment!
+def isSingleMuTriggerOK(event,perRun=True):
+  """Checks if the proper trigger is passed"""
+  # Only simple case: mu trigger for mu channel (1)
+  triggerInfo = event.triggerInfo
+  runNumber = event.run()
+  if triggerInfo is None:
+    return True
+  paths = triggerInfo.acceptedPaths()
+  #for i in range(paths.size()) : print paths[i].name()
+  pathnames = map(lambda i: paths[i].name(),range(paths.size()))
+  intersect = set()
+  if not perRun:
+    intersect = set(pathnames) & set(ourtriggers.SingleMutriggers)
+  else:
+    if ourtriggers.muSinglerunMap[runNumber] is None:
+      print "muon unexpected runNumber : " , runNumber
+    else:
+      intersect = set(pathnames) & set(ourtriggers.muSinglerunMap[runNumber])
+  outcome = len(intersect)>0
+  return (outcome)
+
+def isLooseMuon(muon, pt_ = 20., eta = 2.5):
   """Perform additional checks that define a loose muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything on top of PAT cfg ?
   # cleaning ?
   #return True
-  return muon.pt()>pt_lep
+  return (muon.pt()> pt_ and abs(muon.eta()) < eta)
 
-def isTightMuon(muon,pt_lep=0):
+def isTightMuon(muon, pt_ = 20, eta = 2.5):
   """Perform additional checks that define a tight muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # to requires both muons to be matched
@@ -329,31 +370,32 @@ def isTightMuon(muon,pt_lep=0):
   #  ROOT.SetOwnership( mu, False )
   #else:
   #  mu = muon
-  return (isLooseMuon(muon,pt_lep))
+  #return (isLooseMuon(muon, pt_))
+  return (isLooseMuon(muon, pt_, eta))
 
-def isMatchedMuon(muon, pt_lep=0.):
+def isMatchedMuon(muon, pt_ = 20., eta = 2.5):
   """Perform additional checks that define a matched muon"""
   # see https://server06.fynu.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Exp/Zbbmuonselection
   # anything else on top of PAT cfg ?
   # cleaning ?
-  return (isTightMuon(muon,pt_lep) and True)
+  return (isTightMuon(muon, pt_, eta) and True)
 
-def isGoodMuon(muon,role,pt_lep=0.0):
+def isGoodMuon(muon,role, pt_ = 20., eta = 2.5):
   """Perform additional checks that define a good muon"""
-  if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_lep)
-  if string.find(role,"tight")!=-1   : return isTightMuon(muon, pt_lep)
-  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon, pt_lep)
+  if string.find(role,"all")!=-1     : return isLooseMuon(muon, pt_, eta)
+  if string.find(role,"tight")!=-1   : return isTightMuon(muon, pt_, eta)
+  if string.find(role,"matched")!=-1 : return isMatchedMuon(muon, pt_, eta)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown muon role:",role
   return True
 
-def isLooseElectron(electron, pt_lep=0.0):
+def isLooseElectron(electron):
   """Perform additional checks that define a loose electron"""
   # anything else on top of PAT cfg ?
   # cleaning ?
   # note: how to make a pat lepton from the shallowclone ?
   #if electron.hasOverlaps("muons"): return False
-  return electron.pt()> pt_lep# and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
+  return electron.pt()>20. # and ( abs(electron.eta())< 1.442 or ( 1.566<abs(electron.eta()) and abs(electron.eta())<2.50 ) ) to use superCluster use the electron masterClone() as the example in isTightElectron
   #return True
 
 def isTightElectron(electron):
@@ -381,28 +423,33 @@ def isMatchedElectron(electron):
   #if electron.hasOverlaps("muons"): return False
   return (isTightElectron(electron) and True)
 
-def isGoodElectron(electron,role, pt_lep=0.0):
+def isGoodElectron(electron,role):
   """Perform additional checks that define a good electron"""
-  if string.find(role,"all")!=-1   : return isLooseElectron(electron, pt_lep)
+  if string.find(role,"all")!=-1   : return isLooseElectron(electron)
   if string.find(role,"tight")!=-1   : return isTightElectron(electron)
   if string.find(role,"matched")!=-1 : return isMatchedElectron(electron)
   if string.find(role,"none")!=-1    : return True
   print "Warning: Unknown electron role:",role
   return True
 
-def hasNoOverlap(jet, lepPair = None):
+def hasNoOverlap(jet, Z = None, lepPair = None):
   """check overlap between jets and leptons"""
 
+  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
+  #Only Z candidate or lepPair should be provided, otherwise the code exits
+
+  if (not Z is None) and (not lepPair is None):
+    print "hasNoOverlap called with both Z and lepPair candidate, aborting!"
+    sys.exit(1)
+
+  if (not Z is None) :
+    l1 = Z.daughter(0)
+    l2 = Z.daughter(1)
 
   if (not lepPair is None) :
-    try:
-      l1 = lepPair[0]
-      l2 = lepPair[1]
-    except:
-      l1 = lepPair.daughter(0)
-      l2 = lepPair.daughter(1)
-  else : return True
+    l1 = lepPair[0]
+    l2 = lepPair[1]
 
   l1v = ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy())
   l2v = ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy())
@@ -414,7 +461,6 @@ def hasNoOverlap(jet, lepPair = None):
 
 def jetId(jet,level="loose"):
   """jet id - This corresponds to the jet id selection for PF jets"""
-  if not jet.isPFJet() : return True
   rawjet = jet.correctedJet("Uncorrected")
   nhf = ( rawjet.neutralHadronEnergy() + rawjet.HFHadronEnergy() ) / rawjet.energy()
   nef = rawjet.neutralEmEnergyFraction()
@@ -431,47 +477,30 @@ def jetId(jet,level="loose"):
   else:
     print "Error: unknown jetid level:",level
     return False
-    
-def allJets(event, jets="rawjets", checksubjets=False, cone="AK5"):
+
+def allJets(event, jets="rawjets"):
   eventrawjets = getattr(event, jets)
   if event.object().event().eventAuxiliary().isRealData() : return eventrawjets
-  for jet in eventrawjets:
-    JECuncertaintyProxy.Scale(jet, cone)
-    if checksubjets:
-      for i in range(0,jet.numberOfDaughters()) : JECuncertaintyProxy.Scale(jet.daughter(i))
+  for jet in eventrawjets : JECuncertaintyProxy.Scale(jet)
   return eventrawjets
 
-def isGoodJet(jet, lepPair = None, pt = 30.):
+def isGoodJet(jet, Z = None, lepPair = None, pt = 30.):
   """Perform additional checks that define a good jet"""
+  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
   #If lepPair is given, it checks the overlap of the jet with the pair of leptons
-
   # overlap checking
+  if not Z is None :
+    if not hasNoOverlap(jet,Z=Z) :
+      return False
+
   if not lepPair is None :
-    if not hasNoOverlap(jet,lepPair=lepPair) :
+    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
       return False
 
   # pt, eta, and jetid
   return abs(jet.eta())<2.4 and jet.pt()>pt and jetId(jet,"loose")
-  
-def isGoodJet_fwd(jet, Z = None, lepPair = None, pt = 30.):
-  """Perform additional checks that define a good jet"""
-  #If Z candidate is given, it checks the overlap of the jet with the Z leptons
-  #If lepPair is given, it checks the overlap of the jet with the pair of leptons
 
-  # overlap checking
-#  if not Z is None :
-#    if not hasNoOverlap(jet,Z=Z) :
-#      return False
-#
-#  if not lepPair is None :
-#    if not hasNoOverlap(jet,Z=None,lepPair=lepPair) :
-#      return False
-
-  # pt, eta, and jetid
-  return abs(jet.eta())>2.4 and jet.pt()>pt and jetId(jet,"loose")  
-  
-  
-def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
+def goodJets(event, muChannel=True, eleChannel=True, pt=30.):
   # leptons pair
   if muChannel and eleChannel:
     pair = event.leptonsPair
@@ -482,22 +511,8 @@ def goodJets(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
   else:
     pair = None
   # compute the good jets
-  return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),getattr(event,jets))
+  return map(lambda jet:isGoodJet(jet,lepPair=pair,pt=pt),event.jets)
 
-def goodJets_fwd(event, muChannel=True, eleChannel=True, pt=30., jets="jets"):
-  # leptons pair
-  if muChannel and eleChannel:
-    pair = event.leptonsPair
-  elif muChannel:
-    pair = event.muonsPair
-  elif eleChannel:
-    pair = event.electronsPair
-  else:
-    pair = None
-  # compute the good jets
-  return map(lambda jet:isGoodJet_fwd(jet,lepPair=pair,pt=pt),getattr(event,jets)) 
-  
-   
 def getMet(event,type="PF"):
   """Return the MET value you are interested in (type can be PF, MVA or NoPU)"""
   return{
@@ -647,9 +662,9 @@ def isZcandidate(zCandidate,vertex=None):
     charge *= daughter.charge()
     if daughter.isMuon():
       flavor *= -1
-      result = result and isGoodMuon(zCandidate.daughter(r),r, pt_lep=20.0)
+      result = result and isGoodMuon(zCandidate.daughter(r),r)
     elif zCandidate.daughter(r).isElectron():
-      result = result and isGoodElectron(zCandidate.daughter(r),r, pt_lep=20.0)
+      result = result and isGoodElectron(zCandidate.daughter(r),r)
   # check that leptons are opposite charge (should always be the case)
   if charge != -1:
     print "Error: Z is not made of a proper lepton pair (charge issue)"
@@ -801,15 +816,15 @@ def leptonsFromPV_ptSorted(event):
 	muList=[muon for muon in event.muons if isGoodMuon(muon, "tight") and isFromVertex_SingleLepton(muon,0.05,event.vertex)]
  	elList=[electron for electron in event.electrons if isGoodElectron(electron, "tight") and isFromVertex_SingleLepton(electron,0.05,event.vertex)]
 	lepList=muList+elList
-	ptSortedLepList = sorted(lepList,reverse=True,key=methodcaller('pt'))
+	ptSortedLepList = sorted(lepList,reverse=True,key=attrgetter('pt'))
 	return ptSortedLepList if len(ptSortedLepList)>1 else None
 
-def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3, ptLeadLep=17.0, ptSubLeadLep=8.0):
+def leptonsFromPV_ptSorted_DRllVetoOnFirstTwo(event, DRll_cut=0.3):
 	if event.ptSortedLeptons is not None :
 		l1=event.ptSortedLeptons[0]
 		l2=event.ptSortedLeptons[1]
 		DRll=ROOT.TLorentzVector(l1.px(),l1.py(),l1.pz(),l1.energy()).DeltaR(ROOT.TLorentzVector(l2.px(),l2.py(),l2.pz(),l2.energy()))
-		return event.ptSortedLeptons if (DRll>DRll_cut and l1.pt() > ptLeadLep and l2.pt() > ptSubLeadLep) else None
+		return event.ptSortedLeptons if DRll>DRll_cut else None
 	else :
 		return None
 
@@ -931,11 +946,16 @@ def findBestDiLeptCandidate(event, muChannel=True, eleChannel=True):
 
 
 
-def findBestHambDiMuCandidate(event, muChannel=True):
+def findBestHambDiMuCandidate(event, muChannel=True, leadPt = 20., secPt = 20., MuEta = 2.4):
   muList = []
   for mu in event.muons:
-    if isGoodMuon(mu, "tight"):
+    if(len(muList) == 0):
+      if isGoodMuon(mu, "tight",leadPt,MuEta):
+	muList.append(mu)
+    elif(len(muList) == 1):
+      if isGoodMuon(mu, "tight",secPt,MuEta):
         muList.append(mu)
+    else: break
   if len(muList) < 2: return None
   if muList[0] is None or muList[1] is None: return None
   if not (isfromVertex(muList[0], muList[1], 0.05)):
@@ -954,63 +974,104 @@ def diLeptonsPair(event, bestLeptonCand="bestZcandidate"):
     except:
       return [None, None]
 
+def findJetsMatchedWithB(event): #for muon channel only
+  """Find a pair of jets, matched with b genJets."""
+  goodMatchedJets = event.goodJets_muMatched
+  ret = []
+  for index,jet in enumerate(event.jets):
+     if goodMatchedJets[index]:
+	ret.append(jet)
+  return ret 
 
-def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False, prejets=""):
+def goodJetMatchedWithB(event): #for muon channel only
+  """Produce an array of booleans whether a jet is matched"""
+  goodJets = event.goodJets_mu
+  bGenJets = event.sortedGenJets[0]
+  #if not len(bGenJets) == 2:
+  #  return None
+  matchedJetsIndex = []
+  for iGenJet in bGenJets:
+    minDR = 1000
+    index = -1
+    gen = ROOT.TLorentzVector(iGenJet.px(),iGenJet.py(),iGenJet.pz(),iGenJet.energy())
+    for i, iJet in enumerate(goodJets):
+       if not iJet: continue
+       newJet = True
+       if not len(matchedJetsIndex) == 0:
+          for j in range(len(matchedJetsIndex)):
+             if i == matchedJetsIndex[j]:
+                newJet = False
+                break;
+       if not newJet:
+          continue
+       jet = ROOT.TLorentzVector(event.jets[i].px(),event.jets[i].py(),event.jets[i].pz(),event.jets[i].energy())
+       if jet.DeltaR(gen) < minDR:
+          minDR = jet.DeltaR(gen)
+          index = i
+    matchedJetsIndex.append(index)
+  matchedJetsIndex.sort()
+  ret = []
+  for i, iJet in enumerate(goodJets):
+     found = False
+     for matchIndex in matchedJetsIndex:
+        if(i == matchIndex):
+	   found = True 
+     if found: ret.append(True)
+     else: ret.append(False)
+  return ret
+
+
+def findDijetPair(event, btagging="CSV", WP=["M","L"], muChannel=True, eleChannel=False):
   """Find the best jet pair: high Pt and btagging."""
   # the proper goodJets list
-  goodJetsLabel = "good"+prejets+"Jets_"
-  jetsLabel = prejets+"jets"
   if muChannel and eleChannel:
-    goodJets = getattr(event,goodJetsLabel+"all")
+    goodJets = event.goodJets_all
   elif muChannel:
-    goodJets = getattr(event,goodJetsLabel+"mu")
+    goodJets = event.goodJets_mu
   elif eleChannel:
-    goodJets = getattr(event,goodJetsLabel+"ele")
+    goodJets = event.goodJets_ele
   else:
-    goodJets = getattr(event,goodJetsLabel+"none")
+    goodJets = event.goodJets_none
   # check number of good jets
-  indices_pt = [index for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
+  indices_pt = [index for index,jet in enumerate(event.jets) if goodJets[index] ]
   if btagging == "CSV":
-    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("combinedSecondaryVertexBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
   elif btagging == "JP":
-    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(getattr(event,jetsLabel)) if goodJets[index] ]
+    btagList = [(jet.bDiscriminator("jetProbabilityBJetTags"),index) for index,jet in enumerate(event.jets) if goodJets[index] ]
 
   btagList.sort(reverse=True)
   indices = []
   for ibtag in btagList:
     indices.append(ibtag[1])
   if len(indices)<1: return (None, None)
-  if len(indices)<2: return (getattr(event,jetsLabel)[indices[0]],None)
+  if len(indices)<2: return (event.jets[indices[0]],None)
   jetList = []
   # start with HP b-jets
   for index in indices[:]:
-    if isBJet(getattr(event,jetsLabel)[index],WP[0],btagging):
+    if isBJet(event.jets[index],WP[0],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)
   if len(jetList)>=2:
-    if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
-      return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
+    if event.jets[jetList[0]].pt()>event.jets[jetList[1]].pt() :
+      return (event.jets[jetList[0]],event.jets[jetList[1]])
     else :
-      return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
+      return (event.jets[jetList[1]],event.jets[jetList[0]])
   # continue with HE b-jets
   for index in indices[:]:
-    if isBJet(getattr(event,jetsLabel)[index],WP[1],btagging):
+    if isBJet(event.jets[index],WP[1],btagging):
       jetList.append(index)
       indices.remove(index)
       indices_pt.remove(index)
   if len(jetList)>=2:
-    if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
-      return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
+    if event.jets[jetList[0]].pt()>event.jets[jetList[1]].pt() :
+      return (event.jets[jetList[0]],event.jets[jetList[1]])
     else :
-      return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
+      return (event.jets[jetList[1]],event.jets[jetList[0]])
   # fill with remaining good jets
   for index in indices_pt:
     jetList.append(index)
-  if getattr(event,jetsLabel)[jetList[0]].pt()>getattr(event,jetsLabel)[jetList[1]].pt() :
-    return (getattr(event,jetsLabel)[jetList[0]],getattr(event,jetsLabel)[jetList[1]])
-  else:
-    return (getattr(event,jetsLabel)[jetList[1]],getattr(event,jetsLabel)[jetList[0]])
+  return (event.jets[jetList[0]],event.jets[jetList[1]])
 
 def vertex(event):
   vertices = event.vertices
@@ -1018,6 +1079,8 @@ def vertex(event):
     return vertices[0]
   else:
     return None
+
+
 
 #Get fat jets candidate with pt>20. and with 2 good subjets with pt>pt
 def fatjets(event, pt=30.):
@@ -1053,32 +1116,3 @@ def subjets(event):
   #redifine the subjet flavour using hadron (default flavour definition can be wrong as can match one parton to several jets)
   if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
   return subjets
-
-def jetMult(event, btagging="CSV", WP=["M","L"], prejets=""):
-  goodJets = getattr(event, "good"+prejets+"Jets_all")
-  nJets = 0
-  nBjetsHE = 0
-  nBjetsHP = 0
-  nBjetsHEHP = 0
-  for index,jet in enumerate(getattr(event,prejets+"jets")):
-    if goodJets[index]:
-      nJets += 1
-      HE = isBJet(jet,WP[1],btagging)
-      HP = isBJet(jet,WP[0],btagging)
-      if HE: nBjetsHE += 1
-      if HP: nBjetsHP += 1
-      if HE and HP: nBjetsHEHP +=1
-  if nJets>1:
-    dijet = getattr(event, "di"+prejets+"jet_all")
-    j1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
-    j2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
-    dr = j1.DeltaR(j2)
-  else : dr = -1      
-  jetInfo = {
-    "nj" : nJets,
-    "nbHE" : nBjetsHE,
-    "nbHP" : nBjetsHP,
-    "nbHEHP" : nBjetsHEHP,
-    "drj1j2" : dr
-    }
-  return jetInfo

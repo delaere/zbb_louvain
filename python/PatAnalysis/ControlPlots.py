@@ -138,6 +138,7 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
         mod= __import__(configuration.pythonpath+cp.module)
         atts=(configuration.pythonpath+cp.module).split(".")[1:]
         for att in atts : mod = getattr(mod,att)
+	print cp.label
         controlPlots.append(getattr(mod,cp.classname)(dir=None, purpose=cp.label, mode="dataset", dataset=rds))
 
   # book histograms (separate iteration for clarity)
@@ -155,6 +156,7 @@ def runAnalysis(path, levels, outputname="controlPlots.root", Njobs=1, jobNumber
   i = 0
   t0 = time.time()
   for event in events:
+
     # printout
     if i%100==0 : 
       print "Processing... event %d. Last batch in %f s." % (i,(time.time()-t0))

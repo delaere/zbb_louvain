@@ -256,16 +256,39 @@ def mergeWeightsInRootFile_loopOnTree_NoLoopOnWeightFile(inRootFile,nameInInstan
 		fileOut = TFile.Open(outRootFile,"update")		
 
 	
-	dict_nameHypo_stages_weightsFile = {nameHypo : {stages[i] : MW_directory+dict_InstanceNameInTree_ChannelNames[nameHypo][i]+"/Events/"+nameInInstance+"/weights.out" for i in xrange(len(stages))} for nameHypo in dict_InstanceNameInTree_ChannelNames}
+	#dict_nameHypo_stages_weightsFile = {nameHypo : {stages[i] : MW_directory+dict_InstanceNameInTree_ChannelNames[nameHypo][i]+"/Events/"+nameInInstance+"/weights.out" for i in xrange(len(stages))} for nameHypo in dict_InstanceNameInTree_ChannelNames}
+	dict_nameHypo_stages_weightsFile = {}
+	for nameHype in dict_InstanceNameInTree_ChannelNames :
+		val = {}
+		for i in xrange(len(stages)) :
+			val[ stages[i] ] = MW_directory+dict_InstanceNameInTree_ChannelNames[nameHypo][i]+"/Events/"+nameInInstance+"/weights.out"
+		dict_nameHypo_stages_weightsFile[ nameHypo ] = val
+
         print "Weight file to merge : "
 	print dict_nameHypo_stages_weightsFile,"\n"
 	hasAllWeightsArray =  array("d",[0])
 	treeOut = treeIn.CloneTree(0)
 	branch_hasAllWeightsArray_newTree=treeOut.Branch("hasAllWeights",hasAllWeightsArray,"hasAllWeights")
-	weightsArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
-	weightsErrorArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
-	minusLogWeightsArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
-        dict_hypo_stage_evtRunNum_weightErr = {nameHypo : {stages[i] :{} for i in xrange(len(stages))} for nameHypo in dict_InstanceNameInTree_ChannelNames} 
+	#weightsArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
+	weightsArray = {}
+	for hypo in dict_InstanceNameInTree_ChannelNames:
+		weightsArray[hypo] = array("d",[0])
+	#weightsErrorArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
+	weightsErrorArray = {}
+	for hypo in dict_InstanceNameInTree_ChannelNames:
+		weightsErrorArray[hypo] = array("d",[0])
+	#minusLogWeightsArray = {hypo : array("d",[0]) for hypo in dict_InstanceNameInTree_ChannelNames}
+        minusLogWeightsArray = {}
+	for hypo in dict_InstanceNameInTree_ChannelNames:
+		minusLogWeightsArray = array("d",[0])
+
+        #dict_hypo_stage_evtRunNum_weightErr = {nameHypo : {stages[i] :{} for i in xrange(len(stages))} for nameHypo in dict_InstanceNameInTree_ChannelNames} 
+	dict_hypo_stage_evtRunNum_weightErr = {}
+	for nameHypo in dict_InstanceNameInTree_ChannelNames:
+		val = {}
+		for i in xrange(len(stages)):
+			val [stages[i]] = {}
+		dict_hypo_stage_evtRunNum_weightErr[nameHypo] = val
 	print "Start to put the weights into python dictionnaries to avoid loops for each event.\n"
 	for hypo in dict_InstanceNameInTree_ChannelNames :
 		leave_weight = hypo+"/D" 
@@ -298,7 +321,11 @@ def mergeWeightsInRootFile_loopOnTree_NoLoopOnWeightFile(inRootFile,nameInInstan
 					table_evtRun.append(pieces[0]+runNumber)
 					table_weights.append(eventWeight)
 					table_errorWeights.append(eventWeightError)
-			dict_hypo_stage_evtRunNum_weightErr[hypo][stage]={table_evtRun[index]:[table_weights[index],table_errorWeights[index]] for index in xrange(len(table_evtRun))}
+			tmpmap = {}
+			for index in xrange(len(table_evtRun)):
+				tmpmap [table_evtRun[index]] = [table_weights[index],table_errorWeights[index]]
+			#dict_hypo_stage_evtRunNum_weightErr[hypo][stage]={table_evtRun[index]:[table_weights[index],table_errorWeights[index]] for index in xrange(len(table_evtRun))}
+			dict_hypo_stage_evtRunNum_weightErr[hypo][stage]=tmpmap
 
 	NevtWithWeight=0	
 	print "Starting the loop on the tree.\n"	

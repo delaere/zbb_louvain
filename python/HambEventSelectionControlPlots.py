@@ -6,14 +6,39 @@ confCfg = os.environ["PatAnalysisCfg"]
 if confCfg : from UserCode.zbb_louvain.PatAnalysis.CPconfig import configuration
 else : from zbbConfig import configuration
 
+Mode = configuration.runningMode
+
 class HambEventSelectionControlPlots(BaseControlPlots):
     """A class to create control plots for event selection"""
 
-    def __init__(self, dir=None, dataset=None, mode="plots"):
+    #def __init__(self, dir=None, dataset=None, mode=Mode):
+    def __init__(self, dir=None, purpose="eventSelection", dataset=None, mode=Mode):
       # create output file if needed. If no file is given, it means it is delegated
       BaseControlPlots.__init__(self, dir=dir, purpose="eventSelection", dataset=dataset, mode=mode)
     
-    def beginJob(self):
+    def beginJob(self, mode=Mode):
+      nBinH = 1000
+      xMaxH = 1000.
+      nBinDM = 100
+      xMaxDM = 100.
+      nBinMuPt = 500
+      xMaxMuPt = 500.
+      nBinMET = 100
+      xMaxMET = 200.
+      nBinMETsig = 1000
+      xMaxMETsig = 500.
+      if not (mode == "plots" ):
+	nBinH = 10000
+        xMaxH = 10000.
+        nBinDM = 10000
+        xMaxDM = 10000.
+        nBinMuPt = 10000
+        xMaxMuPt = 10000.
+        nBinMET = 1000
+        xMaxMET = 10000.
+        nBinMETsig = 10000
+        xMaxMETsig = 10000.
+      #print str(mode)+", DiffM numbers: "+repr(xMaxDM)+"\t"+repr(nBinDM)
       # H -> aa -> mumu bb 
       self.add("run","Run number",50000,160000,210000)
       self.add("event","Event number",1000,0,5e9)
@@ -28,13 +53,13 @@ class HambEventSelectionControlPlots(BaseControlPlots):
       self.add("dphiaa","#Delta #phi (a,a)",40,0,3.15)
       self.add("aadR","#Delta R (a,a)",100,0,5)
       self.add("dphiHiggsMET","#Delta #phi (H, MET)",40,0,3.15)
-      self.add("hPt","Higgs p_{T}",1000,0,1000)
-      self.add("hMass","Higgs mass",1000,0,1000)
-      self.add("diffMassaa","#Delta m(a,a)",100,0,100)
+      self.add("hPt","Higgs p_{T}",nBinH,0,xMaxH)
+      self.add("hMass","Higgs mass",nBinH,0,xMaxH)
+      self.add("diffMassaa","#Delta m(a,a)",nBinDM,0,xMaxDM)
 	
       # di-mu plots
       self.add("amassMu","di-#mu mass",10000,0,1000)
-      self.add("aptMu","di-#mu p_{T}",1000,0,1000)
+      self.add("aptMu","di-#mu p_{T}",nBinH,0,1000)
       self.add("dphiaMuMET","#Delta #phi (a_{#mu}, MET)",40,0,3.15)
       self.add("diMudR","#Delta R (#mu,#mu)",100,0,5)
       self.add("dphidiMu","#Delta #phi (#mu,#mu)",40,0,3.15)
@@ -48,15 +73,25 @@ class HambEventSelectionControlPlots(BaseControlPlots):
       self.add("diBjetSVdR","#Delta R_{SV} (b,b)",100,0,5)
 
       # basic distributions
-      self.add("mu1pt","leading muon Pt",500,0,500)
-      self.add("mu2pt","subleading muon Pt",500,0,500)
+      self.add("mu1pt","leading muon Pt",nBinMuPt,0,xMaxMuPt)
+      self.add("mu2pt","subleading muon Pt",nBinMuPt,0,xMaxMuPt)
       self.add("mu1eta","leading muon Eta",25,0,2.5)
       self.add("mu2eta","subleading muon Eta",25,0,2.5)
       self.add("mu1etapm","leading muon Eta",50,-2.5,2.5)
       self.add("mu2etapm","subleading muon Eta",50,-2.5,2.5)
 
-      self.add("MET_hamb","Missing transverse energy",100,0,200)
-      self.add("METsignificance_hamb","missing transverse energy significance",1000,0,500)
+      self.add("jet1pt","leading jet Pt",nBinMuPt,0,xMaxMuPt)
+      self.add("jet2pt","subleading jet Pt",nBinMuPt,0,xMaxMuPt)
+      self.add("jet1CSV","leading jet CSV",2000,-1.,1.)
+      self.add("jet2CSV","subleading jet CSV",2000,-1.,1.)
+
+      self.add("matchedjet1pt","leading matched jet Pt",nBinMuPt,0,xMaxMuPt)
+      self.add("matchedjet2pt","subleading matched jet Pt",nBinMuPt,0,xMaxMuPt)
+      self.add("matchedjet1CSV","leading matched jet CSV",2000,-1.,1.)
+      self.add("matchedjet2CSV","subleading matched jet CSV",2000,-1.,1.)
+
+      self.add("MET_hamb","Missing transverse energy",nBinMET,0,xMaxMET)
+      self.add("METsignificance_hamb","missing transverse energy significance",nBinMETsig,0,xMaxMETsig)
       
 
     def process(self, event):
@@ -138,6 +173,7 @@ class HambEventSelectionControlPlots(BaseControlPlots):
 
 	#Jet selection
         dijet = event.dijet_muChannel
+        matchedjets = event.dijet_matchedJetWithB
         if not dijet[0] is None:
           b1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
         if not dijet[1] is None:
@@ -155,6 +191,30 @@ class HambEventSelectionControlPlots(BaseControlPlots):
 	  higgs = amu + abb
 
           # di-b-jets plots
+	  sortedIndecies = [0,1]
+	  if dijet[1].pt() > dijet[0].pt():
+	     sortedIndecies = [1,0]
+	  #jetpts = [dijet[0].pt(), dijet[1].pt()]
+	  #jetpts.sort(reverse=True)
+          result["jet1pt"] = dijet[sortedIndecies[0]].pt()
+          result["jet2pt"] = dijet[sortedIndecies[1]].pt()
+	  result["jet1CSV"] = dijet[sortedIndecies[0]].bDiscriminator("combinedSecondaryVertexBJetTags")
+	  result["jet2CSV"] = dijet[sortedIndecies[1]].bDiscriminator("combinedSecondaryVertexBJetTags")
+	  
+	  if len(matchedjets) == 2:
+	     sortedIndecies = [0,1]
+	     if matchedjets[1].pt() >  matchedjets[0].pt():
+                sortedIndecies = [1,0]
+  	     result["matchedjet1pt"] = matchedjets[sortedIndecies[0]].pt()
+             result["matchedjet2pt"] = matchedjets[sortedIndecies[1]].pt()
+             result["matchedjet1CSV"] = matchedjets[sortedIndecies[0]].bDiscriminator("combinedSecondaryVertexBJetTags")
+             result["matchedjet2CSV"] = matchedjets[sortedIndecies[1]].bDiscriminator("combinedSecondaryVertexBJetTags")
+	  else:
+             result["matchedjet1pt"] = -100
+             result["matchedjet2pt"] = -100
+             result["matchedjet1CSV"] = -100 
+             result["matchedjet2CSV"] = -100
+
 	  result["amassBjet"] = abb.M()
 	  result["aptBjet"] = abb.Pt()
 	  result["dphiaBjetMET"] = abb.DeltaPhi(met4v)

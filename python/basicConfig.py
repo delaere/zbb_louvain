@@ -31,6 +31,8 @@ class configuration:
 
   # my variables: files, systematics and other options
   ptjet = 30.
+  leadMuPt = 18.
+  secMuPt = 8.
   btagging = "CSV"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   muChannel = True
@@ -48,7 +50,8 @@ class configuration:
 
   # control plot classes
   controlPlots = [
-    controlPlot("jetmet", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP }),
+    controlPlot("jetmet", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP, "postjetsall":"muChannel", "postjetsgood":"mu" }),
+    controlPlot( "jetmetmatched", "ObjectsControlPlots", "JetmetControlPlots", { "btagging":btagging, "WP":WP, "postjetsall":"matchedJetWithB", "postjetsgood":"muMatched" }),
     controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }),
     controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }),
     controlPlot("me", "MatrixElementControlPlots", "MatrixElementControlPlots", { }),
@@ -109,6 +112,7 @@ class configuration:
                        eventProducer("isINCTriggerOK", "ObjectSelection", "isTriggerIncOK", {"perRun":True } ),
                        eventProducer("isTriggerOK", "ObjectSelection", "isTriggerOK", { "muChannel":True,"eleChannel":True,"perRun":True } ),
 		       eventProducer("isHambDiMuTriggerOK", "ObjectSelection", "isTriggerHambOK", {"perRun":True } ),
+		       eventProducer("isDiMuTriggerNoMatchOK", "ObjectSelection", "passDiMuTrigger", {"perRun":True } ),
                        eventProducer("category", "PatAnalysis.EventSelection", "eventCategory", { "btagging":btagging, "WP":WP, "ZjetFilter":theZfilter } ),
                        eventProducer("bestZmumuCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":True,"eleChannel":False } ),
                        eventProducer("bestZelelCandidate", "ObjectSelection", "findBestCandidate", { "muChannel":False,"eleChannel":True } ),
@@ -117,12 +121,13 @@ class configuration:
                        eventProducer("bestHambDiMuCandidate", "ObjectSelection", "findBestHambDiMuCandidate", { "muChannel":True} ),
 		       eventProducer("muonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmumucandidate" } ),
                        eventProducer("electronsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZelelcandidate" } ),
-                       #eventProducer("muelPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZmuelcandidate" } ),
                        eventProducer("leptonsPair", "ObjectSelection", "diLeptonsPair", { "bestLeptonCand":"bestZcandidate" } ),
                        eventProducer("dijet_muChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":False } ),
                        eventProducer("dijet_eleChannel", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":False,"eleChannel":True } ),
                        eventProducer("dijet_all", "ObjectSelection", "findDijetPair", { "btagging":btagging,"WP":WP,"muChannel":True,"eleChannel":True } ),
                        eventProducer("sortedGenJets", "MonteCarloSelection", "genjetCollectionsProducer", { "ptcut":0, "etacut":10 } ),
+		       eventProducer("dijet_matchedJetWithB", "ObjectSelection", "findJetsMatchedWithB", {}),
+		       eventProducer("goodJets_muMatched","ObjectSelection","goodJetMatchedWithB",{}),
                        eventProducer("ptSortedLeptons", "ObjectSelection","leptonsFromPV_ptSorted",{}),
                        eventProducer("ptSortedLeptons_DRll", "ObjectSelection", "leptonsFromPV_ptSorted_DRllVetoOnFirstTwo", {"DRll_cut":0.3, "ptLeadLep":17.0, "ptSubLeadLep":8.0} )
                      ]
@@ -131,7 +136,8 @@ class configuration:
 
   #list of objects to update if you plan to chenge the b-tag WP and/or algo (see: "changeBTAG" below)
   toupdateForBtag = {
-    "controlPlots" : ["jetmet"],
+    "controlPlots" : ["jetmet","jetmetmatched"],
+#    "controlPlots" : ["jetmet"],
     "eventProducers" : ["category", "dijet_muChannel", "dijet_eleChannel", "dijet_all"]
     }
 
@@ -148,6 +154,20 @@ def changeJetPt(conf = None, ptjet=30.):
   while True:
     try: next(iter).kwargs["pt"] = ptjet
     except StopIteration : break  
+  return
+#function to change muon pt cut
+def changeHambMuPt(conf = configuration, leadPt=17., secPt = 8.):
+  if conf is None: return
+  conf.leadMuPt = leadPt
+  conf.secMuPt = secPt
+  iter = (x for x in conf.eventProducers if x.function == "findBestHambDiMuCandidate")
+  while True:
+    try: next(iter).kwargs["leadPt"] = leadPt
+    except StopIteration : break
+  iter = (x for x in conf.eventProducers if x.function == "findBestHambDiMuCandidate")
+  while True:
+    try: next(iter).kwargs["secPt"] = secPt
+    except StopIteration : break
   return
 
 #function to switch b-tagging or WP
