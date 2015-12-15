@@ -128,7 +128,8 @@ class BaseControlPlots:
         if isinstance(value,list):
           for val in value: self._h_vector[name].Fill(val,weight)
         else:
-          self._h_vector[name].Fill(value,weight)
+	  if name in self._h_vector:
+            self._h_vector[name].Fill(value,weight)
 
     def fillRDS(self, data):
       """Fills roodataset with the data provided as input."""
@@ -141,7 +142,8 @@ class BaseControlPlots:
 	  #for now, we only store scalars, not vectors
 	  pass
         else:
-	  self._rrv_vector[name].setVal(value)
+	  if name in self._rrv_vector:
+	     self._rrv_vector[name].setVal(value)
       if self._ownedRDS:
         self._rds.add(self._obsSet)  
 

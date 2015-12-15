@@ -1116,3 +1116,32 @@ def subjets(event):
   #redifine the subjet flavour using hadron (default flavour definition can be wrong as can match one parton to several jets)
   if not event.object().event().eventAuxiliary().isRealData() : hadronFlavour(event.genParticles, subjets)
   return subjets
+
+def jetMult(event, btagging="CSV", WP=["M","L"], prejets=""):
+  goodJets = getattr(event, "good"+prejets+"Jets_all")
+  nJets = 0
+  nBjetsHE = 0
+  nBjetsHP = 0
+  nBjetsHEHP = 0
+  for index,jet in enumerate(getattr(event,prejets+"jets")):
+    if goodJets[index]:
+      nJets += 1
+      HE = isBJet(jet,WP[1],btagging)
+      HP = isBJet(jet,WP[0],btagging)
+      if HE: nBjetsHE += 1
+      if HP: nBjetsHP += 1
+      if HE and HP: nBjetsHEHP +=1
+  if nJets>1:
+    dijet = getattr(event, "di"+prejets+"jet_all")
+    j1 = ROOT.TLorentzVector(dijet[0].px(),dijet[0].py(),dijet[0].pz(),dijet[0].energy())
+    j2 = ROOT.TLorentzVector(dijet[1].px(),dijet[1].py(),dijet[1].pz(),dijet[1].energy())
+    dr = j1.DeltaR(j2)
+  else : dr = -1      
+  jetInfo = {
+    "nj" : nJets,
+    "nbHE" : nBjetsHE,
+    "nbHP" : nBjetsHP,
+    "nbHEHP" : nBjetsHEHP,
+    "drj1j2" : dr
+    }
+  return jetInfo

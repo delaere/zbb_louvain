@@ -18,30 +18,16 @@ channels = [ "Muon" ]
 
 categories = [ 
 
-  "Trigger", #0
+  "Trigger -- no matching", #0
   #signal
-  "ll + 1b (HP) + 1j", #1
-  "ll + 1b (HP) + 1j + 20 < Mll < 70 GeV + METSIG < 6", #2
-  #backgrounds
-  "ll + 1b (HP) + 1j + 20 < Mll < 70 GeV + METSIG > 10.", #3
-  "ll + 1b (HP) + 1j + 10 < Mll < 120 GeV + METSIG < 6", #4
-  #optimized signal
-  #40 GeV
-  "ll + 1b (HP) + 1j + 30 < Mll < 50 GeV + METSIG < 6 vOld", #5
-  #50 GeV
-  "ll + 1b (HP) + 1j + 40 < Mll < 60 GeV + METSIG < 6 vOld", #6
-  #60 GeV
-  "ll + 1b (HP) + 1j + 50 < Mll < 70 GeV + METSIG < 6 vOld", #7
-  #20 GeV
-  "ll + 1b (HP) + 1j + 10 < Mll < 30 GeV + METSIG < 6 ", #8
-  #30 GeV
-  "ll + 1b (HP) + 1j + 20 < Mll < 40 GeV + METSIG < 6 ", #9
-  #40 GeV
-  "ll + 1b (HP) + 1j + 30 < Mll < 50 GeV + METSIG < 6 vNew", #10
-  #50 GeV
-  "ll + 1b (HP) + 1j + 40 < Mll < 60 GeV + METSIG < 6 vNew", #11
-  #60 GeV
-  "ll + 1b (HP) + 1j + 50 < Mll < 70 GeV + METSIG < 6 vNew", #12
+  "Trigger no match + 2mu", #1
+  "Trigger no match + 2mu + HLT match", #2
+  "Trigger no match + 2mu + HLT match + >1j", #3
+  "Trigger no match + 2mu + HLT match + >1j + >= 1b (HP)", #4
+  "Trigger no match + 2mu + HLT match + >1j + >= 1b (HP) + MetSig < 6", #5
+  "Trigger no match + 2mu + HLT match + >1j + >= 1b (HP) + MetSig < 6 + [20,70]", #6
+  "Trigger no match + 2mu + HLT match + >1j + >= 1b (HP) + MetSig < 6 + [10,120]", #7
+  "Trigger no match + 2mu + HLT match + >1j + >= 1b (HP) + MetSig > 10 + [20,70]", #8
 ]
 
 categoryNames = [ chan+"/"+cat for chan in channels for cat in categories ]
@@ -51,66 +37,33 @@ def isInCategory(category, categoryTuple):
 
 def isInCategoryChannel(category, categoryTuple):
   """Check if the event enters category X, given the tuple computed by eventCategory."""
-  # category 0: Trigger
+  # category 0: Trigger -- no matching
   if category==0:
     return categoryTuple[0]==1
-  # caregory 1: 2 muons + 2 jets + 1 Loose btag
+  # category 1: dimu HLT `and` dimuon candidte
   elif category==1:
-    cat1 = isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>0 and categoryTuple[3]>1 
-    if (configuration.blindingOpt == 0):
-      return cat1 
-    elif (configuration.blindingOpt == 1):
-      if(configuration.isRealData):
-        return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
-      else:
-        return cat1
-    elif(configuration.blindingOpt == 2):
-      return cat1  and not (abs(categoryTuple[12]) < configuration.mHwindow)
-    elif(configuration.blindingOpt == 3):
-      return cat1  and (abs(categoryTuple[12]) < configuration.mHwindow)
- # category 2: 2 muons + 2 jets + 1 Loose btag + 20 < Mll < 70 GeV + METSIG
+    return (isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1)
+  # category 2: dimu HLT `and` dimuon candidte `and` muons matched with HLT objects
   elif category==2:
-    return isInCategoryChannel(1, categoryTuple) and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu and categoryTuple[7]< 6.
-
- # category 3:mu-mu + 2b (HPHP) + 20 < Mll < 70 GeV + !METSIG
+    return (isInCategoryChannel(1, categoryTuple) and categoryTuple[3]==1)
+  # category 3: dimu HLT `and` dimuon candidte `and` muons matched with HLT objects `and` at least 2 jets
   elif category==3:
-    return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>0 and categoryTuple[3]>1 and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu and categoryTuple[7]>10. and categoryTuple[7]<9999 
-
- # category 4:mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG
+    return (isInCategoryChannel(2, categoryTuple) and categoryTuple[4]>1)
+  # category 4: dimu HLT `and` dimuon candidte `and` muons matched with HLT objects `and` at least 2 jets `and` the highest tag is tight
   elif category==4:
-    return isInCategoryChannel(0, categoryTuple) and categoryTuple[1]==1 and categoryTuple[5]>0 and categoryTuple[3]>1 and categoryTuple[7] <6. and categoryTuple[2] > 10 and categoryTuple[2] < 120
-
-  # category 5: ma = 40 Old, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
+    return (isInCategoryChannel(3, categoryTuple) and categoryTuple[6]>0)
+  # category 5: dimu HLT `and` dimuon candidte `and` muons matched with HLT objects `and` at least 2 jets `and` the highest tag is tight `and` MetSig
   elif category==5:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[0] and categoryTuple[13]>= configuration.mu1ptOpt[0] and categoryTuple[14]>= configuration.mu2ptOpt[0] and categoryTuple[15]>= configuration.jet1ptOpt[0] and categoryTuple[16]>= configuration.jet2ptOpt[0]
-
- # category 6: ma = 50 Old, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
+    return (isInCategoryChannel(4, categoryTuple) and categoryTuple[8]<6)
+  # category 6: dimu HLT `and` dimuon candidte `and` muons matched with HLT objects `and` at least 2 jets `and` the highest tag is tight `and` MetSig `and` mll in [20,70]
   elif category==6:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[1] and categoryTuple[13]>= configuration.mu1ptOpt[1] and categoryTuple[14]>= configuration.mu2ptOpt[1] and categoryTuple[15]>= configuration.jet1ptOpt[1] and categoryTuple[16]>= configuration.jet2ptOpt[1]
-
-  # category 7: ma = 60 Old, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
+    return (isInCategoryChannel(5, categoryTuple) and categoryTuple[2] > configuration.lowmassMu and categoryTuple[2] < configuration.highmassMu)
+  # category 7: DY bkg 5 + mll in [10,120]
   elif category==7:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[2] and categoryTuple[13]>= configuration.mu1ptOpt[2] and categoryTuple[14]>= configuration.mu2ptOpt[2] and categoryTuple[15]>= configuration.jet1ptOpt[2] and categoryTuple[16]>= configuration.jet2ptOpt[2]
-
-  # category 8: ma = 20, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
+    return (isInCategoryChannel(5, categoryTuple) and categoryTuple[2] > 10. and categoryTuple[2] < 120.)
+  # category 8: Tt bkg 4 + mll in [20,70] + MetSig > 10.
   elif category==8:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[3] and categoryTuple[13]>= configuration.mu1ptOpt[3] and categoryTuple[14]>= configuration.mu2ptOpt[3] and categoryTuple[15]>= configuration.jet1ptOpt[3] and categoryTuple[16]>= configuration.jet2ptOpt[3]
-
- # category 9: ma = 30, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
-  elif category==9:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[4] and categoryTuple[13]>= configuration.mu1ptOpt[4] and categoryTuple[14]>= configuration.mu2ptOpt[4] and categoryTuple[15]>= configuration.jet1ptOpt[4] and categoryTuple[16]>= configuration.jet2ptOpt[4]
-
-  # category 10: ma = 40, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
-  elif category==10:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[5] and categoryTuple[13]>= configuration.mu1ptOpt[5] and categoryTuple[14]>= configuration.mu2ptOpt[5] and categoryTuple[15]>= configuration.jet1ptOpt[5] and categoryTuple[16]>= configuration.jet2ptOpt[5]
-
- # category 11: ma = 50, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
-  elif category==11:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[6] and categoryTuple[13]>= configuration.mu1ptOpt[6] and categoryTuple[14]>= configuration.mu2ptOpt[6] and categoryTuple[15]>= configuration.jet1ptOpt[6] and categoryTuple[16]>= configuration.jet2ptOpt[6]
-
-# category 12: ma = 60, mu-mu + 2b (HPHP) + 10 < Mll < 120 GeV + METSIG + mH window
-  elif category==12:
-    return isInCategoryChannel(4, categoryTuple) and categoryTuple[12]< configuration.mHOpt[7] and categoryTuple[13]>= configuration.mu1ptOpt[7] and categoryTuple[14]>= configuration.mu2ptOpt[7] and categoryTuple[15]>= configuration.jet1ptOpt[7] and categoryTuple[16]>= configuration.jet2ptOpt[7]
+    return (isInCategoryChannel(4, categoryTuple) and categoryTuple[2] > 20. and categoryTuple[2] < 70. and categoryTuple[8] > 10)
 
 
 
@@ -133,8 +86,7 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   output = []
   # find the best Z candidate, and make sure it is of the proper type.
   bestDiLeptcandidate = event.bestHambDiMuCandidate
-  #goodJets = event.goodJets_all
-  goodJets = event.goodJets_mu
+  goodJets = event.goodJets_all
   nlept = 0
   higgs = ROOT.TLorentzVector(0,0,0,0)
   mass = -1  
@@ -146,6 +98,7 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
   # output[0]: Trigger Only! No matching
   checkTrigger = event.object().event().eventAuxiliary().isRealData()
   if checkTrigger==False or event.isDiMuTriggerNoMatchOK:
+    #print "MC does not need trigger"
     output.append(1)
   else:
     output.append(0)
@@ -176,7 +129,8 @@ def eventCategoryChannel(event, muChannel=True, btagging="CSV", WP=["M","L"], Zj
     output.append(mass)
 
   #output[3]: triggerMatched with muons
-  if event.isHambDiMuTriggerOK :
+  if checkTrigger==False or event.isHambDiMuTriggerOK :
+    #print "Matching for MC"
     output.append(1)  
   else:
     output.append(0)      

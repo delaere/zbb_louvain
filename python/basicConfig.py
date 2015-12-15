@@ -36,7 +36,7 @@ class configuration:
   btagging = "CSV"
   WP = ["M","L"] # to be ordered from tighter to looser ones: ["M","L"], ["T","L"], ["T","M"]
   muChannel = True
-  eleChannel = True
+  eleChannel =False 
   doMEcontrolPlots = True
   doNNJetRegression = False
   JERfactor = 0. # don't change it, should be 0 on data

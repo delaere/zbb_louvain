@@ -30,7 +30,7 @@ dir_plot = {
 dir_rds = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-  "ajafari": "/home/fynu/ajafari/storage/RDS/VTest2/",
+  "ajafari": "/home/fynu/ajafari/storage/RDS/V4/",
   "bfrancois": "/nfs/user/bfrancois/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
@@ -126,8 +126,8 @@ DATA = "2012"
 PATversion = "5320"
 #PATversion = "ReReco"
 #cpVersion = "V44"
-cpVersion = "V1"
-README = "What you produced... \n"
+cpVersion = ""
+README = "What you produced... \nAll configurations are available in ../config"
 
 stages = "--all"
 #stages = "-l 18,37"
@@ -202,6 +202,10 @@ os.system('mkdir '+dir+string_mode+cpVersion)
 f = open(dir+string_mode+cpVersion+'/README.txt', 'w')
 f.write(README)
 f.close()
+os.system('mkdir '+dir+"/config")
+os.system('cp ../Hamb*.py ../hamb*.py ../basicConfig.py ../ObjectSelection.py ../Objects*.py '+dir+"/config")
+
+
 for sample in samples :
     if sample=="ZH":
         for m in mass:

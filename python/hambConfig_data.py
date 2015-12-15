@@ -50,4 +50,13 @@ class configuration(configuration):
   controlPlots.extend([
     controlPlot("selection", "HambEventSelectionControlPlots", "HambEventSelectionControlPlots", { })
     ])
+  eventProducers = configuration.eventProducers
+  eventProducers.extend([
+    eventProducer("jetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP } ),
+    ])
+  toupdateForBtag = configuration.toupdateForBtag
+  toupdateForBtag = {
+    "eventProducers" : ["jetInfo"]
+    }
+
   configuration.toprint.extend(["leadMuPt", "secMuPt","blindingOpt"])
