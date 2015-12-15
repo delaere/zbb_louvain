@@ -30,7 +30,7 @@ dir_plot = {
 dir_rds = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-  "ajafari": "/home/fynu/ajafari/storage/RDS/V4/",
+  "ajafari": "/home/fynu/ajafari/storage/RDS/SL6/V4/",
   "bfrancois": "/nfs/user/bfrancois/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
@@ -41,17 +41,25 @@ dir_rds = {
         
 samples = [
     #"DATA",
-    #"DY",
-    #"TT",
+    "DY",
+    "TT",
     #"ZZ",
-    #"ZH",
+    ##"ZH",
     #"WW",
     #"WZ",
     #"SingleT",
-    #"ZA"
+    ##"ZA"
     "Hamb"
     ]
-
+ZZsamples = [
+    "ZZ",
+    ]
+WZsamples = [
+    "WZ",
+    ]
+WWsamples = [
+    "WW",
+    ]
 ZAsamples = [
     "ZA_350_15",
     "ZA_350_30",
@@ -82,14 +90,14 @@ DYsamples = [
     #"DY2jets",
     #"DY3jets",
     #"DY4jets",
-    "DYjets_Pt50to70",
-    "DYjets_Pt70to100",
-    "DYjets_Pt100",
-    "DYjets_Pt180",
-    "DYjets_HT200to400",
-    "DYjets_HT400",
+    #"DYjets_Pt50to70",
+    #"DYjets_Pt70to100",
+    #"DYjets_Pt100",
+    #"DYjets_Pt180",
+    #"DYjets_HT200to400",
+    #"DYjets_HT400",
     #"Zbb",
-    #"DYjets_M10to50",
+    "DYjets_M10to50",
     #"DYjets_aMCatNLO",
     ]
 
@@ -102,13 +110,14 @@ if mode == "plots":
         ]
 
 TTsamples = [
-    #"TTjets",
     "TTFullLept",
-    "TTSemiLept",
-    #"TTHadronic"
+    #"TTSemiLept",
     ]
 Hambsamples = [
-   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-30_LowJetPt10"
+   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-30_LowJetPt10",
+   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-40_LowJetPt10",
+   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-50_LowJetPt10",
+   "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-60_LowJetPt10",
 ]
 mass = [125] #[110,115,120,125,130,135]
 
@@ -189,6 +198,9 @@ jobs = {
     "DYjets_M10to50" : 100,
     "DYjets_aMCatNLO" : 300,
     "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-30_LowJetPt10" : 50,
+    "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-40_LowJetPt10" : 50,
+    "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-50_LowJetPt10" : 50,
+    "H2ToH1H1_H1To2Mu2B_mH2-125_mH1-60_LowJetPt10" : 50,
     }
 
 if mode == "plots":
