@@ -30,7 +30,8 @@ class MuonsControlPlots(BaseControlPlots):
       self.add("muonMatches","Muon matched segments",10,0,10)
       self.add("muonMHits","Muon muon hits",100,0,100)
       self.add("muondb","muon dB",100,0,0.05)
-      self.add("nmu","muon count",5,0,5)
+      self.add("nmuL","muon count low pt",5,0,5)
+      self.add("nmuH","muon count high pt",5,0,5)
       self.muonType = muonType
       self.muonList = muonList
     
@@ -50,11 +51,11 @@ class MuonsControlPlots(BaseControlPlots):
       result["muonMatches"]     = [ ]
       result["muonMHits"]       = [ ]
       result["muondb"]          = [ ]
-      nmu = 0
+      nmuH = 0
+      nmuL = 0
       for muon in getattr(event, self.muonList):
         # for muons:
         if muon.pt()<8. : continue
-        
         chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt
         chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt  
         neutralHadronIso  = muon.pfIsolationR04().sumNeutralHadronEt
@@ -86,9 +87,12 @@ class MuonsControlPlots(BaseControlPlots):
         result["muonEta"].append(abs(muon.eta()))
         result["muonEtapm"].append(muon.eta())
         result["muonMatches"].append(muon.numberOfMatches())
-        if isGoodMuon(muon,self.muonType) : nmu += 1
+        if isGoodMuon(muon,self.muonType,8.,2.4) : nmuL += 1
+        if isGoodMuon(muon,self.muonType,17.,2.4) : nmuH += 1
+        #if isGoodMuon(muon,self.muonType) : nmu += 1
         result["muondb"].append(abs(muon.dB()))
-      result["nmu"] = nmu
+      result["nmuH"] = nmuH
+      result["nmuL"] = nmuL
       return result
 
 class ElectronsControlPlots(BaseControlPlots):

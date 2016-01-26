@@ -48,8 +48,12 @@ class configuration(configuration):
   #Add inclusive selection plots
   controlPlots = configuration.controlPlots
   controlPlots.extend([
+    controlPlot("tightmuons", "ObjectsControlPlots", "MuonsControlPlots", { "muonType":"tight" }),
     controlPlot("selection", "HambEventSelectionControlPlots", "HambEventSelectionControlPlots", { })
     ])
+  controlPlots.remove( controlPlot("allMets", "ObjectsControlPlots", "MetControlPlots", { }))
+  controlPlots.remove( controlPlot("vertexAssociation", "VertexAssociationControlPlots", "VertexAssociationControlPlots", { }))
+  controlPlots.remove( controlPlot("me", "MatrixElementControlPlots", "MatrixElementControlPlots", { }))
   eventProducers = configuration.eventProducers
   eventProducers.extend([
     eventProducer("jetInfo", "ObjectSelection", "jetMult", { "btagging":btagging,"WP":WP } ),

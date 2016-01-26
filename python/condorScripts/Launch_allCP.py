@@ -30,7 +30,7 @@ dir_plot = {
 dir_rds = {
   "abdollah": "",
   "acaudron": "/nfs/user/acaudron/ControlPlots/cp5314p1/",
-  "ajafari": "/home/fynu/ajafari/storage/RDS/SL6/V4/",
+  "ajafari": "/home/fynu/ajafari/storage/RDS/SL6/V4MuMult/",
   "bfrancois": "/nfs/user/bfrancois/RDS/",
   "cbeluffi": "/home/fynu/cbeluffi/storage/ControlPlots/",
   "vizangarciaj": "/home/fynu/vizangarciaj/storage/RDS/testOct2014/",
